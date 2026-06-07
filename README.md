@@ -23,7 +23,9 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://mysql.com)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.x-7952B3?style=flat-square&logo=bootstrap&logoColor=white)](https://getbootstrap.com)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=flat-square)](https://ecashbook.in)
-[![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square&logo=shield)](https://github.com/Astarand/E-Cashbook)
+[![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square&logo=shield)](https://github.com/Astarand/Ecashbook)
+
+> 💡 **E-Cashbook™** is an intelligent accounting and GST management platform built with Laravel 10 & PHP 8.1. Tailored for CAs, tax professionals, and small businesses, it features invoicing, multi-client management, payroll processing, asset tracking, and real-time financial reporting.
 
 ---
 
@@ -375,6 +377,18 @@ _Chartered Accountants • Tax Professionals • Small Businesses_
 
 ---
 
+## 🔮 **Future Roadmap**
+
+We are committed to continuously improving **E-Cashbook™**. Here are some of the key features planned for our upcoming releases:
+
+- 🏦 **Automated Bank Reconciliation**: Upload bank statements (CSV/Excel) to automatically match and reconcile transactions with ledgers.
+- 🤖 **AI-Powered Receipt OCR Scanner**: Instantly extract invoice details (vendor, date, amount, tax) from receipt photos using OCR.
+- ⏰ **Smart Payment Reminders**: Automated email and SMS reminders with payment links for clients with outstanding invoices.
+- 💵 **Multi-Currency Support**: Full support for international clients, enabling invoicing and transactions in multiple currencies.
+- 📋 **Auto GST Return Drafts**: One-click GSTR-1 and GSTR-3B draft JSON generation based on sales and purchase history for seamless tax filing.
+
+---
+
 ## 🚀 **Installation**
 
 <div align="center">
@@ -422,8 +436,8 @@ Latest version
 <summary><strong>📥 1. Clone Repository</strong></summary>
 
 ```bash
-git clone https://github.com/Astarand/E-Cashbook.git
-cd E-Cashbook
+git clone https://github.com/Astarand/Ecashbook.git
+cd Ecashbook
 ```
 
 </details>
@@ -553,7 +567,7 @@ php artisan storage:link
 
 ### 📊 **Dashboard Overview**
 
-![Dashboard](https://raw.githubusercontent.com/Astarand/E-Cashbook/main/public/assets/images/screenshots/dashboard.png)
+![Dashboard](https://raw.githubusercontent.com/Astarand/Ecashbook/main/public/assets/images/screenshots/dashboard.png)
 
 </td>
 </tr>
@@ -562,7 +576,7 @@ php artisan storage:link
 
 ### 📄 **Invoice Management**
 
-![Invoice Management](https://raw.githubusercontent.com/Astarand/E-Cashbook/main/public/assets/images/screenshots/invoice-management.png)
+![Invoice Management](https://raw.githubusercontent.com/Astarand/Ecashbook/main/public/assets/images/screenshots/invoice-management.png)
 
 </td>
 </tr>
@@ -571,7 +585,7 @@ php artisan storage:link
 
 ### 📈 **Financial Reports**
 
-![Reports](https://raw.githubusercontent.com/Astarand/E-Cashbook/main/public/assets/images/screenshots/financial-reports.png)
+![Reports](https://raw.githubusercontent.com/Astarand/Ecashbook/main/public/assets/images/screenshots/financial-reports.png)
 
 </td>
 </tr>
@@ -696,9 +710,9 @@ E-Cashbook/
 
 ![Development](https://img.shields.io/badge/Channel-Development-green?style=flat-square)
 
-📂 **Repository**: [GitHub](https://github.com/Astarand/E-Cashbook)  
+📂 **Repository**: [GitHub](https://github.com/Astarand/Ecashbook)  
 👨‍💻 **Developer**: [Astarand](https://github.com/Astarand)  
-🐛 **Issues**: [GitHub Issues](https://github.com/Astarand/E-Cashbook/issues) _(Authorized users only)_
+🐛 **Issues**: [GitHub Issues](https://github.com/Astarand/Ecashbook/issues) _(Authorized users only)_
 
 </td>
 </tr>
@@ -756,9 +770,9 @@ treaties, as well as other intellectual property laws and treaties.
 
 ### 📊 **Repository Statistics**
 
-[![GitHub stars](https://img.shields.io/github/stars/Astarand/E-Cashbook?style=for-the-badge&logo=github&color=yellow)](https://github.com/Astarand/E-Cashbook/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/Astarand/E-Cashbook?style=for-the-badge&logo=github&color=blue)](https://github.com/Astarand/E-Cashbook/network)
-[![GitHub issues](https://img.shields.io/github/issues/Astarand/E-Cashbook?style=for-the-badge&logo=github&color=red)](https://github.com/Astarand/E-Cashbook/issues)
+[![GitHub stars](https://img.shields.io/github/stars/Astarand/Ecashbook?style=for-the-badge&logo=github&color=yellow)](https://github.com/Astarand/Ecashbook/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Astarand/Ecashbook?style=for-the-badge&logo=github&color=blue)](https://github.com/Astarand/Ecashbook/network)
+[![GitHub issues](https://img.shields.io/github/issues/Astarand/Ecashbook?style=for-the-badge&logo=github&color=red)](https://github.com/Astarand/Ecashbook/issues)
 
 ---
 
