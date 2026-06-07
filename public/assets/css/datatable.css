@@ -1,0 +1,472 @@
+/* Custom DataTable Styles */
+.datatable-wrapper.no-header .datatable-container {
+    border-top: 1px solid #d9d9d9;
+}
+
+.datatable-wrapper.no-footer .datatable-container {
+    border-bottom: none;
+}
+
+.datatable-top,
+.datatable-bottom {
+    padding: 8px 10px;
+}
+
+.datatable-top>nav:first-child,
+.datatable-top>div:first-child,
+.datatable-bottom>nav:first-child,
+.datatable-bottom>div:first-child {
+    float: left;
+}
+
+.datatable-top>nav:last-child,
+.datatable-top>div:not(first-child),
+.datatable-bottom>nav:last-child,
+.datatable-bottom>div:last-child {
+    float: right;
+}
+
+.datatable-selector {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.datatable-input {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.datatable-info {
+    margin: 7px 0;
+}
+
+/* PAGER */
+.datatable-pagination ul {
+    margin: 0;
+    padding-left: 0;
+}
+
+.datatable-pagination li {
+    list-style: none;
+    float: left;
+}
+
+.datatable-pagination li.datatable-hidden {
+    visibility: hidden;
+}
+
+.datatable-pagination a,
+.datatable-pagination button {
+    border: 1px solid transparent;
+    float: left;
+    margin-left: 2px;
+    padding: 6px 12px;
+    position: relative;
+    text-decoration: none;
+    color: #333;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.datatable-pagination a:hover,
+.datatable-pagination button:hover {
+    background-color: #f5f5f5;
+    border-color: #ddd;
+}
+
+.datatable-pagination .datatable-active a,
+.datatable-pagination .datatable-active a:focus,
+.datatable-pagination .datatable-active a:hover,
+.datatable-pagination .datatable-active button,
+.datatable-pagination .datatable-active button:focus,
+.datatable-pagination .datatable-active button:hover,
+.datatable-pagination .active a,
+.datatable-pagination .active a:focus,
+.datatable-pagination .active a:hover,
+.datatable-pagination .active button,
+.datatable-pagination .active button:focus,
+.datatable-pagination .active button:hover {
+    background-color: #422f90;
+    border-color: #422f90;
+    color: white;
+    cursor: default;
+}
+
+.datatable-pagination .datatable-ellipsis a,
+.datatable-pagination .datatable-disabled a,
+.datatable-pagination .datatable-disabled a:focus,
+.datatable-pagination .datatable-disabled a:hover,
+.datatable-pagination .datatable-ellipsis button,
+.datatable-pagination .datatable-disabled button,
+.datatable-pagination .datatable-disabled button:focus,
+.datatable-pagination .datatable-disabled button:hover {
+    pointer-events: none;
+    cursor: default;
+}
+
+.datatable-pagination .datatable-disabled a,
+.datatable-pagination .datatable-disabled a:focus,
+.datatable-pagination .datatable-disabled a:hover,
+.datatable-pagination .datatable-disabled button,
+.datatable-pagination .datatable-disabled button:focus,
+.datatable-pagination .datatable-disabled button:hover {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.datatable-pagination .datatable-pagination a,
+.datatable-pagination .datatable-pagination button {
+    font-weight: bold;
+}
+
+/* TABLE */
+.datatable-table {
+    max-width: 100%;
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: separate;
+}
+
+.datatable-table>tbody>tr>td,
+.datatable-table>tbody>tr>th,
+.datatable-table>tfoot>tr>td,
+.datatable-table>tfoot>tr>th,
+.datatable-table>thead>tr>td,
+.datatable-table>thead>tr>th {
+    vertical-align: top;
+    padding: 8px 10px;
+}
+
+.datatable-table>thead>tr>th {
+    vertical-align: bottom;
+    text-align: left;
+    border-bottom: 1px solid #d9d9d9;
+    font-weight: 600;
+    background-color: #f8f9fa;
+}
+
+.datatable-table>tfoot>tr>th {
+    vertical-align: bottom;
+    text-align: left;
+    border-top: 1px solid #d9d9d9;
+}
+
+.datatable-table th {
+    vertical-align: bottom;
+    text-align: left;
+}
+
+.datatable-table th a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.datatable-table th button,
+.datatable-pagination-list button {
+    color: inherit;
+    border: 0;
+    background-color: inherit;
+    cursor: pointer;
+    text-align: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+}
+
+.datatable-sorter,
+.datatable-filter {
+    display: inline-block;
+    height: 100%;
+    position: relative;
+    width: 100%;
+}
+
+.datatable-sorter::before,
+.datatable-sorter::after {
+    content: "";
+    height: 0;
+    width: 0;
+    position: absolute;
+    right: 4px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    opacity: 0.2;
+}
+
+.datatable-sorter::before {
+    border-top: 4px solid #000;
+    bottom: 0px;
+}
+
+.datatable-sorter::after {
+    border-bottom: 4px solid #000;
+    border-top: 4px solid transparent;
+    top: 0px;
+}
+
+.datatable-ascending .datatable-sorter::after,
+.datatable-descending .datatable-sorter::before,
+.datatable-ascending .datatable-filter::after,
+.datatable-descending .datatable-filter::before {
+    opacity: 0.6;
+}
+
+.datatable-filter::before {
+    content: "";
+    position: absolute;
+    right: 4px;
+    opacity: 0.2;
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-radius: 50%;
+    border-top: 10px solid #000;
+    top: 25%;
+}
+
+.datatable-filter-active .datatable-filter::before {
+    opacity: 0.6;
+}
+
+.datatable-empty {
+    text-align: center;
+    padding: 20px 0;
+    font-style: italic;
+    color: #888;
+}
+
+.datatable-top::after,
+.datatable-bottom::after {
+    clear: both;
+    content: " ";
+    display: table;
+}
+
+table.datatable-table:focus tr.datatable-cursor>td:first-child {
+    border-left: 3px #7a65cd solid;
+}
+
+table.datatable-table:focus {
+    outline: solid 1px #7a65cd;
+    outline-offset: -1px;
+}
+
+/* Custom styles for #pc-dt-simple */
+#pc-dt-simple {
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    border-bottom: none;
+}
+
+#pc-dt-simple thead {
+    padding: 5px;
+}
+
+#pc-dt-simple thead th {
+    background-color: #f5f7fb;
+    color: #4b4b4b;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    padding: 17px 15px;
+    border-top: none;
+}
+
+#pc-dt-simple tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+#pc-dt-simple tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+#pc-dt-simple tbody td {
+    padding: 12px 15px;
+    border-top: 1px solid #eeeeee;
+    vertical-align: middle;
+}
+
+/* Custom pagination styling */
+#pc-dt-simple+.datatable-bottom .datatable-pagination button {
+    border-radius: 4px;
+    margin: 0 2px;
+}
+
+#pc-dt-simple+.datatable-bottom .datatable-pagination .datatable-active a,
+#pc-dt-simple+.datatable-bottom .datatable-pagination .datatable-active button,
+#pc-dt-simple+.datatable-bottom .datatable-pagination .active a,
+#pc-dt-simple+.datatable-bottom .datatable-pagination .active button {
+    background-color: #422f90;
+    border-color: #422f90;
+    color: white;
+}
+
+/* Remove border above the entries info */
+#pc-dt-simple+.datatable-bottom {
+    border-top: none;
+    margin-top: 0;
+    box-shadow: none;
+}
+
+#pc-dt-simple+.datatable-bottom .datatable-info {
+    border-top: none;
+    margin-top: 10px;
+}
+
+/* Custom search styling to match form-search design */
+.datatable-top .datatable-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    float: none;
+    margin-left: 0;
+    margin-right: auto;
+    max-width: 250px;
+    width: 100%;
+}
+
+.datatable-top .datatable-search .icon-search {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 1;
+    font-size: 16px;
+}
+
+.datatable-top .datatable-search .datatable-input,
+.datatable-top .datatable-search input[type="search"] {
+    padding: 6px 12px 6px 40px !important;
+    border: 1px solid #e4e7eb !important;
+    border-radius: 4px !important;
+    background-color: #fff !important;
+    height: 38px !important;
+    width: 100% !important;
+    font-size: 14px !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Custom buttons in top-right */
+.datatable-top .datatable-custom-buttons {
+    display: flex;
+    margin-left: auto;
+}
+
+/* Adjust bottom layout for selector and info */
+.datatable-bottom {
+    padding-top: 10px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+/* Style selector in bottom */
+.datatable-bottom .datatable-selector-wrapper {
+    order: 1 !important;
+    margin-bottom: 10px !important;
+    float: left !important;
+    clear: left !important;
+}
+
+/* Style info */
+.datatable-bottom .datatable-info {
+    order: 2 !important;
+    clear: left !important;
+    float: left !important;
+    margin-top: 5px !important;
+    padding-top: 10px !important;
+}
+
+/* Style pagination */
+.datatable-bottom .datatable-pagination {
+    order: 3 !important;
+    float: right !important;
+    margin-top: 10px !important;
+    padding-top: 10px !important;
+}
+
+/* Focus state for the search box */
+.datatable-top .datatable-search input:focus {
+    border-color: #7a65cd;
+    box-shadow: 0 0 0 0.15rem rgba(122, 101, 205, 0.15);
+}
+
+/* Hide default pseudo-elements since we're using actual elements */
+.datatable-top .datatable-search::before,
+.datatable-top .datatable-search::after {
+    content: none;
+    display: none;
+}
+
+/* Custom selector styling */
+#pc-dt-simple+.datatable-top .datatable-selector {
+    border: 1px solid #e4e7eb;
+    border-radius: 4px;
+    padding: 5px 10px;
+    background-color: #fff;
+}
+
+#pc-dt-simple+.datatable-container {
+    border-bottom: none;
+}
+
+/* Make sure top bar items are properly aligned */
+.datatable-top {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+/* Position search and buttons at right */
+.datatable-top .datatable-search-and-buttons {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-left: auto !important;
+    padding-right: 0 !important;
+}
+
+/* Position search at top right next to buttons */
+.datatable-top .datatable-search {
+    float: none !important;
+    margin: 0 !important;
+    max-width: 180px !important;
+}
+
+/* Position buttons at top right */
+.datatable-top .datatable-custom-buttons {
+    display: flex !important;
+    margin: 0 !important;
+}
+
+/* Style the buttons */
+.datatable-top .datatable-custom-buttons .btn {
+    height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 4px !important;
+    min-width: 38px !important;
+}
+
+/* Ensure proper alignment for the bottom row elements */
+.datatable-bottom:after {
+    display: none !important;
+}
+
+/* Style pagination active state */
+.datatable-pagination .datatable-active a,
+.datatable-pagination .datatable-active button,
+.datatable-pagination .active a,
+.datatable-pagination .active button {
+    background-color: #422f90 !important;
+    border-color: #422f90 !important;
+    color: white !important;
+}
