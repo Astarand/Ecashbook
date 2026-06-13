@@ -16,7 +16,7 @@
                 <div class="col-md-8">
                     <div class="page-header-title">
                         <h2 class="mb-0">
-							@if(Auth::user()->u_type == 2)
+							@if(Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
 								Support Tickets
 							@else
 								Customer Support Tickets
@@ -24,7 +24,7 @@
 						</h2>
                     </div>
                 </div>
-				@if(Auth::user()->u_type == 2)
+				@if(Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
 				<div class="col-md-4 text-end">
                     <button type="button" class="btn btn-primary" id="openModal">Create Ticket</button>
                 </div>

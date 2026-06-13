@@ -7,22 +7,25 @@
 <!-- [ breadcrumb ] start -->
         <div class="page-header">
             <div class="page-block">
-                <div class="row align-items-center">
-                    <div class="col-md-12">
-                        <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
-                            <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('user.VendorList') }}">Vendors & Payables</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Edit Vendor</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="page-header-title">
-                            <h2 class="mb-0">Edit Vendor</h2>
-                        </div>
+            <div class="row align-items-center">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
+                        <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('user.VendorList') }}">Vendors & Payables</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Vendor</li>
+                    </ul>
+                    <a href="javascript:void(0);" id="start-edit-vendor-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
+                <div class="col-md-12 mt-2">
+                    <div class="page-header-title">
+                        <h2 class="mb-0">Edit Vendor</h2>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
         <!-- [ breadcrumb ] end -->
@@ -1063,5 +1066,88 @@
 		this.value = value.substring(0, 10);
 	});
 
+    function startEditVendorTour() {
+        if (typeof introJs !== 'function') return;
+
+        let tour = introJs().setOptions({
+            steps: [
+                {
+                    title: 'Edit Vendor Wizard Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-edit" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Modify existing vendor registration details, update billing/shipping addresses, and manage banking info.</p></div>'
+                },
+                {
+                    element: 'a[href="#basicDetail"]',
+                    title: 'Personal Details Tab',
+                    intro: 'This tab holds the vendor\'s company profile, PAN, contact information, and GST status.'
+                },
+                {
+                    element: '#vendor_name',
+                    title: 'Company Name',
+                    intro: 'Enter the official name of the vendor company or supplier.'
+                },
+                {
+                    element: '#gst_reg',
+                    title: 'GST Status',
+                    intro: 'Indicate whether the vendor is GST registered. Selecting "Yes" opens additional fields to fetch GST details automatically.'
+                },
+                {
+                    element: 'a[href="#billingDetails"]',
+                    title: 'Billing Details Tab',
+                    intro: 'This tab is where you enter the billing and shipping addresses.'
+                },
+                {
+                    element: '#vendor_bill_addone',
+                    title: 'Billing Address',
+                    intro: 'Fill in the vendor\'s primary billing address, state, city, and zip code.'
+                },
+                {
+                    element: 'a[href="#bankDetails"]',
+                    title: 'Bank Details Tab',
+                    intro: 'Register and manage bank account info, IFSC codes, and UPI IDs for this vendor.'
+                },
+                {
+                    element: '#nxtBtnVThree',
+                    title: 'Save Vendor Changes',
+                    intro: 'After updating the details, click this button to submit and save the changes.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        });
+
+        tour.onbeforechange(function(targetElement) {
+            if (!targetElement) return;
+
+            // Find the closest tab-pane containing the target element
+            let tabPane = targetElement.closest('.tab-pane');
+            if (tabPane) {
+                let tabId = tabPane.getAttribute('id');
+                let tabTrigger = document.querySelector(`a[href="#${tabId}"]`);
+                if (tabTrigger && !tabTrigger.classList.contains('active')) {
+                    let tab = new bootstrap.Tab(tabTrigger);
+                    tab.show();
+                }
+            } else if (targetElement.getAttribute('href') && targetElement.getAttribute('data-bs-toggle') === 'tab') {
+                // If the target element is the tab trigger itself
+                let tab = new bootstrap.Tab(targetElement);
+                tab.show();
+            }
+        });
+
+        tour.start();
+    }
+
+    $(document).ready(function() {
+        $('#start-edit-vendor-tour').on('click', function(e) {
+            e.preventDefault();
+            startEditVendorTour();
+        });
+    });
     </script>
 @endsection

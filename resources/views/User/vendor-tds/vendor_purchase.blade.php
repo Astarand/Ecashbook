@@ -8,13 +8,16 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Purchase & Procurement</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Vendor Report</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-vendor-report-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -127,9 +130,53 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('page-script')
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
+    function startVendorReportTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Vendor TDS & Purchase Reports',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-report" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Track annual vendor purchase volumes, calculate TDS applicability, rates, and amounts dynamically.</p></div>'
+                },
+                {
+                    element: '#filterForm',
+                    title: 'Date Filters',
+                    intro: 'Set the date range boundaries and click filter to generate the vendor report details.'
+                },
+                {
+                    element: '#resultTable',
+                    title: 'Calculated Results',
+                    intro: 'Review summary records showing vendor names, PAN codes, total purchase amount, TDS rates, calculated tax, and applicability flags.'
+                },
+                {
+                    element: '.text-end.mt-3 button',
+                    title: 'Download PDF',
+                    intro: 'Click here to save the filtered report records as a formal PDF document.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-vendor-report-tour').on('click', function(e) {
+            e.preventDefault();
+            startVendorReportTour();
+        });
+    });
 	function numberFormat(value, decimals = 2) {
 		return Number(value || 0).toLocaleString('en-IN', {
 			minimumFractionDigits: decimals,

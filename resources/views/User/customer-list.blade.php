@@ -10,22 +10,25 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/customer-list') }}">Customer & Receivables</a></li>
                         <li class="breadcrumb-item" aria-current="page">Customer & Receivables List</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-customer-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-5 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Customer & Receivables List</h2>
                     </div>
                 </div>
-                <div class="col-md-7 text-end">
-                    <a href="{{ route('user.AddCustomer') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Customer / Buyer</a>
+                <div class="col-md-7 text-end mt-2">
+                    <a href="{{ route('user.AddCustomer') }}" class="btn btn-primary" id="add-customer-btn"><i class="ti ti-square-plus"></i> Add New Customer / Buyer</a>
                 </div>
             </div>
         </div>
@@ -36,7 +39,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card" id="customer-table-card">
                 <div class="table-responsive">
                     <table class="table tbl-product my-3" id="pc-dt-simple">
                         <thead>
@@ -192,7 +195,9 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('page-script')
 <script>
     let deleteId = null; // Store the ID of the customer to be deleted
 
@@ -298,6 +303,49 @@
             });
         });
     });
-</script>
 
+    function startCustomerTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Customer Directory Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-users" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage your active customer directory, track their total invoices, and control account status.</p></div>'
+                },
+                {
+                    element: '#add-customer-btn',
+                    title: 'Add New Customer',
+                    intro: 'Click here to create a new customer profile, complete with GST status, billing/shipping address, and bank accounts.'
+                },
+                {
+                    element: '#customer-table-card',
+                    title: 'Customer Database',
+                    intro: 'Review your registered customer details, including unique Customer IDs, contact info, total invoices generated, and current status (Active/Deactive).'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Action Controls',
+                    intro: 'Perform quick actions on each customer, such as View details, Edit profile, or toggle active/inactive status.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            skipIfNoElement: true,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-customer-tour').on('click', function(e) {
+            e.preventDefault();
+            startCustomerTour();
+        });
+    });
+</script>
 @endsection

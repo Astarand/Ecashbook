@@ -5,21 +5,24 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
                         <li class="breadcrumb-item"><a href="#">HR, Payroll & Attendance</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Leave Management</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-leave-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Leave Management</h2>
                     </div>
                 </div>
-                <div class="col-md-8 text-end">
-                    <a href="#" class="btn btn-primary" data-bs-toggle="modal"
+                <div class="col-md-8 text-end mt-2">
+                    <a href="#" class="btn btn-primary" id="add-leave-btn" data-bs-toggle="modal"
                         data-bs-target="#addLeaveModal"><i class="ti ti-square-plus"></i> Add Leave Request</a>
                 </div>
             </div>
@@ -28,7 +31,7 @@
     <!-- [ breadcrumb ] end -->
 
     <!-- [ Main Content ] start -->
-    <div class="row">
+    <div class="row" id="leave-stats-row">
         <!-- Statistics Cards -->
         <div class="col-md-12 col-xxl-3">
             <div class="card statistics-card-1">
@@ -95,7 +98,7 @@
     <!-- Leave Management Table -->
     <div class="row">
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card" id="leave-table-card">
                 <div class="table-responsive">
                     <table class="table tbl-product my-3" id="pc-dt-simple">
                         <thead class="table-light">
@@ -388,6 +391,9 @@
 </div>
 
 
+@endsection
+
+@section('page-script')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('leaveformadd');
@@ -1148,6 +1154,53 @@
             showToast('An error occurred while deleting leave request', 'error');
         });
     }
-</script>
 
+    function startLeaveTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Leave Management Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-calendar" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Submit and manage leave applications, check approval states, and review statistics.</p></div>'
+                },
+                {
+                    element: '#leave-stats-row',
+                    title: 'Leave Stats Panel',
+                    intro: 'Monitor your organisation\'s overall metrics: Total leaves, Pending approvals, Approved status, and Rejected requests.'
+                },
+                {
+                    element: '#add-leave-btn',
+                    title: 'Apply For Leave',
+                    intro: 'Click here to open the Leave Application form. Choose the employee, leave type, select single/multiple days, and provide a reason.'
+                },
+                {
+                    element: '#leave-table-card',
+                    title: 'Leave Logs',
+                    intro: 'Review leave history table including start/end dates, total day calculations, leave reason, and status badges.'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Review Controls',
+                    intro: 'Approve or Reject pending requests directly from here, view detailed comments, or delete applications.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-leave-tour').on('click', function(e) {
+            e.preventDefault();
+            startLeaveTour();
+        });
+    });
+</script>
 @endsection

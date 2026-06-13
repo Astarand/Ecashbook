@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; 
 
 use App\Models\Sales;
 use App\Models\Customers;
@@ -12,7 +13,7 @@ use App\Models\Carriageout;
 use App\Models\Vouchers;
 
 use Redirect;
-use DB;
+// use DB;
 use Auth;
 use Validator;
 use App\User;
@@ -67,9 +68,11 @@ class SalesController extends Controller
 					'sales.inv_name',
 					'sales.inv_date',
 					'sales.mode_of_pay',
+					'sales.due_amount',
 					'sales.other_payment',
 					'sales.pay_status',
 					'sales.status',
+					'sales.signed_pdf_status',
 
 					'company_profiles.comp_name',
 
@@ -105,9 +108,11 @@ class SalesController extends Controller
 					'sales.inv_name',
 					'sales.inv_date',
 					'sales.mode_of_pay',
+					'sales.due_amount',
 					'sales.other_payment',
 					'sales.pay_status',
 					'sales.status',
+					'sales.signed_pdf_status',
 					'company_profiles.comp_name',
 					'proprietorship_profiles.comp_name',
 					'customers.cust_name',
@@ -134,11 +139,13 @@ class SalesController extends Controller
 			$array[$val->id]['prop_name'] = $val->prop_name ?? '';
 			$array[$val->id]['inv_num'] = $val->inv_num;
 			$array[$val->id]['inv_date'] = $val->inv_date;
+			$array[$val->id]['due_amount'] = $val->due_amount;
 			$array[$val->id]['mode_of_pay'] = $val->mode_of_pay;
 			$array[$val->id]['other_payment'] = $val->other_payment;
 			$array[$val->id]['pay_status'] = $val->pay_status;
 			$array[$val->id]['total_amount'] = $val->total_amount;
 			$array[$val->id]['status'] = $val->status;
+			$array[$val->id]['signed_pdf_status'] = $val->signed_pdf_status ?? 0;
 			$array[$val->id]['cust_name'] = $val->cust_name ?? '';
 			$array[$val->id]['cust_phone'] = $val->cust_phone ?? '';
 
@@ -200,11 +207,30 @@ class SalesController extends Controller
 
 		return true;
 	}
+	
+	private function buildPrefix($raw, $financialYear)
+	{
+		$parts = explode('/', trim($raw, '/'));
 
+		// 1. remove ONLY last numeric part
+		if (!empty($parts) && is_numeric(end($parts))) {
+			array_pop($parts);
+		}
+
+		// 2. replace FY ONLY if exists, otherwise DO NOTHING
+		foreach ($parts as $k => $v) {
+			if (preg_match('/^\d{2}-\d{2}$/', $v)) {
+				$parts[$k] = $financialYear;
+				return implode('/', $parts) . '/'; // STOP HERE (IMPORTANT FIX)
+			}
+		}
+
+		// 3. if FY not present, DO NOT INSERT blindly
+		return implode('/', $parts) . '/';
+	}
 	
 	public function generateInvoiceNumber($userId)
 	{
-		// Stop execution if company profile not filled
 		if (!$this->companyInfoFill($userId)) {
 			return redirect()->route('user.CompanyProfile');
 		}
@@ -213,176 +239,103 @@ class SalesController extends Controller
 			->where('userId', $userId)
 			->first(['comp_name', 'comp_inv_digits']);
 
-		if (!$company || empty($company->comp_name)) {
-			return false;
-		}
+		if (!$company) return false;
 
-		/* ===============================
-		   FINANCIAL YEAR (APR–MAR)
-		=============================== */
+		/* FY */
+		$year  = date('Y');
+		$month = date('n');
 
-		$currentMonth = date('n');
-		$currentYear  = date('Y');
+		$fyStart = substr($month >= 4 ? $year : $year - 1, 2);
+		$fyEnd   = substr($month >= 4 ? $year + 1 : $year, 2);
 
-		if ($currentMonth >= 4) {
-			$startYear = substr($currentYear, 2);
-			$endYear   = substr($currentYear + 1, 2);
-		} else {
-			$startYear = substr($currentYear - 1, 2);
-			$endYear   = substr($currentYear, 2);
-		}
+		$financialYear = $fyStart . '-' . $fyEnd;
 
-		$financialYear = $startYear . '-' . $endYear;
+		/* PREFIX */
+		$prefix = !empty($company->comp_inv_digits)
+			? $this->buildPrefix($company->comp_inv_digits, $financialYear)
+			: strtoupper(substr($company->comp_name, 0, 3)) . '/' . $financialYear . '/';
 
-
-		/* ===============================
-		   PREFIX GENERATION
-		=============================== */
-
-		if (!empty($company->comp_inv_digits)) {
-
-			// Example comp_inv_digits: SI/001
-			$basePrefix = trim($company->comp_inv_digits, '/');
-
-			$parts = explode('/', $basePrefix);
-
-			// Insert financial year only if not already present
-			if (!in_array($financialYear, $parts)) {
-				array_splice($parts, 1, 0, $financialYear);
-			}
-
-			$finalPrefix = implode('/', $parts) . '/';
-
-		} else {
-
-			// Default prefix
-			$prefix = strtoupper(substr($company->comp_name, 0, 3));
-			$seriesType = 'SI';
-
-			$finalPrefix = $prefix . '/' . $financialYear . '/' . $seriesType . '/';
-		}
-
-
-		/* ===============================
-		   FETCH LAST NUMBER
-		=============================== */
-
+		/* LAST INVOICE */
 		$lastInvoice = DB::table('sales')
 			->where('added_by', $userId)
-			//->where('inv_num', 'like', $finalPrefix . '%')
+			->where('inv_num', 'like', $prefix . '%')
 			->orderBy('id', 'desc')
 			->value('inv_num');
 
+		$next = 1;
 
 		if ($lastInvoice) {
+			$parts = explode('/', $lastInvoice);
+			$last = end($parts);
 
-			$lastNumber = (int) substr($lastInvoice, strrpos($lastInvoice, '/') + 1);
-			$nextNumber = $lastNumber + 1;
-
-		} else {
-
-			$nextNumber = 1;
+			if (is_numeric($last)) {
+				$next = (int)$last + 1;
+			}
 		}
 
+		return $prefix . str_pad($next, 4, '0', STR_PAD_LEFT);
+	}
 
-		/* ===============================
-		   FINAL INVOICE NUMBER
-		=============================== */
+	public function generateInvoiceNumberProprietorship($id, $userId)
+	{
+		$company = DB::table('proprietorship_profiles')
+			->where('id', $id)
+			->first(['comp_name', 'comp_inv_digits']);
 
-		$increment = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+		if (!$company) return false;
 
-		return $finalPrefix . $increment;
+		/* FY */
+		$year  = date('Y');
+		$month = date('n');
+
+		$fyStart = substr($month >= 4 ? $year : $year - 1, 2);
+		$fyEnd   = substr($month >= 4 ? $year + 1 : $year, 2);
+
+		$financialYear = $fyStart . '-' . $fyEnd;
+
+		/* PREFIX */
+		$prefix = !empty($company->comp_inv_digits)
+			? $this->buildPrefix($company->comp_inv_digits, $financialYear)
+			: strtoupper(substr($company->comp_name, 0, 3)) . '/' . $financialYear . '/';
+
+		/* LAST */
+		$lastInvoice = DB::table('sales')
+			->where('added_by', $userId)
+			->where('propId', $id)
+			->where('inv_num', 'like', $prefix . '%')
+			->orderBy('id', 'desc')
+			->value('inv_num');
+
+		$next = 1;
+
+		if ($lastInvoice) {
+			$parts = explode('/', $lastInvoice);
+			$last = end($parts);
+
+			if (preg_match('/^\d+$/', $last)) {
+				$next = ((int)$last) + 1;
+			}
+		} else {
+			if (!empty($company->comp_inv_digits)) {
+				$baseParts = explode('/', trim($company->comp_inv_digits, '/'));
+				$lastPart = end($baseParts);
+
+				if (preg_match('/^\d+$/', $lastPart)) {
+					$next = ((int)$lastPart) + 1;
+				}
+			}
+		}
+
+		return $prefix . str_pad($next, 4, '0', STR_PAD_LEFT);
 	}
 	
-	public function generateInvoiceNumberProprietorship($id,$userId)
-	{
-
-		$company = DB::table('proprietorship_profiles')
-					->where('id', $id)
-					->first(['comp_name', 'comp_inv_digits']);
-
-		if (!$company || empty($company->comp_name)) {
-			return false;
-		}
-
-		/* ===============================
-		   FINANCIAL YEAR (APR–MAR)
-		=============================== */
-
-		$currentMonth = date('n');
-		$currentYear  = date('Y');
-
-		if ($currentMonth >= 4) {
-			$startYear = substr($currentYear, 2);
-			$endYear   = substr($currentYear + 1, 2);
-		} else {
-			$startYear = substr($currentYear - 1, 2);
-			$endYear   = substr($currentYear, 2);
-		}
-
-		$financialYear = $startYear . '-' . $endYear;
-
-
-		/* ===============================
-		   PREFIX GENERATION
-		=============================== */
-
-		if (!empty($company->comp_inv_digits)) {
-
-			// Example comp_inv_digits: SI/001
-			$basePrefix = trim($company->comp_inv_digits, '/');
-
-			$parts = explode('/', $basePrefix);
-
-			// Insert financial year only if not already present
-			if (!in_array($financialYear, $parts)) {
-				array_splice($parts, 1, 0, $financialYear);
-			}
-
-			$finalPrefix = implode('/', $parts) . '/';
-
-		} else {
-
-			// Default prefix
-			$prefix = strtoupper(substr($company->comp_name, 0, 3));
-			$seriesType = 'SI';
-
-			$finalPrefix = $prefix . '/' . $financialYear . '/' . $seriesType . '/';
-		}
-
-
-		/* ===============================
-		   FETCH LAST NUMBER
-		=============================== */
-
-		$lastInvoice = DB::table('sales')
-			->where('added_by', $userId)
-			//->where('inv_num', 'like', $finalPrefix . '%')
-			->orderBy('id', 'desc')
-			->value('inv_num');
-
-
-		if ($lastInvoice) {
-			$lastNumber = (int) substr($lastInvoice, strrpos($lastInvoice, '/') + 1);
-			$nextNumber = $lastNumber + 1;
-		} else {
-
-			$nextNumber = 1;
-		}
-		//FINAL INVOICE NUMBER
-		$increment = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-		return $finalPrefix . $increment;
-	}
-
 	// Maximum 2 invoices can remain pending
 	public function invoice_create_status() {
 		$userId = currentOwnerId();
 
 		$count = DB::table('sales')
 			->where('added_by', $userId)
-			->where(function($query) {
-				$query->whereNull('pay_status')->orWhere('pay_status', '');
-			})
+			->where('status', '0')
 			->count();
 
 			if($count >=2){    //---------- count empty or null payment status -------
@@ -691,6 +644,7 @@ class SalesController extends Controller
 			'propId' => $propId,
 			'inv_num' => $invoiceNo,
 			'inv_date' => $data['inv_date'],
+			'pay_status' => 'Due',
 
 			'seller_name' => $data['seller_name'],
 			'seller_contact' => $data['seller_contact'],
@@ -849,7 +803,19 @@ class SalesController extends Controller
 		$states_seller = State::where('country_id', '=', isset($sales->seller_country) ? $sales->seller_country : 101)->get();
 		$cities_seller = City::where('state_id', '=', isset($sales->seller_state) ? $sales->seller_state : 0)->get();
 
-		// echo "<pre>";print_r($sales);exit;
+		//--------- Fetch the Bank Details for the selected seller -----------
+		
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name', 'bank_branch', 'bank_qr_code')
+					->where('status', 1)
+					->when(!empty($sales->propId), function ($query) use ($sales) {
+						return $query->where('propId', $sales->propId);
+					}, function ($query) use ($sales) {
+						return $query->where('added_by', $sales->added_by);
+					})
+					->get();
+
+		// echo "<pre>";print_r($sales);exit;   //-------- Khokan ----
 
 		$sales_values = $this->items_sales_list($sId);
 		
@@ -866,6 +832,7 @@ class SalesController extends Controller
 			'cities_seller' => $cities_seller,
 			'custData' => $custData,
 			'purposes_of_tds' => $purposes_of_tds,
+			'bankDetails' => $bankDetails,
 			'sId' => $sId
 		]);
 	}
@@ -950,6 +917,18 @@ class SalesController extends Controller
 		$cities_seller = City::where('state_id', '=', isset($sales->seller_state) ? $sales->seller_state : 0)->get();
 		//echo "<pre>";print_r($sales);exit;
 
+		//--------- Fetch the Bank Details for the selected seller -----------
+		
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name', 'bank_branch', 'bank_qr_code')
+					->where('status', 1)
+					->when(!empty($sales->propId), function ($query) use ($sales) {
+						return $query->where('propId', $sales->propId);
+					}, function ($query) use ($sales) {
+						return $query->where('added_by', $sales->added_by);
+					})
+					->get();
+
 		$sales_values = $this->items_sales_list($sId);
 		return view('User.view-sales-invoice')->with([
 			'products' => $products,
@@ -964,6 +943,7 @@ class SalesController extends Controller
 			'cities_seller' => $cities_seller,
 			'custData' => $custData,
 			'purposes_of_tds' => $purposes_of_tds,
+			'bankDetails' => $bankDetails,
 			'sId' => $sId
 		]);
 	}
@@ -1169,7 +1149,6 @@ class SalesController extends Controller
 			DB::commit();
 			$sales_values = $this->items_sales_list($sid);
 			$this->updateGstType($sid);
-			$this->journalEntry($sid,$uid); //Journal Entry
 			return view('User.ajax-sales-invoice-display')->with([
 				'sales_values' => $sales_values,
 			]);
@@ -1268,7 +1247,6 @@ class SalesController extends Controller
 		$sales_values = $this->items_sales_list($sid);
 		//echo "<pre>"; print_r($sales_values);exit;
 		$this->updateGstType($sid);		
-		$this->journalEntry($sid,$uid); //Journal Entry
 		return view('User.ajax-sales-invoice-display')->with([
 			'sales_values' => $sales_values,
 		]);
@@ -1297,6 +1275,9 @@ class SalesController extends Controller
 			->first();
 
 		if ($sale) {
+			$amount = ($totals->total_amount+$totals->total_tax);
+			//$this->paymentVoucherService->storePaymentVoucherEntries($sid,'Sales',$amount);
+			
 			$this->journalService->storeSalesJournalEntries([
 				'source'        => 'Sales',
 				'autoId'        => $sid,
@@ -1306,6 +1287,8 @@ class SalesController extends Controller
 				'reference_no'  => $sale->inv_num,
 				'entry_type'    => 'Sales',
 				'party_name'    => $sale->cust_name ?? '',
+				'pay_status'    => $sale->pay_status ?? '',
+				'amount'    	=> $amount ?? 0,
 				'total_amount'  => $totals->total_amount ?? 0,
 				'base_amount'   => ($totals->total_amount - $totals->total_tax),
 				'gst_amount'    => $totals->total_tax ?? 0,
@@ -1372,14 +1355,13 @@ class SalesController extends Controller
 		$sales_values = $this->items_sales_list($sales_data[0]->sid);
 		//echo "<pre>"; print_r($sales_values);exit;
 		$this->updateGstType($sid);
-		$this->journalEntry($sid,$uid); //Journal Entry
 		return view('User.ajax-sales-invoice-display')->with([
 			'sales_values' => $sales_values,
 		]);
 	}
 
 
-public function update_sales_invoice_final(Request $request)
+	public function update_sales_invoice_final(Request $request)
 	{
 
 		//print_r($_FILES);
@@ -1391,6 +1373,7 @@ public function update_sales_invoice_final(Request $request)
 
 		$tds_amount = $request->tds_amount;
 		$special_discount_amount = $request->discount_amount;
+		$signature_type = $request->signature_type;
 
 
 		if ($file = $request->hasFile('signature')) {
@@ -1415,7 +1398,7 @@ public function update_sales_invoice_final(Request $request)
 						'tds_amount' => $tds_amount,
 						'status' => 1,
 						'special_discount_amount' => $special_discount_amount,
-
+						'signature_type' => $signature_type,
 					)
 				);
 		} else {
@@ -1430,7 +1413,7 @@ public function update_sales_invoice_final(Request $request)
 						'tds_amount' => $tds_amount,
 						'status' => 1,
 						'special_discount_amount' => $special_discount_amount,
-
+						'signature_type' => $signature_type,
 					)
 				);
 		}
@@ -1477,39 +1460,20 @@ public function update_sales_invoice_final(Request $request)
 			$oldRec = DB::table('sales')
 				->where('id', $sId)
 				->first();
-			$oldAdvanceAmount  = (float) ($oldRec->advance_amount ?? 0);
-			$oldAdjustedAmount = (float) ($oldRec->adjusted_amount ?? 0);
 			//end get old records
 			
 			//Payment full-advance logic
-			$payStatus = $request->pay_status;
+			$payStatus = $oldRec->pay_status ?? '';
 			$totalAmount   = $request->total_amount ?? 0;
-			$advanceAmount = $request->advance_amount ?? 0;
-			$dueAmount     = $request->due_amount ?? 0;
-			$adjustedAmount = $request->adjusted_amount ?? 0;
-			$currentPayment = 0;
-			if ($payStatus === 'Partial') {
-				$currentPayment = $advanceAmount;
-				$advanceAmount = $oldAdvanceAmount + $advanceAmount;
-				$adjustedAmount = 0;
-				$dueAmount = $totalAmount - $advanceAmount;
-				if ($dueAmount < 0) {
-					$dueAmount = 0;
-				}
-			}
-			else if ($payStatus === 'Full') 
+			$dueAmount =  (float) ($oldRec->due_amount ?? 0);
+			$advanceAmount  = (float) ($oldRec->advance_amount ?? 0);
+			$adjustedAmount = (float) ($oldRec->adjusted_amount ?? 0);
+			if ($payStatus === 'Due') 
 			{
-				$remainingAmount = $totalAmount - $oldAdjustedAmount;
-				if ($remainingAmount < 0) {
-					$remainingAmount = 0;
-				}
-				$currentPayment = $remainingAmount;
-				$adjustedAmount = $totalAmount;
-				$advanceAmount = $oldAdvanceAmount;
-				$dueAmount = 0;
-			}
-			else {
-				$currentPayment = 0;
+				$payStatus = 'Due';
+				$dueAmount =  0;
+				$advanceAmount  = 0;
+				$adjustedAmount  = 0;
 			}
 			
 			$update = DB::table('sales')
@@ -1518,10 +1482,10 @@ public function update_sales_invoice_final(Request $request)
 					array(
 						'mode_of_pay' => $request->mode_of_pay,
 						'other_payment' => $request->other_payment,
-						'pay_status' => $request->pay_status,
+						'pay_status' => $payStatus,
 						'total_amount' => isset($request->total_amount) ? $request->total_amount : 0,
-						'advance_amount' => isset($request->advance_amount) ? $request->advance_amount : 0,
-						'due_amount' => isset($request->due_amount) ? $request->due_amount : 0,
+						'advance_amount' => $advanceAmount,
+						'due_amount' => $dueAmount,
 						'adjusted_amount' => $adjustedAmount,
 						'buyer_orderno' => isset($request->buyer_orderno) ? $request->buyer_orderno : "",
 						'order_date' => !empty($request->order_date) ? $request->order_date : null,
@@ -1531,19 +1495,12 @@ public function update_sales_invoice_final(Request $request)
 						'dispa_docno_two' => isset($request->dispa_docno_two) ? $request->dispa_docno_two : "",
 						'disp_through' => $request->disp_through,
 						'other_dispa_det' => isset($request->other_dispa_det) ? $request->other_dispa_det : "",
-						'terms_delivery' => isset($request->terms_delivery) ? $request->terms_delivery : ""
+						'terms_delivery' => isset($request->terms_delivery) ? $request->terms_delivery : "",
+						'bank_id' => isset($request->bank_id) ? $request->bank_id : null,
 					)
 				);
-			
-			//start entry for voucher payment
-			if ($currentPayment <= 0) {
-				$currentPayment = 0;
-			}
-			if ($currentPayment > 0)
-			{
-				$this->paymentVoucherService->storePaymentVoucherEntries($sId, 'Sales', $currentPayment);
-			}
-			//end entry for voucher payment
+			$userId = currentOwnerId();
+			$this->journalEntry($sId,$userId); //Journal Entry
 			$msg = array(
 				'status' => 'success',
 				'class' => 'succ',
@@ -1567,7 +1524,12 @@ public function update_sales_invoice_final(Request $request)
 				
 		$delInvoice = DB::table('sales')->where('id', $request->id)->delete();
 		$delInvoiceItemValue = DB::table('sales_values')->where('sid', $request->id)->delete();
-		$delJournalRec = DB::table('journals')->where('autoId', $request->id)->delete();
+		$delJournalRec = DB::table('journals')
+								->where('autoId', $request->id)
+								->where('source', 'Sales')->delete();
+		$delPaymentRec = DB::table('payment_vouchers')
+							->where('f_id', $request->id)
+							->where('source', 'Sales')->delete();
 		if ($delInvoice) {
 			//AUDIT LOG ENTRY
             AuditLogger::logEntry(
@@ -1635,7 +1597,6 @@ public function update_sales_invoice_final(Request $request)
 		$sales_values = $this->items_sales_list($sales_data[0]->sid);
 		//echo "<pre>"; print_r($sales_values);exit;
 		$this->updateGstType($sid);
-		$this->journalEntry($sid,$uid); //Journal Entry
 		return view('User.ajax-sales-invoice-display')->with([
 			'sales_values' => $sales_values,
 		]);
@@ -1697,7 +1658,6 @@ public function update_sales_invoice_final(Request $request)
 		$sales_values = $this->items_sales_list($request->sid);
 		$uid = currentOwnerId();
 		$sid = $request->sid;
-		$this->journalEntry($sid,$uid); //Journal Entry
 		//echo "<pre>"; print_r($sales_values);exit;
 		return view('User.ajax-sales-invoice-display')->with([
 			'sales_values' => $sales_values,
@@ -2518,6 +2478,8 @@ public function update_sales_invoice_final(Request $request)
 		$states_seller = State::where('id', '=', isset($sales->seller_state) ? $sales->seller_state : 0)->get();
 		$cities_seller = City::where('state_id', '=', isset($sales->seller_state) ? $sales->seller_state : 0)->get();
 		//$vouchers_values = $this->items_sales_list_credit_debit($sId);
+
+		//
 		return view('User.view-sales-credit-debit')->with([
 			'products' => $products,
 			'sales' => $sales,
@@ -2565,6 +2527,8 @@ public function update_sales_invoice_final(Request $request)
 		$cities_seller = City::where('state_id', '=', isset($sales->seller_state) ? $sales->seller_state : 0)->get();
 
 		//$vouchers_values = $this->items_sales_list_credit_debit($sId);
+
+		// echo "<pre>";print_r($sales);exit;
 		return view('User.edit-sales-credit-debit')->with([
 			'products' => $products,
 			'sales' => $sales,

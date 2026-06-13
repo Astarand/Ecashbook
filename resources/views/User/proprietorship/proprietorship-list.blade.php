@@ -8,21 +8,26 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ url('/proprietorship-list') }}">Proprietorship Companies List</a></li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url('/proprietorship-list') }}">Proprietorship Companies List</a></li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-proprietorship-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
                         <h2 class="mb-0">Proprietorship Companies List</h2>
                     </div>
                 </div>
-                <!--<div class="col-md-8 text-end">
-                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-loan-account-modal">
+                <div class="col-md-8 text-end">
+                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#proprietorshipModal">
                         <i class="ti ti-square-plus f-20"></i> Add New Proprietorship
                     </a>
-                </div>-->
+                </div>
             </div>
         </div>
     </div>
@@ -229,6 +234,79 @@
 			}
 		});
 	});
+
+    function startProprietorshipListTour() {
+        function launch() {
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Proprietorship Profile Guide',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-info-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage your multiple Proprietorship companies here.</p></div>'
+                    },
+                    {
+                        element: 'a[data-bs-target="#proprietorshipModal"]',
+                        title: 'Add New Proprietorship',
+                        intro: 'Click here to add a new proprietorship company.'
+                    },
+                    {
+                        element: '#pc-dt-simple',
+                        title: 'Proprietorship Companies List',
+                        intro: 'View and manage registered proprietorship company details, PAN, and GST numbers.'
+                    },
+                    {
+                        element: '.prod-action-links',
+                        title: 'Actions',
+                        intro: 'Edit or update details of your proprietorship companies.'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            }).start();
+        }
+
+        if (typeof introJs === 'function') {
+            launch();
+        } else {
+            // CSS
+            if (!document.getElementById('introjs-cdn-css')) {
+                let css = document.createElement('link');
+                css.id = 'introjs-cdn-css';
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+                document.head.appendChild(css);
+            }
+
+            // JS
+            let js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+            js.onload = function() {
+                launch();
+            };
+            document.body.appendChild(js);
+        }
+    }
+
+    function bindProprietorshipTour() {
+        const btn = document.getElementById('start-proprietorship-list-tour');
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                startProprietorshipListTour();
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindProprietorshipTour);
+    } else {
+        bindProprietorshipTour();
+    }
 </script>
 
 @endsection

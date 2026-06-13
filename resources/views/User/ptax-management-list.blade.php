@@ -2,9 +2,6 @@
 
 @section('container')
 
-
-
-
 <div class="pc-content">
     <!-- [ breadcrumb ] start -->
     <div class="page-header">
@@ -419,6 +416,5 @@
         
         return true;
     }
-
 </script>
 @endsection

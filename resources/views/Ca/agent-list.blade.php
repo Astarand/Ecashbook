@@ -7,14 +7,16 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
-                        <li class="breadcrumb-item"><a href="{{ url('/agent-list') }}">Agent & Channel Partner</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit Agent Record</li>
+                        <li class="breadcrumb-item active" aria-current="page">Agent & Channel Partner</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-agent-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-8">
                     <div class="page-header-title">
@@ -22,7 +24,7 @@
                     </div>
                 </div>
 				<div class="col-md-4 text-end">
-                    <a href="{{ route('ca.AddAgent') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Agent</a>
+                    <a href="{{ route('ca.AddAgent') }}" id="add-agent-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Agent</a>
                 </div>
             </div>
         </div>
@@ -178,12 +180,53 @@
         </div>
     </div>
 </div>
+@endsection
 
-
-
-
-
+@section('page-script')
 <script>
+    function startAgentListTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Agent & Channel Partners',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-users" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage your active channel partners, agent directories, commission rates, and status registries.</p></div>'
+                },
+                {
+                    element: '#add-agent-btn',
+                    title: 'Add New Partner',
+                    intro: 'Click here to register a new agent or channel partner profile.'
+                },
+                {
+                    element: '.table-responsive',
+                    title: 'Agents Register',
+                    intro: 'List of registered partners showing agent IDs, contact parameters, emails, and active/deactive status badges.'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Action Commands',
+                    intro: 'Use these controls to view profile specifics, edit info, or toggle active status.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            skipIfNoElement: true,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-agent-list-tour').on('click', function(e) {
+            e.preventDefault();
+            startAgentListTour();
+        });
+    });
     $('#status_modal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);
         var agentId = button.data('id');

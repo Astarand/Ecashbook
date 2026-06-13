@@ -7,13 +7,16 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Project & Job Management</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-project-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
@@ -21,7 +24,7 @@
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
-                    <a href="{{ url('/add-project') }}" class="btn btn-primary"><i class="ti ti-square-plus f-20"></i> Add New Project</a>
+                    <a href="{{ url('/add-project') }}" id="add-project-btn" class="btn btn-primary"><i class="ti ti-square-plus f-20"></i> Add New Project</a>
                 </div>
             </div>
         </div>
@@ -32,7 +35,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-md-12">
-            <div class="card">
+            <div class="card" id="project-filters-card">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-sm-3 mb-3">
@@ -190,7 +193,59 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('page-script')
 <script>
+    function startProjectListTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Project & Job Management',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-briefcase" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage your active client projects, view valuations, set schedules, and track job statuses.</p></div>'
+                },
+                {
+                    element: '#add-project-btn',
+                    title: 'Add New Project',
+                    intro: 'Click here to register a new project and input client info, valuation, and timelines.'
+                },
+                {
+                    element: '#project-filters-card',
+                    title: 'Search Filters',
+                    intro: 'Filter projects by project name, client name, or category topic to locate specific files quickly.'
+                },
+                {
+                    element: '.table-responsive',
+                    title: 'Projects Directory',
+                    intro: 'List of all registered projects, displaying client names, budgets, timelines, and status badges.'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Action Controls',
+                    intro: 'Use these buttons to view details, edit settings, or delete project files.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            skipIfNoElement: true,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-project-list-tour').on('click', function(e) {
+            e.preventDefault();
+            startProjectListTour();
+        });
+    });
+
     // Categories for each topic
     const categories = {
         Technology: [

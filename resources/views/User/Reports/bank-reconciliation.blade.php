@@ -9,11 +9,16 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Financial Reports</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Bank Reconciliation</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Financial Reports</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Bank Reconciliation</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-recon-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -29,137 +34,64 @@
 
         <div class="col-md-12">
 
-            <div class="card">
-
-                <div class="card-header">
-                    <h4 class="text-center">
-                        Bank Reconciliation Report
-                    </h4>
+            <div class="card reconciliation-filter-card mb-4" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <div class="card-header py-3" style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                    <h5 class="mb-0 text-primary d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
+                        <i class="ti ti-filter f-20"></i> Filter Report Options
+                    </h5>
                 </div>
 
-                <div class="card-body">
-
-                    <div class="row">
-					
-						<div class="col-md-3">
-							<label class="form-label">Proprietorship Company</label>
-							<select name="propId" id="propId" class="form-control">
-								<option value="">{{ parentCompanyName() }}</option>
-								@foreach($proprietorships as $company)
-									<option value="{{ $company->id }}">
-										{{ $company->comp_name }}
-									</option>
-								@endforeach
-							</select>
-						</div>
-
-                        <div class="col-md-3">
-
-                            <label>
-                                Financial Year
-                            </label>
-
-                            <select class="form-select"
-                                    id="financial_year">
-
-                                <option value="">
-                                    Select
-                                </option>
-
-                                <option value="2025-2026">
-                                    2025-2026
-                                </option>
-
-                                <option value="2026-2027">
-                                    2026-2027
-                                </option>
-
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-muted">Proprietorship Company</label>
+                            <select name="propId" id="propId" class="form-select">
+                                <option value="">{{ parentCompanyName() }}</option>
+                                @foreach($proprietorships as $company)
+                                    <option value="{{ $company->id }}">
+                                        {{ $company->comp_name }}
+                                    </option>
+                                @endforeach
                             </select>
-
                         </div>
 
-                        <div class="col-md-3">
-
-                            <label>
-                                Report Type
-                            </label>
-
-                            <select class="form-select"
-                                    id="reportType"
-                                    onchange="toggleFilters()">
-
-                                <option value="">
-                                    Select
-                                </option>
-
-                                <option value="Monthly">
-                                    Monthly
-                                </option>
-
-                                <option value="Quarterly">
-                                    Quarterly
-                                </option>
-
-                                <option value="Half-Yearly">
-                                    Half-Yearly
-                                </option>
-
-                                <option value="Yearly">
-                                    Yearly
-                                </option>
-
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-muted">Financial Year</label>
+                            <select class="form-select" id="financial_year">
+                                <option value="">Select Financial Year</option>
+                                <option value="2025-2026">2025-2026</option>
+                                <option value="2026-2027">2026-2027</option>
                             </select>
-
                         </div>
 
-                        <div class="col-md-3">
-
-                            <label>
-                                Quarter
-                            </label>
-
-                            <select class="form-select"
-                                    id="quarterSelect"
-                                    disabled>
-
-                                <option value="">
-                                    Select Quarter
-                                </option>
-
-                                <option value="1">
-                                    Q1
-                                </option>
-
-                                <option value="2">
-                                    Q2
-                                </option>
-
-                                <option value="3">
-                                    Q3
-                                </option>
-
-                                <option value="4">
-                                    Q4
-                                </option>
-
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-muted">Report Type</label>
+                            <select class="form-select" id="reportType" onchange="toggleFilters()">
+                                <option value="">Select Report Type</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="Half-Yearly">Half-Yearly</option>
+                                <option value="Yearly">Yearly</option>
                             </select>
+                        </div>
+                    </div>
 
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-muted">Quarter</label>
+                            <select class="form-select" id="quarterSelect" disabled>
+                                <option value="">Select Quarter</option>
+                                <option value="1">Q1</option>
+                                <option value="2">Q2</option>
+                                <option value="3">Q3</option>
+                                <option value="4">Q4</option>
+                            </select>
                         </div>
 
-                        <div class="col-md-3">
-
-                            <label>
-                                Month
-                            </label>
-
-                            <select class="form-select"
-                                    id="monthSelect"
-                                    disabled>
-
-                                <option value="">
-                                    Select Month
-                                </option>
-
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-muted">Month</label>
+                            <select class="form-select" id="monthSelect" disabled>
+                                <option value="">Select Month</option>
                                 <option value="April">April</option>
                                 <option value="May">May</option>
                                 <option value="June">June</option>
@@ -172,38 +104,25 @@
                                 <option value="January">January</option>
                                 <option value="February">February</option>
                                 <option value="March">March</option>
-
                             </select>
-
                         </div>
 
-                    </div>
-
-                    <div class="row mt-3">
-
-                        <div class="col-md-12 text-end">
-
-                            <button type="button"
-                                    class="btn btn-primary"
-                                    onclick="fetchBankReconciliation()">
-
-                                Generate Report
-
+                        <div class="col-md-4 d-flex align-items-end gap-2">
+                            <button type="button" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" onclick="fetchBankReconciliation()" style="height: 41px;">
+                                <i class="ti ti-settings f-18"></i> Generate Report
                             </button>
-							<a href="javascript:void(0);" onclick="downloadPdf()" class="btn btn-primary">Download</a>
-
+                            <a href="javascript:void(0);" onclick="downloadPdf()" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" style="height: 41px;">
+                                <i class="ti ti-download f-18"></i> Download
+                            </a>
                         </div>
-
                     </div>
-
-                </div>
 
             </div>
 
         </div>
 
         <div class="col-md-12">
-            <div class="card">
+            <div class="card summary-table-card">
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
@@ -254,7 +173,7 @@
         </div>
 
         <div class="col-md-12">
-			<div class="card">
+			<div class="card records-table-card">
 
 				<div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
 
@@ -760,7 +679,56 @@
 		currentPage = 1;
 
 		renderTable();
+
 	});
+
+    function startReconTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Bank Reconciliation Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-report-analytics" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Bank Reconciliation page. This tool helps you match bank statement records with your recorded vouchers to ensure accuracy.</p></div>'
+                },
+                {
+                    element: '.reconciliation-filter-card',
+                    title: 'Filter Options',
+                    intro: 'Select the Proprietorship Company, Financial Year, and Report Type, then click "Generate Report" to pull reconciliation data.'
+                },
+                {
+                    element: '.summary-table-card',
+                    title: 'Reconciliation Summary',
+                    intro: 'This summary table displays the opening and closing balances, transit deposits, unmatched cheques, and matches them to calculate the reconciled balance.'
+                },
+                {
+                    element: '.records-table-card',
+                    title: 'Matched & Unmatched Records',
+                    intro: 'View all compared transactions. This table lists the bank transactions matched with voucher details side-by-side along with their status.'
+                },
+                {
+                    element: '.reconcile-help',
+                    title: 'Status Legends',
+                    intro: 'Hover here anytime to see a quick guide on what Matched, Review Required, and Unmatched statuses represent.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-recon-tour').on('click', function(e) {
+            e.preventDefault();
+            startReconTour();
+        });
+    });
 
 </script>
 

@@ -7,16 +7,19 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('user.VendorList') }}">Vendors & Payables</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Add Vendors & Payables</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-add-vendor-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Add Vendors & Payables</h2>
                     </div>
@@ -315,7 +318,7 @@
                                     <div class="col-lg-6 col-sm-12">
                                         <div class="d-flex justify-content-between align-items-center mb-4">
                                             <h5>Shipping Address</h5>
-                                            <div class="btn btn-primary" onclick="copyBillingAddress_vendor()">Same as Billing Address</div>
+                                            <div class="btn btn-primary" id="copy-billing-address-btn" onclick="copyBillingAddress_vendor()">Same as Billing Address</div>
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-6">
@@ -455,6 +458,9 @@
         </div>
     </div>
 
+@endsection
+
+@section('page-script')
 <script>
     //GST YES/ NO
     document.addEventListener("DOMContentLoaded", function() {
@@ -1106,5 +1112,104 @@
 		value = value.replace(/\D/g, '');
 		this.value = value.substring(0, 10);
 	});
+
+    function startAddVendorTour() {
+        if (typeof introJs !== 'function') return;
+
+        let tour = introJs().setOptions({
+            steps: [
+                {
+                    title: 'Add Vendor Wizard Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-user-plus" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Follow this interactive guide to fill in company profile, contact person, billing/shipping addresses, and banking accounts for a new vendor.</p></div>'
+                },
+                {
+                    element: 'a[href="#basicDetail"]',
+                    title: 'Personal Details Tab',
+                    intro: 'Register basic vendor details, priority rating, company name, GST registration status, and primary contact details.'
+                },
+                {
+                    element: '#highValuevendoromers',
+                    title: 'Vendor Priority Type',
+                    intro: 'Categorize this vendor as high valued or low valued for priority queueing.'
+                },
+                {
+                    element: '#gst_reg',
+                    title: 'GST Registration',
+                    intro: 'Select whether the vendor is GST registered. Selecting "Yes" opens fields to enter and auto-fetch company details using the GST number.'
+                },
+                {
+                    element: '#vendor_name',
+                    title: 'Company Name',
+                    intro: 'Enter the official company name or trade name of the vendor.'
+                },
+                {
+                    element: 'a[href="#billingDetails"]',
+                    title: 'Billing & Shipping Details Tab',
+                    intro: 'Provide registered office billing addresses and shipment receiving locations.'
+                },
+                {
+                    element: '#vendor_bill_addone',
+                    title: 'Billing Address Line 1',
+                    intro: 'Enter primary building address, state, city, and zip code for invoices.'
+                },
+                {
+                    element: '#copy-billing-address-btn',
+                    title: 'Same as Billing Address',
+                    intro: 'Click here to quickly copy all billing address inputs over to the shipping address fields.'
+                },
+                {
+                    element: 'a[href="#bankDetails"]',
+                    title: 'Bank Details Tab',
+                    intro: 'Add vendor bank account routing details for processing invoice payables.'
+                },
+                {
+                    element: '#addBankAccount',
+                    title: 'Add Another Account',
+                    intro: 'Allows registering up to 3 bank accounts for this vendor.'
+                },
+                {
+                    element: '#nxtBtnVThree',
+                    title: 'Add Vendor',
+                    intro: 'Click here to submit the wizard forms and save the vendor profile.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        });
+
+        tour.onbeforechange(function(targetElement) {
+            if (!targetElement) return;
+
+            // Find the closest tab-pane containing the target element
+            let tabPane = targetElement.closest('.tab-pane');
+            if (tabPane) {
+                let tabId = tabPane.getAttribute('id');
+                let tabTrigger = document.querySelector(`a[href="#${tabId}"]`);
+                if (tabTrigger && !tabTrigger.classList.contains('active')) {
+                    let tab = new bootstrap.Tab(tabTrigger);
+                    tab.show();
+                }
+            } else if (targetElement.getAttribute('href') && targetElement.getAttribute('data-bs-toggle') === 'tab') {
+                // If the target element is the tab trigger itself
+                let tab = new bootstrap.Tab(targetElement);
+                tab.show();
+            }
+        });
+
+        tour.start();
+    }
+
+    $(document).ready(function() {
+        $('#start-add-vendor-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddVendorTour();
+        });
+    });
 </script>
 @endsection

@@ -8,20 +8,27 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Financial Reports</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Journal Entry</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url('/journal-list') }}">Journal</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Journal List</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-journal-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
-                        <h2 class="mb-0">Journal Entry</h2>
+                        <h2 class="mb-0">Journal List</h2>
                     </div>
                 </div>
-                 <div class="col-md-8 text-end">
-                    <a href="{{ route('user.AddJournal') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Journal</a>
-                </div>
+				@if($req_type != 1)
+					<div class="col-md-8 text-end">
+						<a href="{{ route('user.AddJournal') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Journal</a>
+					</div>
+				@endif
             </div>
         </div>
     </div>
@@ -29,10 +36,66 @@
 
     <!-- [ Main Content ] start -->
     <div class="row">
+        <div class="col-sm-12">
+            <!-- Filter Options Card -->
+            <div class="card mb-4 reconciliation-filter-card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <div class="card-header py-3" style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                    <h5 class="mb-0 text-primary d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
+                        <i class="ti ti-filter f-20"></i> Filter Journal Options
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="GET" action="{{ url('/journal-list') }}">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-muted">Ledger</label>
+                                <select name="party_name" class="form-select">
+                                    <option value="">All</option>
+                                    @foreach($parties as $party)
+                                        <option value="{{ $party }}"
+                                            {{ request('party_name') == $party ? 'selected' : '' }}>
+                                            {{ $party }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted">From Date</label>
+                                <input type="date" name="from_date" value="{{ request('from_date') }}" class="form-control">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted">To Date</label>
+                                <input type="date" name="to_date" value="{{ request('to_date') }}" class="form-control">
+                            </div>
+
+                            <div class="col-md-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" style="height: 41px;">
+                                    <i class="ti ti-filter f-18"></i> Filter
+                                </button>
+                                <a href="{{ url('/journal-list') }}" class="btn btn-secondary w-100 d-flex align-items-center justify-content-center" style="height: 41px;">
+                                    Reset
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <div class="col-sm-12">
-            <div class="card card-body table-card">
-                <div class="table-responsive">
+            <div class="card mb-4 journal-table-card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center" style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                    <h5 class="mb-0 text-primary d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
+                        <i class="ti ti-table f-20"></i> Journal Records
+                    </h5>
+                    <a href="{{ route('journal.export', request()->query()) }}" class="btn btn-success btn-sm d-flex align-items-center gap-2">
+                        <i class="ti ti-file-export f-18"></i> Export Excel
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    <div class="table-responsive">
                     <table class="table tbl-product my-3" id="pc-dt-simple">
                         <thead>
                             <tr style="background-color: #cbcbcb;">
@@ -59,7 +122,7 @@
 								<td class="text-end">
 									{{ $journals->firstItem() + $key }}
 								</td>
-								<td>{{ \Carbon\Carbon::parse($journal->journal_date)->format('d-m-Y') }}</td>
+								<td>{{ date('d-m-Y',strtotime($journal->journal_date)) }}</td>
 								<td>{{ 'JV-' . $journal->journal_no }}</td>
 								<td>{{ $journal->entry_type }}</td>
 								<td>{{ $journal->ledger }}</td>
@@ -272,6 +335,54 @@ $(document).on('click', '.delete-journal', function () {
         }
     });
 });
+
+    function startJournalTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Journal List Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-notes" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage and review journal voucher entries from this dashboard.</p></div>'
+                },
+                {
+                    element: 'a[href="{{ route("user.AddJournal") }}"]',
+                    title: 'Add New Journal',
+                    intro: 'Click here to create a new manual journal entry.'
+                },
+                {
+                    element: '.reconciliation-filter-card',
+                    title: 'Filter Options',
+                    intro: 'Filter your journal list by selecting specific ledgers and date ranges.'
+                },
+                {
+                    element: '.journal-table-card',
+                    title: 'Journal Records Table',
+                    intro: 'This section contains the journal entries. You can see details like date, ledger name, Cr/Dr type, and total amount.'
+                },
+                {
+                    element: 'a[href*="export-journal"]',
+                    title: 'Export Excel',
+                    intro: 'Click here to export the currently filtered journal entries to an Excel sheet.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-journal-tour').on('click', function(e) {
+            e.preventDefault();
+            startJournalTour();
+        });
+    });
 </script>
 
 @endsection

@@ -8,11 +8,16 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Cash & Banking</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Bank Account Master</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Cash & Banking</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Bank Account Master</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-bank-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <div class="page-header-title">
@@ -34,7 +39,7 @@
         @foreach ($banks as $val)
 
         <div class="col-md-5 col-xxl-4">
-            <div class="card">
+            <div class="card bank-account-card">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <h5 class="mb-0">{{ $val->bank_name }} Details</h5>
@@ -398,6 +403,46 @@
                 }
             });
         }
+    });
+
+    function startBankTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Bank Account Master Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-info-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage bank details, branches, and balances.</p></div>'
+                },
+                {
+                    title: 'Bank Account Master',
+                    intro: 'Manage bank details, branches, and balances.'
+                },
+                {
+                    element: 'a[data-bs-target="#add-bank-modal"]', title: 'Add New Bank',
+                    intro: 'Click here to register a new bank account.'
+                },
+                {
+                    element: '.bank-account-card', title: 'Bank Account Card',
+                    intro: 'View account details, branch codes, and current balances.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-bank-tour').on('click', function(e) {
+            e.preventDefault();
+            startBankTour();
+        });
     });
 </script>
 

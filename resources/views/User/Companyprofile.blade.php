@@ -9,217 +9,21 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 @section('container')
-<style>
-  /* 💎 Clean Premium Profile Style Overrides 💎 */
 
-  /* Alert Box: More prominent, modern warning-amber box */
-  .alert-warning.card {
-    background-color: #fef3c7 !important; /* Rich amber background */
-    border: 1px solid #fcd34d !important; /* Solid amber border */
-    border-left: 6px solid #d97706 !important; /* Bold amber side accent */
-    border-radius: 12px !important;
-    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.06) !important;
-    overflow: hidden !important;
-  }
-  
-  .alert-warning .alert-heading {
-    color: #92400e !important; /* Deep dark amber heading */
-    font-weight: 700 !important;
-    font-size: 1.1rem !important;
-  }
-  
-  .alert-warning p {
-    color: #78350f !important; /* Legible warm text */
-    font-size: 0.9rem !important;
-    font-weight: 500 !important;
-  }
-
-  /* Sidebar Pills styling */
-  .account-pills.nav-pills {
-    background-color: #ffffff !important;
-    border-top: 1px solid #e2e6ee !important;
-    padding: 10px 0 !important;
-  }
-
-  .account-pills.nav-pills .nav-link {
-    border-radius: 8px !important;
-    margin: 4px 12px !important;
-    padding: 12px 16px !important;
-    color: #5e6e82 !important;
-    font-weight: 500 !important;
-    border: none !important;
-    background: transparent !important;
-    transition: all 0.2s ease-in-out !important;
-  }
-
-  .account-pills.nav-pills .nav-link::after {
-    display: none !important; /* Hide old generic sidebar highlight line */
-  }
-
-  .account-pills.nav-pills .nav-link:hover {
-    color: #422f90 !important;
-    background-color: #f5f4fa !important;
-    transform: translateX(4px) !important;
-  }
-
-  .account-pills.nav-pills .nav-link.active {
-    color: #ffffff !important;
-    background-color: #422f90 !important; /* Brand accent color for active item */
-    box-shadow: 0 4px 12px rgba(66, 47, 144, 0.2) !important;
-    font-weight: 600 !important;
-  }
-
-  .account-pills.nav-pills .nav-link.active i {
-    color: #ffffff !important;
-  }
-
-  .account-pills.nav-pills .nav-link.active:hover {
-    transform: none !important;
-    background-color: #2d1f6a !important;
-  }
-
-  /* Form controls styling */
-  .form-control, .form-select {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    padding: 10px 14px !important;
-    font-size: 0.9rem !important;
-    transition: all 0.2s ease !important;
-  }
-
-  .form-control:focus, .form-select:focus {
-    border-color: #422f90 !important;
-    box-shadow: 0 0 0 3px rgba(66, 47, 144, 0.15) !important;
-    outline: none !important;
-  }
-
-  /* Cards inside layout */
-  .card {
-    border: 1px solid #e2e6ee !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 12px rgba(66, 47, 144, 0.015) !important;
-  }
-
-  .card-header {
-    border-bottom: 1px solid #e2e6ee !important;
-    background-color: #ffffff !important;
-    padding: 18px 24px !important;
-  }
-
-  .card-header h5 {
-    font-weight: 600 !important;
-    color: #2d1f6a !important;
-    margin-bottom: 0 !important;
-  }
-
-  /* Standardizing Buttons */
-  .btn-primary {
-    background-color: #422f90 !important;
-    border-color: #422f90 !important;
-    border-radius: 8px !important;
-    padding: 10px 20px !important;
-    font-weight: 600 !important;
-    transition: all 0.2s ease !important;
-    color: #ffffff !important;
-  }
-
-  .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
-    background-color: #2d1f6a !important;
-    border-color: #2d1f6a !important;
-    color: #ffffff !important;
-  }
-
-  .btn-secondary {
-    background-color: #eae7f7 !important;
-    border-color: #eae7f7 !important;
-    color: #422f90 !important;
-    border-radius: 8px !important;
-    padding: 10px 20px !important;
-    font-weight: 600 !important;
-    transition: all 0.2s ease !important;
-  }
-
-  .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
-    background-color: #dcd7f2 !important;
-    color: #2d1f6a !important;
-  }
-
-  /* Upload Areas */
-  .upload-area {
-    border: 2px dashed #cbd5e1 !important;
-    padding: 30px 20px !important;
-    border-radius: 10px !important;
-    color: #5e6e82 !important;
-    background-color: #f8fafc !important;
-    transition: all 0.2s ease-in-out !important;
-    display: inline-flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  .upload-area:hover {
-    border-color: #422f90 !important;
-    background-color: #f5f4fa !important;
-    color: #422f90 !important;
-  }
-
-  /* Profile Picture Upload Pencil Button */
-  label[for="fileUpload"].btn-primary.btn-icon {
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-    border: 1px solid #e2e6ee !important;
-    color: #422f90 !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04) !important;
-    padding: 0 !important;
-    width: 34px !important;
-    height: 34px !important;
-    border-radius: 50% !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-
-  label[for="fileUpload"].btn-primary.btn-icon:hover {
-    background-color: #422f90 !important;
-    background: #422f90 !important;
-    border-color: #422f90 !important;
-    color: #ffffff !important;
-    box-shadow: 0 6px 14px rgba(66, 47, 144, 0.25) !important;
-    transform: scale(1.08) !important;
-  }
-
-  label[for="fileUpload"].btn-primary.btn-icon:active {
-    transform: scale(0.95) !important;
-  }
-
-  /* Uniform Table Action Buttons */
-  .table .btn.btn-sm {
-    width: 32px !important;
-    height: 32px !important;
-    padding: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 6px !important;
-  }
-</style>
 
     <div class="pc-content">
         <!-- [ breadcrumb ] start -->
         <div class="page-header">
             <div class="page-block">
                 <div class="row align-items-center">
-                    <div class="col-md-12">
-                        <ul class="breadcrumb">
+                    <div class="col-md-12 d-flex justify-content-between align-items-center">
+                        <ul class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="">Home</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Company Profile</li>
                         </ul>
+                        <a href="javascript:void(0);" id="start-profile-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                        </a>
                     </div>
 					<div class="col-md-4">
 						<div class="page-header-title">
@@ -1212,23 +1016,43 @@
 																<h6 class="text-white mb-0">{{ $val->swift_code }}</h6>
 															</div>
 														</div>
-														<div class="row mt-4">
-															<div class="col-auto">
-																<p class="text-white text-sm text-opacity-50 mb-0">Account Name</p>
-																<h6 class="text-white mb-3">{{ $val->accholder_name }}</h6>
-															</div>
-															<div class="col-auto">
-																<p class="text-white text-sm text-opacity-50 mb-0">Account Balance</p>
-																<h6 class="text-white mb-0">₹{{ $val->curr_bal }}</h6>
-															</div>
-														</div>
+														<div class="row mt-4 align-items-start">
+                                                            <div class="col-auto">
+                                                                <p class="text-white text-sm text-opacity-50 mb-0">Account Name</p>
+                                                                <h6 class="text-white mb-3">{{ $val->accholder_name }}</h6>
+                                                            </div>
+
+                                                            <div class="col-auto">
+                                                                <p class="text-white text-sm text-opacity-50 mb-0">Account Balance</p>
+                                                                <h6 class="text-white mb-0">₹{{ number_format($val->curr_bal, 2) }}</h6>
+                                                            </div>
+
+                                                            @if(!empty($val->bank_qr_code))
+                                                            <div class="col-auto ms-auto text-end">
+                                                                <p class="text-white text-sm text-opacity-50 mb-2">Bank QR Code</p>
+                                                                <button type="button"
+                                                                        class="btn btn-sm btn-light toggleQrBtn"
+                                                                        data-target="qrCode{{ $val->id }}">
+                                                                    <i class="ti ti-eye"></i>
+                                                                    <span>View QR</span>
+                                                                </button>
+
+                                                                <div id="qrCode{{ $val->id }}" class="d-none mt-2">
+                                                                    <img src="{{ asset('storage/'.$val->bank_qr_code) }}"
+                                                                        alt="Bank QR Code"
+                                                                        class="img-fluid bg-white rounded p-2"
+                                                                        style="width:130px;height:130px;object-fit:contain;">
+                                                                </div>
+                                                            </div>
+                                                            @endif
+                                                        </div>
 													</div>
 												</div>
 											</div>
 										</div>
-
-
 									</div>
+
+
 									{{-- Edit Modal --}}
 									<div class="modal custom-modal fade" id="edit-bank-modal{{ $val->id }}" tabindex="-1" role="dialog" aria-hidden="true">
 										<div class="modal-dialog modal-dialog-centered modal-xl">
@@ -1237,7 +1061,7 @@
 													<h5 class="modal-title">Edit Bank Details</h5>
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
-												<form id="upadteBankForm{{ $val->id }}" method="post" >
+												<form id="upadteBankForm{{ $val->id }}" method="post" enctype="multipart/form-data">
 													<input type="hidden" name="id"  value="{{ $val->id }}">
 													<input type="hidden" name="redirectUrl" value="company-profile">
 													<div class="modal-body">
@@ -1276,6 +1100,26 @@
 																<label for="bankName" class="form-label">Current Bank Balance<span class="text-danger">*</span></label>
 																<input type="text" name="curr_bal" id="curr_bal{{ $val->id }}" value="{{ $val->curr_bal }}" class="form-control" placeholder="Enter Current Bank Balance" required>
 															</div>
+                                                            <div class="col-md-4 mb-3">
+                                                                <label class="form-label">
+                                                                    Bank QR Code 
+                                                                </label>
+
+                                                                <input type="file"
+                                                                    name="bank_qr_code"
+                                                                    id="bank_qr_code{{ $val->id }}"
+                                                                    class="form-control"
+                                                                    accept=".jpg,.jpeg,.png,.webp">
+
+                                                                @if(!empty($val->bank_qr_code))
+                                                                    <div class="mt-2">
+                                                                        <img src="{{ asset('storage/'.$val->bank_qr_code) }}"
+                                                                            alt="QR Code"
+                                                                            style="max-width:120px; max-height:120px;"
+                                                                            class="img-thumbnail">
+                                                                    </div>
+                                                                @endif
+                                                            </div>
 														</div>
 
 													</div>
@@ -1324,7 +1168,7 @@
                                                         <label class="upload-area" for="inc_certificate" style="cursor: pointer;">
                                                             <span class="upload-text" id="inc_certificate_label">
 
-                                                                @if(isset($docs['Certificate of Incorporation']))
+                                                                @if(isset($docs['Certificate of Incorporation of Company']))
                                                                     <i class="fa fa-check-circle text-success"></i> Already Uploaded
                                                                 @else
                                                                     Click to Upload or Drag & Drop
@@ -1337,7 +1181,7 @@
                                                                 name="inc_certificate"
                                                                 id="inc_certificate"
                                                                 accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                                                                {{ isset($docs['Certificate of Incorporation']) ? 'disabled' : '' }}
+                                                                {{ isset($docs['Certificate of Incorporation of Company']) ? 'disabled' : '' }}
                                                                 hidden
                                                                 onchange="updateFileName(this, 'inc_certificate_label')">
 
@@ -1356,7 +1200,7 @@
 
                                                             <span class="upload-text" id="pan_doc_label">
 
-                                                                @if(isset($docs['Company PAN Card']))
+                                                                @if(isset($docs['Pan Card of Company']))
                                                                     <i class="fa fa-check-circle text-success"></i> Already Uploaded
                                                                 @else
                                                                     Click to Upload or Drag & Drop
@@ -1369,7 +1213,7 @@
                                                                 name="pan_doc"
                                                                 id="pan_doc"
                                                                 accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                                                                {{ isset($docs['Company PAN Card']) ? 'disabled' : '' }}
+                                                                {{ isset($docs['Pan Card of Company']) ? 'disabled' : '' }}
                                                                 hidden
                                                                 onchange="updateFileName(this, 'pan_doc_label')">
 
@@ -1394,7 +1238,7 @@
 
                                                             <span class="upload-text" id="gst_doc_label">
 
-                                                                @if(isset($docs['GST Registration Certificate']))
+                                                                @if(isset($docs['GST Registration Certificate of Company']))
                                                                     <i class="fa fa-check-circle text-success"></i> Already Uploaded
                                                                 @else
                                                                     Click to Upload or Drag & Drop
@@ -1407,7 +1251,7 @@
                                                                 id="gst_doc"
                                                                 class="fileInput"
                                                                 accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                                                                {{ isset($docs['GST Registration Certificate']) ? 'disabled' : '' }}
+                                                                {{ isset($docs['GST Registration Certificate of Company']) ? 'disabled' : '' }}
                                                                 hidden
                                                                 onchange="updateFileName(this, 'gst_doc_label')">
 
@@ -1429,7 +1273,7 @@
 
                                                             <span class="upload-text" id="trade_doc_label">
 
-                                                                @if(isset($docs['Trade License']))
+                                                                @if(isset($docs['Trade License Document']))
                                                                     <i class="fa fa-check-circle text-success"></i> Already Uploaded
                                                                 @else
                                                                     Click to Upload or Drag & Drop
@@ -1442,7 +1286,7 @@
                                                                 id="trade_doc"
                                                                 class="fileInput"
                                                                 accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                                                                {{ isset($docs['Trade License']) ? 'disabled' : '' }}
+                                                                {{ isset($docs['Trade License Document']) ? 'disabled' : '' }}
                                                                 hidden
                                                                 onchange="updateFileName(this, 'trade_doc_label')">
 
@@ -1498,7 +1342,7 @@
 
                                                             <span class="upload-text" id="ptex_doc_label">
 
-                                                                @if(isset($docs['Professional Tax Returns']))
+                                                                @if(isset($docs['Professional Tax Registration Document']))
                                                                     <i class="fa fa-check-circle text-success"></i> Already Uploaded
                                                                 @else
                                                                     Click to Upload or Drag & Drop
@@ -1511,7 +1355,7 @@
                                                                 id="ptex_doc"
                                                                 class="fileInput"
                                                                 accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                                                                {{ isset($docs['Professional Tax Returns']) ? 'disabled' : '' }}
+                                                                {{ isset($docs['Professional Tax Registration Document']) ? 'disabled' : '' }}
                                                                 hidden
                                                                 onchange="updateFileName(this, 'ptex_doc_label')">
 
@@ -1714,7 +1558,7 @@
                                                                     Click to Upload or Drag & Drop
                                                                 @endif --}}
 
-                                                                @if(isset($docs['Latest Photograph']))  {{-- Second Director --}}
+                                                                @if(isset($docs['Second Director Photograph']))
                                                                     <i class="fa fa-check-circle text-success"></i> Already Uploaded
                                                                 @else
                                                                     Click to Upload or Drag & Drop
@@ -1726,7 +1570,7 @@
                                                             {{-- Input is disabled if file exists; triggers filename update via JS --}}
                                                             <input type="file" name="second_dirphoto_doc" id="second_dirphoto_doc"
                                                                 class="fileInput" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                                                                {{ isset($docs['Latest Photograph']) ? 'disabled' : '' }}
+                                                                {{ isset($docs['Second Director Photograph']) ? 'disabled' : '' }}
                                                                 hidden
                                                                 onchange="updateFileName(this, 'second_dirphoto_doc_label')">
                                                         </label>
@@ -1745,7 +1589,7 @@
                                                         <label class="upload-area" for="signature_doc" style="cursor: pointer;">
                                                             <span class="upload-text" id="signature_doc_label">
                                                                 {{-- Logic: Show success icon if uploaded, otherwise show prompt --}}
-                                                                @if(isset($docs['Powers of Attorney']))  {{-- Second Director --}}
+                                                                @if(isset($docs['Authorized Signature']))
                                                                     <i class="fa fa-check-circle text-success"></i> Already Uploaded
                                                                 @else
                                                                     Click to Upload or Drag & Drop
@@ -1755,7 +1599,7 @@
                                                             {{-- Input is disabled if file exists; triggers JS update on selection --}}
                                                             <input type="file" name="signature_doc" id="signature_doc"
                                                                 class="fileInput" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                                                                {{ isset($docs['Powers of Attorney']) ? 'disabled' : '' }}
+                                                                {{ isset($docs['Authorized Signature']) ? 'disabled' : '' }}
                                                                 hidden
                                                                 onchange="updateFileName(this, 'signature_doc_label')">
                                                         </label>
@@ -1771,7 +1615,7 @@
                                                         <label class="upload-area" for="stamp_doc" style="cursor: pointer;">
                                                             <span class="upload-text" id="stamp_doc_label">
                                                                 {{-- Logic: If file exists, show success; otherwise show upload prompt --}}
-                                                                @if(isset($docs['Other']))  {{-- Second Director --}}
+                                                                @if(isset($docs['Company Stamp']))
                                                                     <i class="fa fa-check-circle text-success"></i> Already Uploaded
                                                                 @else
                                                                     Click to Upload or Drag & Drop
@@ -1781,7 +1625,7 @@
                                                             {{-- Input is disabled if file already exists; triggers name preview via JS --}}
                                                             <input type="file" name="stamp_doc" id="stamp_doc"
                                                                 class="fileInput" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                                                                {{ isset($docs['Other']) ? 'disabled' : '' }} hidden
+                                                                {{ isset($docs['Company Stamp']) ? 'disabled' : '' }} hidden
                                                                 onchange="updateFileName(this, 'stamp_doc_label')">
                                                         </label>
                                                     </div>
@@ -1797,7 +1641,7 @@
                                                             <span class="upload-text" id="other_logo_doc_label">
                                                                 {{-- Logic: Toggle checkmark if file exists, else show upload prompt --}}
                                                                 
-                                                                @if(isset($docs['Other']))  {{-- Second Director --}}
+                                                                @if(isset($docs['Company Logo']))
                                                                     <i class="fa fa-check-circle text-success"></i> Already Uploaded
                                                                 @else
                                                                     Click to Upload or Drag & Drop
@@ -1807,7 +1651,7 @@
                                                             {{-- Input is disabled if file exists; triggers JS update on selection --}}
                                                             <input type="file" name="other_logo_doc" id="other_logo_doc"
                                                                 class="fileInput" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                                                                {{ isset($docs['Other']) ? 'disabled' : '' }} hidden
+                                                                {{ isset($docs['Company Logo']) ? 'disabled' : '' }} hidden
                                                                 onchange="updateFileName(this, 'other_logo_doc_label')">
                                                         </label>
                                                     </div>
@@ -4037,6 +3881,13 @@
 								<label for="bankName" class="form-label">Current Bank Balance<span class="text-danger">*</span></label>
 								<input type="text" name="curr_bal" id="curr_bal" class="form-control" placeholder="Enter Current Bank Balance" required>
 							</div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">
+                                    Bank QR Code
+                                </label>
+                                <input type="file"  name="bank_qr_code" id="bank_qr_code" class="form-control" accept=".jpg,.jpeg,.png,.webp">
+                            </div>
 						</div>
 
 					</div>
@@ -4905,7 +4756,7 @@
                             $("#gstdocstate").val(response.gstdocstate);
                             // showToast("Profile picture updated successfully!", "success");
                             showToast(response.message, "success");
-                            // setTimeout(() => location.reload(), 2000); // Reload after 2s
+                            setTimeout(() => location.reload(), 2000); // Reload after 2s
                         } else {
                             showToast("Business Details Update: " + response.message, "error");
                         }
@@ -6365,7 +6216,7 @@
             };
 
             // Debug: Log form data
-            console.log('Form Data being sent:', formData);
+            // console.log('Form Data being sent:', formData);
 
             // Validate required fields
             if (!formData.locationName || !formData.locationType || !formData.latitude || !formData.longitude || !
@@ -6592,39 +6443,52 @@
         });
 		
 		
-	$(document).on("submit", "form[id^='upadteBankForm']", function(e) {
-		e.preventDefault();
-		var form = $(this);
-		var bankurl = "/update_bank";
-		var bankData = form.serialize();
+	
 
-		$.ajax({
-			headers: {
-				"X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-			},
-			url: bankurl,
-			type: "POST",
-			data: bankData,
-			success: function(response) {
-				if (response.class == "succ") {
-					showToast(response.message, "success");
-					localStorage.setItem('activeTab', 'bank-details');
-					setTimeout(() => {
-						window.location.href = response.redirect;
-					}, 2000);
-				} else {
-					showToast("Error: While Bank Update", "error");
-				}
-			}
-		});
-	});
+    $(document).on('submit', '[id^="upadteBankForm"]', function(e) {
+
+        e.preventDefault();
+
+        let form = this;
+        let formData = new FormData(form);
+
+        $.ajax({
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+            },
+            url: "/update_bank",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+
+            success: function(response) {
+
+                if (response.class == "succ") {
+
+                    localStorage.setItem('activeTab', 'bank-details');
+
+                    showToast(response.message, "success");
+
+                    setTimeout(function() {
+                        window.location.href = response.redirect;
+                    }, 1500);
+
+                } else {
+
+                    showToast(response.message, "error");
+                }
+            }
+        });
+    });
 
     $("form#addBankForm").bind("submit", function(e) {
         e.preventDefault();
 
         var bankId = $("#bankId").val();
         var bankurl = "/save_bank"; 
-        var bankData = $(this).serialize();
+        // var bankData = $(this).serialize();
+        var bankData = new FormData(this);
 
         $.ajax({
             headers: {
@@ -6633,18 +6497,53 @@
             url: bankurl,
             type: "POST",
             data: bankData,
+            processData: false,
+            contentType: false,
             success: function(response) {
-                //console.log(response);
+
                 if (response.class == "succ") {
-					localStorage.setItem('activeTab', 'bank-details');
+
+                    localStorage.setItem('activeTab', 'bank-details');
+
                     showToast(response.message, "success");
+
                     setTimeout(() => {
                         window.location.href = response.redirect;
                     }, 2000);
-                } else {
-                    showToast("Error: While Bank Add", "error");
+
+                } 
+                else if (response.class == "validation") {
+
+                    let errorMsg = '';
+
+                    $.each(response.errors, function(field, messages) {
+                        errorMsg += messages[0] + '<br>';
+                    });
+
+                    showToast(errorMsg, "error");
+                } 
+                else {
+
+                    showToast(response.message || "Something went wrong", "error");
                 }
             },
+            error: function(xhr) {
+
+                if (xhr.status === 422) {
+
+                    let errors = xhr.responseJSON.errors;
+                    let errorMsg = '';
+
+                    $.each(errors, function(field, messages) {
+                        errorMsg += messages[0] + '<br>';
+                    });
+
+                    showToast(errorMsg, "error");
+                } else {
+
+                    showToast("Server Error", "error");
+                }
+            }
         });
     });
 	
@@ -6760,8 +6659,246 @@
 			});
 		});
 	});
-		
-		
+
+    $(document).on('click', '.toggleQrBtn', function () {
+
+        let target = $('#' + $(this).data('target'));
+        let icon = $(this).find('i');
+        let text = $(this).find('span');
+
+        if (target.hasClass('d-none')) {
+
+            target.removeClass('d-none');
+
+            icon.removeClass('ti-eye').addClass('ti-eye-off');
+            text.text('Hide QR');
+
+        } else {
+
+            target.addClass('d-none');
+
+            icon.removeClass('ti-eye-off').addClass('ti-eye');
+            text.text('View QR');
+        }
+    });
+</script>
+
+<script>
+		function startProfileTour() {
+			function launch() {
+				let tour = introJs().setOptions({
+					steps: [
+						{
+							title: 'Company Profile Guide',
+							intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-building" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Let\'s walk through the profile section to configure your company details, bank accounts, CA access, and policies.</p></div>'
+						},
+						{
+							element: '#uploadedImage',
+							title: 'Company Logo',
+							intro: 'Click the pencil icon here to upload your company logo (max size 200 KB).',
+							tabId: 'company-details-tab'
+						},
+						{
+							element: '#gst_reg',
+							title: 'GST Registered Status',
+							intro: 'Select if this company is registered under GST. Choosing Yes enables GST number and transaction type setups.',
+							tabId: 'company-details-tab'
+						},
+						{
+							element: '#comp_name',
+							title: 'Company Name',
+							intro: 'Enter your business\'s registered legal name.',
+							tabId: 'company-details-tab'
+						},
+						{
+							element: '#comp_type',
+							title: 'Company Constitution Type',
+							intro: 'Select the legal structure of your business (e.g. Proprietorship, Partnership, PVT Ltd). Proprietorship allows adding multiple businesses under one user.',
+							tabId: 'company-details-tab'
+						},
+						{
+							element: '#billing-address-1',
+							title: 'Billing Address',
+							intro: 'Fill in your billing details here. You can also add dynamic billing addresses.',
+							tabId: 'company-details-tab'
+						},
+						{
+							element: '#business-details-tab',
+							title: 'Business & GST Details',
+							intro: 'Click next to view the Business Details tab for nature of business and invoice sequences.',
+							tabId: 'business-details-tab'
+						},
+						{
+							element: '#business',
+							title: 'Category of Business',
+							intro: 'Specify whether your business is Trading, Service, Professional, or Mixed.',
+							tabId: 'business-details-tab'
+						},
+						{
+							element: '#exact_comp_nature',
+							title: 'Exact Nature of Business',
+							intro: 'Provide a description of the products or services your company trades/provides.',
+							tabId: 'business-details-tab'
+						},
+						{
+							element: '#comp_inv_digits',
+							title: 'Invoice Series Prefixes',
+							intro: 'Set up prefixes (e.g., PI/2024-25/ for Proforma, SI/2024-25/ for Sales) to auto-generate sequence numbers.',
+							tabId: 'business-details-tab'
+						},
+						{
+							element: '#contact-details-tab',
+							title: 'Contact Details',
+							intro: 'Click next to manage contact details.',
+							tabId: 'contact-details-tab'
+						},
+						{
+							element: '#comp_phone',
+							title: 'Contact Information',
+							intro: 'Verify your company phone, email address, WhatsApp number, and official website URL.',
+							tabId: 'contact-details-tab'
+						},
+						{
+							element: '#director-details-tab',
+							title: 'Directors & Owners List',
+							intro: 'Manage partners, directors, or proprietors. You can add new ones, check DIN status, and upload digital signatures.',
+							tabId: 'director-details-tab'
+						},
+						{
+							element: '#bank-details-tab',
+							title: 'Bank Accounts Tab',
+							intro: 'Click here to view, register, and update bank account details for your organization.',
+							tabId: 'bank-details-tab'
+						},
+						{
+							element: '#bank-details a[data-bs-target="#add-bank-modal"]',
+							title: 'Add New Bank Account',
+							intro: 'Click here to record a new bank account with branch details, account number, IFSC code, and current balance.',
+							tabId: 'bank-details-tab'
+						},
+						{
+							element: '#bank-details .card',
+							title: 'Bank Account Card',
+							intro: 'Displays registered bank details, branch codes, Swift code, and current balance. You can view, edit, or delete accounts using the menu.',
+							tabId: 'bank-details-tab'
+						},
+						{
+							element: '#attachment-tab',
+							title: 'Locker & Attachments',
+							intro: 'Securely upload corporate certificates (PAN, Incorporation, Trade license, Signatures) for safe digital locker storage.',
+							tabId: 'attachment-tab'
+						},
+						{
+							element: '#ca-access-tab',
+							title: 'CA / Accountant Access',
+							intro: 'Define module-wise access levels (View or Edit permissions for Sales, Purchases, Banking, HR/Payroll) for your Chartered Accountant.',
+							tabId: 'ca-access-tab'
+						},
+						{
+							element: '#holidays-tab',
+							title: 'Company Holidays',
+							intro: 'Establish the yearly office holiday calendar, linking directly to automated attendance and payroll computations.',
+							tabId: 'holidays-tab'
+						},
+						{
+							element: '#schedule-tab',
+							title: 'Shift Timings & Day Schedule',
+							intro: 'Configure shifts, weekend offs, working hours, and grace times for automated employee logs.',
+							tabId: 'schedule-tab'
+						},
+						{
+							element: '#locations-tab',
+							title: 'Office Locations Tab',
+							intro: 'Click here to view, register, and update office locations and branches.',
+							tabId: 'locations-tab'
+						},
+						{
+							element: '#locations button[data-bs-target="#locationModal"]',
+							title: 'Add New Location',
+							intro: 'Click here to register a new branch or office location with latitude and longitude coordinates.',
+							tabId: 'locations-tab'
+						},
+						{
+							element: '#locations .row.mb-4.g-4',
+							title: 'Location Summary Statistics',
+							intro: 'Quickly review count summaries of operational Head Offices and Branch Offices.',
+							tabId: 'locations-tab'
+						},
+						{
+							element: '#locations .table-responsive',
+							title: 'Office Locations Table',
+							intro: 'Manage geofenced location entries. These are used to verify and secure employee attendance logs.',
+							tabId: 'locations-tab'
+						}
+					],
+					showBullets: true,
+					showProgress: true,
+					helperElementPadding: 5,
+					exitOnOverlayClick: false,
+					doneLabel: 'Done',
+					nextLabel: 'Next',
+					prevLabel: 'Prev',
+					skipLabel: 'Skip'
+				});
+
+				tour.onbeforechange(function(targetElement) {
+					if (!targetElement) return;
+
+					// Find closest tab-pane containing the target element
+					let tabPane = targetElement.closest('.tab-pane');
+					if (tabPane) {
+						let tabId = tabPane.getAttribute('id');
+						let tabTrigger = document.getElementById(tabId + '-tab');
+						if (tabTrigger && !tabTrigger.classList.contains('active')) {
+							let tab = new bootstrap.Tab(tabTrigger);
+							tab.show();
+						}
+					} else if (targetElement.classList.contains('nav-link') && targetElement.getAttribute('data-bs-toggle') === 'pill') {
+						let tab = new bootstrap.Tab(targetElement);
+						tab.show();
+					}
+				});
+
+				tour.start();
+			}
+
+			if (typeof introJs === 'function') {
+				launch();
+			} else {
+				// CSS
+				if (!document.getElementById('introjs-cdn-css')) {
+					let css = document.createElement('link');
+					css.id = 'introjs-cdn-css';
+					css.rel = 'stylesheet';
+					css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+					document.head.appendChild(css);
+				}
+
+				// JS
+				let js = document.createElement('script');
+				js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+				js.onload = function() {
+					launch();
+				};
+				document.body.appendChild(js);
+			}
+		}
+
+		function bindProfileTour() {
+			const btn = document.getElementById('start-profile-tour');
+			if (btn) {
+				btn.addEventListener('click', function(e) {
+					e.preventDefault();
+					startProfileTour();
+				});
+			}
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', bindProfileTour);
+		} else {
+			bindProfileTour();
+		}
     </script>
 
 

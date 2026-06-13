@@ -12,13 +12,16 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Liabilities & Borrowings</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/liabilites-list')}}">Liabilities & Borrowing List</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Edit Liability</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-edit-liabilities-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -1793,7 +1796,48 @@ $(document).ready(function () {
 
     });
 
-    
+    function startEditLiabilitiesTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Edit Liabilities Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-edit-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Modify and update details for this liability record. Fields are dynamically presented based on the liability type.</p></div>'
+                },
+                {
+                    element: '#liabilitiesType',
+                    title: 'Liability Type',
+                    intro: 'This field shows the type of liability and is locked for editing once created.'
+                },
+                {
+                    element: 'select[name="propId"]',
+                    title: 'Proprietorship Entity',
+                    intro: 'Update the assigned proprietorship company registration if needed.'
+                },
+                {
+                    element: 'button[type="submit"]',
+                    title: 'Save Changes',
+                    intro: 'Click here to save the updated details and update the balance sheet ledger.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-edit-liabilities-tour').on('click', function(e) {
+            e.preventDefault();
+            startEditLiabilitiesTour();
+        });
+    });
 </script>
 
 @endsection

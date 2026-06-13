@@ -7,11 +7,16 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">GST Management</a></li>
-                        <li class="breadcrumb-item" aria-current="page">GST Compliance Support List</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">GST Management</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">GST Compliance Support List</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-gst-support-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <i class="ti ti-help-circle f-18"></i> <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
@@ -20,7 +25,7 @@
                 </div>
 				@if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
                 <div class="col-md-8 text-end">
-                    <a href="#supportTicketModal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#supportTicketModal"><i class="ti ti-square-plus"></i> Generate New Support Ticket</a>
+                    <a href="#supportTicketModal" class="btn btn-primary btn-generate-ticket" data-bs-toggle="modal" data-bs-target="#supportTicketModal"><i class="ti ti-square-plus"></i> Generate New Support Ticket</a>
                 </div>
 				@endif
             </div>
@@ -49,7 +54,7 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card gst-support-card">
                 <div class="table-responsive">
                     <table class="table tbl-product my-3">
                         <thead>
@@ -104,7 +109,7 @@
 											<ul class="list-inline me-auto mb-0">
 												<li class="list-inline-item" data-bs-toggle="tooltip" title="View Chat">
 													<a href="#ticketChatModal"
-													   class="avtar avtar-xs btn-link-warning btn-pc-default"
+													   class="avtar avtar-xs btn-link-warning btn-pc-default ticket-chat-btn"
 													   data-bs-toggle="modal"
 													   data-bs-target="#ticketChatModal"
 													   onclick="openChat({{ $ticket->id }},'{{ $ticket->status }}')">
@@ -802,7 +807,48 @@
 	}
 
 
+	function startGstSupportTour() {
+		if (typeof introJs !== 'function') return;
 
+		introJs().setOptions({
+			steps: [
+				{
+					title: 'GST Compliance Support',
+					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-help-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Raise support tickets here to consult directly with Chartered Accountants and GST experts.</p></div>'
+				},
+				{
+					element: '.btn-generate-ticket',
+					title: 'Generate Support Ticket',
+					intro: 'Click here to create a new support ticket, choose query categories, and attach relevant files.'
+				},
+				{
+					element: '.gst-support-card',
+					title: 'Tickets Table',
+					intro: 'Track and monitor the status of all your raised support queries (Open, Resolved, Closed) here.'
+				},
+				{
+					element: '.ticket-chat-btn',
+					title: 'Conversation Chat',
+					intro: 'Click this chat button to communicate with experts, reply to queries, and upload attachments.'
+				}
+			],
+			showBullets: true,
+			showProgress: true,
+			helperElementPadding: 5,
+			exitOnOverlayClick: false,
+			doneLabel: 'Done',
+			nextLabel: 'Next',
+			prevLabel: 'Prev',
+			skipLabel: 'Skip'
+		}).start();
+	}
+
+	$(document).ready(function() {
+		$('#start-gst-support-tour').on('click', function(e) {
+			e.preventDefault();
+			startGstSupportTour();
+		});
+	});
 
 </script>
 @endsection

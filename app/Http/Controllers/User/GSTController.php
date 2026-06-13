@@ -1087,6 +1087,7 @@ class GSTController extends Controller
 			//->groupBy('sales.id','sales.inv_num','sales.seller_gst','sales.inv_date','sales.seller_state','sales.inv_name')
 			->whereBetween('sales.inv_date', [$fromDate, $toDate])
 			->where('sales.status', 1) //only active records
+			->where('sales.pay_status', 'Full')
 			->where('sales.added_by', '=', $userId)
 			->when($flag === 'B2B', function ($q) {
 				$q->where('gst_type', 'B2B');
@@ -1304,6 +1305,7 @@ class GSTController extends Controller
             ->where('sales.gst_type', '=', 'B2B')
 			->where('sales.added_by', '=', $userId)
 			->where('sales.status', 1) //only active records
+			->where('sales.pay_status', 'Full')
             ->groupBy('products.hsn_code','products.sac_code', 'products.base_unit','sales_values.gst_trans', 'sales_values.gst_rate')
             ->get()
             ->map(function ($item, $index) {
@@ -1349,6 +1351,7 @@ class GSTController extends Controller
 			->where('sales.gst_type', '!=', 'B2B')
 			->where('sales.added_by', '=', $userId)
 			->where('sales.status', 1) //only active records
+			->where('sales.pay_status', 'Full')
             ->where(function ($q) {
                 $q->whereNull('customers.cust_gst_no')
                   ->orWhere('customers.cust_gst_no', '=', '');
@@ -1407,6 +1410,7 @@ class GSTController extends Controller
 			->whereBetween('sales.inv_date', [$fromDate, $toDate])
 			->where('sales.added_by', '=', $userId)
 			->where('sales.status', 1) //only active records
+			->where('sales.pay_status', 'Full')
 			->groupBy('sales.id', 'sales.inv_num', 'sales.inv_date', 'sales.status', 'customers.cust_gst_no')
 			//->havingRaw('SUM(sales_values.amount) > 250000')
 			->orderBy('sales.inv_num', 'asc')

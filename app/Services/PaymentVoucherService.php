@@ -70,7 +70,7 @@ class PaymentVoucherService
 	// ===============================================
 	// SALES / PURCHASE PAYMENT VOUCHER ENTRY
 	// ===============================================
-	public function storePaymentVoucherEntries($id, $source = 'Sales', $currentPayment = 0)
+	public function storePaymentVoucherEntries($id, $source = 'Sales', $currentPayment = 0, array $data = [])
 	{
 		DB::beginTransaction();
 
@@ -127,7 +127,7 @@ class PaymentVoucherService
 
 					$voucherType = 'Receipt Voucher';
 					$propId = $sales->propId;
-					$date = $sales->inv_date;
+					$date = $data['date'] ?? $sales->inv_date;
 					$invoiceNo = $id; //$sales->inv_num;
 					$partyType = 'Customer';
 					$partyId = $sales->customer_id ?? null;
@@ -144,7 +144,7 @@ class PaymentVoucherService
 						$transactionDetails = 'Advance';
 					}
 					$creditDebit = 'Credit';
-					$paymentMode = $this->getPaymentMode($sales->mode_of_pay ?? '');
+					$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $sales->mode_of_pay ?? null);
 					$referenceId = $sales->supplier_refno ?? null;
 					$narration = 'Sales Invoice Entry';
 			}
@@ -195,7 +195,7 @@ class PaymentVoucherService
 
 				$voucherType = 'Payment Voucher';
 				$propId = $purchase->propId;
-				$date = $purchase->inv_date;
+				$date = $data['date'] ?? $purchase->inv_date;
 				$invoiceNo = $id; //$purchase->inv_num;
 				$partyType = 'Vendor';
 				$partyId = $purchase->vendor_id ?? null;
@@ -212,7 +212,7 @@ class PaymentVoucherService
 					$transactionDetails = 'Advance';
 				}
 				$creditDebit = 'Debit';
-				$paymentMode = $this->getPaymentMode($purchase->mode_of_pay ?? '');
+				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $purchase->mode_of_pay ?? null);
 				$referenceId = $purchase->supplier_refno ?? null;
 				$narration = 'Purchase Invoice Entry';
 			}

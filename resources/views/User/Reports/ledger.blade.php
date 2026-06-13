@@ -4,20 +4,25 @@
 
 <div class="pc-content">
 
-<!-- [ breadcrumb ] start -->
+    <!-- [ breadcrumb ] start -->
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Financial Reports</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Accounts & Ledger</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Financial Reports</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Ledger Report</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-ledger-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
-                        <h2 class="mb-0">Accounts & Ledger</h2>
+                        <h2 class="mb-0">Ledger Report</h2>
                     </div>
                 </div>
             </div>
@@ -30,18 +35,20 @@
         <div class="col-md-12">
 
             <!-- FILTER CARD -->
-            <div class="card mb-4">
-                <div class="card-header py-3">
-                    <h4 class="text-center mb-0">Generate Ledger Report</h4>
+            <div class="card mb-4 reconciliation-filter-card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <div class="card-header py-3" style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                    <h5 class="mb-0 text-primary d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
+                        <i class="ti ti-filter f-20"></i> Filter Ledger Options
+                    </h5>
                 </div>
 
-                <div class="card-body">
+                <div class="card-body p-4">
                     <form method="POST" name="frmLedger" id="frmLedger" action="javascript:void(0);">
                         <div class="row g-3">
 
                             <div class="col-md-3">
-								<label class="form-label">Proprietorship Company</label>
-								<select name="propId" id="propId" class="form-control">
+								<label class="form-label fw-semibold text-muted">Proprietorship Company</label>
+								<select name="propId" id="propId" class="form-select">
 									<option value="">{{ parentCompanyName() }}</option>
 									@foreach($proprietorships as $company)
 										<option value="{{ $company->id }}">
@@ -51,28 +58,53 @@
 								</select>
 							</div>
 
-                            <!-- FROM DATE -->
-                            <div class="col-md-3">
-                                <label class="form-label">From Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="from_date" id="from_date" required>
-                            </div>
+							<div class="col-md-3">
+								<label class="form-label fw-semibold text-muted">Customers <span class="text-danger">*</span></label>
+								<select class="form-select" name="custId" id="custId">
+									<option value="">All</option>
+									@foreach($customers as $c)
+										<option value="{{ $c->id }}">
+											{{ $c->cust_name }}
+										</option>
+									@endforeach
+								</select>
+							</div>
+							
+							<div class="col-md-3">
+								<label class="form-label fw-semibold text-muted">Vendors <span class="text-danger">*</span></label>
+								<select class="form-select" name="vendId" id="vendId">
+									<option value="">All</option>
+									@foreach($vendors as $v)
+										<option value="{{ $v->id }}">
+											{{ $v->vendor_name }}
+										</option>
+									@endforeach
+								</select>
+							</div>
+							
+							<div class="col-md-3">
+								<label class="form-label fw-semibold text-muted">Party Name <span class="text-danger">*</span></label>
+								<select class="form-select" name="party_name" id="party_name">
+									<option value="">All</option>
 
-                            <!-- TO DATE -->
-                            <div class="col-md-3">
-                                <label class="form-label">To Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="to_date" id="to_date" required>
-                            </div>
+									@foreach($parties as $party)
+										<option value="{{ $party }}">
+											{{ $party }}
+										</option>
+									@endforeach
+								</select>
+							</div>
 
                             <!-- LEDGER NAME (7 TYPES) -->
                             <div class="col-md-3">
-                                <label class="form-label">Ledger Name <span class="text-danger">*</span></label>
+                                <label class="form-label fw-semibold text-muted">Ledger Name <span class="text-danger">*</span></label>
                                 <select class="form-select" name="ledger_name" id="ledger_name" required>
                                     <option value="">Select Ledger</option>
                                     <option value="all">General Entries</option>
-                                    <option value="customer">Customer Ledger</option>
-                                    <option value="supplier">Supplier Ledger</option>
-                                    <option value="sales">Sales Ledger</option>
+									<option value="sales">Sales Ledger</option>
                                     <option value="purchase">Purchase Ledger</option>
+                                    <option value="customer">Customer Ledger</option>
+                                    <option value="supplier">Supplier Ledger</option>                                    
                                     <option value="bank">Bank Ledger</option>
                                     <option value="gst_output">GST Output Ledger</option>
                                     <option value="gst_input">GST Input Ledger</option>
@@ -81,7 +113,7 @@
 
                             <!-- LEDGER GROUP -->
                             <div class="col-md-3">
-                                <label class="form-label">Ledger Group <span class="text-danger">*</span></label>
+                                <label class="form-label fw-semibold text-muted">Ledger Group</label>
                                 <select class="form-select" name="ledger_group" id="ledgerGroup" onchange="handleLedgerGroup()" >
                                     <option value="">Select Group</option>
                                     <option value="assets">Assets</option>
@@ -93,7 +125,7 @@
 
                             <!-- LEDGER SUB GROUP -->
                             <div class="col-md-3">
-                                <label class="form-label">Ledger Sub Group</label>
+                                <label class="form-label fw-semibold text-muted">Ledger Sub Group</label>
                                 <select class="form-select" name="ledger_sub_group" id="ledgerSubGroup" disabled>
                                     <option value="">Select Sub Group</option>
                                 </select>
@@ -101,25 +133,42 @@
 
                             <!-- OPENING BALANCE -->
                             <div class="col-md-3">
-                                <label class="form-label">Opening Balance (₹)</label>
+                                <label class="form-label fw-semibold text-muted">Opening Balance (₹)</label>
                                 <input type="number" step="0.01" value="{{ $openingBalance }}" class="form-control" name="opening_balance"  id="opening_balance">
                             </div>
+                        </div>
 
-                            <!-- GENERATE BUTTON -->
-                            <div class="col-md-3 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    Generate Ledger Report
-                                </button>
+                        <div class="row g-3 mt-1">
+                            <!-- FROM DATE -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted">From Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="from_date" id="from_date" required>
                             </div>
 
+                            <!-- TO DATE -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted">To Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="to_date" id="to_date" required>
+                            </div>
+
+                            <div class="col-md-6 d-flex align-items-end justify-content-end gap-2">
+                                <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center gap-2" style="height: 41px; min-width: 200px;">
+                                    <i class="ti ti-settings f-18"></i> Generate Ledger Report
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
             </div>
 
             <!-- LEDGER TABLE -->
-            <div class="card">
-                <div class="card-body">
+            <div class="card mb-4 ledger-table-card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <div class="card-header py-3" style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                    <h5 class="mb-0 text-primary d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
+                        <i class="ti ti-table f-20"></i> Ledger Records
+                    </h5>
+                </div>
+                <div class="card-body p-4">
                     <div class="table-responsive">
 
                         <table id="ledgerTable" class="table table-bordered table-sm text-nowrap">
@@ -194,8 +243,9 @@
 
                     <!-- ACTION BUTTONS -->
                     <div class="text-end mt-3">
-                        <!--<button class="btn btn-secondary me-2">Print</button>-->
-                        <button class="btn btn-primary" onclick="exportLedgerToExcel()">Download</button>
+                        <button class="btn btn-primary d-inline-flex align-items-center gap-2" onclick="exportLedgerToExcel()">
+                            <i class="ti ti-download f-18"></i> Download Excel
+                        </button>
                     </div>
 
                 </div>
@@ -521,6 +571,54 @@
 		 const sign = amount < 0 ? '-' : '';
 		return sign + Math.abs(amount).toLocaleString('en-IN');
 	}
+
+    function startLedgerTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Ledger Report Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-file-text" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Ledger Report generator. Here you can generate complete financial ledger reports for General entries, sales, purchases, banks, customers, and suppliers.</p></div>'
+                },
+                {
+                    element: '.reconciliation-filter-card',
+                    title: 'Filter Ledger Parameters',
+                    intro: 'Configure date ranges, companies, party names, ledger types, groups, and opening balance.'
+                },
+                {
+                    element: '.ledger-table-card',
+                    title: 'Ledger Records Table',
+                    intro: 'The generated transactions will display here. You can view narration, debit/credit details, and the running balance.'
+                },
+                {
+                    element: '#ledgerSummary',
+                    title: 'Ledger Summary',
+                    intro: 'Displays closing balance, total debits, and total credits calculated from the generated report.'
+                },
+                {
+                    element: 'button[onclick="exportLedgerToExcel()"]',
+                    title: 'Download Excel',
+                    intro: 'Click here to download the generated ledger report as a formatted Excel spreadsheet.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-ledger-tour').on('click', function(e) {
+            e.preventDefault();
+            startLedgerTour();
+        });
+    });
 </script>
 
 @endsection

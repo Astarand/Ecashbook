@@ -3,11 +3,29 @@
 @section('container')
 
 <div class="pc-content">
-    <div class="col-md-4">
-		<div class="page-header-title">
-			<h2 class="mb-0">Edit Other Income</h2>
-		</div>
-	</div>
+    <!-- [ breadcrumb ] start -->
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/other-income-list">Other Income List</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Other Income</li>
+                    </ul>
+                    <a href="javascript:void(0);" id="start-edit-income-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
+                <div class="col-md-12 mt-2">
+                    <div class="page-header-title">
+                        <h2 class="mb-0">Edit Other Income</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ breadcrumb ] end -->
 
     <div class="col-md-12">
         <div class="card">
@@ -39,18 +57,18 @@
 							<select id="incomeType" name="incomeType" class="form-select" required>
 								<option value="">Select</option>
 								<option value="Revenue" {{ $income->incomeType == 'Revenue' ? 'selected' : '' }}>
-									Revenue from Operations
+									Other Operating Income
 								</option>
 								<option value="Other" {{ $income->incomeType == 'Other' ? 'selected' : '' }}>
-									Other Income
+									Other Non-Operating Income
 								</option>
 							</select>
 						</div>
 						
 						<div class="col-sm-3 mb-3">
-                            <label class="form-label">Service Category<span class="text-danger">*</span></label>
+                            <label class="form-label">Income Category<span class="text-danger">*</span></label>
                             <select id="categoryIncome" name="categoryIncome" required class="form-select">
-                                <option value="">Select Services</option>                                
+                                <option value="">Select Category</option>                                
                                 <!--<option value="Other Income" <?=($income->categoryIncome == "Other Income") ? 'selected' : '' ?>>Other Income</option>-->
                             </select>
                         </div>
@@ -61,7 +79,11 @@
                         </div>
 												
 						<div class="col-md-3 mb-3">
-							<label class="form-label">Customer / Party Name<span class="text-danger">*</span></label>
+							<label class="form-label">Party / Source Name<span class="text-danger"></span></label>
+							<input type="text" name="customer_name" id="customer_name" class="form-control" value="{{$income->customer_name}}">
+						</div>
+						<!--<div class="col-md-3 mb-3">
+							<label class="form-label">Party / Source Name<span class="text-danger"></span></label>
 							<select name="customer_id" id="customer_id" required class="form-control">
 								<option value="">Select</option>
 								@foreach($customers as $customer)
@@ -70,7 +92,7 @@
 									</option>
 								@endforeach
 							</select>
-						</div>
+						</div>-->
 						<div class="col-md-3 mb-3">
 							<label class="form-label">Invoice / Reference Number</label>
 							<input type="text" name="invoice_no" id="invoice_no" value="{{$income->invoice_no}}" class="form-control">
@@ -268,22 +290,34 @@
 	$(document).ready(function () {
 
 		const revenueOptions = [
-			"Sales of Goods",
-			"Service Income",
-			"Contract / Job Work Income",
-			"Commission / Brokerage",
-			"Other Operating Income"
+			"Freight / Delivery Charges Recovery",
+			"Packing & Handling Charges Recovery",
+			"Installation Charges",
+			"Training Charges",
+			"AMC / Maintenance Charges",
+			"Commission Income",
+			"Service Recovery Charges",
+			"Documentation Charges",
+			"Processing Charges",
+			"Onboarding Charges",
+			"Platform / API Usage Charges",
+			"SMS / Communication Charges Recovery",
+			"Data Migration Charges",
+			"Scrap Sales",			
+			"Miscellaneous Operating Income"
 		];
 
 		const otherOptions = [
 			"Interest Income",
 			"Rental Income",
 			"Dividend Income",
-			"Net Gain on Sale of Investments",
-			"Net Gain on Sale of Fixed Assets",
-			"Royalty / License Income",
-			"Miscellaneous Income",
-			"Other Income"
+			"Profit on Sale of Fixed Assets",
+			"Profit on Sale of Investments",
+			"Foreign Exchange Gain",
+			"Insurance Claim Received",
+			"Bad Debts Recovered",
+			"Government Grant / Subsidy Income",
+			"Miscellaneous Non-Operating Income"
 		];
 
 		// Get old values from blade
@@ -329,8 +363,8 @@
 		$('#categoryIncome').on('change', function () {
 			let selected = $(this).val();
 			if (
-				selected === "Other Income" ||
-				selected === "Other Operating Income"
+				selected === "Miscellaneous Non-Operating Income" ||
+				selected === "Miscellaneous Operating Income"
 			) {
 				$('#otherIncomeCategory').show();
 			} else {
@@ -340,7 +374,7 @@
 		});
 
 		// Show "Other" if already selected in edit
-		if (selectedCategory === "Other Income" || selectedCategory === "Other Operating Income") {
+		if (selectedCategory === "Miscellaneous Non-Operating Income" || selectedCategory === "Miscellaneous Operating Income") {
 			$('#otherIncomeCategory').show();
 		}
 
@@ -661,5 +695,37 @@
     });
 
 
+
+    function startEditIncomeTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Edit Income Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-info-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Update date, source, category, and amount of this income.</p></div>'
+                },
+                {
+                    title: 'Edit Income',
+                    intro: 'Update date, source, category, and amount of this income.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-edit-income-tour').on('click', function(e) {
+            e.preventDefault();
+            startEditIncomeTour();
+        });
+    });
 </script>
 @endsection

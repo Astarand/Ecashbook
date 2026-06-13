@@ -7,13 +7,16 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Sales & Revenue</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Credit & Debit Note</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-sales-credit-debit-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
@@ -21,7 +24,7 @@
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
-                    <a href="{{ route('user.AddSalesCreditDebit') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Credit / Debit Note</a>
+                    <a href="{{ route('user.AddSalesCreditDebit') }}" id="add-credit-debit-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Credit / Debit Note</a>
                 </div>
             </div>
         </div>
@@ -136,8 +139,54 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('page-script')
 <script>
+    function startSalesCreditDebitTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Credit & Debit Notes List',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-receipt" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Review and manage credit and debit adjustments issued against your sales invoices.</p></div>'
+                },
+                {
+                    element: '#add-credit-debit-btn',
+                    title: 'Add Adjustment Note',
+                    intro: 'Click here to issue a new Credit/Debit Note adjusting balances for an existing client invoice.'
+                },
+                {
+                    element: '#pc-dt-simple',
+                    title: 'Adjustment Registry',
+                    intro: 'Browse all registered credit/debit notes, showing customer names, dates, amounts, note types, and statuses.'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Action Controls',
+                    intro: 'View details of the note, edit notes (if permitted), or delete notes.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            skipIfNoElement: true,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-sales-credit-debit-tour').on('click', function(e) {
+            e.preventDefault();
+            startSalesCreditDebitTour();
+        });
+    });
+
     let deleteId = null; // Store the ID of the customer to be deleted
 
     // Capture the customer ID when the delete button is clicked

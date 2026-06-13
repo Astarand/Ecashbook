@@ -7,14 +7,17 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/agent-list') }}">Agent & Channel Partner</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Add Agent / Channel Partner</li>
+                        <li class="breadcrumb-item active" aria-current="page">Add Agent</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-add-agent-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -180,7 +183,7 @@
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="d-flex justify-content-between align-items-center mb-4">
                                         <h5>Current Address</h5>
-                                        <div class="btn btn-primary" onclick="copyParamanentAddress()">Same as Permanent Address</div>
+                                         <div class="btn btn-primary" id="copy-permanent-address-btn" onclick="copyParamanentAddress()">Same as Permanent Address</div>
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-6">
@@ -251,8 +254,60 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('page-script')
 <script>
+    function startAddAgentTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Add New Agent / Partner',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-user-plus" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Input personal profile details and addresses to register a new partner.</p></div>'
+                },
+                {
+                    element: '#personalDetail',
+                    title: 'Agent Details Form',
+                    intro: 'Provide the agent name, contact number, email, and company details here.'
+                },
+                {
+                    element: '#address',
+                    title: 'Address Information',
+                    intro: 'Define the permanent and current addresses. Use the copy shortcut if they are identical.'
+                },
+                {
+                    element: '#copy-permanent-address-btn',
+                    title: 'Address Shortcut',
+                    intro: 'Click here to copy the permanent address to the current address fields automatically.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).onbeforechange(function(targetElement) {
+            if (targetElement.id === 'personalDetail') {
+                // Switch to agent details tab
+                document.querySelector('.nav-pills .nav-link[href="#personalDetail"]').click();
+            } else if (targetElement.id === 'address' || targetElement.id === 'copy-permanent-address-btn') {
+                // Switch to address tab
+                document.querySelector('.nav-pills .nav-link[href="#address"]').click();
+            }
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-add-agent-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddAgentTour();
+        });
+    });
     document.getElementById('fileInput').addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (file) {

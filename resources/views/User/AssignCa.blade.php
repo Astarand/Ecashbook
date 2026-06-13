@@ -7,13 +7,16 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Assign CA Firm / Accountant</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-assign-ca-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Assign CA Firm / Accountant</h2>
                     </div>
@@ -1104,4 +1107,82 @@
         zipInput.addEventListener("input", filterCACards);
         expertCheckboxes.forEach(cb => cb.addEventListener("change", filterCACards));
     });
+
+    function startAssignCATour() {
+        function launch() {
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Assign CA / Accountant Guide',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ph-duotone ph-user-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Connect with professional Chartered Accountants or Accounting Professionals to manage your accounting operations.</p></div>'
+                    },
+                    {
+                        element: '.ca-highlight-section',
+                        title: 'Add Existing Professional',
+                        intro: 'Click "clicking here" to open the drawer panel. Enter their name, mobile, email, and location details to add your existing CA.'
+                    },
+                    {
+                        element: '#ecom-filter',
+                        title: 'Search & Filters',
+                        intro: 'Filter CA firms by name, pincode/zip code, or select specific categories (e.g., GST Registration, TDS Filing) to find the right professional.'
+                    },
+                    {
+                        element: '.ecom-content',
+                        title: 'CA / Accountant Directory',
+                        intro: 'View details of available CA firms: their total assigned clients, verification status, active status, areas of expertise, and office address.'
+                    },
+                    {
+                        element: '.assignCABtn',
+                        title: 'Send Assignment Invitation',
+                        intro: 'Click here to send an invitation request to assign your bookkeeping, taxation, or payroll modules to the CA.'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            }).start();
+        }
+
+        if (typeof introJs === 'function') {
+            launch();
+        } else {
+            // CSS
+            if (!document.getElementById('introjs-cdn-css')) {
+                let css = document.createElement('link');
+                css.id = 'introjs-cdn-css';
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+                document.head.appendChild(css);
+            }
+
+            // JS
+            let js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+            js.onload = function() {
+                launch();
+            };
+            document.body.appendChild(js);
+        }
+    }
+
+    function bindAssignCATour() {
+        const btn = document.getElementById('start-assign-ca-tour');
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                startAssignCATour();
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindAssignCATour);
+    } else {
+        bindAssignCATour();
+    }
 </script>

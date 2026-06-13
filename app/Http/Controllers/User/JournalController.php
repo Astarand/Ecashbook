@@ -13,27 +13,53 @@ use Carbon\Carbon;
 use PDF;
 use App\Models\Journals;
 use App\Models\JournalAttachments;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class JournalController extends Controller
 {
-    public function JournalList(request $request)
-    {
+    
+	public function JournalList(Request $request)
+	{
 		$userId = currentOwnerId();
 
-		//start ca-accountant access
-		$req_type = 0;
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 			$userId = getAccessCompanyId($request);
 			$req_type = 1;
+		} else {
+			$req_type = 0;
 		}
-		
-		//end ca-accountant access
 
-		$journals = Journals::where('added_by', $userId)
-					->orderBy('id', 'desc') // or 'asc' as per requirement
-					->paginate(10);
-		// Calculate GST + Total Amount
+		$query = Journals::where('added_by', $userId);
+
+		// Party Filter
+		if ($request->filled('party_name')) {
+			$query->where('ledger', $request->party_name);
+		}
+
+		// From Date
+		if ($request->filled('from_date')) {
+			$query->whereDate('journal_date', '>=', $request->from_date);
+		}
+
+		// To Date
+		if ($request->filled('to_date')) {
+			$query->whereDate('journal_date', '<=', $request->to_date);
+		}
+
+		$journals = $query
+			->orderBy('journal_date', 'desc')
+			->paginate(10)
+			->appends($request->all());
+
+		// Party List
+		$parties = Journals::where('added_by', $userId)
+			->whereNotNull('ledger')
+			->whereIn('party_name', ['Customer', 'Vendor'])
+			->select('ledger')
+			->distinct()
+			->pluck('ledger');
+
 		foreach ($journals as $journal) {
 
 			$gstRate = $journal->gst_rate ?? 0;
@@ -42,14 +68,100 @@ class JournalController extends Controller
 			$gstAmount = ($amount * $gstRate) / 100;
 			$totalAmount = $amount + $gstAmount;
 
-			// Attach dynamic values
-			$journal->gst_amount   = $gstAmount;
-			$journal->total_amount = $totalAmount;
+			$journal->gst_amount = $gstAmount;
+
+			if (in_array($journal->entry_type, ['Sales', 'Purchase'])) {
+				$journal->total_amount = $amount;
+			} else {
+				$journal->total_amount = $totalAmount;
+			}
 		}
-		//echo "<pre>";print_r($journals);exit;
-		return view('User.Reports.journal-list', compact('journals', 'req_type'));
-    }
-    public function AddJournal()
+
+		return view(
+			'User.Reports.journal-list',
+			compact(
+				'journals',
+				'req_type',
+				'parties'
+			)
+		);
+	}
+	
+	public function export(Request $request)
+	{
+		$userId = currentOwnerId();
+		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
+			$userId = getAccessCompanyId($request);
+		} 
+
+		$query = Journals::where('added_by', $userId);
+
+		if ($request->filled('party_name')) {
+			$query->where('ledger', $request->party_name);
+		}
+
+		if ($request->filled('from_date')) {
+			$query->whereDate('journal_date', '>=', $request->from_date);
+		}
+
+		if ($request->filled('to_date')) {
+			$query->whereDate('journal_date', '<=', $request->to_date);
+		}
+
+		$journals = $query->orderBy('journal_date')->get();
+
+		$data = [];
+
+		$data[] = [
+			'Date',
+			'Journal No',
+			'Entry Type',
+			'Ledger',
+			'Dr/Cr',
+			'Amount',
+			'GST %',
+			'TDS Amount',
+			'Party',
+			'Status',
+			'Notes'
+		];
+
+		foreach ($journals as $row) {
+
+			$data[] = [
+				$row->journal_date,
+				'JV-'.$row->journal_no,
+				$row->entry_type,
+				$row->ledger,
+				$row->debit_credit,
+				$row->amount,
+				$row->gst_rate,
+				$row->tds_amt,
+				$row->party_name,
+				$row->status,
+				$row->notes
+			];
+		}
+
+		return Excel::download(
+			new class($data) implements \Maatwebsite\Excel\Concerns\FromArray {
+				private $data;
+
+				public function __construct($data)
+				{
+					$this->data = $data;
+				}
+
+				public function array(): array
+				{
+					return $this->data;
+				}
+			},
+			'Journal_Report_'.date('Ymd_His').'.xlsx'
+		);
+	}
+	
+	public function AddJournal()
     {
 		$userId = currentOwnerId();
 		$purposes_of_tds = DB::table('tds_rules')

@@ -7,15 +7,18 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
                         <li class="breadcrumb-item"><a href="#">HR, Payroll & Attendance</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Add Employee</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-add-employee-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Add Employee</h2>
                     </div>
@@ -269,7 +272,7 @@
                                         <div class="col-lg-6 col-sm-12">
                                             <div class="d-flex justify-content-between align-items-center mb-4">
                                                 <h5>Permanent Address</h5>
-                                                <div class="btn btn-primary" onclick="copyParamanentAddress()">Same as Current Address</div>
+                                                <div class="btn btn-primary" id="copy-permanent-address-btn" onclick="copyParamanentAddress()">Same as Current Address</div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-sm-6">
@@ -591,16 +594,16 @@
                                                     class="form-control"
                                                     name="basic_percentage"
                                                     id="basic_percentage"
-                                                    value="40"
+                                                    value="50"
                                                     min="30"
-                                                    max="40"
+                                                    max="50"
                                                     step="1"
-                                                    oninput="if(this.value > 40) this.value = 40;
+                                                    oninput="if(this.value > 50) this.value = 50;
                                                         if(this.value < 30) this.value = 30;"
                                                     required
                                                 />
                                                 <small class="text-danger">
-                                                    Percentage must be between 30 and 40
+                                                    Percentage must be between 30 and 50
                                                 </small>
 
                                                 
@@ -1244,6 +1247,9 @@
     </div>
 </div>
 
+@endsection
+
+@section('page-script')
 <script>
     // Auto Fetch filled email for login when user types email in the email field
     const emailInput = document.getElementById('email');
@@ -2426,5 +2432,104 @@
 		}
 
 	});
+
+    function startAddEmployeeTour() {
+        if (typeof introJs !== 'function') return;
+
+        let tour = introJs().setOptions({
+            steps: [
+                {
+                    title: 'Add Employee Wizard Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-user-plus" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Follow this interactive guide to fill in all personal, address, payroll, banking, attachment, and permission settings for a new employee.</p></div>'
+                },
+                {
+                    element: 'a[href="#personalDetail"]',
+                    title: 'Personal Details Tab',
+                    intro: 'This tab holds basic employee details (Name, Contact No, DOB, Aadhaar, and PAN).'
+                },
+                {
+                    element: '#name',
+                    title: 'Employee Name',
+                    intro: 'Enter the official name of the employee.'
+                },
+                {
+                    element: 'a[href="#address"]',
+                    title: 'Address & References Tab',
+                    intro: 'Capture both Current and Permanent addresses, and details for emergency contacts.'
+                },
+                {
+                    element: '#copy-permanent-address-btn',
+                    title: 'Same as Current Address',
+                    intro: 'If the permanent address is identical to the current address, click here to copy it.'
+                },
+                {
+                    element: 'a[href="#jobDetails"]',
+                    title: 'Payroll Details Tab',
+                    intro: 'Assign departments, designations, joining dates, EPF/ESIC statutory compliance status, and Gross Salary calculations.'
+                },
+                {
+                    element: '#total_addition',
+                    title: 'Gross Salary',
+                    intro: 'Enter the monthly Gross Salary amount. Allowances and deductions will calculate automatically.'
+                },
+                {
+                    element: 'a[href="#bankDetails"]',
+                    title: 'Bank Details Tab',
+                    intro: 'Register the employee\'s official bank name, account number, branch, and IFSC code for salary payouts.'
+                },
+                {
+                    element: 'a[href="#attachments"]',
+                    title: 'Attachments Tab',
+                    intro: 'Upload scans of Aadhar, PAN, CV, educational certificates, and experience letters.'
+                },
+                {
+                    element: 'a[href="#access"]',
+                    title: 'Access Tab',
+                    intro: 'Set up login credentials (email, password) and assign specific portal module access permissions.'
+                },
+                {
+                    element: '#submitBtn',
+                    title: 'Submit Details',
+                    intro: 'Once all details are fully completed, click here to save the employee profile.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        });
+
+        tour.onbeforechange(function(targetElement) {
+            if (!targetElement) return;
+
+            // Find the closest tab-pane containing the target element
+            let tabPane = targetElement.closest('.tab-pane');
+            if (tabPane) {
+                let tabId = tabPane.getAttribute('id');
+                let tabTrigger = document.querySelector(`a[href="#${tabId}"]`);
+                if (tabTrigger && !tabTrigger.classList.contains('active')) {
+                    let tab = new bootstrap.Tab(tabTrigger);
+                    tab.show();
+                }
+            } else if (targetElement.getAttribute('href') && targetElement.getAttribute('data-bs-toggle') === 'tab') {
+                // If the target element is the tab trigger itself
+                let tab = new bootstrap.Tab(targetElement);
+                tab.show();
+            }
+        });
+
+        tour.start();
+    }
+
+    $(document).ready(function() {
+        $('#start-add-employee-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddEmployeeTour();
+        });
+    });
 </script>
 @endsection

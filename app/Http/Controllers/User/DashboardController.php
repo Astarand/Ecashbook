@@ -1401,16 +1401,6 @@ class DashboardController extends Controller
         $viewType = $request->view_type ?? 'monthly';
         $financialYear = $request->financial_year;
 
-        if (!$financialYear || strpos($financialYear, '-') === false) {
-            $currentYear = date('Y');
-            $currentMonth = date('n');
-            if ($currentMonth >= 4) {
-                $financialYear = $currentYear . '-' . ($currentYear + 1);
-            } else {
-                $financialYear = ($currentYear - 1) . '-' . $currentYear;
-            }
-        }
-
         list($startYear, $endYear) = explode('-', $financialYear);
 
         // Financial Year Months (Apr-Mar)
@@ -1442,7 +1432,7 @@ class DashboardController extends Controller
             // Credit = Cash In
             $credit = DB::table('mcash_credit_debits')
                 ->where('added_by', $uid)
-                ->whereIn('cd_type', ['cr', 'Cr'])
+                ->where('cd_type', 'Cr')
                 ->whereMonth('cd_date', $m['month'])
                 ->whereYear('cd_date', $m['year'])
                 ->sum('cd_amount');
@@ -1450,7 +1440,7 @@ class DashboardController extends Controller
             // Debit = Cash Out
             $debit = DB::table('mcash_credit_debits')
                 ->where('added_by', $uid)
-                ->whereIn('cd_type', ['dr', 'Dr'])
+                ->where('cd_type', 'Dr')
                 ->whereMonth('cd_date', $m['month'])
                 ->whereYear('cd_date', $m['year'])
                 ->sum('cd_amount');
@@ -1574,4 +1564,15 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function completeTour(Request $request)
+    {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user) {
+            \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update(['tour_completed' => 1]);
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false], 401);
+    }
+
 }
+

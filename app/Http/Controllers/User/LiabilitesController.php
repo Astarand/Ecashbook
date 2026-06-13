@@ -1778,7 +1778,12 @@ class LiabilitesController extends Controller
 			->where('id', $id)
 			->update(['status' => 0]);
 			
-		//$delJournalRec = DB::table('journals')->where('autoId', $id)->delete();
+		$delJournalRec = DB::table('journals')
+								->where('autoId', $id)
+								->where('source', 'Liability')->delete();
+		$delPaymentRec = DB::table('payment_vouchers')
+							->where('f_id', $id)
+							->where('source', 'Liability')->delete();
 		
 		if ($updateStatus) {
 			// AUDIT LOG ENTRY

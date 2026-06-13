@@ -158,81 +158,82 @@ class ProformasController extends Controller
         }
     }
 
+	
+	private function buildPrefix($raw, $financialYear)
+	{
+		$parts = explode('/', trim($raw, '/'));
+
+		// 1. remove ONLY last numeric part
+		if (!empty($parts) && is_numeric(end($parts))) {
+			array_pop($parts);
+		}
+
+		// 2. replace FY ONLY if exists, otherwise DO NOTHING
+		foreach ($parts as $k => $v) {
+			if (preg_match('/^\d{2}-\d{2}$/', $v)) {
+				$parts[$k] = $financialYear;
+				return implode('/', $parts) . '/'; // STOP HERE (IMPORTANT FIX)
+			}
+		}
+
+		// 3. if FY not present, DO NOT INSERT blindly
+		return implode('/', $parts) . '/';
+	}
+	
 	public function generateProformaNumber($userId)
 	{
-		// Check company profile
 		$this->companyInfoFill($userId);
 
-		// Get company settings
 		$company = DB::table('company_profiles')
 			->where('userId', $userId)
 			->first(['comp_name', 'comp_prof_digits']);
 
-		if (!$company) {
-			return false;
-		}
+		if (!$company) return false;
 
-		/* ===============================
-		   1. FINANCIAL YEAR (APR–MAR)
-		=============================== */
-
-		$month = date('n');
+		/* FY */
 		$year  = date('Y');
+		$month = date('n');
 
-		if ($month >= 4) {
-			$startYear = substr($year, 2);
-			$endYear   = substr($year + 1, 2);
+		$fyStart = substr($month >= 4 ? $year : $year - 1, 2);
+		$fyEnd   = substr($month >= 4 ? $year + 1 : $year, 2);
+
+		$financialYear = $fyStart . '-' . $fyEnd;
+
+		/* PREFIX */
+		$prefix = !empty($company->comp_prof_digits)
+			? $this->buildPrefix($company->comp_prof_digits, $financialYear)
+			: strtoupper(substr($company->comp_name, 0, 3)) . '/' . $financialYear . '/';
+
+		/* LAST */
+		$lastInvoice = DB::table('proformas')
+			->where('added_by', $userId)
+			->where('inv_num', 'like', $prefix . '%')
+			->orderBy('id', 'desc')
+			->value('inv_num');
+
+		$next = 1;
+
+		if ($lastInvoice) {
+			$parts = explode('/', $lastInvoice);
+			$last = end($parts);
+
+			if (preg_match('/^\d+$/', $last)) {
+				$next = ((int)$last) + 1;
+			}
 		} else {
-			$startYear = substr($year - 1, 2);
-			$endYear   = substr($year, 2);
-		}
 
-		$financialYear = $startYear . '-' . $endYear;
+			// 🔥 FIX: ONLY use config numeric if exists (do NOT force wrong start)
+			if (!empty($company->comp_prof_digits)) {
+				$base = explode('/', trim($company->comp_prof_digits, '/'));
+				$lastPart = end($base);
 
-
-		/* ===============================
-		   2. PREFIX GENERATION
-		=============================== */
-
-		if (!empty($company->comp_prof_digits)) {
-
-			// Example stored: PI/001 or 367/PI
-			$basePrefix = trim($company->comp_prof_digits, '/');
-			$parts = explode('/', $basePrefix);
-
-			// Remove existing financial year if present
-			foreach ($parts as $key => $part) {
-				if (preg_match('/^\d{2}-\d{2}$/', $part)) {
-					unset($parts[$key]);
+				if (preg_match('/^\d+$/', $lastPart)) {
+					$next = ((int)$lastPart) + 1;
 				}
 			}
-
-			$parts = array_values($parts);
-
-			// Insert financial year after first element
-			array_splice($parts, 1, 0, $financialYear);
-
-			$finalPrefix = implode('/', $parts) . '/';
-
-		} else {
-
-			// Default prefix from company name
-			$prefix = strtoupper(substr($company->comp_name, 0, 3));
-			$seriesType = 'PI';
-
-			$finalPrefix = $prefix . '/' . $financialYear . '/' . $seriesType . '/';
 		}
-		/* ===============================
-		   3. FIND LAST NUMBER
-		=============================== */
-		$lastIncrement = DB::table('proformas')
-			->where('added_by', $userId)
-			//->where('inv_num', 'like', $finalPrefix . '%')
-			->select(DB::raw("MAX(CAST(SUBSTRING_INDEX(inv_num,'/',-1) AS UNSIGNED)) as max_num"))
-			->value('max_num');
-		$nextIncrement = $lastIncrement ? $lastIncrement + 1 : 1;
-		$increment = str_pad($nextIncrement, 4, '0', STR_PAD_LEFT);
-		return $finalPrefix . $increment;
+
+		return $prefix . str_pad($next, 4, '0', STR_PAD_LEFT);
 	}
 	
 	public function generateProformaNumberProprietorship($id, $userId)
@@ -241,72 +242,54 @@ class ProformasController extends Controller
 			->where('id', $id)
 			->first(['comp_name', 'comp_prof_digits']);
 
-		if (!$company) {
-			return false;
-		}
+		if (!$company) return false;
 
-		/* ===============================
-		   1. FINANCIAL YEAR (APR–MAR)
-		=============================== */
-
-		$month = date('n');
+		/* FY */
 		$year  = date('Y');
+		$month = date('n');
 
-		if ($month >= 4) {
-			$startYear = substr($year, 2);
-			$endYear   = substr($year + 1, 2);
+		$fyStart = substr($month >= 4 ? $year : $year - 1, 2);
+		$fyEnd   = substr($month >= 4 ? $year + 1 : $year, 2);
+
+		$financialYear = $fyStart . '-' . $fyEnd;
+
+		/* PREFIX */
+		$prefix = !empty($company->comp_prof_digits)
+			? $this->buildPrefix($company->comp_prof_digits, $financialYear)
+			: strtoupper(substr($company->comp_name, 0, 3)) . '/' . $financialYear . '/';
+
+		/* LAST */
+		$lastInvoice = DB::table('proformas')
+			->where('added_by', $userId)
+			->where('propId', $id)
+			->where('inv_num', 'like', $prefix . '%')
+			->orderBy('id', 'desc')
+			->value('inv_num');
+
+		$next = 1;
+
+		if ($lastInvoice) {
+			$parts = explode('/', $lastInvoice);
+			$last = end($parts);
+
+			if (preg_match('/^\d+$/', $last)) {
+				$next = ((int)$last) + 1;
+			}
 		} else {
-			$startYear = substr($year - 1, 2);
-			$endYear   = substr($year, 2);
-		}
 
-		$financialYear = $startYear . '-' . $endYear;
+			if (!empty($company->comp_prof_digits)) {
+				$base = explode('/', trim($company->comp_prof_digits, '/'));
+				$lastPart = end($base);
 
-
-		/* ===============================
-		   2. PREFIX GENERATION
-		=============================== */
-
-		if (!empty($company->comp_prof_digits)) {
-
-			// Example stored: PI/001 or 367/PI
-			$basePrefix = trim($company->comp_prof_digits, '/');
-			$parts = explode('/', $basePrefix);
-
-			// Remove existing financial year if present
-			foreach ($parts as $key => $part) {
-				if (preg_match('/^\d{2}-\d{2}$/', $part)) {
-					unset($parts[$key]);
+				if (preg_match('/^\d+$/', $lastPart)) {
+					$next = ((int)$lastPart) + 1;
 				}
 			}
-
-			$parts = array_values($parts);
-
-			// Insert financial year after first element
-			array_splice($parts, 1, 0, $financialYear);
-
-			$finalPrefix = implode('/', $parts) . '/';
-
-		} else {
-
-			// Default prefix from company name
-			$prefix = strtoupper(substr($company->comp_name, 0, 3));
-			$seriesType = 'PI';
-
-			$finalPrefix = $prefix . '/' . $financialYear . '/' . $seriesType . '/';
 		}
-		/* ===============================
-		   3. FIND LAST NUMBER
-		=============================== */
-		$lastIncrement = DB::table('proformas')
-			->where('added_by', $userId)
-			//->where('inv_num', 'like', $finalPrefix . '%')
-			->select(DB::raw("MAX(CAST(SUBSTRING_INDEX(inv_num,'/',-1) AS UNSIGNED)) as max_num"))
-			->value('max_num');
-		$nextIncrement = $lastIncrement ? $lastIncrement + 1 : 1;
-		$increment = str_pad($nextIncrement, 4, '0', STR_PAD_LEFT);
-		return $finalPrefix . $increment;
+
+		return $prefix . str_pad($next, 4, '0', STR_PAD_LEFT);
 	}
+
 
 	public function proforma_create_status() {
 		$userId = currentOwnerId();

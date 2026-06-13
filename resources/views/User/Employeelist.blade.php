@@ -7,22 +7,25 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
                         <li class="breadcrumb-item"><a href="#">HR, Payroll & Attendance</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Employee Master</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-employee-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Employee Master</h2>
                     </div>
                 </div>
                 @if(Auth::user()->u_type == 2 || Auth::user()->u_type == 3 || Auth::user()->u_type == 5 || Auth::user()->u_type == 6)
-                <div class="col-md-8 text-end">
-                    <a href="{{ route('user.AddEmployee') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i>
+                <div class="col-md-8 text-end mt-2">
+                    <a href="{{ route('user.AddEmployee') }}" class="btn btn-primary" id="add-employee-btn"><i class="ti ti-square-plus"></i>
                         Add New Employee</a>
                 </div>
 				@endif
@@ -35,7 +38,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card table-card">
+            <div class="card table-card" id="employee-table-card">
                 <div class="card-body table-card">
                     {{-- <table class="table tbl-product" id="dom-table"> --}}
                         <table class="table tbl-product" id="pc-dt-simple">
@@ -300,6 +303,9 @@
     </div>
 </div>
 
+@endsection
+
+@section('page-script')
 <script>
     function toggleDateFields(employeeId) {
         const permanentYes = document.getElementById('permanent_wfh_yes' + employeeId);
@@ -463,6 +469,48 @@
             endDateField.prop('disabled', false).prop('required', true);
         }
     });
-</script>
 
+    function startEmployeeListTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Employee Master Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-users" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage your organization\'s employee profiles, department allocation, designation assignments, and active work statuses.</p></div>'
+                },
+                {
+                    element: '#add-employee-btn',
+                    title: 'Add New Employee',
+                    intro: 'Click here to register a new employee. This launches the wizard to capture personal, address, job, bank details, and app permissions.'
+                },
+                {
+                    element: '#employee-table-card',
+                    title: 'Employee Directory',
+                    intro: 'List of all registered employees. Verify their contact details, assigned departments, and status (Active/Inactive).'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Employee Action Controls',
+                    intro: 'Quick links to trigger Resignation/Termination procedures, View full profile sheets, or Edit records.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-employee-list-tour').on('click', function(e) {
+            e.preventDefault();
+            startEmployeeListTour();
+        });
+    });
+</script>
 @endsection

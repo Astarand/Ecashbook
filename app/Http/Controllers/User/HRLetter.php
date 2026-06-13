@@ -46,46 +46,46 @@ class HRLetter extends Controller
         return view('User.hr-letter-list', compact('letters'));
     }
 
-    public function GenerateLetter()
-    {
-        if (auth()->user()->u_type != '3') {
-            return redirect()->route('index');
-        }
+    // public function GenerateLetter()
+    // {
+    //     if (auth()->user()->u_type != '3') {
+    //         return redirect()->route('index');
+    //     }
 
-        return view('User.generate-hr-letter');
-    }
+    //     return view('User.generate-hr-letter');
+    // }
 
-    // ✅ Store new HR Letter
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'subject' => 'required|string|max:255',
-            'content' => 'required|string',
-        ]);
+    // // ✅ Store new HR Letter
+    // public function store(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'subject' => 'required|string|max:255',
+    //         'content' => 'required|string',
+    //     ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $validator->errors()->first()
-            ], 422);
-        }
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => $validator->errors()->first()
+    //         ], 422);
+    //     }
 
-        $user = Auth::user();
-		$userId = currentOwnerId();
+    //     $user = Auth::user();
+	// 	$userId = currentOwnerId();
 
-        DB::table('hr_letter_master')->insert([
-            'subject' => $request->subject,
-            'content' => $request->content,
-            'added_by' => $userId,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+    //     DB::table('hr_letter_master')->insert([
+    //         'subject' => $request->subject,
+    //         'content' => $request->content,
+    //         'added_by' => $userId,
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'HR Letter created successfully!'
-        ]);
-    }
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'HR Letter created successfully!'
+    //     ]);
+    // }
 
     // ✅ Edit HR Letter
     public function edit($id)
@@ -313,9 +313,23 @@ class HRLetter extends Controller
     public function getEmployees()
     {
         $userId = currentOwnerId();
+        $owner_user_type = currentOwnerUserType();
 
+        // 1. Determine which column to look at based on the user type
+        if (in_array($owner_user_type, [3, 6])) {
+            $column = 'admin_add_by';
+        } elseif (in_array($owner_user_type, [2, 5])) {
+            $column = 'user_add_by';
+        } elseif (in_array($owner_user_type, [1, 4])) {
+            $column = 'ca_add_by';
+        } else {
+            // Fallback: Default column if user type doesn't match expected criteria
+            $column = 'user_add_by'; 
+        }
+
+        // 2. Fetch data based on the dynamically determined column
         $employees = DB::table('users')
-            ->where('user_add_by', $userId)
+            ->where($column, $userId)
             ->select('id', 'name')
             ->get();
 

@@ -39,18 +39,18 @@
 							<select id="incomeType" name="incomeType" class="form-select" required>
 								<option value="">Select</option>
 								<option value="Revenue" {{ $income->incomeType == 'Revenue' ? 'selected' : '' }}>
-									Revenue from Operations
+									Other Operating Income
 								</option>
 								<option value="Other" {{ $income->incomeType == 'Other' ? 'selected' : '' }}>
-									Other Income
+									Other Non-Operating Income
 								</option>
 							</select>
 						</div>
 						
 						<div class="col-sm-3 mb-3">
-                            <label class="form-label">Service Category<span class="text-danger">*</span></label>
+                            <label class="form-label">Income Category<span class="text-danger">*</span></label>
                             <select id="categoryIncome" name="categoryIncome" required class="form-select">
-                                <option value="">Select Services</option>                                
+                                <option value="">Select Category</option>                                
                                 <!--<option value="Other Income" <?=($income->categoryIncome == "Other Income") ? 'selected' : '' ?>>Other Income</option>-->
                             </select>
                         </div>
@@ -61,15 +61,16 @@
                         </div>
 												
 						<div class="col-md-3 mb-3">
-							<label class="form-label">Customer / Party Name</label>
-							<select name="customer_id" id="customer_id" required class="form-control">
+							<label class="form-label">Party / Source Name</label>
+							<input type="text" name="customer_name" id="customer_name" class="form-control" value="{{$income->customer_name}}">
+							<!---<select name="customer_id" id="customer_id" required class="form-control">
 								<option value="">Select</option>
 								@foreach($customers as $customer)
 									<option value="{{ $customer->id }}" {{ (isset($income->customer_id) && $income->customer_id == $customer->id) ? 'selected' : '' }}>
 										{{ $customer->cust_name }}
 									</option>
 								@endforeach
-							</select>
+							</select>-->
 						</div>
 						<div class="col-md-3 mb-3">
 							<label class="form-label">Invoice / Reference Number</label>
@@ -273,22 +274,34 @@
 	$(document).ready(function () {
 
 		const revenueOptions = [
-			"Sales of Goods",
-			"Service Income",
-			"Contract / Job Work Income",
-			"Commission / Brokerage",
-			"Other Operating Income"
+			"Freight / Delivery Charges Recovery",
+			"Packing & Handling Charges Recovery",
+			"Installation Charges",
+			"Training Charges",
+			"AMC / Maintenance Charges",
+			"Commission Income",
+			"Service Recovery Charges",
+			"Documentation Charges",
+			"Processing Charges",
+			"Onboarding Charges",
+			"Platform / API Usage Charges",
+			"SMS / Communication Charges Recovery",
+			"Data Migration Charges",
+			"Scrap Sales",			
+			"Miscellaneous Operating Income"
 		];
 
 		const otherOptions = [
 			"Interest Income",
 			"Rental Income",
 			"Dividend Income",
-			"Net Gain on Sale of Investments",
-			"Net Gain on Sale of Fixed Assets",
-			"Royalty / License Income",
-			"Miscellaneous Income",
-			"Other Income"
+			"Profit on Sale of Fixed Assets",
+			"Profit on Sale of Investments",
+			"Foreign Exchange Gain",
+			"Insurance Claim Received",
+			"Bad Debts Recovered",
+			"Government Grant / Subsidy Income",
+			"Miscellaneous Non-Operating Income"
 		];
 
 		// Get old values from blade
@@ -334,8 +347,8 @@
 		$('#categoryIncome').on('change', function () {
 			let selected = $(this).val();
 			if (
-				selected === "Other Income" ||
-				selected === "Other Operating Income"
+				selected === "Miscellaneous Non-Operating Income" ||
+				selected === "Miscellaneous Operating Income"
 			) {
 				$('#otherIncomeCategory').show();
 			} else {
@@ -345,7 +358,7 @@
 		});
 
 		// Show "Other" if already selected in edit
-		if (selectedCategory === "Other Income" || selectedCategory === "Other Operating Income") {
+		if (selectedCategory === "Miscellaneous Non-Operating Income" || selectedCategory === "Miscellaneous Operating Income") {
 			$('#otherIncomeCategory').show();
 		}
 

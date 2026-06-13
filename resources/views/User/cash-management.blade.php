@@ -8,11 +8,16 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Cash & Banking</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Cash Management</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Cash & Banking</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Cash Management</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-cash-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <div class="page-header-title">
@@ -33,7 +38,7 @@
     <!-- [ Main Content ] start -->
     <div class=" row">
         <div class="col-md-6 col-xl-6">
-            <div class="card statistics-card-1 overflow-hidden ">
+            <div class="card statistics-card-1 overflow-hidden cash-in-hand-card">
                 <div class="card-body">
                     <!-- <img src="../assets/images/widget/img-status-7.svg" alt="img" class="img-fluid img-bg"> -->
                     <div class="d-flex align-items-center">
@@ -55,7 +60,7 @@
             </div>
         </div>
         <div class="col-md-6 col-xl-6">
-            <div class="card statistics-card-1 overflow-hidden ">
+            <div class="card statistics-card-1 overflow-hidden cash-details-card">
                 <div class="card-body">
                     <!-- <img src="../assets/images/widget/img-status-9.svg" alt="img" class="img-fluid img-bg"> -->
                     <div class="d-flex align-items-center">
@@ -522,6 +527,53 @@
                 }
             });
         }
+    });
+    function startCashTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Cash Management Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-wallet" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Cash Management dashboard. Here you can track your business cash flows, cash-in-hand balances, and transactions.</p></div>'
+                },
+                {
+                    element: '.cash-in-hand-card',
+                    title: 'Total Cash in Hand',
+                    intro: 'This card displays your current total cash balance available on hand.'
+                },
+                {
+                    element: '.cash-details-card',
+                    title: 'Cash Flow Details',
+                    intro: 'View the summary of all Credit (received) and Debit (spent) cash transactions.'
+                },
+                {
+                    element: 'a[data-bs-target="#add-loan-account-modal"]',
+                    title: 'Add Transaction',
+                    intro: 'Click here to record a new cash credit or debit transaction.'
+                },
+                {
+                    element: '.table-card',
+                    title: 'Transaction History',
+                    intro: 'Browse, search, edit, or delete recent cash transactions from this history table.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-cash-tour').on('click', function(e) {
+            e.preventDefault();
+            startCashTour();
+        });
     });
 </script>
 

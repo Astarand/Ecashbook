@@ -7,13 +7,16 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Assets Management</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('user.AssetList') }}">Assets List</a></li>
                         <li class="breadcrumb-item" aria-current="page">Assets List</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-assets-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
@@ -297,6 +300,49 @@
 		let url = `/export-assets?from_date=${from}&to_date=${to}&asset_type=${type}`;
 		window.location.href = url; // trigger download
 	});
+
+    function startAssetsTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Assets List Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-briefcase" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Review company assets database, monitor depreciation details, and track current vs. non-current holdings.</p></div>'
+                },
+                {
+                    element: 'a[href="{{ route('user.AddAsset') }}"]',
+                    title: 'Add New Asset',
+                    intro: 'Click this button to record new capital investments or asset details.'
+                },
+                {
+                    element: '.card.mb-3',
+                    title: 'Asset Filters',
+                    intro: 'Filter assets database by specific duration ranges or asset types, and export results directly to Excel.'
+                },
+                {
+                    element: '.table-responsive',
+                    title: 'Asset Ledger Table',
+                    intro: 'Track details including purchase dates, GST transactions, payment status, and asset values.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-assets-tour').on('click', function(e) {
+            e.preventDefault();
+            startAssetsTour();
+        });
+    });
 </script>
 
 @endsection

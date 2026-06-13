@@ -7,14 +7,17 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Sales & Revenue</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/sales-quotation') }}">Quotation</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Create Sales Quotation</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-create-quotation-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -626,8 +629,87 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('page-script')
 <script>
+    function startCreateQuotationTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Create Sales Quotation',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-file-text" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Follow the 4-step wizard to create and save a new sales quotation.</p></div>'
+                },
+                {
+                    element: '#inv_num',
+                    title: 'Quotation Number',
+                    intro: 'This is the auto-generated unique reference code for the quotation.'
+                },
+                {
+                    element: '#inv_date',
+                    title: 'Quotation Date',
+                    intro: 'Set the date when this quotation is issued.'
+                },
+                {
+                    element: '#sellerDetail',
+                    title: 'Step 1: Seller Details',
+                    intro: 'Confirm your business name, email, phone, state/city, and address coordinates.'
+                },
+                {
+                    element: '#customerDetails',
+                    title: 'Step 2: Customer Details',
+                    intro: 'Select the target customer and specify the corresponding billing and shipping addresses.'
+                },
+                {
+                    element: '#itemDetails',
+                    title: 'Step 3: Item Specifications',
+                    intro: 'Add inventory products or service entries, input quantity, pricing, discount, and select tax modes.'
+                },
+                {
+                    element: '#others',
+                    title: 'Step 4: Additional Logistics',
+                    intro: 'Provide dispatch methods, delivery terms, order dates, and payment modes.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).onbeforechange(function(targetElement) {
+            if (targetElement.id === 'sellerDetail' || targetElement.id === 'customerDetails' || targetElement.id === 'itemDetails' || targetElement.id === 'others') {
+                $('.tab-pane').removeClass('show active');
+                $('.nav-pills .nav-link').removeClass('active');
+                
+                $(targetElement).addClass('show active');
+                
+                // Also highlight corresponding nav-link tab header
+                let tabIndexMap = {
+                    'sellerDetail': 0,
+                    'customerDetails': 1,
+                    'itemDetails': 2,
+                    'others': 3
+                };
+                let idx = tabIndexMap[targetElement.id];
+                $('.nav-pills .nav-link').eq(idx).addClass('active');
+            }
+        }).start();
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
+        const tourBtn = document.getElementById('start-create-quotation-tour');
+        if (tourBtn) {
+            tourBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                startCreateQuotationTour();
+            });
+        }
+
         const addressTypeDropdown = document.getElementById("InvoiceaddressType");
 
         if (addressTypeDropdown) {

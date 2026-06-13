@@ -27,7 +27,7 @@ class Income extends Model
         'pay_status',
         'due_date',
         'pay_mode',
-        'customer_id',
+        'customer_name',
         'specification',
         'tds_applicable',
         'tds_percentage',

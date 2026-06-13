@@ -1,251 +1,7 @@
 @extends('App.Layout')
 
 @section('container')
-<style>
-  #customer-rate-graph1 {
-    width: 100%;
-    height: 300px;
-    padding: 10px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-  }
 
-  /* Calendar styling */
-  .date-picker-container {
-    display: flex;
-    align-items: center;
-  }
-
-  .date-picker-wrapper {
-    cursor: pointer;
-  }
-
-  #attendance_date_display {
-    background-color: #fff;
-    cursor: pointer;
-    font-size: 14px;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 6px 0 0 6px !important;
-  }
-
-  .calendar-trigger {
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background-color: #eae7f7 !important;
-    border: 1px solid #cbd5e1 !important;
-    border-left: none !important;
-    border-radius: 0 6px 6px 0 !important;
-  }
-
-  .calendar-trigger:hover {
-    background-color: #dcd7f2 !important;
-  }
-
-  .calendar-trigger i {
-    font-size: 1.2rem;
-    color: #422f90 !important;
-  }
-
-  /* Flatpickr customization */
-  .flatpickr-calendar {
-    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.15) !important;
-    border-radius: 8px !important;
-  }
-
-  /* Search dropdown styling */
-  #sidebarSearchResults {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: auto;
-    z-index: 1080;
-  }
-
-  #sidebarSearchResults .dropdown-item {
-    cursor: pointer;
-  }
-
-  #sidebarSearchResults .dropdown-divider {
-    margin: 0.25rem 0;
-  }
-
-  .input-group {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-    width: 80%;
-  }
-
-  /* 💎 Clean Premium Design System overrides (60-30-10 Rule) 💎 */
-
-  /* Override default card styles to clean, flat, premium containers */
-  .card {
-    border: 1px solid #e2e6ee !important;
-    border-radius: 12px !important;
-    background-color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(66, 47, 144, 0.015) !important;
-    transition: all 0.2s ease-in-out;
-  }
-
-  .card:hover {
-    box-shadow: 0 6px 18px rgba(66, 47, 144, 0.03) !important;
-  }
-
-  .card-header {
-    border-bottom: 1px solid #e2e6ee !important;
-    background-color: #ffffff !important;
-    padding: 16px 20px !important;
-  }
-
-  /* Hide busy background SVGs to remove clutter */
-  .statistics-card-1 .img-bg {
-    display: none !important;
-  }
-
-  /* Modern Card Icon Wrappers */
-  .statistics-card-1 .d-flex.align-items-center > img:first-child {
-    background-color: #f5f4fa !important;
-    padding: 10px !important;
-    border-radius: 10px !important;
-    width: 48px !important;
-    height: 48px !important;
-    object-fit: contain;
-  }
-
-  /* Subdued labels */
-  .text-muted, p.text-muted {
-    color: #5e6e82 !important;
-    font-size: 0.85rem;
-  }
-
-  /* Custom styled select boxes */
-  .form-select {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 6px !important;
-    font-size: 0.85rem !important;
-    color: #422f90 !important;
-    background-color: #ffffff !important;
-    transition: border-color 0.15s ease-in-out;
-    padding: 0.25rem 2rem 0.25rem 0.75rem !important;
-  }
-
-  .form-select:focus {
-    border-color: #422f90 !important;
-    box-shadow: 0 0 0 2px rgba(66, 47, 144, 0.1) !important;
-  }
-
-  /* Buttons styling override to be flat & brand-colored */
-  .btn-primary {
-    background-color: #422f90 !important;
-    border-color: #422f90 !important;
-    color: #ffffff !important;
-    font-weight: 500 !important;
-    border-radius: 6px !important;
-    transition: all 0.2s ease;
-  }
-
-  .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
-    background-color: #2d1f6a !important;
-    border-color: #2d1f6a !important;
-  }
-
-  .btn-secondary {
-    background-color: #eae7f7 !important;
-    border-color: #eae7f7 !important;
-    color: #422f90 !important;
-    font-weight: 500 !important;
-    border-radius: 6px !important;
-    transition: all 0.2s ease;
-  }
-
-  .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
-    background-color: #dcd7f2 !important;
-    border-color: #dcd7f2 !important;
-    color: #2d1f6a !important;
-  }
-
-  /* Custom Search border logic */
-  #compo-menu-search {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 6px !important;
-    transition: all 0.2s ease;
-  }
-
-  #compo-menu-search:focus {
-    border-color: #422f90 !important;
-    box-shadow: 0 0 0 2px rgba(66, 47, 144, 0.1) !important;
-  }
-
-  /* Table design and table headings */
-  .table {
-    border-collapse: collapse;
-  }
-
-  .table thead th {
-    background-color: #f8fafc !important;
-    color: #5e6e82 !important;
-    font-weight: 600 !important;
-    font-size: 0.8rem !important;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid #e2e6ee !important;
-    padding: 12px 16px !important;
-  }
-
-  .table tbody td {
-    padding: 14px 16px !important;
-    border-bottom: 1px solid #f1f3f7 !important;
-    vertical-align: middle;
-  }
-
-  .table-hover tbody tr:hover {
-    background-color: #f8fafc !important;
-  }
-
-  /* Flat custom badges */
-  .badge {
-    font-weight: 500 !important;
-    padding: 6px 10px !important;
-    border-radius: 4px !important;
-    font-size: 0.75rem !important;
-  }
-
-  .text-bg-success {
-    background-color: #e6f6ec !important;
-    color: #1a7f37 !important;
-  }
-
-  .text-bg-danger {
-    background-color: #ffebe9 !important;
-    color: #cf222e !important;
-  }
-
-  .text-bg-warning {
-    background-color: #fff8e6 !important;
-    color: #b07000 !important;
-  }
-
-  /* Chat Message button relative and custom unread badge */
-  .btn-outline-success {
-    border-color: #e2e6ee !important;
-    color: #422f90 !important;
-    background-color: #ffffff !important;
-  }
-
-  .btn-outline-success:hover {
-    background-color: #f5f4fa !important;
-    border-color: #cbd5e1 !important;
-    color: #2d1f6a !important;
-  }
-
-  .mcCircle {
-    background: #422f90 !important; /* Premium brand accent instead of bright red */
-    color: #ffffff !important;
-    box-shadow: 0 0 0 2px #ffffff !important;
-  }
-</style>
 
 <!-- Flatpickr CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -260,18 +16,21 @@
         <div class="col-md-9 col-sm-12">
           <div class="d-flex flex-nowrap align-items-center justify-content-md-end justify-content-center flex-md-nowrap flex-wrap gap-2 mt-md-0 mt-2 pe-md-2">
             {{-- Search Options --}}
-            <div class="form-search" style="max-height: 35px;">
+            <div class="form-search tour-search" style="max-height: 35px;">
               <i class="ph-duotone ph-magnifying-glass icon-search" style="color: #422f90;"></i>
               <input type="search" class="form-control" placeholder="Search.." id="compo-menu-search" autocomplete="off">
               <div id="sidebarSearchResults" class="dropdown-menu w-100 mt-1 shadow" style="display: none; max-height: 240px; overflow-y: auto;"></div>
             </div>
-            <a href="{{ route('user.AssignCa') }}" class="btn btn-primary btn-sm flex-shrink-0 d-flex align-items-center" data-bs-toggle="tooltip" title="Assign CA">
+            <button id="start-tour-btn" class="btn btn-outline-primary btn-sm flex-shrink-0 d-flex align-items-center" data-bs-toggle="tooltip" title="Take a Tour">
+              <i class="ti ti-help me-1"></i> <span class="d-md-inline d-none">Guide Tour</span>
+            </button>
+            <a href="{{ route('user.AssignCa') }}" class="btn btn-primary btn-sm flex-shrink-0 d-flex align-items-center tour-assign-ca" data-bs-toggle="tooltip" title="Assign CA">
               <i class="ti ti-user-plus me-1"></i> <span class="d-md-inline d-none">Assign CA Firm</span>
             </a>
-            <a href="{{ route('user.CreateSalesInvoices') }}" class="btn btn-secondary btn-sm flex-shrink-0 d-flex align-items-center" data-bs-toggle="tooltip" title="Add Sales">
+            <a href="{{ route('user.CreateSalesInvoices') }}" class="btn btn-secondary btn-sm flex-shrink-0 d-flex align-items-center tour-add-sales" data-bs-toggle="tooltip" title="Add Sales">
               <i class="ti ti-download me-1"></i> <span class="d-md-inline d-none">Add Sales</span>
             </a>
-            <a href="{{ route('user.CreatePurchaseInvoices') }}" class="btn btn-primary btn-sm flex-shrink-0 d-flex align-items-center">
+            <a href="{{ route('user.CreatePurchaseInvoices') }}" class="btn btn-primary btn-sm flex-shrink-0 d-flex align-items-center tour-add-purchases">
               <i class="ti ti-square-plus me-1"></i> <span class="d-md-inline d-none">Add Purchases</span>
             </a>
             <select name="slet_financial_year" id="slet_financial_year" class="form-select form-select-sm flex-shrink-0" style="max-width: 180px; min-width: 150px;">
@@ -285,7 +44,7 @@
   <!-- [ Main Content ] start -->
   <div class="row">
     <div class="col-lg-5">
-      <div class="col-md-12 col-xl-12">
+      <div class="col-md-12 col-xl-12 tour-receivables">
         <div class="card statistics-card-1 overflow-hidden">
           <div class="card-body">
             <img src="../assets/images/widget/img-status-8.svg" alt="img" class="img-fluid img-bg">
@@ -329,7 +88,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-12 col-xl-12">
+      <div class="col-md-12 col-xl-12 tour-payables">
         <div class="card statistics-card-1 overflow-hidden ">
           <div class="card-body">
             <img src="../assets/images/widget/img-status-9.svg" alt="img" class="img-fluid img-bg">
@@ -376,7 +135,7 @@
       </div>
     </div>
 
-    <div class="col-lg-7">
+    <div class="col-lg-7 tour-turnover">
       <div class="card">
         <div class="card-header">
           <div class="d-flex align-items-center justify-content-between">
@@ -401,7 +160,7 @@
     </div>
 
     <div class="col-lg-7">
-      <div class="card">
+      <div class="card tour-income-expenses">
         <div class="card-header d-flex align-items-center justify-content-between">
           <h5>Income And Expenses</h5>
           <div class="dropdown">
@@ -438,7 +197,7 @@
     </div>
 
     <div class="col-lg-5">
-      <div class="card">
+      <div class="card tour-cashflow">
         <div class="card-header d-flex align-items-center justify-content-between">
           <h5 class="mb-0">Cashflow Summary</h5>
           <div class="dropdown">
@@ -471,7 +230,7 @@
     <div class="col-lg-12">
       <div class="row">
         <div class="col-lg-4">
-          <div class="card statistics-card-1 overflow-hidden ">
+          <div class="card statistics-card-1 overflow-hidden tour-assets">
             <div class="card-body p-3">
               <img src="../assets/images/widget/img-status-8.svg" alt="img" class="img-fluid img-bg">
               <div class="d-flex align-items-center justify-content-between mb-3">
@@ -515,7 +274,7 @@
 
 
         <div class="col-lg-4">
-          <div class="card statistics-card-1 overflow-hidden ">
+          <div class="card statistics-card-1 overflow-hidden tour-liabilities">
             <div class="card-body p-3">
               <img src="../assets/images/widget/img-status-8.svg" alt="img" class="img-fluid img-bg">
               <div class="d-flex align-items-center justify-content-between mb-3">
@@ -556,7 +315,7 @@
           </div>
         </div>
         <div class="col-lg-4">
-          <div class="card statistics-card-1 overflow-hidden ">
+          <div class="card statistics-card-1 overflow-hidden tour-gst">
             <div class="card-body p-3">
               <img src="../assets/images/widget/img-status-8.svg" alt="img" class="img-fluid img-bg">
               <div class="d-flex align-items-center justify-content-between mb-3">
@@ -605,7 +364,7 @@
     <div class="col-lg-12">
       <div class="row">
         <div class="col-lg-4">
-          <div class="card">
+          <div class="card tour-attendance">
             <div class="card-header d-flex align-items-center justify-content-between">
               <h5>Employee Attendance List</h5>
               <div class="date-picker-container">
@@ -638,7 +397,7 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-8">
+        <div class="col-lg-8 tour-compliances">
           <div class="card table-card pb-2">
             <div class="card-header d-flex align-items-center justify-content-between">
               <h5 class="mb-0">Compliances Status</h5>
@@ -698,32 +457,15 @@
   <!-- [ Main Content ] end -->
 </div>
 
-<style>
-  .relative {
-    position: relative;
-  }
 
-  .mcCircle {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: #ff3b3b;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 600;
-    min-width: 18px;
-    height: 18px;
-    line-height: 18px;
-    text-align: center;
-    border-radius: 50%;
-    padding: 0 5px;
-    box-shadow: 0 0 0 2px #fff;
-    /* white border */
-  }
-</style>
 @endsection
 
 @section('page-script')
+<script>
+  const USER_TOUR_COMPLETED = {{ Auth::user()->tour_completed ? 'true' : 'false' }};
+  const TOUR_COMPLETE_ROUTE = "{{ route('user.completeTour') }}";
+  const CSRF_TOKEN = "{{ csrf_token() }}";
+</script>
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="{{ asset('assets/js/user-chart.js') }}"></script>

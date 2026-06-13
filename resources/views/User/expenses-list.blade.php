@@ -7,22 +7,27 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/expenses-list') }}">Expenses Management</a></li>
                         <li class="breadcrumb-item" aria-current="page">Expenses Management List</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-expenses-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Expenses Management List</h2>
                     </div>
                 </div>
+                @if(in_array(Auth::user()->u_type, [2,5]))
                 <div class="col-md-8 text-end">
-                    <a href="{{ route('user.AddExpenses') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Expenses</a>
+                    <a href="{{ route('user.AddExpenses') }}" class="btn btn-primary" id="add-expense-btn"><i class="ti ti-square-plus"></i> Add New Expenses</a>
                 </div>
+                @endif
             </div>
         </div>
     </div>
@@ -32,7 +37,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card" id="expenses-table-card">
                 <div class="table-responsive">
                     <table class="table tbl-product" id="pc-dt-simple">
                         <thead>
@@ -47,6 +52,7 @@
                                 <th>Expense Details</th>
                                 <th>Total Amount</th>
                                 <th>TDS</th>
+                                <th>Income Tax</th>
                                 <th>Approve By</th>
                                 <th>Pay Status</th>
                                 <th>Status</th>
@@ -67,6 +73,7 @@
                                 <td><span class="text-muted text-hover-primary">{{ ucwords(str_replace(['_', '-'], ' ', $expen->expense_type)) }}</span></td>
                                 <td><span class="text-muted text-hover-primary">₹ {{ $expen->expense_amt }}</span></td>
                                 <td><span class="text-muted text-hover-primary">₹ {{ $expen->tds_amount }}</span></td>
+                                <td><span class="text-muted text-hover-primary">₹ {{ $expen->deduction_amount }}</span></td>
                                 <td><span class="text-muted text-hover-primary">{{ $expen->approved_by }}</span></td>
 								<td>
                                     @if ($expen->payment_status == 'full')
@@ -162,6 +169,9 @@
 </div>
 
 
+@endsection
+
+@section('page-script')
 <script>
     $(document).on("click", ".expenses", function() {
         var itemId = $(this).data("id");
@@ -193,6 +203,94 @@
             });
         });
     });
-</script>
 
+    function startExpensesListTour() {
+        function launch() {
+            let introTour = introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Expenses List Guide',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-receipt" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage company operating expenses, track TDS/GST payments, and monitor approval status.</p></div>'
+                    },
+                    {
+                        element: '#add-expense-btn',
+                        title: 'Add New Expenses',
+                        intro: 'Click here to record a new business expense, assign category, TDS/GST, vendor, and upload proof.'
+                    },
+                    {
+                        element: '#expenses-table-card',
+                        title: 'Expenses Records',
+                        intro: 'View details of logged expenses including date, ref number, categories, total amount, TDS, payment status, and approval details.'
+                    },
+                    {
+                        element: '.prod-action-links',
+                        title: 'Action Items',
+                        intro: 'View full details of an expense record, edit it, or delete it from the system.'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                skipIfNoElement: true,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            });
+
+            introTour.onbeforechange(function(targetElement) {
+                if (!targetElement) return;
+                let isAction = targetElement.matches('.prod-action-links') || targetElement.closest('.prod-action-links') || targetElement.closest('td:last-child');
+                let scrollable = targetElement.closest('.datatable-container') || targetElement.closest('.table-responsive') || document.querySelector('.datatable-container') || document.querySelector('.table-responsive');
+                if (scrollable) {
+                    if (isAction) {
+                        scrollable.scrollLeft = scrollable.scrollWidth;
+                    } else {
+                        scrollable.scrollLeft = 0;
+                    }
+                }
+            });
+
+            introTour.start();
+        }
+
+        if (typeof introJs === 'function') {
+            launch();
+        } else {
+            // CSS
+            if (!document.getElementById('introjs-cdn-css')) {
+                let css = document.createElement('link');
+                css.id = 'introjs-cdn-css';
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+                document.head.appendChild(css);
+            }
+
+            // JS
+            let js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+            js.onload = function() {
+                launch();
+            };
+            document.body.appendChild(js);
+        }
+    }
+
+    function bindExpensesTour() {
+        const btn = document.getElementById('start-expenses-list-tour');
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                startExpensesListTour();
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindExpensesTour);
+    } else {
+        bindExpensesTour();
+    }
+</script>
 @endsection

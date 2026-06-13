@@ -8,11 +8,16 @@
     <div class="page-block">
       <div class="row align-items-center">
         <div class="col-md-12">
-          <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="">Home</a></li>
-            <li class="breadcrumb-item"><a href="#">Inventory</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Inventory Management</li>
-          </ul>
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <ul class="breadcrumb mb-0">
+              <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+              <li class="breadcrumb-item"><a href="#">Inventory</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Inventory Management</li>
+            </ul>
+            <a href="javascript:void(0);" id="start-inv-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+              <i class="ti ti-help-circle f-18"></i> <u>How does this Page works?</u>
+            </a>
+          </div>
         </div>
         <div class="col-md-4">
           <div class="page-header-title">
@@ -29,7 +34,7 @@
 @endphp
 	<form method="GET"
 		  action="{{ route('user.Inventory') }}"
-		  class="mb-3 d-flex justify-content-end align-items-center">
+		  class="mb-3 d-flex justify-content-end align-items-center inv-nature-filter">
 
 		<div class="form-check form-check-inline">
 			<input class="form-check-input"
@@ -68,7 +73,7 @@
 
 
 
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4 inv-summary-cards">
         <!-- 1. Total Inventory Inward Value (Purchase) -->
         <div class="col-md-2-4 col-lg-2-4">
             <div class="card border-0 shadow-sm h-100">
@@ -227,7 +232,7 @@
   <div class=" row">
     <!-- [ sample-page ] start -->
     <div class="col-sm-12">
-      <div class="card card-body table-card">
+      <div class="card card-body table-card inv-table-card">
         <div class="table-responsive">
           <table class="table tbl-product my-3" id="pc-dt-simple">
             <thead>
@@ -700,10 +705,47 @@
       });
     });
 
-
-
+    $('#start-inv-tour').on('click', function(e) {
+      e.preventDefault();
+      startInvTour();
+    });
 
   });
+
+  function startInvTour() {
+    if (typeof introJs !== 'function') return;
+    introJs().setOptions({
+      steps: [
+        {
+          title: 'Inventory Guide',
+          intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-package" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to Inventory Management. Track stock values, purchases, sales, write-offs, and profits.</p></div>'
+        },
+        {
+          element: '.inv-nature-filter',
+          title: 'Business Nature Filter',
+          intro: 'Filter inventory records by Service Provider, Trading/Reseller, or Mixed nature.'
+        },
+        {
+          element: '.inv-summary-cards',
+          title: 'Metrics & Values',
+          intro: 'Instantly view total Inward (Purchase), Outward (Sales), Debit/Credit Notes, Write-offs, Closing Stock, and Gross Profit values.'
+        },
+        {
+          element: '.inv-table-card',
+          title: 'Inventory List Table',
+          intro: 'Manage your product database. Check current stocks, purchase and selling prices, and view stock ledger history.'
+        }
+      ],
+      showBullets: true,
+      showProgress: true,
+      helperElementPadding: 5,
+      exitOnOverlayClick: false,
+      doneLabel: 'Done',
+      nextLabel: 'Next',
+      prevLabel: 'Prev',
+      skipLabel: 'Skip'
+    }).start();
+  }
 </script>
 <style>
 /* Custom 5-column layout for equal width */

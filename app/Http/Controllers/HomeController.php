@@ -217,9 +217,13 @@ class HomeController extends Controller
 						')
 						->first();
 			//return view('pages.employee.emp-home')->with([
-			return view('Ca.Dashboard')->with([
-				'tasks' => $tasks
-			]);
+// 			return view('Ca.Dashboard')->with([
+// 				'tasks' => $tasks
+// 			]);
+
+            return view('Employee.UserEmployee.Dashboard')->with([
+        				'tasks' => $tasks
+        			]);
 		}
 		else if(Auth::user() && Auth::user()->u_type == 5){
 			$userId = Auth::user()->id;

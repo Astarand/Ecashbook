@@ -3,21 +3,21 @@
 @section('container')
 
 <div class="pc-content">
-
-<!-- [ breadcrumb ] start -->
+    <!-- [ breadcrumb ] start -->
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
-                        <li class="breadcrumb-item"><a href="">Sales & Revenue</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('user.SalesInvoices') }}">Sales Invoices</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit Invoice</li>
+                        <li class="breadcrumb-item"><a href="/sale-invoices">Sales Invoices</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Sales Invoice</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-edit-sales-invoice-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Edit Sales Invoice</h2>
                     </div>
@@ -26,9 +26,6 @@
         </div>
     </div>
     <!-- [ breadcrumb ] end -->
-    <div class="row align-item-center mb-4">
-        <h2 class="text-muted">Edit Sales Invoice</h2>
-    </div>
     <form action="javascript:void(0);" method="post" name="addSalesFrmTop" id="addSalesFrmTop">
         @csrf
         <div class="card">
@@ -595,7 +592,7 @@
                                         <input type="file" name="signature" id="signature" class="form-control" placeholder="Enter Name">
                                         @if(isset($sales->signature) && $sales->signature != "")
                                         <div class="downloadFile"><a target="_blank"
-                                                href="{{ asset('/public/uploads/invoice-signature/'.$sales->signature) }}">Download</a>
+                                                href="{{ asset('uploads/invoice-signature/'.$sales->signature) }}">Download</a>
                                         </div>
                                         @endif
                                     </div>
@@ -668,20 +665,14 @@
                                             <div class="form-group">
                                                 <select name="mode_of_pay" id="mode_of_pay" class="form-select has-success" aria-invalid="false">
                                                     <option value="">Select</option>
-                                                    <option value="IMPS" <?php echo ($sales->mode_of_pay == "IMPS") ?
-                                                                                "selected" : "" ?>>IMPS</option>
-                                                    <option value="RTGS" <?php echo ($sales->mode_of_pay == "RTGS") ?
-                                                                                "selected" : "" ?>>RTGS</option>
-                                                    <option value="NEFT" <?php echo ($sales->mode_of_pay == "NEFT") ?
-                                                                                "selected" : "" ?>>NEFT</option>
+                                                    <option value="Bank" <?php echo ($sales->mode_of_pay == "Bank") ?
+                                                                                "selected" : "" ?>>Bank</option>                                                    
                                                     <option value="UPI" <?php echo ($sales->mode_of_pay == "UPI") ?
-                                                                            "selected" : "" ?>>UPI</option>
-                                                    <option value="CARD" <?php echo ($sales->mode_of_pay == "CARD") ?
-                                                                                "selected" : "" ?>>Credit/Debit Card</option>
-                                                    <option value="CASH" <?php echo ($sales->mode_of_pay == "CASH") ?
+                                                                            "selected" : "" ?>>UPI</option>                                                   
+                                                    <option value="Cash" <?php echo ($sales->mode_of_pay == "Cash") ?
                                                                                 "selected" : "" ?>>Cash</option>
-                                                    <option value="OTHER" <?php echo ($sales->mode_of_pay == "OTHER") ?
-                                                                                "selected" : "" ?>>Other</option>
+                                                    <!--<option value="OTHER" <?php echo ($sales->mode_of_pay == "OTHER") ?
+                                                                                "selected" : "" ?>>Other</option>-->
                                                 </select>
                                             </div>
                                         </div>
@@ -704,39 +695,74 @@
                                                                                 "selected" : "" ?>>Full Payment</option>
                                                     <option value="Partial" <?php echo ($sales->pay_status == "Partial") ?
                                                                                 "selected" : "" ?>>Advance Payment</option>
+													<option value="Due" <?php echo ($sales->pay_status == "Due") ?
+                                                                                "selected" : "" ?>>Due</option>							
                                                 </select>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>									
+									
                                     <!-- Payment Section -->
-									<div class="row" id="paymentSection" style="display:none;">
+									<div class="row align-items-end" id="paymentSection">
 										<div class="col-md-4 mb-3">
 											<label>Total Amount</label>
-											<input type="text" name="total_amount" id="total_amount" class="form-control">
+											<input type="text" name="total_amount" id="total_amount" readonly class="form-control">
 										</div>
-
-										<!-- Advance Only -->
-										<div class="col-md-4 mb-3 d-none" id="advanceBox">
-											<label>Advance Amount</label>
-											<input type="text"  name="advance_amount" id="advance_amount" value="{{ $sales->advance_amount }}" class="form-control">
-										</div>
-
-										<!-- Due Only -->
-										<div class="col-md-4 mb-3 d-none" id="dueBox">
-											<label>Balance Receivable</label>
-											<input type="text" name="due_amount" id="due_amount" class="form-control" readonly>
-										</div>
-
-										<!-- Adjusted Only -->
-										<div class="col-md-4 mb-3 d-none" id="adjustedBox">
-											<label>Adjusted Amount</label>
-											<input type="text" name="adjusted_amount" id="adjusted_amount" value="{{ $sales->adjusted_amount }}" class="form-control">
+										
+										<div class="col-md-4 mb-3 d-flex align-items-end">
+											<button
+												type="button"
+												class="btn btn-primary paymentModalBtn"
+												data-id="{{ $sales->id }}"
+												data-type="Sales">
+												Click to Update Payment
+											</button>
 										</div>
 									</div>
+                                    
+                                    {{-- Start Bank Details --}}
+                                    {{-- <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label>Select Bank <span class="text-danger">*</span></label>
+                                            <select name="bank_id" id="bank_id" class="form-control">
+                                                <option value="">-- Select Bank --</option>
+                                                @foreach($bankDetails as $bank)
+                                                    <option value="{{ $bank->id }}"
+                                                            data-qr="{{ asset('storage/' . $bank->bank_qr_code) }}">
+                                                        {{ $bank->bank_name }} - {{ $bank->bank_branch }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <img id="bankQrPreview" style="max-width:200px; display:none;">
+                                    </div> --}}
 
 
                                     <div class="col-md-6 mb-3">
-                                        <div class="form-group ">
+                                        <div class="form-group">
+                                            <label>Select Bank <span class="text-danger">*</span></label>
+                                            <select name="bank_id" id="bank_id" class="form-control">
+                                                <option value="">-- Select Bank --</option>
+
+                                                @foreach($bankDetails as $bank)
+                                                    <option value="{{ $bank->id }}"
+                                                            data-qr="{{ asset('storage/' . $bank->bank_qr_code) }}"
+                                                            {{ $sales->bank_id == $bank->id ? 'selected' : '' }}>
+                                                        {{ $bank->bank_name }} - {{ $bank->bank_branch }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <img id="bankQrPreview" style="max-width:200px; display:none;">
+                                    </div>
+                                    {{-- End Bank Details --}}
+
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
                                             <label>Buyer's Order Number</label>
                                             <input type="text" name="buyer_orderno" id="buyer_orderno"
                                                 value="{{ $sales->buyer_orderno }}" class="form-control"
@@ -903,6 +929,91 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="paymentVoucherModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Details</h5>
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="f_id">
+                <input type="hidden" id="voucher_type">
+				<input type="hidden" id="isViewPage" value="0">
+				
+				<div id="paymentNoteArea" class="alert alert-warning mt-2">
+					<strong>Note:</strong>
+					Please click <strong>Save</strong> to update payment vouchers,
+					journal entries and payment status.
+				</div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Total Invoice Amount</label>
+                        <input type="text"
+                            id="invoice_total"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Paid Amount</label>
+                        <input type="text"
+                            id="total_paid"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Balance Due</label>
+                        <input type="text"
+                            id="balance_due"
+                            class="form-control"
+                            readonly>
+                    </div>
+					
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+                        <th width="80">Action</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="voucherRows">
+
+                    </tbody>
+                </table>
+
+                <button type="button"
+                    class="btn btn-success"
+                    id="addVoucherRow">
+                    Add Payment
+                </button>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                    class="btn btn-primary"
+                    id="saveVoucherPayments">
+                    Save
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <style>
     .digital-signature-upload .upload-area {
         border: 2px dashed #ccc;
@@ -928,6 +1039,7 @@
         background: #f0f2ff;
     }
 </style>
+
 <script>
 
 	function changeProductType() {
@@ -1168,27 +1280,30 @@
             });
         }
     });
+	
+	
+	document.addEventListener("DOMContentLoaded", function () {
+		const paymentStatusDropdown = document.getElementById("pay_status");
+		const paymentBtn = document.querySelector(".paymentModalBtn");
+
+		function toggleFields() {
+			const status = paymentStatusDropdown.value;
+			if (status === "Due") {
+				paymentBtn.style.display = "none";
+			} else {
+				paymentBtn.style.display = "inline-block";
+			}
+		}
+
+		if (paymentStatusDropdown) {
+			paymentStatusDropdown.addEventListener("change", toggleFields);
+			toggleFields(); // Initial page load
+		}
+	});
+	
     document.addEventListener("DOMContentLoaded", function() {
-        const paymentStatusDropdown = document.getElementById("pay_status");
-        const partialRow = document.getElementById("partial");
+ 
         var base_url = "{{ url('/') }}";
-
-        if (paymentStatusDropdown) {
-            paymentStatusDropdown.addEventListener("change", function() {
-                if (this.value === "Partial") {
-                    partialRow.style.display = "flex"; // Show the row
-                } else {
-                    partialRow.style.display = "none"; // Hide the row
-                }
-            });
-
-            // Initialize visibility on page load
-            if (paymentStatusDropdown.value === "Partial") {
-                partialRow.style.display = "flex";
-            } else {
-                partialRow.style.display = "none";
-            }
-        }
 
         //- ------------- Fetch City for billing -----------
 
@@ -1503,112 +1618,6 @@
     });
 
 
-
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const payStatus = document.getElementById("pay_status");
-
-		const paymentSection = document.getElementById("paymentSection");
-		const totalAmount = document.getElementById("total_amount");
-
-		const advanceBox = document.getElementById("advanceBox");
-		const dueBox = document.getElementById("dueBox");
-		const adjustedBox = document.getElementById("adjustedBox");
-
-		const advanceAmount = document.getElementById("advance_amount");
-		const dueAmount = document.getElementById("due_amount");
-		const adjustedAmount = document.getElementById("adjusted_amount");
-
-		const grandTotalElement = document.getElementById("grand_total_amount");
-
-		// ✅ Detect edit mode
-		let isEditMode = advanceAmount.value !== "" || dueAmount.value !== "";
-
-		// Set total amount
-		if (grandTotalElement && totalAmount) {
-			let amt = grandTotalElement.textContent.replace(/[₹,]/g, '').trim();
-			totalAmount.value = parseFloat(amt || 0).toFixed(2);
-		}
-
-		function resetFields() {
-			advanceAmount.value = "";
-			dueAmount.value = "";
-			adjustedAmount.value = "";
-		}
-
-		function togglePaymentUI(reset = false) {
-
-			let status = payStatus.value;
-
-			if (!status) {
-				paymentSection.style.display = "none";
-				return;
-			}
-
-			paymentSection.style.display = "flex";
-
-			// Hide all
-			advanceBox.classList.add("d-none");
-			dueBox.classList.add("d-none");
-			adjustedBox.classList.add("d-none");
-
-			// ✅ Reset ONLY when user changes
-			if (reset) {
-				resetFields();
-			}
-
-			if (status === "Full") {
-
-				adjustedBox.classList.remove("d-none");
-
-				let total = parseFloat(totalAmount.value) || 0;
-
-				// Only overwrite if not edit mode
-				if (reset || !isEditMode) {
-					adjustedAmount.value = total.toFixed(2);
-				}
-
-				adjustedAmount.readOnly = true;
-
-			} else if (status === "Partial") {
-
-				advanceBox.classList.remove("d-none");
-				dueBox.classList.remove("d-none");
-
-				adjustedAmount.readOnly = false;
-
-				// Only calculate if empty
-				if (!dueAmount.value) {
-					calculateDue();
-				}
-			}
-		}
-
-		function calculateDue() {
-
-			let total = parseFloat(totalAmount.value) || 0;
-			let advance = parseFloat(advanceAmount.value) || 0;
-
-			if (advance > total) {
-				advanceAmount.value = total.toFixed(2);
-				advance = total;
-			}
-
-			let due = total - advance;
-
-			dueAmount.value = due.toFixed(2);
-		}
-
-		// ✅ When user changes → reset values
-		payStatus.addEventListener("change", function () {
-			isEditMode = false; // now user changed manually
-			togglePaymentUI(true);
-		});
-
-		advanceAmount.addEventListener("input", calculateDue);
-		togglePaymentUI(false);
-    });
-
     document.addEventListener("DOMContentLoaded", function() {
         // Existing code...
 
@@ -1701,6 +1710,60 @@
             previewContainer.style.display = 'block';
             uploadArea.style.display = 'none';
         }
+    });
+
+    //-------Bank Details Dropdown change --------
+    
+
+
+    $(document).ready(function () {
+        let qr = $('#bank_id option:selected').data('qr');
+
+        if (qr) {
+            $('#bankQrPreview').attr('src', qr).show();
+        }
+
+        $('#bank_id').on('change', function () {
+            let qr = $(this).find(':selected').data('qr');
+
+            if (qr) {
+                $('#bankQrPreview').attr('src', qr).show();
+            } else {
+                $('#bankQrPreview').hide();
+            }
+        });
+    });
+
+    function startEditSalesInvoiceTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Edit Sales Invoice Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-info-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Modify customer invoice items, taxes, discounts, or terms.</p></div>'
+                },
+                {
+                    title: 'Edit Sales Invoice',
+                    intro: 'Modify customer invoice items, taxes, discounts, or terms.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-edit-sales-invoice-tour').on('click', function(e) {
+            e.preventDefault();
+            startEditSalesInvoiceTour();
+        });
     });
 </script>
 @endsection

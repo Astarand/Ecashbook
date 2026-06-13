@@ -355,6 +355,7 @@ class AssetController extends Controller
 			'depreciation_method' => !$isWip ? ($data['depreciation_method'] ?? null) : null,
 			'residual_value' => !$isWip ? ($data['residual_value'] ?? 0) : 0,
 			'depreciation_value' => !$isWip ? ($data['depreciation_value'] ?? 0) : 0,
+			'depreciation_rate' => !$isWip ? ($data['depreciation_rate'] ?? 0) : 0,
 
 			// ================= CWIP (ONLY IF WIP) =================
 			'project_name' => $isWip ? ($data['project_name'] ?? null) : null,
@@ -916,6 +917,7 @@ class AssetController extends Controller
 					'depreciation_method' => !$isWip ? ($data['depreciation_method'] ?? null) : null,
 					'residual_value' => !$isWip ? ($data['residual_value'] ?? 0) : 0,
 					'depreciation_value' => !$isWip ? ($data['depreciation_value'] ?? 0) : 0,
+					'depreciation_rate' => !$isWip ? ($data['depreciation_rate'] ?? 0) : 0,
 
 					// ================= CWIP (ONLY IF WIP) =================
 					'project_name' => $isWip ? ($data['project_name'] ?? null) : null,
@@ -1105,7 +1107,12 @@ class AssetController extends Controller
 
         $delAsset = DB::table('assets')->where('id', $id)->delete();
 		$delCurrAsset = DB::table('assets_currs')->where('aid', $id)->delete();
-		$delJournalRec = DB::table('journals')->where('autoId', $id)->delete();
+		$delJournalRec = DB::table('journals')
+								->where('autoId', $id)
+								->where('source', 'Asset')->delete();
+		$delPaymentRec = DB::table('payment_vouchers')
+							->where('f_id', $id)
+							->where('source', 'Asset')->delete();
 		if($delAsset){
 			AuditLogger::logEntry(
 				action: 'delete',

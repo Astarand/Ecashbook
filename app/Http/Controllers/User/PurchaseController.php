@@ -83,6 +83,7 @@ class PurchaseController extends Controller
 			$array[$val->id]['branch_name'] = $val->branch_name;
 			$array[$val->id]['inv_date'] = $val->inv_date;
 			$array[$val->id]['mode_of_pay'] = $val->mode_of_pay;
+			$array[$val->id]['due_amount'] = $val->due_amount;
 			$array[$val->id]['other_payment'] = $val->other_payment;
 			$array[$val->id]['pay_status'] = $val->pay_status;
 			$array[$val->id]['total_amount'] = $val->total_amount;
@@ -126,12 +127,10 @@ class PurchaseController extends Controller
 
 		$count = DB::table('purchases')
 			->where('added_by', $userId)
-			->where(function($query) {
-				$query->whereNull('pay_status')->orWhere('pay_status', '');
-			})
+			->where('status', '0')
 			->count();
 
-			if($count >=2){    //---------- count empty or null payment status -------
+			if($count >=2){
 				return "false";
 			}else{
 				return "true";
@@ -503,6 +502,91 @@ class PurchaseController extends Controller
 		//echo "<pre>";print_r($result);exit;
 		echo json_encode($result);
 	}
+	
+	public function saveProductAndPurchase(Request $request)
+	{
+		//echo "<pre>";print_r($_POST);exit;
+		DB::beginTransaction();
+		$uid = currentOwnerId();
+		$sid = $request->sId;
+		try {
+			//SAVE PRODUCT			
+			$insertItem = Helper::createProductService($request->all());
+			// Save images
+			if ($request->hasFile('prod_image')) {
+				foreach ($request->file('prod_image') as $file) {
+					$fileName = date("YmdHis") . '-' . $file->getClientOriginalName();
+					$file->storeAs('public/product_images', $fileName);
+
+					DB::table('product_images')->insert([
+						'product_id' => $insertItem->id,
+						'image_path' => $fileName,
+						'created_at' => now(),
+						'updated_at' => now(),
+					]);
+				}
+			}
+
+			//CALCULATIONS
+			$qty   = (!empty($request->opening_stock_bal) && $request->opening_stock_bal > 0) ? $request->opening_stock_bal : 1;
+			$rate  = $request->selling_price ?? $request->ser_selling_price;
+			$disc  = $request->disc_sell ?? 0;
+			$discType = $request->disc_sell_type ?? 'percentage';
+			$gstRate  = $request->gst_rate_prod ?? $request->gst_rate_service;
+
+			// Discount per unit
+			if ($discType == 'percentage') {
+				$discAmt = ($rate * $disc) / 100;
+			} else {
+				$discAmt = $disc;
+			}
+			// Per unit taxable
+			$taxablePerUnit = $rate - $discAmt;
+			// Total taxable
+			$taxable = $taxablePerUnit * $qty;
+			// Total tax
+			$taxAmt  = ($taxable * $gstRate) / 100;
+
+			// Grand amount
+			$amount  = $taxable;
+
+			//INSERT INTO purchase_values
+			DB::table('purchase_values')->insert([
+				'sid'       => $sid, // current sales id (replace with dynamic)
+				'uid'       => $uid,
+				'prod_id'   => $insertItem->id,
+				'quantity'  => $qty,
+				'rate'      => $rate,
+				'disc'      => $disc,
+				'disc_type' => $discType,
+				'disc_amt'  => $discAmt,
+				'tax_amt'   => $taxAmt,
+				'amount'    => $amount,
+				'tax_type'  => "N/A",
+				'gst_rate'  => $gstRate,
+				'gst_trans' => $request->gst_trans,
+				'billing_type' => "Product/ Service Billing",
+				'prod_gov_fee' => isset($request->prod_gov_fee) ? $request->prod_gov_fee : 0,
+				'created_at' => now(),
+				'updated_at' => now(),
+			]);
+
+			DB::commit();
+			$sales_values = $this->items_purchase_list($sid);
+			return view('User.ajax-purchase-invoice-display')->with([
+				'sales_values' => $sales_values,
+			]);
+
+		} catch (\Exception $e) {
+			DB::rollBack();
+
+			return response()->json([
+				'status' => 'error',
+				'class'  => 'err',
+				'message'=> $e->getMessage()
+			], 500);
+		}
+	}
 
 	public function purchase_items_display(Request $request)
     {
@@ -583,7 +667,6 @@ class PurchaseController extends Controller
 
 
 		$sales_values = $this->items_purchase_list($sid);
-		$this->journalEntry($sid,$uid); //Journal Entry
 		//echo "<pre>"; print_r($sales_values);exit;
 		return view('User.ajax-purchase-invoice-display')->with([
 			'sales_values'=>$sales_values,
@@ -613,6 +696,9 @@ class PurchaseController extends Controller
 			->first();
 
 		if ($purchase) {
+			$amount = ($totals->total_amount+$totals->total_tax);
+			//$this->paymentVoucherService->storePaymentVoucherEntries($sid,'Purchase',$amount);
+			
 			$this->journalService->storePurchaseJournalEntries([
 				'source'        => 'Purchase',
 				'autoId'        => $sid,
@@ -622,6 +708,8 @@ class PurchaseController extends Controller
 				'reference_no'  => $purchase->inv_num,
 				'entry_type'    => 'Purchase',
 				'party_name'    => $purchase->vendor_name ?? '',
+				'pay_status'    => $purchase->pay_status ?? '',
+				'amount'    	=> $amount ?? 0,
 				'total_amount'  => $totals->total_amount ?? 0,
 				'gst_amount'    => $totals->total_tax ?? 0,
 				'gst_rate'      => $totals->avg_gst_rate ?? 0,
@@ -672,6 +760,7 @@ class PurchaseController extends Controller
 			'propId' => $propId,
             'inv_num' => $data['inv_num'], //$invoiceNo,
 			'inv_date' => $data['inv_date'],
+			'pay_status' => 'Due',
 			'seller_name' => $data['seller_name'],
 			'seller_contact' => $data['seller_contact'],
 			'seller_email' => $data['seller_email'],
@@ -1142,7 +1231,6 @@ class PurchaseController extends Controller
 				);
 
 		$sales_values = $this->items_purchase_list($sales_data[0]->sid);
-		$this->journalEntry($sid,$uid); //Journal Entry
 		//echo "<pre>"; print_r($sales_values);exit;
 		return view('User.ajax-purchase-invoice-display')->with([
 			'sales_values'=>$sales_values,
@@ -1153,6 +1241,7 @@ class PurchaseController extends Controller
 
 		//print_r($_FILES);
 		$signature_name = $request->signature_name;
+		$special_discount_amount = $request->discount_amount ?? 0;
 		//$tds_applicable = $request->tdsApplicable;
 		//$tds_percentage = $request->tdsPercentage;
 		//$tds_amount = $request->tds_amount;
@@ -1174,6 +1263,7 @@ class PurchaseController extends Controller
 				 array(
 						'signature' => $signature,
 						'signature_name' => $signature_name,
+						'special_discount_amount' => $special_discount_amount,
 						//'tds_applicable' => $tds_applicable,
 						//'tds_percentage' => $tds_percentage,
 						//'tds_amount' => $tds_amount,
@@ -1188,6 +1278,7 @@ class PurchaseController extends Controller
 				->update(
 					 array(
 							'signature_name' => $signature_name,
+							'special_discount_amount' => $special_discount_amount,
 							//'tds_applicable' => $tds_applicable,
 							//'tds_percentage' => $tds_percentage,
 							//'tds_amount' => $tds_amount,
@@ -1292,50 +1383,32 @@ class PurchaseController extends Controller
 			$oldRec = DB::table('purchases')
 				->where('id', $sId)
 				->first();
-			$oldAdvanceAmount  = (float) ($oldRec->advance_amount ?? 0);
-			$oldAdjustedAmount = (float) ($oldRec->adjusted_amount ?? 0);
 			//end get old records
 			
 			$tdsApplicable = $request->tds_applicable === 'yes';
-			$payStatus = $request->pay_status;
-			$totalAmount   = $request->total_amount ?? 0;
-			$advanceAmount = $request->advance_amount ?? 0;
-			$dueAmount     = $request->due_amount ?? 0;
-			$adjustedAmount = $request->adjusted_amount ?? 0;
-			if ($payStatus === 'Partial') {
-				$currentPayment = $advanceAmount;
-				$advanceAmount = $oldAdvanceAmount + $advanceAmount;
-				$adjustedAmount = 0;
-				$dueAmount = $totalAmount - $advanceAmount;
-				if ($dueAmount < 0) {
-					$dueAmount = 0;
-				}
-			}
-			else if ($payStatus === 'Full') 
+			$payStatus = $oldRec->pay_status ?? '';
+			$totalAmount   = $request->total_amount ?? 0;			
+			$dueAmount =  (float) ($oldRec->due_amount ?? 0);
+			$advanceAmount  = (float) ($oldRec->advance_amount ?? 0);
+			$adjustedAmount = (float) ($oldRec->adjusted_amount ?? 0);
+			if ($payStatus === 'Due') 
 			{
-				$remainingAmount = $totalAmount - $oldAdjustedAmount;
-				if ($remainingAmount < 0) {
-					$remainingAmount = 0;
-				}
-				$currentPayment = $remainingAmount;
-				$adjustedAmount = $totalAmount;
-				$advanceAmount = $oldAdvanceAmount;
-				$dueAmount = 0;
+				$payStatus = 'Due';
+				$dueAmount =  0;
+				$advanceAmount  = 0;
+				$adjustedAmount  = 0;
 			}
-			else {
-				$currentPayment = 0;
-			}
-			
+
 			$update = DB::table('purchases')
 					->where('id', $sId)
 					->update(
 						array(	
 								'mode_of_pay' => $request->mode_of_pay,
 								'other_payment' => $request->other_payment,
-								'pay_status' => $request->pay_status,
+								'pay_status' => $payStatus,
 								'total_amount' => isset($request->total_amount)?$request->total_amount:0,
-								'advance_amount' => isset($request->advance_amount)?$request->advance_amount:0,
-								'due_amount' => isset($request->due_amount)?$request->due_amount:0,
+								'advance_amount' => $advanceAmount,
+								'due_amount' => $dueAmount,
 								'adjusted_amount' => $adjustedAmount,
 								'seller_orderno' => isset($request->seller_orderno)?$request->seller_orderno:"",
 								'order_date' => !empty($request->order_date) ? $request->order_date : null,
@@ -1348,16 +1421,8 @@ class PurchaseController extends Controller
 								'status' => 1,
 						)
 					);
-
-			//start entry for voucher payment
-			if ($currentPayment <= 0) {
-				$currentPayment = 0;
-			}
-			if ($currentPayment > 0)
-			{
-				$this->paymentVoucherService->storePaymentVoucherEntries($sId, 'Purchase', $currentPayment);
-			}
-			//end entry for voucher payment
+			$userId = currentOwnerId();
+			$this->journalEntry($sId,$userId); //Journal Entry
 			$msg = array(
 				'status' => 'success',
 				'class' => 'succ',
@@ -1374,7 +1439,6 @@ class PurchaseController extends Controller
 		$sales_values = $this->items_purchase_list($request->sid);
 		$uid = currentOwnerId();
 		$sid = $request->sid;
-		$this->journalEntry($sid,$uid); //Journal Entry
 		//echo "<pre>"; print_r($sales_values);exit;
 		return view('User.ajax-purchase-invoice-display')->with([
 			'sales_values'=>$sales_values,
@@ -1419,7 +1483,6 @@ class PurchaseController extends Controller
 				);
 
 		$sales_values = $this->items_purchase_list($sales_data[0]->sid);
-		$this->journalEntry($sid,$uid); //Journal Entry
 		//echo "<pre>"; print_r($sales_values);exit;
 		return view('User.ajax-purchase-invoice-display')->with([
 			'sales_values'=>$sales_values,
@@ -1437,7 +1500,12 @@ class PurchaseController extends Controller
 				
         $delInvoice = DB::table('purchases')->where('id', $request->id)->delete();
         $delInvoiceItemValue = DB::table('purchase_values')->where('sid', $request->id)->delete();
-		$delJournalRec = DB::table('journals')->where('autoId', $request->id)->delete();
+		$delJournalRec = DB::table('journals')
+								->where('autoId', $request->id)
+								->where('source', 'Purchase')->delete();
+		$delPaymentRec = DB::table('payment_vouchers')
+							->where('f_id', $request->id)
+							->where('source', 'Purchase')->delete();
 		if($delInvoice){
 			//AUDIT LOG ENTRY
             AuditLogger::logEntry(

@@ -10,12 +10,15 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Tax Filing & Returns</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Startup Filing Reports</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-startup-filing-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-8">
                     <div class="page-header-title">
@@ -214,5 +217,43 @@
 			}
 		});
 	});
+
+function startStartupFilingListTour() {
+    if (typeof introJs !== 'function') return;
+
+    introJs().setOptions({
+        steps: [
+            {
+                title: 'Incubator Applications Guide',
+                intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-rocket" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Review incubator application logs, filing states, payment details, and processed status indicators.</p></div>'
+            },
+            {
+                element: 'a[href="{{ route('user.StartupFiling') }}"]',
+                title: 'Apply New Service',
+                intro: 'Click here to start a new Startup Incubator Service engagement.'
+            },
+            {
+                element: '.table-responsive',
+                title: 'Applications Table',
+                intro: 'Review business name, founder details, application statuses, and process dates.'
+            }
+        ],
+        showBullets: true,
+        showProgress: true,
+        helperElementPadding: 5,
+        exitOnOverlayClick: false,
+        doneLabel: 'Done',
+        nextLabel: 'Next',
+        prevLabel: 'Prev',
+        skipLabel: 'Skip'
+    }).start();
+}
+
+$(document).ready(function() {
+    $('#start-startup-filing-list-tour').on('click', function(e) {
+        e.preventDefault();
+        startStartupFilingListTour();
+    });
+});
 </script>
 @endsection

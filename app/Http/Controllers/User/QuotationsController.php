@@ -155,153 +155,129 @@ class QuotationsController extends Controller
             return true;
         }
     }
+	
+	private function getNextNumber($table, $column, $where, $configLastPart = null)
+	{
+		$last = DB::table($table)
+			->where($where)
+			->select(DB::raw("MAX(CAST(SUBSTRING_INDEX($column,'/',-1) AS UNSIGNED)) as max_num"))
+			->value('max_num');
 
+		if ($last) {
+			return $last + 1;
+		}
+
+		// fallback from config
+		if ($configLastPart && is_numeric($configLastPart)) {
+			return ((int)$configLastPart) + 1;
+		}
+
+		return 1;
+	}
+	
 	public function generateQuotationNumber($userId)
 	{
-		$this->companyInfoFill(); //------------Check Company Info fill ----------
+		$this->companyInfoFill($userId);
 
-		// Fetch company settings
 		$company = DB::table('company_profiles')
-					->where('userId', $userId)
-					->first(['comp_name', 'comp_quo_digits']);
+			->where('userId', $userId)
+			->first(['comp_name', 'comp_quo_digits']);
 
 		if (!$company) return false;
 
-		$currentMonth = date('n');
-		$currentYear  = date('Y');
+		/* FY */
+		$year = date('Y');
+		$month = date('n');
 
-		if ($currentMonth >= 4) {
-			$startYear = substr($currentYear, 2);
-			$endYear   = substr($currentYear + 1, 2);
-		} else {
-			$startYear = substr($currentYear - 1, 2);
-			$endYear   = substr($currentYear, 2);
-		}
+		$fyStart = substr($month >= 4 ? $year : $year - 1, 2);
+		$fyEnd   = substr($month >= 4 ? $year + 1 : $year, 2);
 
-		$financialYear = $startYear . '-' . $endYear;
+		$financialYear = $fyStart . '-' . $fyEnd;
 
-
-		/* ===============================
-		   PREFIX GENERATION
-		=============================== */
-
+		/* PREFIX */
 		if (!empty($company->comp_quo_digits)) {
+			$base = trim($company->comp_quo_digits, '/');
+			$parts = explode('/', $base);
 
-			$basePrefix = trim($company->comp_quo_digits, '/');
-
-			// ✅ If FY already exists → DO NOT add again
-			if (strpos($basePrefix, $financialYear) !== false) {
-				$finalPrefix = $basePrefix . '/';
+			if (is_numeric(end($parts))) {
+				$configLast = array_pop($parts);
 			} else {
-				$parts = explode('/', $basePrefix);
-
-				// Insert FY after first part
-				array_splice($parts, 1, 0, $financialYear);
-
-				$finalPrefix = implode('/', $parts) . '/';
+				$configLast = null;
 			}
 
+			$parts = array_values(array_filter($parts, fn($p) => !preg_match('/^\d{2}-\d{2}$/', $p)));
+			array_splice($parts, 1, 0, $financialYear);
+
+			$prefix = implode('/', $parts) . '/';
 		} else {
-
-			$prefix = strtoupper(substr($company->comp_name, 0, 3));
-			$seriesType = 'QT';
-
-			$finalPrefix = $prefix . '/' . $financialYear . '/' . $seriesType . '/';
+			$configLast = null;
+			$prefix = strtoupper(substr($company->comp_name, 0, 3))
+				. '/QT/' . $financialYear . '/';
 		}
 
+		$lastPart = $configLast;
 
-		/* ===============================
-		   FETCH LAST NUMBER
-		=============================== */
+		$next = $this->getNextNumber(
+			'quotations',
+			'inv_num',
+			[['added_by', '=', $userId]],
+			$lastPart
+		);
 
-		$lastIncrement = DB::table('quotations')
-			->where('added_by', $userId)
-			//->where('inv_num', 'like', $finalPrefix . '%')
-			->select(DB::raw("MAX(CAST(SUBSTRING_INDEX(inv_num, '/', -1) AS UNSIGNED)) as max_num"))
-			->value('max_num');
-
-		$nextIncrement = $lastIncrement ? $lastIncrement + 1 : 1;
-
-		$increment = str_pad($nextIncrement, 4, '0', STR_PAD_LEFT);
-
-		return $finalPrefix . $increment;
+		return $prefix . str_pad($next, 4, '0', STR_PAD_LEFT);
 	}
 	
 	public function generateQuotationNumberProprietorship($id, $userId)
 	{
-		// Fetch company settings
 		$company = DB::table('proprietorship_profiles')
 			->where('id', $id)
 			->first(['comp_name', 'comp_quo_digits']);
 
-		if (!$company) {
-			return false;
-		}
+		if (!$company) return false;
 
-		/* ===============================
-		   FINANCIAL YEAR (APR–MAR)
-		=============================== */
+		/* FY */
+		$year = date('Y');
+		$month = date('n');
 
-		$currentMonth = date('n');
-		$currentYear  = date('Y');
+		$fyStart = substr($month >= 4 ? $year : $year - 1, 2);
+		$fyEnd   = substr($month >= 4 ? $year + 1 : $year, 2);
 
-		if ($currentMonth >= 4) {
-			$startYear = substr($currentYear, 2);
-			$endYear   = substr($currentYear + 1, 2);
-		} else {
-			$startYear = substr($currentYear - 1, 2);
-			$endYear   = substr($currentYear, 2);
-		}
+		$financialYear = $fyStart . '-' . $fyEnd;
 
-		$financialYear = $startYear . '-' . $endYear;
-
-
-		/* ===============================
-		   PREFIX GENERATION
-		=============================== */
-
+		/* PREFIX */
 		if (!empty($company->comp_quo_digits)) {
+			$base = trim($company->comp_quo_digits, '/');
+			$parts = explode('/', $base);
 
-			$basePrefix = trim($company->comp_quo_digits, '/');
-
-			// ✅ If FY already exists → DO NOT add again
-			if (strpos($basePrefix, $financialYear) !== false) {
-				$finalPrefix = $basePrefix . '/';
+			if (is_numeric(end($parts))) {
+				$configLast = array_pop($parts);
 			} else {
-				$parts = explode('/', $basePrefix);
-
-				// Insert FY after first part
-				array_splice($parts, 1, 0, $financialYear);
-
-				$finalPrefix = implode('/', $parts) . '/';
+				$configLast = null;
 			}
 
+			$parts = array_values(array_filter($parts, fn($p) => !preg_match('/^\d{2}-\d{2}$/', $p)));
+			array_splice($parts, 1, 0, $financialYear);
+
+			$prefix = implode('/', $parts) . '/';
 		} else {
-
-			$prefix = strtoupper(substr($company->comp_name, 0, 3));
-			$seriesType = 'QT';
-
-			$finalPrefix = $prefix . '/' . $financialYear . '/' . $seriesType . '/';
+			$configLast = null;
+			$prefix = strtoupper(substr($company->comp_name, 0, 3))
+				. '/QT/' . $financialYear . '/';
 		}
 
+		$next = $this->getNextNumber(
+			'quotations',
+			'inv_num',
+			[
+				['added_by', '=', $userId],
+				['propId', '=', $id]
+			],
+			$configLast
+		);
 
-		/* ===============================
-		   FETCH LAST NUMBER
-		=============================== */
-
-		$lastIncrement = DB::table('quotations')
-			->where('added_by', $userId)
-			//->where('inv_num', 'like', $finalPrefix . '%')
-			->select(DB::raw("MAX(CAST(SUBSTRING_INDEX(inv_num, '/', -1) AS UNSIGNED)) as max_num"))
-			->value('max_num');
-
-		$nextIncrement = $lastIncrement ? $lastIncrement + 1 : 1;
-
-		$increment = str_pad($nextIncrement, 4, '0', STR_PAD_LEFT);
-
-		return $finalPrefix . $increment;
+		return $prefix . str_pad($next, 4, '0', STR_PAD_LEFT);
 	}
-
+	
 	public function quotation_create_status() {
 		$userId = currentOwnerId();
 

@@ -9,14 +9,14 @@
                 <div class="col-md-12">
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Helpdesk</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/help-center') }}">Helpdesk</a></li>
                         <li class="breadcrumb-item active" aria-current="page">CA Tickets</li>
                     </ul>
                 </div>
                 <div class="col-md-8">
                     <div class="page-header-title">
 						<h2 class="mb-0">
-							@if(Auth::user()->u_type == 2)
+							@if(Auth::user()->u_type == 1 || Auth::user()->u_type == 4)
 								Support Tickets
 							@else
 								CA Support Tickets
@@ -24,7 +24,7 @@
 						</h2>
                     </div>
                 </div>
-				@if(Auth::user()->u_type == 1)
+				@if(Auth::user()->u_type == 1 || Auth::user()->u_type == 4)
 				<div class="col-md-4 text-end">
                     <button type="button" class="btn btn-primary" id="openModal">Create Ticket</button>
                 </div>

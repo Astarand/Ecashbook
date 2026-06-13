@@ -7,14 +7,17 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Purchase & Procurement</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('user.PurchaseCreditDebit') }}">Credit & Debit Note</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Add Credit/Debit Note</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-add-purchase-credit-debit-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
             </div>
         </div>
@@ -340,7 +343,78 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('page-script')
 <script>
+    function startAddPurchaseCreditDebitTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Add Purchase Credit/Debit Note',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-file-text" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Record a purchase credit or debit note adjustment from your suppliers against an existing purchase invoice.</p></div>'
+                },
+                {
+                    element: '#inv_num',
+                    title: 'Reference Invoice',
+                    intro: 'Select the original vendor purchase invoice number being adjusted.'
+                },
+                {
+                    element: '#note_type',
+                    title: 'Note Type',
+                    intro: 'Choose Credit (vendor refunds/discounts) or Debit (additional charges from vendor).'
+                },
+                {
+                    element: '#buyerDetail',
+                    title: 'Step 1: Buyer Details',
+                    intro: 'Select the vendor and review details populated from the purchase registry.'
+                },
+                {
+                    element: '#sellerDetail',
+                    title: 'Step 2: Seller/Company Details',
+                    intro: 'Confirm your company profiles details automatically filled.'
+                },
+                {
+                    element: '#others',
+                    title: 'Step 3: Adjustment Details',
+                    intro: 'Input note date, voucher code, items returned/adjusted, quantities, tax values, tax amounts, shipping agent, and upload vendor documents.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).onbeforechange(function(targetElement) {
+            if (targetElement.id === 'buyerDetail' || targetElement.id === 'sellerDetail' || targetElement.id === 'others') {
+                $('#buyerDetail, #sellerDetail, #others').hide().removeClass('show active');
+                $('.nav-pills .nav-link').removeClass('active');
+                
+                $(targetElement).show().addClass('show active');
+                
+                let tabIndexMap = {
+                    'buyerDetail': '#tab-A',
+                    'sellerDetail': '#tab-B',
+                    'others': '#tab-C'
+                };
+                let linkId = tabIndexMap[targetElement.id];
+                $(linkId).addClass('active');
+            }
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-add-purchase-credit-debit-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddPurchaseCreditDebitTour();
+        });
+    });
+
     /*document.getElementById("imageUpload").addEventListener("change", function() {
         const fileInput = this;
         const previewBox = document.getElementById("imagePreview");

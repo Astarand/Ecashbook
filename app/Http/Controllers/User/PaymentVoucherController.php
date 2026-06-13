@@ -452,6 +452,26 @@ class PaymentVoucherController extends Controller
             'amount' => $invoice->total_amount  ?? 0
         ]);
     }
+	
+	public function voucherDelete($id)
+	{
+		try {
+
+			PaymentVoucher::findOrFail($id)->delete();
+
+			return response()->json([
+				'status' => true,
+				'message' => 'Voucher deleted successfully'
+			]);
+
+		} catch (\Exception $e) {
+
+			return response()->json([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+		}
+	}
 
 
 

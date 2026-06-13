@@ -23,22 +23,25 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Sales & Revenue</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Sales Invoices</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-sales-invoice-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
                         <h2 class="mb-0">Sales Invoice List</h2>
                     </div>
                 </div>
-				@if ($invoice_create_status == "true")
+				@if ($invoice_create_status == "true" && (Auth::user()->u_type == 2 || Auth::user()->u_type == 5))
                 <div class="col-md-8 text-end">
-                    <a href="{{ route('user.CreateSalesInvoices') }}" class="btn btn-primary"><i
+                    <a href="{{ route('user.CreateSalesInvoices') }}" id="add-sales-invoice-btn" class="btn btn-primary"><i
                             class="ti ti-square-plus"></i> Add New Sales Invoice</a>
                 </div>
 				@endif
@@ -59,39 +62,6 @@
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
             <div class="card card-body table-card">
-				<!--<div class="row mb-3">
-					<div class="col-md-12 d-flex justify-content-end">
-						<div class="input-group" style="max-width: 650px;">
-
-							<input type="text"
-								   name="search"
-								   id="searchInvoice"
-								   class="form-control"
-								   placeholder="Search Invoice No / Customer"
-								   value="{{ request('search') }}">
-
-							<input type="date"
-								   name="search_date"
-								   id="searchDate"
-								   class="form-control"
-								   value="{{ request('search_date') }}">
-
-							<button type="button"
-									id="searchBtn"
-									class="btn btn-primary">
-								Search
-							</button>
-
-							@if(request('search') || request('search_date'))
-								<a href="{{ url()->current() }}"
-								   class="btn btn-light-danger">
-									Reset
-								</a>
-							@endif
-
-						</div>
-					</div>
-				</div>-->
 				
 				<div class="table-responsive">
 					<table class="table tbl-product"  id="pc-dt-simple">
@@ -106,6 +76,8 @@
 								<th>Invoice Date</th>
 								<th>Transation Type</th>
 								<th>Grand Total</th>
+								<th>Due</th>
+								<th>Digital Signature</th>
 								<th>Payment Status</th>
 								<th>Status</th>
 								<th>Action</th>
@@ -139,7 +111,20 @@
 										@endif
 									</span>
 								</td>
-								<td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->total_amount }}</span>
+								<td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->total_amount }}</span></td>
+								<td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->due_amount ?? 0 }}</span></td>
+								<td>
+									@if ($sale->signed_pdf_status == 1)
+										<span class="badge bg-success">
+											<i class="ti ti-circle-check f-14"></i>
+											Signed
+										</span>
+									@else
+										<span class="badge bg-warning text-dark">
+											<i class="ti ti-circle-x f-14"></i>
+											Not Signed
+										</span>
+									@endif
 								</td>
 								<td>
 									@if ($sale->pay_status == 'Full')
@@ -147,7 +132,7 @@
 									@elseif ($sale->pay_status == 'Partial')
 									<span class="badge bg-warning text-dark">Advance</span>                                    
 									@else
-									<span class="badge bg-secondary">Incomplete</span>
+									<span class="badge bg-danger">Due</span>
 									@endif
 								</td>
 								<td>
@@ -170,6 +155,34 @@
 													<i class="ti ti-file f-18"></i>
 												</a>
 											</li>
+											@if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
+											<li class="list-inline-item align-bottom"
+												data-bs-toggle="tooltip"
+												data-bs-placement="top"
+												title="Upload Digitally Signed PDF">
+												<a href="#"
+												   class="avtar avtar-xs btn-link-primary btn-pc-default upload-pdf-btn"
+												   data-id="{{$sale->id}}"
+												   data-type="sales"
+												   data-bs-toggle="modal"
+												   data-bs-target="#uploadPdfModal">
+													<i class="ti ti-cloud-upload f-18"></i>
+												</a>
+											</li>
+											@endif
+											@if($sale->signed_pdf_status==1)
+											<li class="list-inline-item align-bottom"
+												data-bs-toggle="tooltip"
+												data-bs-placement="top"
+												title="Download Digitally Signed PDF">
+
+												<a href="{{route('download.signed.pdf',
+													['type'=>'sales','id'=>$sale->id])}}"
+												   class="avtar avtar-xs btn-link-danger">
+													<i class="ti ti-file-invoice f-18"></i>
+												</a>
+											</li>
+											@endif
 											<li class="list-inline-item align-bottom" data-bs-toggle="tooltip"
 												title="View">
 												<a href="{{ url('/view-sales-invoice/'.base64_encode($sale->id)) }}"
@@ -195,13 +208,7 @@
 													<i class="ti ti-trash f-18"></i>
 												</a>
 											</li>
-											@endif
-										  {{--  <li class="list-inline-item align-bottom" data-bs-toggle="tooltip"
-												title="Payment History">
-												<a href="{{ url('/payment_history/'.base64_encode($sale->id)) }}" class="avtar avtar-xs btn-link-primary btn-pc-default">
-													<i class="ti ti-currency-rupee f-18"></i>
-												</a>
-											</li>--}}
+											@endif									
 										</ul>
 									</div>
 
@@ -220,8 +227,6 @@
     </div>
     <!-- [ Main Content ] end -->
 </div>
-
-
 
 <div class="modal custom-modal fade" id="delete_modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
@@ -252,7 +257,136 @@
     </div>
 </div>
 
+<div class="modal fade" id="uploadPdfModal">
+   <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">
+               Upload Digitally Signed PDF
+            </h5>
+            <button
+               class="btn-close"
+               data-bs-dismiss="modal">
+            </button>
+         </div>
+         <div class="modal-body">
+            <form id="uploadPdfForm" enctype="multipart/form-data">
+               @csrf
+               <input type="hidden" name="id" id="pdf_id">
+               <input type="hidden" name="type" id="pdf_type">
+               <div class="alert alert-info">
+                  <i class="ti ti-info-circle"></i>
+                  Only PDF allowed.
+                  Maximum size 5 MB.
+               </div>
+               <div class="mb-3">
+                  <label>
+                  Select Signed PDF
+                  </label>
+                  <input
+                     type="file"
+                     name="pdf"
+                     id="pdf_file"
+                     class="form-control"
+                     accept="application/pdf">
+               </div>
+               <div
+                  id="uploadError"
+                  class="text-danger"></div>
+               <button
+                  class="btn btn-primary w-100">
+               Upload PDF
+               </button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+@endsection
+
+@section('page-script')
 <script>
+    function startSalesInvoiceTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Sales Invoices Directory',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-receipt" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Review and manage your company sales invoices, tracking totals, receipts, and payment status badges.</p></div>'
+                },
+                {
+                    element: '#add-sales-invoice-btn',
+                    title: 'New Sales Invoice',
+                    intro: 'Click here to create a new billing invoice, set items, compute GST, and register payments.'
+                },
+                {
+                    element: '.table-responsive',
+                    title: 'Invoices Listing',
+                    intro: 'Browse history files, showing invoice codes, dates, transaction types, grand totals, and payment status.'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Action Controls',
+                    intro: 'Analyse reports, upload or download signed PDFs, view invoice details, edit properties, or delete items.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            skipIfNoElement: true,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-sales-invoice-tour').on('click', function(e) {
+            e.preventDefault();
+            startSalesInvoiceTour();
+        });
+
+        // Set inputs in the PDF Upload Modal when click trigger
+        $(document).on('click', '.upload-pdf-btn', function () {
+            let id = $(this).data('id');
+            let type = $(this).data('type');
+            $('#pdf_id').val(id);
+            $('#pdf_type').val(type);
+            $('#uploadError').text('');
+            $('#pdf_file').val('');
+        });
+
+        // Handle the PDF Upload via AJAX
+        $('#uploadPdfForm').on('submit', function (e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+            $('#uploadError').text('');
+            
+            $.ajax({
+                url: "{{ route('upload.signed.pdf') }}",
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.status == 'success' || response.success) {
+                        alert(response.message || 'Signed PDF uploaded successfully!');
+                        location.reload();
+                    } else {
+                        $('#uploadError').text(response.message || 'Error uploading PDF.');
+                    }
+                },
+                error: function (xhr) {
+                    let res = xhr.responseJSON;
+                    $('#uploadError').text(res && res.message ? res.message : 'An error occurred during upload.');
+                }
+            });
+        });
+    });
 
 	$(document).ready(function () {
 
@@ -283,7 +417,6 @@
 
 	});
 	
-	
     let deleteId = null; 
     $(document).on('click', '.delete-btn', function () {
 		deleteId = $(this).data('id');
@@ -299,11 +432,11 @@
             });
 
             $.ajax({
-                url: '/delInvoice/' + deleteId, // Update with your delete route
+                url: '/delInvoice/' + deleteId,
                 type: 'DELETE',
                 success: function(response) {
-                    alert(response.message); // Show success message
-                    location.reload(); // Reload the page
+                    alert(response.message);
+                    location.reload();
                 },
                 error: function(xhr) {
                     alert("Error deleting invoice!");
@@ -312,12 +445,5 @@
         }
     });
 
-
-
 </script>
-
-
-
-
-
 @endsection

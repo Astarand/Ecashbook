@@ -4,16 +4,21 @@
 
 <div class="pc-content">
 
-<!-- [ breadcrumb ] start -->
+    <!-- [ breadcrumb ] start -->
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Financial Reports</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Trial Balance (TB)</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Financial Reports</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Trial Balance (TB)</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-tb-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -30,18 +35,20 @@
         <div class="col-md-12">
 
             <!-- FILTER CARD -->
-            <div class="card mb-4">
-                <div class="card-header py-3">
-                    <h4 class="text-center mb-0">Generate Trial Balance Report</h4>
+            <div class="card mb-4 reconciliation-filter-card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <div class="card-header py-3" style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                    <h5 class="mb-0 text-primary d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
+                        <i class="ti ti-filter f-20"></i> Filter Trial Balance Options
+                    </h5>
                 </div>
 
-                <div class="card-body">
+                <div class="card-body p-4">
                     <form method="POST" name="frmTrialBalance" id="frmTrialBalance" action="javascript:void(0);">
                         <div class="row g-3">
 
                             <div class="col-md-3">
-								<label class="form-label">Proprietorship Company</label>
-								<select name="propId" id="propId" class="form-control">
+								<label class="form-label fw-semibold text-muted">Proprietorship Company</label>
+								<select name="propId" id="propId" class="form-select">
 									<option value="">{{ parentCompanyName() }}</option>
 									@foreach($proprietorships as $company)
 										<option value="{{ $company->id }}">
@@ -51,21 +58,9 @@
 								</select>
 							</div>
 
-                            <!-- FROM DATE -->
-                            <div class="col-md-3">
-                                <label class="form-label">From Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="from_date" id="from_date" required>
-                            </div>
-
-                            <!-- TO DATE -->
-                            <div class="col-md-3">
-                                <label class="form-label">To Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="to_date" id="to_date" required>
-                            </div>                            
-
                             <!-- LEDGER NAME (7 TYPES) -->
                             <div class="col-md-3">
-                                <label class="form-label">Ledger Name <span class="text-danger">*</span></label>
+                                <label class="form-label fw-semibold text-muted">Ledger Name <span class="text-danger">*</span></label>
                                 <select class="form-select" name="ledger_name" id="ledger_name" required>
                                     <option value="">Select Ledger</option>
                                     <option value="all">All</option>
@@ -81,7 +76,7 @@
 							
 							<!-- LEDGER GROUP -->
                             <div class="col-md-3">
-                                <label class="form-label">Ledger Group <span class="text-danger">*</span></label>
+                                <label class="form-label fw-semibold text-muted">Ledger Group <span class="text-danger">*</span></label>
                                 <select class="form-select" name="ledger_group" id="ledgerGroup" onchange="handleLedgerGroup()">
                                     <option value="">Select Group</option>
                                     <option value="assets">Assets</option>
@@ -93,37 +88,57 @@
 
                             <!-- LEDGER SUB GROUP -->
                             <div class="col-md-3">
-                                <label class="form-label">Ledger Sub Group</label>
+                                <label class="form-label fw-semibold text-muted">Ledger Sub Group</label>
                                 <select class="form-select" name="ledger_sub_group" id="ledgerSubGroup" disabled>
                                     <option value="">Select Sub Group</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="row g-3 mt-1">
+                            <!-- FROM DATE -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted">From Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="from_date" id="from_date" required>
+                            </div>
+
+                            <!-- TO DATE -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted">To Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="to_date" id="to_date" required>
+                            </div>                            
 
                             <!-- OPENING BALANCE -->
                             <div class="col-md-3">
-                                <label class="form-label">Opening Balance (Dr.)</label>
-                                <input type="number" step="0.01" value="{{ $openingDr }}" class="form-control"  name="opening_balance_dr" id="opening_balance_dr">
+                                <label class="form-label fw-semibold text-muted">Opening Balance (Dr.)</label>
+                                <input type="number" step="0.01" value="{{ $openingDr }}" class="form-control" name="opening_balance_dr" id="opening_balance_dr">
                             </div>
-                             <div class="col-md-3">
-                                <label class="form-label">Opening Balance (Cr.)</label>
-                                <input type="number" step="0.01" value="{{ $openingCr }}" class="form-control"  name="opening_balance_cr" id="opening_balance_cr">
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted">Opening Balance (Cr.)</label>
+                                <input type="number" step="0.01" value="{{ $openingCr }}" class="form-control" name="opening_balance_cr" id="opening_balance_cr">
                             </div>
+                        </div>
 
+                        <div class="row g-3 mt-1">
                             <!-- GENERATE BUTTON -->
-                            <div class="col-md-12 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    Generate Trial Balance Report
+                            <div class="col-md-12 text-end">
+                                <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2" style="height: 41px;">
+                                    <i class="ti ti-settings f-18"></i> Generate Trial Balance Report
                                 </button>
                             </div>
-
                         </div>
                     </form>
                 </div>
             </div>
 
             <!-- LEDGER TABLE -->
-            <div class="card" style="border:1px solid #dee2e6;">
-                <div class="card-body">
+            <div class="card mb-4 tb-table-card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <div class="card-header py-3" style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                    <h5 class="mb-0 text-primary d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
+                        <i class="ti ti-table f-20"></i> Trial Balance Worksheet
+                    </h5>
+                </div>
+                <div class="card-body p-4">
 
                     <div class="table-responsive">
                         <table class="table table-bordered table-sm text-nowrap"
@@ -131,42 +146,42 @@
 
                             <!-- GROUP HEADERS -->
                             <thead>
-                                <tr style="text-align:center; font-weight:700;">
+                                <tr style="text-align:center; font-weight:700; font-size: 0.9rem;">
                                     <th colspan="3"
-                                        style="background:#ffc107; border:1px solid #000;">
+                                        style="background: #eef2ff; color: #4f46e5; border: 1px solid #cbd5e1; padding: 10px;">
                                         Ledger Details
                                     </th>
 
                                     <th colspan="2"
-                                        style="background:#9ee7e3; border:1px solid #000;">
+                                        style="background: #ecfdf5; color: #059669; border: 1px solid #cbd5e1; padding: 10px;">
                                         Opening Balance
                                     </th>
 
                                     <th colspan="2"
-                                        style="background:#ffc107; border:1px solid #000;">
+                                        style="background: #fef2f2; color: #dc2626; border: 1px solid #cbd5e1; padding: 10px;">
                                         Closing Balance
                                     </th>
 
                                     <th colspan="2"
-                                        style="background:#9ee7e3; border:1px solid #000;">
+                                        style="background: #fffbeb; color: #d97706; border: 1px solid #cbd5e1; padding: 10px;">
                                         Reporting Section
                                     </th>
                                 </tr>
 
                                 <!-- COLUMN HEADERS -->
-                                <tr style="text-align:center; font-weight:600; background:#fff3cd;">
-                                    <th style="border:1px solid #000;">Ledger Group</th>
-                                    <th style="border:1px solid #000;">Ledger Name</th>
-                                    <th style="border:1px solid #000;">Sub Group</th>
+                                <tr style="text-align:center; font-weight:600; background: #fafafa; font-size: 0.85rem;">
+                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Ledger Group</th>
+                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Ledger Name</th>
+                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Sub Group</th>
 
-                                    <th style="border:1px solid #000;">Opening Dr (₹)</th>
-                                    <th style="border:1px solid #000;">Opening Cr (₹)</th>
+                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Opening Dr (₹)</th>
+                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Opening Cr (₹)</th>
 
-                                    <th style="border:1px solid #000;">Closing Dr (₹)</th>
-                                    <th style="border:1px solid #000;">Closing Cr (₹)</th>
+                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Closing Dr (₹)</th>
+                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Closing Cr (₹)</th>
 
-                                    <th style="border:1px solid #000;">Schedule III Head</th>
-                                    <th style="border:1px solid #000;">Report Type (BS / P&amp;L)</th>
+                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Schedule III Head</th>
+                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Report Type (BS / P&amp;L)</th>
                                 </tr>
                             </thead>
 
@@ -184,19 +199,19 @@
                             <tfoot id="trialFooterData">
                                 <tr style="font-weight:700; background:#f8f9fa;">
                                     <td colspan="5"
-                                        style="text-align:right; border:1px solid #000;">
+                                        style="text-align:right; border: 1px solid #e2e8f0;">
                                         Total Closing Balance
                                     </td>
 
-                                    <td style="text-align:right; border:1px solid #000;" id="totalDr">
+                                    <td style="text-align:right; border: 1px solid #e2e8f0;" id="totalDr">
                                         ₹ 0.00
                                     </td>
 
-                                    <td style="text-align:right; border:1px solid #000;" id="totalCr">
+                                    <td style="text-align:right; border: 1px solid #e2e8f0;" id="totalCr">
                                         ₹ 0.00
                                     </td>
 
-                                    <td colspan="2" style="border:1px solid #000;"></td>
+                                    <td colspan="2" style="border: 1px solid #e2e8f0;"></td>
                                 </tr>
                             </tfoot>
 
@@ -224,7 +239,9 @@
 
                     <!-- ACTION BUTTONS -->
                     <div style="text-align:right; margin-top:12px;">
-                        <a href="javascript:void(0);" onclick="downloadTrialBalancePdf()" class="btn btn-primary">Download</a>
+                        <a href="javascript:void(0);" onclick="downloadTrialBalancePdf()" class="btn btn-primary d-inline-flex align-items-center gap-2">
+                            <i class="ti ti-download f-18"></i> Download PDF
+                        </a>
                     </div>
 
                 </div>
@@ -256,8 +273,9 @@
     color: #212529 !important;
 }
 .table-primary-soft {
-    background-color: rgba(13, 110, 253, 0.18) !important;
-    color: #000000 !important;
+    background-color: #f1f5f9 !important;
+    color: #1e293b !important;
+    font-weight: 600;
 }
 
 </style>
@@ -477,6 +495,49 @@
 			}
 		});
 	}
+
+    function startTbTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Trial Balance Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-scale" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Trial Balance (TB) report sheet. Review opening and closing balances for all active ledger groups.</p></div>'
+                },
+                {
+                    element: '.reconciliation-filter-card',
+                    title: 'Filter Parameters',
+                    intro: 'Set your dates, select ledger names, groups, subgroups, and opening balances, then generate the report.'
+                },
+                {
+                    element: '.tb-table-card',
+                    title: 'Worksheet Table',
+                    intro: 'Review your ledger details, opening balances, closing balances, and reporting groups side by side.'
+                },
+                {
+                    element: 'a[onclick="downloadTrialBalancePdf()"]',
+                    title: 'Download PDF',
+                    intro: 'Click here to save the generated trial balance worksheet as a PDF file.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-tb-tour').on('click', function(e) {
+            e.preventDefault();
+            startTbTour();
+        });
+    });
 </script>
 
 @endsection

@@ -7,13 +7,16 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Liabilities & Borrowings</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/liabilites-list')}}">Liabilities & Borrowing List</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Add Liability & Borrowing</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-liabilities-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
@@ -359,6 +362,49 @@
                     showToast("Something went wrong. Please try again.", "error");
                 }
             });
+        });
+    });
+
+    function startLiabilitiesTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Liabilities & Borrowings Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-receipt" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage company borrowings, stockholder funds, and long/short term debt details in one ledger.</p></div>'
+                },
+                {
+                    element: 'a[href="{{ route('user.AddLiabilites') }}"]',
+                    title: 'Add New Liability',
+                    intro: 'Click here to log a new borrowing or update equity/liability status.'
+                },
+                {
+                    element: '.col-md-12.col-xxl-4',
+                    title: 'Equity & Shareholder Funds',
+                    intro: 'View total capital injected by directors or shareholders.'
+                },
+                {
+                    element: '.table-card',
+                    title: 'Liabilities Table',
+                    intro: 'Review list of liabilities, their payable balances, and record status (Active/Cancelled).'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-liabilities-tour').on('click', function(e) {
+            e.preventDefault();
+            startLiabilitiesTour();
         });
     });
 </script>

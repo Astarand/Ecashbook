@@ -4,28 +4,6 @@
 
 <div class="pc-content">
 
-<!-- [ breadcrumb ] start -->
-    <div class="page-header">
-        <div class="page-block">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Financial Reports</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('user.BalanceSheetReport') }}">Balance Sheet</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Submission Form</li>
-                    </ul>
-                </div>
-                <div class="col-md-12">
-                    <div class="page-header-title">
-                        <h2 class="mb-0">Balance Sheet Submission Form</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- [ breadcrumb ] end -->
-
     <!-- [ Main Content ] start -->
     <div class="row">
         <div class="container-fluid">
@@ -41,7 +19,7 @@
                 </div>
             </div>
 
-            <form id="balanceForm" action="{{ route('balance-sheet.savebalancesheetprivious') }}" method="POST">
+            <form id="balanceForm" action="{{ route('savePreviousBalanceSheet') }}" method="POST">
                 @csrf
 
                 <div class="card shadow-sm mb-4">
@@ -64,6 +42,12 @@
                                     <option value="2027-2028">2027-2028</option>
                                     <option value="2028-2029">2028-2029</option>
                                     <option value="2029-2030">2029-2030</option>
+                                    <option value="2030-2031">2030-2031</option>
+                                    <option value="2031-2032">2031-2032</option>
+                                    <option value="2032-2033">2032-2033</option>
+                                    <option value="2033-2034">2033-2034</option>
+                                    <option value="2034-2035">2034-2035</option>
+                                    <option value="2035-2036">2035-2036</option>
                                 </select>
                             </div>
                             <div class="mb-3 col-md-6 col-lg-3">
@@ -74,10 +58,12 @@
                                 <label class="form-label">Reserves and Surplus</label>
                                 <input type="number" value="{{ old('reserves_surplus') }}" name="reserves_surplus" class="form-control">
                             </div>
+							<div class="mb-3 col-md-6 col-lg-3">
+                                <label class="form-label">Current Year Profit</label>
+                                <input type="number" value="{{ old('current_year_profit') }}" name="current_year_profit" class="form-control">
+                            </div>
                             
                         </div>
-
-                        <h5 class="mb-3">2. Share Application Money Pending Allotment</h5>
 
                         <h5 class="mb-3">Non-Current Liabilities</h5>
                         <div class="row g-3">
@@ -85,13 +71,17 @@
                                 <label class="form-label">Long-term Borrowings</label>
                                 <input type="number" value="{{ old('long_term_borrowings') }}" name="long_term_borrowings" class="form-control">
                             </div>
+							<div class="mb-3 col-md-6 col-lg-3">
+                                <label class="form-label">Other Financial Liabilities</label>
+                                <input type="number" value="{{ old('other_financial_liabilities') }}" name="other_financial_liabilities" class="form-control">
+                            </div>
                             <div class="mb-3 col-md-6 col-lg-3">
                                 <label class="form-label">Deferred Tax Liabilities (Net)</label>
                                 <input type="number" value="{{ old('deferred_tax_liabilities') }}" name="deferred_tax_liabilities" class="form-control">
                             </div>
                             <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Other Long-term Liabilities</label>
-                                <input type="number" value="{{ old('other_long_term_liabilities') }}" name="other_long_term_liabilities" class="form-control">
+                                <label class="form-label">Other Non-Current Liabilities</label>
+                                <input type="number" value="{{ old('other_non_current_liabilities') }}" name="other_non_current_liabilities" class="form-control">
                             </div>
                             <div class="mb-3 col-md-6 col-lg-3">
                                 <label class="form-label">Long-term Provisions</label>
@@ -100,60 +90,59 @@
                         </div>
 
                         <h5 class="mb-3">4. Current Liabilities</h5>
-                        <div class="row g-3">
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Short-term Borrowings</label>
-                                <input type="number" value="{{ old('short_term_borrowings') }}" name="short_term_borrowings" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Trade Payables</label>
-                                <input type="number" value="{{ old('trade_payables') }}" name="trade_payables" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Advances from Customers</label>
-                                <input type="number" value="{{ old('advances_from_customers') }}" name="advances_from_customers" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Statutory Dues Payable</label>
-                                <input type="number" value="{{ old('statutory_dues_payable') }}" name="statutory_dues_payable" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">TDS Payable</label>
-                                <input type="number" value="{{ old('tds_payable') }}" name="tds_payable" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">EMI Payables</label>
-                                <input type="number" value="{{ old('emi_payables') }}" name="emi_payables" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Accrued Expenses / Income</label>
-                                <input type="number" value="{{ old('accrued_expenses_income') }}" name="accrued_expenses_income" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Royalty Payables</label>
-                                <input type="number" value="{{ old('royalty_payables') }}" name="royalty_payables" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">GST Payable</label>
-                                <input type="number" value="{{ old('gst_payable') }}" name="gst_payable" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Unearned Revenue</label>
-                                <input type="number" value="{{ old('unearned_revenue') }}" name="unearned_revenue" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Security Deposits Payable</label>
-                                <input type="number" value="{{ old('security_deposits_payable') }}" name="security_deposits_payable" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Other Current Liabilities</label>
-                                <input type="number" value="{{ old('other_current_liabilities') }}" name="other_current_liabilities" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Short-term Provisions</label>
-                                <input type="number" value="{{ old('short_term_provisions') }}" name="short_term_provisions" class="form-control">
-                            </div>
-                        </div>
+						<div class="row g-3">
+
+							<div class="col-md-3">
+								<label class="form-label">Trade Payables (Creditors)</label>
+								<input type="number" name="trade_payables" class="form-control" value="{{ old('trade_payables') }}">
+							</div>
+
+							<div class="col-md-3">
+								<label class="form-label">Advance from Customer</label>
+								<input type="number" name="advance_from_customer" class="form-control" value="{{ old('advance_from_customer') }}">
+							</div>
+
+							<div class="col-md-3">
+								<label class="form-label">Outstanding Expenses</label>
+								<input type="number" name="outstanding_expenses" class="form-control" value="{{ old('outstanding_expenses') }}">
+							</div>
+
+							<div class="col-md-3">
+								<label class="form-label">Salary Payable</label>
+								<input type="number" name="salary_payable" class="form-control" value="{{ old('salary_payable') }}">
+							</div>
+
+							<div class="col-md-3">
+								<label class="form-label">GST Payable</label>
+								<input type="number" name="gst_payable" class="form-control" value="{{ old('gst_payable') }}">
+							</div>
+
+							<div class="col-md-3">
+								<label class="form-label">TDS Payable</label>
+								<input type="number" name="tds_payable" class="form-control" value="{{ old('tds_payable') }}">
+							</div>
+
+							<div class="col-md-3">
+								<label class="form-label">PF Payable</label>
+								<input type="number" name="pf_payable" class="form-control" value="{{ old('pf_payable') }}">
+							</div>
+
+							<div class="col-md-3">
+								<label class="form-label">ESI Payable</label>
+								<input type="number" name="esi_payable" class="form-control" value="{{ old('esi_payable') }}">
+							</div>
+
+							<div class="col-md-3">
+								<label class="form-label">Short-term Loans</label>
+								<input type="number" name="short_term_loans" class="form-control" value="{{ old('short_term_loans') }}">
+							</div>
+
+							<div class="col-md-3">
+								<label class="form-label">Interest Payable</label>
+								<input type="number" name="interest_payable" class="form-control" value="{{ old('interest_payable') }}">
+							</div>
+
+						</div>
                     </div>
                 </div>
 
@@ -163,111 +152,120 @@
                     </div>
                     <div class="card-body">
                         <h5 class="mb-3">1. Non-Current Assets</h5>
-                        <div class="row g-3">
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Fixed Assets</label>
-                                <input type="number" value="{{ old('fixed_assets') }}" name="fixed_assets" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Tangible Assets</label>
-                                <input type="number" value="{{ old('tangible_assets') }}" name="tangible_assets" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Intangible Assets</label>
-                                <input type="number" value="{{ old('intangible_assets') }}" name="intangible_assets" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Capital WIP / Under Development</label>
-                                <input type="number" value="{{ old('capital_wip_under_development') }}" name="capital_wip_under_development" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Non-Current Investments</label>
-                                <input type="number" value="{{ old('non_current_investments') }}" name="non_current_investments" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Deferred Tax Assets (Net)</label>
-                                <input type="number" value="{{ old('deferred_tax_assets') }}" name="deferred_tax_assets" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Long-term Loans and Advances</label>
-                                <input type="number" value="{{ old('long_term_loans_and_advances') }}" name="long_term_loans_and_advances" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Other Non-Current Assets</label>
-                                <input type="number" value="{{ old('other_non_current_assets') }}" name="other_non_current_assets" class="form-control">
-                            </div>
-                        </div>
+						<div class="row g-3">
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Property, Plant & Equipment (PPE)</label>
+								<input type="number"
+									   value="{{ old('property_plant_equipment') }}"
+									   name="property_plant_equipment"
+									   class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Furniture & Fixtures</label>
+								<input type="number"
+									   value="{{ old('furniture_fixtures') }}"
+									   name="furniture_fixtures"
+									   class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Computer & IT Equipment</label>
+								<input type="number"
+									   value="{{ old('computer_it_equipment') }}"
+									   name="computer_it_equipment"
+									   class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Machinery</label>
+								<input type="number"
+									   value="{{ old('machinery') }}"
+									   name="machinery"
+									   class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Vehicles</label>
+								<input type="number"
+									   value="{{ old('vehicles') }}"
+									   name="vehicles"
+									   class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Intangible / Non-physical Assets</label>
+								<input type="number"
+									   value="{{ old('intangible_assets') }}"
+									   name="intangible_assets"
+									   class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Capital Work-in-Progress</label>
+								<input type="number"
+									   value="{{ old('capital_work_in_progress') }}"
+									   name="capital_work_in_progress"
+									   class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Other Non-Current Assets</label>
+								<input type="number"
+									   value="{{ old('other_non_current_assets') }}"
+									   name="other_non_current_assets"
+									   class="form-control">
+							</div>
+
+						</div>
 
                         <h5 class="mb-3">2. Current Assets</h5>
                         <div class="row g-3">
                             <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Current Investments</label>
-                                <input type="number" value="{{ old('current_investments') }}" name="current_investments" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Inventories</label>
-                                <input type="number" value="{{ old('inventories') }}" name="inventories" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Trade Receivables</label>
-                                <input type="number" value="{{ old('trade_receivables') }}" name="trade_receivables" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Cash and Cash Equivalents</label>
-                                <input type="number" value="{{ old('cash_and_cash_equivalents') }}" name="cash_and_cash_equivalents" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Short-Term Loans and Advances</label>
-                                <input type="number" value="{{ old('short_term_loans_and_advances') }}" name="short_term_loans_and_advances" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Advances to Vendors</label>
-                                <input type="number" value="{{ old('advances_to_vendors') }}" name="advances_to_vendors" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Unbilled Revenue</label>
-                                <input type="number" value="{{ old('unbilled_revenue') }}" name="unbilled_revenue" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">GST Receivable</label>
-                                <input type="number" value="{{ old('gst_receivable') }}" name="gst_receivable" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">TDS Receivable</label>
-                                <input type="number" value="{{ old('tds_receivable') }}" name="tds_receivable" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Interest Accrued but Not Due</label>
-                                <input type="number" value="{{ old('interest_accrued_but_not_due') }}" name="interest_accrued_but_not_due" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Prepaid Expenses</label>
-                                <input type="number" value="{{ old('prepaid_expenses') }}" name="prepaid_expenses" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Group Company Receivables</label>
-                                <input type="number" value="{{ old('group_company_receivables') }}" name="group_company_receivables" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Other Current Assets</label>
-                                <input type="number" value="{{ old('other_current_assets') }}" name="other_current_assets" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Grant/Subsidy Receivables</label>
-                                <input type="number" value="{{ old('grant_subsidy_receivables') }}" name="grant_subsidy_receivables" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Deferred Revenue</label>
-                                <input type="number" value="{{ old('deferred_revenue') }}" name="deferred_revenue" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Royalty Receivables</label>
-                                <input type="number" value="{{ old('royalty_receivables') }}" name="royalty_receivables" class="form-control">
-                            </div>
-                            <div class="mb-3 col-md-6 col-lg-3">
-                                <label class="form-label">Work-in-Progress</label>
-                                <input type="number" value="{{ old('work_in_progress') }}" name="work_in_progress" class="form-control">
-                            </div>
+								<label class="form-label">Cash in Hand</label>
+								<input type="number" name="cash_in_hand" value="{{ old('cash_in_hand') }}" class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Bank Accounts</label>
+								<input type="number" name="bank_accounts" value="{{ old('bank_accounts') }}" class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Trade Receivables (Debtors)</label>
+								<input type="number" name="trade_receivables" value="{{ old('trade_receivables') }}" class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Advance to Vendor</label>
+								<input type="number" name="advance_to_vendor" value="{{ old('advance_to_vendor') }}" class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Employee Advance</label>
+								<input type="number" name="employee_advance" value="{{ old('employee_advance') }}" class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Prepaid Expenses</label>
+								<input type="number" name="prepaid_expenses" value="{{ old('prepaid_expenses') }}" class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Input GST Credit (ITC)</label>
+								<input type="number" name="input_gst_credit" value="{{ old('input_gst_credit') }}" class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">TDS Receivable</label>
+								<input type="number" name="tds_receivable" value="{{ old('tds_receivable') }}" class="form-control">
+							</div>
+
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Inventories / Stocks</label>
+								<input type="number" name="inventories" value="{{ old('inventories') }}" class="form-control">
+							</div>
                         </div>
                     </div>
                 </div>
@@ -340,22 +338,15 @@
                             <td class="text-start"></td>
                             <td class="text-start" id="curr-reserves-surplus"></td>
                         </tr>
-                        <!--<tr>
+						<tr>
                             <td></td>
                             <td class="text-center" style="width: 50px;">c.</td>
-                            <td class="text-start">Retained Earnings</td>
+                            <td class="text-start">Current Year Profit</td>
                             <td></td>
                             <td class="text-start"></td>
-                            <td class="text-start" id="curr-retained-earnings"></td>
+                            <td class="text-start" id="curr-current-year-profit"></td>
                         </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">d.</td>
-                            <td class="text-start">Money received against share warrants</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-money-against-warrants"></td>
-                        </tr>-->
+                        
                         <tr>
                             <td class="text-center" style="border: 1px solid #ddd;"><strong></strong></td>
                             <td colspan="4" class="text-start" style="background-color: yellow; border: 1px solid #ddd;"><strong>TOTAL</strong></td>
@@ -385,6 +376,14 @@
                             <td class="text-start"></td>
                             <td class="text-start" id="curr-long-term-borrowings"></td>
                         </tr>
+						<tr>
+                            <td></td>
+                            <td class="text-center" style="width: 50px;">a.</td>
+                            <td class="text-start"> Other Financial Liabilities</td>
+                            <td></td>
+                            <td class="text-start"></td>
+                            <td class="text-start" id="curr-other-financial-liabilities"></td>
+                        </tr>
                         <tr>
                             <td></td>
                             <td class="text-center" style="width: 50px;">b.</td>
@@ -396,7 +395,7 @@
                         <tr>
                             <td></td>
                             <td class="text-center" style="width: 50px;">c.</td>
-                            <td class="text-start"> Other long-term liabilities</td>
+                            <td class="text-start"> Other Non-Current Liabilities</td>
                             <td></td>
                             <td class="text-start"></td>
                             <td class="text-start" id="curr-other-long-term-liabilities"></td>
@@ -423,109 +422,94 @@
                             
                         </tr>
                         <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">a.</td>
-                            <td class="text-start"> Short-Term Borrowings</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-short-term-borrowings"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">b.</td>
-                            <td class="text-start"> Trade Payables</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-trade-payables"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">c.</td>
-                            <td class="text-start">Advances from Customers</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-advances-from-customers"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">d.</td>
-                            <td class="text-start">Statutory Dues Payable</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-stat-dus-payable"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">e.</td>
-                            <td class="text-start">TDS Payable</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-tds-payable"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">f.</td>
-                            <td class="text-start">EMI Payables</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-emi-payables"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">g.</td>
-                            <td class="text-start">Accrued Expenses / Income</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-accrued-expenses"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">h.</td>
-                            <td class="text-start">Royalty Payables</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-royalty-payables"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">i.</td>
-                            <td class="text-start">GST Payable</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-gst-payable"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">j.</td>
-                            <td class="text-start">Unearned Revenue</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-unearned-revenue"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">k.</td>
-                            <td class="text-start">Security Deposits Payable</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-security-deposits-payable"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">l.</td>
-                            <td class="text-start"> Other Current Liabilities</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-other-current-liabilities"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">m.</td>
-                            <td class="text-start"> Short-Term Provisions</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-short-term-provisions"></td>
-                        </tr>
+							<td></td>
+							<td class="text-center" style="width: 50px;">a.</td>
+							<td class="text-start">Trade Payables</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-trade-payables"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">b.</td>
+							<td class="text-start">Advance from Customer</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-advance-from-customer"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">c.</td>
+							<td class="text-start">Outstanding Expenses</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-outstanding-expenses"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">d.</td>
+							<td class="text-start">Salary Payable</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-salary-payable"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">e.</td>
+							<td class="text-start">GST Payable</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-gst-payable"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">f.</td>
+							<td class="text-start">TDS Payable</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-tds-payable"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">g.</td>
+							<td class="text-start">PF Payable</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-pf-payable"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">h.</td>
+							<td class="text-start">ESI Payable</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-esi-payable"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">i.</td>
+							<td class="text-start">Short-term Loans</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-short-term-loans"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">j.</td>
+							<td class="text-start">Interest Payable</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-interest-payable"></td>
+						</tr>
                         <tr>
                             <td class="text-center" style="border: 1px solid #ddd;"><strong></strong></td>
                             <td colspan="4" class="text-start" style="background-color: yellow; border: 1px solid #ddd;"><strong>TOTAL</strong></td>
@@ -552,69 +536,81 @@
                             
                         </tr>
                         <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">a.</td>
-                            <td class="text-start"> Fixed Assets</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-fixed-assets"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">b.</td>
-                            <td class="text-start">Tangible Assets</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-tangible-assets"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">c.</td>
-                            <td class="text-start">Intangible Assets</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-intangible-assets"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">d.</td>
-                            <td class="text-start">Capital WIP / Under Development</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-capital-wip"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">e.</td>
-                            <td class="text-start">Non-Current Investments</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-non-current-investments"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">f.</td>
-                            <td class="text-start">Deferred Tax Assets (Net)</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-deferred-tax-assets"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">g.</td>
-                            <td class="text-start">Long-term Loans and Advances</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-long-term-loans-advances"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">h.</td>
-                            <td class="text-start">Other Non-Current Assets</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-other-non-current-assets"></td>
-                        </tr>
+							<td></td>
+							<td class="text-center" style="width: 50px;">a.</td>
+							<td class="text-start">Property, Plant & Equipment (PPE)</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-ppe"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">b.</td>
+							<td class="text-start">Furniture & Fixtures</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-furniture-fixtures"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">c.</td>
+							<td class="text-start">Computer & IT Equipment</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-computer-it-equipment"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">d.</td>
+							<td class="text-start">Machinery</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-machinery"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">e.</td>
+							<td class="text-start">Vehicles</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-vehicles"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">f.</td>
+							<td class="text-start">Intangible / Non-physical Assets</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-intangible-assets"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">g.</td>
+							<td class="text-start">Capital Work-in-Progress</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-capital-work-in-progress"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">h.</td>
+							<td class="text-start">Other Non-Current Assets</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-other-non-current-assets"></td>
+						</tr>
+
+						<tr>
+							<th colspan="5" class="text-end">Total</th>
+							<th id="curr-nonassets-total"></th>
+						</tr>
                         
                         <tr>
                             <td class="text-center" style="border: 1px solid #ddd;"><strong></strong></td>
@@ -630,142 +626,85 @@
                             
                         </tr>
                         <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">a.</td>
-                            <td class="text-start"> Current Investments</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-current-investments"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">b.</td>
-                            <td class="text-start">Inventories</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-inventories"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">c.</td>
-                            <td class="text-start"> Trade Receivables</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-trade-receivables"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">d.</td>
-                            <td class="text-start"> Cash and Cash Equivalents</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-cash-and-cash-equivalents"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">e.</td>
-                            <td class="text-start"> Short-Term Loans and Advances</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-short-term-loans-and-advances"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">f.</td>
-                            <td class="text-start">Advances to Vendors</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-advances-to-vendors"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">g.</td>
-                            <td class="text-start">Unbilled Revenue</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-unbilled-revenue"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">h.</td>
-                            <td class="text-start">GST Receivable</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-gst-receivable"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">i.</td>
-                            <td class="text-start">TDS Receivable</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-tds-receivable"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">j.</td>
-                            <td class="text-start">Interest Accrued but Not Due</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-interest-accrued-but-not-due"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">k.</td>
-                            <td class="text-start">Prepaid Expenses</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-prepaid-expenses"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">l.</td>
-                            <td class="text-start">Group Company Receivables</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-group-company-receivables"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">m.</td>
-                            <td class="text-start">Other Current Assets</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-other-current-assets"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">n.</td>
-                            <td class="text-start">Grant/Subsidy Receivables</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-grant-subsidy-receivables"></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">o.</td>
-                            <td class="text-start">Deferred Revenue</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-deferred-revenue"></td>
-                        </tr>
-                        
-                        <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">p.</td>
-                            <td class="text-start">Royalty Receivables</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-royalty-receivables"></td>
-                        </tr>
-                            <tr>
-                            <td></td>
-                            <td class="text-center" style="width: 50px;">q.</td>
-                            <td class="text-start">Work-in-Progress</td>
-                            <td></td>
-                            <td class="text-start"></td>
-                            <td class="text-start" id="curr-work-in-progress"></td>
-                        </tr>
+							<td></td>
+							<td class="text-center">a.</td>
+							<td>Cash in Hand</td>
+							<td></td>
+							<td></td>
+							<td id="curr-cash-in-hand"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">b.</td>
+							<td>Bank Accounts</td>
+							<td></td>
+							<td></td>
+							<td id="curr-bank-accounts"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">c.</td>
+							<td>Trade Receivables (Debtors)</td>
+							<td></td>
+							<td></td>
+							<td id="curr-trade-receivables"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">d.</td>
+							<td>Advance to Vendor</td>
+							<td></td>
+							<td></td>
+							<td id="curr-advance-to-vendor"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">e.</td>
+							<td>Employee Advance</td>
+							<td></td>
+							<td></td>
+							<td id="curr-employee-advance"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">f.</td>
+							<td>Prepaid Expenses</td>
+							<td></td>
+							<td></td>
+							<td id="curr-prepaid-expenses"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">g.</td>
+							<td>Input GST Credit (ITC)</td>
+							<td></td>
+							<td></td>
+							<td id="curr-input-gst-credit"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">h.</td>
+							<td>TDS Receivable</td>
+							<td></td>
+							<td></td>
+							<td id="curr-tds-receivable"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">i.</td>
+							<td>Inventories / Stocks</td>
+							<td></td>
+							<td></td>
+							<td id="curr-inventories"></td>
+						</tr>
                         <tr>
                             <td class="text-center" style="border: 1px solid #ddd;"><strong></strong></td>
                             <td colspan="4" class="text-start" style="background-color: yellow; border: 1px solid #ddd;"><strong>TOTAL</strong></td>
@@ -837,11 +776,13 @@ $(function () {
         ========================= */
         let share_capital = getVal('share_capital');
         let reserves = getVal('reserves_surplus');
+        let currYearProfit = getVal('current_year_profit');
 
         setText('curr-share-capital', share_capital);
         setText('curr-reserves-surplus', reserves);
+        setText('curr-current-year-profit', currYearProfit);
 
-        let equityTotal = share_capital + reserves;
+        let equityTotal = share_capital + reserves + currYearProfit;
         setText('curr-equity-total', equityTotal);
 
 
@@ -849,52 +790,61 @@ $(function () {
            NON CURRENT LIABILITIES
         ========================= */
         let long_term_borrowings = getVal('long_term_borrowings');
+        let other_financial_liabilities = getVal('other_financial_liabilities');
         let deferred_tax_liabilities = getVal('deferred_tax_liabilities');
-        let other_long_term_liabilities = getVal('other_long_term_liabilities');
+        let other_non_current_liabilities = getVal('other_non_current_liabilities');
         let long_term_provisions = getVal('long_term_provisions');
 
         setText('curr-long-term-borrowings', long_term_borrowings);
+        setText('curr-other-financial-liabilities', other_financial_liabilities);
         setText('curr-deferred-tax-liabilities', deferred_tax_liabilities);
-        setText('curr-other-long-term-liabilities', other_long_term_liabilities);
+        setText('curr-other-long-term-liabilities', other_non_current_liabilities);
         setText('curr-long-term-provisions', long_term_provisions);
 
-        let nonCurrLiabTotal = long_term_borrowings + deferred_tax_liabilities + other_long_term_liabilities + long_term_provisions;
+        let nonCurrLiabTotal = (long_term_borrowings + other_financial_liabilities + deferred_tax_liabilities + other_non_current_liabilities + long_term_provisions);
         setText('curr-noncurr-liab-total', nonCurrLiabTotal);
 
 
         /* =========================
            CURRENT LIABILITIES
         ========================= */
-        let short_term_borrowings = getVal('short_term_borrowings');
         let trade_payables = getVal('trade_payables');
-        let advances = getVal('advances_from_customers');
-        let statutory = getVal('statutory_dues_payable');
-        let tds = getVal('tds_payable');
-        let emi = getVal('emi_payables');
-        let accrued = getVal('accrued_expenses_income');
-        let royalty = getVal('royalty_payables');
-        let gst = getVal('gst_payable');
-        let unearned = getVal('unearned_revenue');
-        let security = getVal('security_deposits_payable');
-        let other = getVal('other_current_liabilities');
-        let shortProv = getVal('short_term_provisions');
+		let advance_from_customer = getVal('advance_from_customer');
+		let outstanding_expenses = getVal('outstanding_expenses');
+		let salary_payable = getVal('salary_payable');
+		let gst_payable = getVal('gst_payable');
+		let tds_payable = getVal('tds_payable');
+		let pf_payable = getVal('pf_payable');
+		let esi_payable = getVal('esi_payable');
+		let short_term_loans = getVal('short_term_loans');
+		let interest_payable = getVal('interest_payable');
 
-        setText('curr-short-term-borrowings', short_term_borrowings);
-        setText('curr-trade-payables', trade_payables);
-        setText('curr-advances-from-customers', advances);
-        setText('curr-stat-dus-payable', statutory);
-        setText('curr-tds-payable', tds);
-        setText('curr-emi-payables', emi);
-        setText('curr-accrued-expenses', accrued);
-        setText('curr-royalty-payables', royalty);
-        setText('curr-gst-payable', gst);
-        setText('curr-unearned-revenue', unearned);
-        setText('curr-security-deposits-payable', security);
-        setText('curr-other-current-liabilities', other);
-        setText('curr-short-term-provisions', shortProv);
+		/* preview set */
+		setText('curr-trade-payables', trade_payables);
+		setText('curr-advance-from-customer', advance_from_customer);
+		setText('curr-outstanding-expenses', outstanding_expenses);
+		setText('curr-salary-payable', salary_payable);
+		setText('curr-gst-payable', gst_payable);
+		setText('curr-tds-payable', tds_payable);
+		setText('curr-pf-payable', pf_payable);
+		setText('curr-esi-payable', esi_payable);
+		setText('curr-short-term-loans', short_term_loans);
+		setText('curr-interest-payable', interest_payable);
 
-        let currLiabTotal = short_term_borrowings + trade_payables + advances + statutory + tds + emi + accrued + royalty + gst + unearned + security + other + shortProv;
-        setText('curr-curr-liab-total', currLiabTotal);
+		/* TOTAL */
+		let currLiabTotal =
+			trade_payables +
+			advance_from_customer +
+			outstanding_expenses +
+			salary_payable +
+			gst_payable +
+			tds_payable +
+			pf_payable +
+			esi_payable +
+			short_term_loans +
+			interest_payable;
+
+		setText('curr-curr-liab-total', currLiabTotal);
 
 
         let totalEqLiab = equityTotal + nonCurrLiabTotal + currLiabTotal;
@@ -904,70 +854,64 @@ $(function () {
         /* =========================
            NON CURRENT ASSETS
         ========================= */
-        let fixed_assets = getVal('fixed_assets');
-        let tangible_assets = getVal('tangible_assets');
-        let intangible_assets = getVal('intangible_assets');
-        let capital_wip = getVal('capital_wip_under_development');
-        let investments = getVal('non_current_investments');
-        let dta = getVal('deferred_tax_assets');
-        let loans = getVal('long_term_loans_and_advances');
-        let other_assets = getVal('other_non_current_assets');
+		let ppe = getVal('property_plant_equipment');
+		let furniture = getVal('furniture_fixtures');
+		let computer = getVal('computer_it_equipment');
+		let machinery = getVal('machinery');
+		let vehicles = getVal('vehicles');
+		let intangible = getVal('intangible_assets');
+		let cwp = getVal('capital_work_in_progress');
+		let other = getVal('other_non_current_assets');
 
-        setText('curr-fixed-assets', fixed_assets);
-        setText('curr-tangible-assets', tangible_assets);
-        setText('curr-intangible-assets', intangible_assets);
-        setText('curr-capital-wip', capital_wip);
-        setText('curr-non-current-investments', investments);
-        setText('curr-deferred-tax-assets', dta);
-        setText('curr-long-term-loans-advances', loans);
-        setText('curr-other-non-current-assets', other_assets);
+		setText('curr-ppe', ppe);
+		setText('curr-furniture-fixtures', furniture);
+		setText('curr-computer-it-equipment', computer);
+		setText('curr-machinery', machinery);
+		setText('curr-vehicles', vehicles);
+		setText('curr-intangible-assets', intangible);
+		setText('curr-capital-work-in-progress', cwp);
+		setText('curr-other-non-current-assets', other);
 
-        let nonAssetTotal = fixed_assets + tangible_assets + intangible_assets + capital_wip + investments + dta + loans + other_assets;
-        setText('curr-nonassets-total', nonAssetTotal);
+		let nonAssetTotal =
+			ppe +
+			furniture +
+			computer +
+			machinery +
+			vehicles +
+			intangible +
+			cwp +
+			other;
 
+		setText('curr-nonassets-total', nonAssetTotal);
 
         /* =========================
            CURRENT ASSETS
         ========================= */
-        let current_inv = getVal('current_investments');
-        let inventories = getVal('inventories');
-        let receivables = getVal('trade_receivables');
-        let cash = getVal('cash_and_cash_equivalents');
-        let short_loans = getVal('short_term_loans_and_advances');
-        let adv_vendors = getVal('advances_to_vendors');
-        let unbilled = getVal('unbilled_revenue');
-        let gst_rec = getVal('gst_receivable');
-        let tds_rec = getVal('tds_receivable');
-        let interest = getVal('interest_accrued_but_not_due');
-        let prepaid = getVal('prepaid_expenses');
-        let group = getVal('group_company_receivables');
-        let other_curr = getVal('other_current_assets');
-        let grant = getVal('grant_subsidy_receivables');
-        let deferred = getVal('deferred_revenue');
-        let royalty_rec = getVal('royalty_receivables');
-        let wip = getVal('work_in_progress');
+		let cash = getVal('cash_in_hand');
+		let bank = getVal('bank_accounts');
+		let receivables = getVal('trade_receivables');
+		let adv_vendor = getVal('advance_to_vendor');
+		let employee_adv = getVal('employee_advance');
+		let prepaid = getVal('prepaid_expenses');
+		let gst_itc = getVal('input_gst_credit');
+		let tds = getVal('tds_receivable');
+		let inventory = getVal('inventories');
 
-        setText('curr-current-investments', current_inv);
-        setText('curr-inventories', inventories);
-        setText('curr-trade-receivables', receivables);
-        setText('curr-cash-and-cash-equivalents', cash);
-        setText('curr-short-term-loans-and-advances', short_loans);
-        setText('curr-advances-to-vendors', adv_vendors);
-        setText('curr-unbilled-revenue', unbilled);
-        setText('curr-gst-receivable', gst_rec);
-        setText('curr-tds-receivable', tds_rec);
-        setText('curr-interest-accrued-but-not-due', interest);
-        setText('curr-prepaid-expenses', prepaid);
-        setText('curr-group-company-receivables', group);
-        setText('curr-other-current-assets', other_curr);
-        setText('curr-grant-subsidy-receivables', grant);
-        setText('curr-deferred-revenue', deferred);
-        setText('curr-royalty-receivables', royalty_rec);
-        setText('curr-work-in-progress', wip);
+		setText('curr-cash-in-hand', cash);
+		setText('curr-bank-accounts', bank);
+		setText('curr-trade-receivables', receivables);
+		setText('curr-advance-to-vendor', adv_vendor);
+		setText('curr-employee-advance', employee_adv);
+		setText('curr-prepaid-expenses', prepaid);
+		setText('curr-input-gst-credit', gst_itc);
+		setText('curr-tds-receivable', tds);
+		setText('curr-inventories', inventory);
 
-        let currAssetTotal = current_inv + inventories + receivables + cash + short_loans + adv_vendors + unbilled + gst_rec + tds_rec + interest + prepaid + group + other_curr + grant + deferred + royalty_rec + wip;
+		let currAssetTotal =
+			cash + bank + receivables + adv_vendor + employee_adv +
+			prepaid + gst_itc + tds + inventory;
 
-        setText('curr-assets-total', currAssetTotal);
+		setText('curr-assets-total', currAssetTotal);
 
 
         let totalAssets = nonAssetTotal + currAssetTotal;

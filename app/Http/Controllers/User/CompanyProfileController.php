@@ -52,85 +52,7 @@ class CompanyProfileController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    // public function CompanyProfile()
-    // {
-		
-	// 	//$this->middleware('auth'); 
-	// 	$userId = Auth::user()->id;
-		
-	// 	$compDetails = DB::table('company_profiles')->where('userId', '=', $userId)->get();
-	// 	// $compDetails = isset($compDetails[0])?$compDetails[0]:"";
-	// 	$compDetails = isset($compDetails[0]) ? $compDetails[0] : (object)[];
-		
-	// 	$bankDetails = DB::table('company_banks')->where('uid', '=', $userId)->get();
-	// 	$bankDetails = isset($bankDetails)?$bankDetails:[];
-	// 	//echo "<pre>";print_r($bankDetails);die;
-		
-	// 	$countries = Country::where('id', '>', '0')->get();
-	// 	$states = State::where('country_id', '=', 101)->get();
-    // 	$states_bill = State::where('country_id', '=', isset($compDetails->comp_bill_country)?$compDetails->comp_bill_country:0)->get();
-	// 	$cities_bill = City::where('state_id', '=', isset($compDetails->comp_bill_state)?$compDetails->comp_bill_state:0)->get();
-		
-	// 	$states_ship = State::where('country_id', '=', isset($compDetails->comp_ship_country)?$compDetails->comp_ship_country:0)->get();
-	// 	$cities_ship = City::where('state_id', '=', isset($compDetails->comp_ship_state)?$compDetails->comp_ship_state:0)->get();
-
-		
-	// 	// echo "<pre>";print_r($compDetails);die;
-		
-	// 	$ca_details = DB::table('users')
-	// 				->select(DB::raw('users.*,ca_profiles.comp_logo,ca_profiles.comp_name,ca_profiles.total_no_client,
-	// 				ca_profiles.comp_bill_addone,ca_profiles.comp_bill_country,ca_profiles.comp_bill_state,
-	// 				ca_profiles.comp_bill_city,ca_profiles.comp_bill_pin,ca_profiles.ca_spec,ca_assigns.request_for,ca_assigns.ca_assign_status'))
-	// 				->leftJoin('ca_profiles', 'users.id', '=', 'ca_profiles.userId')
-	// 				->leftJoin('ca_assigns', 'users.id', '=', 'ca_assigns.ca_id')
-	// 				->where('users.u_type','=',1) 
-	// 				->where('ca_assigns.comp_id', '=', $userId)
-	// 				->where('ca_assigns.ca_current_status', '=', 1)
-	// 				->get();
-	// 	$array = array();
-	// 	foreach($ca_details as $k=>$val)
-	// 	{
-	// 		$array[$val->id]['id'] = $val->id;
-	// 		$array[$val->id]['u_type'] = $val->u_type;
-	// 		$array[$val->id]['name'] = $val->name;
-	// 		$array[$val->id]['email'] = $val->email;
-	// 		$array[$val->id]['phone'] = $val->phone;
-	// 		$array[$val->id]['addr_one'] = $val->addr_one;
-	// 		$array[$val->id]['addr_two'] = $val->addr_two;
-	// 		$array[$val->id]['pincode'] = $val->pincode;
-	// 		$array[$val->id]['status'] = $val->status;
-	// 		$array[$val->id]['comp_name'] = $val->comp_name;
-	// 		$array[$val->id]['comp_logo'] = $val->comp_logo;
-	// 		$array[$val->id]['total_no_client'] = $val->total_no_client;
-	// 		$array[$val->id]['comp_bill_addone'] = isset($val->comp_bill_addone)?$val->comp_bill_addone:"";
-	// 		$array[$val->id]['comp_bill_pin'] = isset($val->comp_bill_pin)?$val->comp_bill_pin:"";
-	// 		$array[$val->id]['ca_spec'] = $val->ca_spec;
-	// 		$array[$val->id]['request_for'] = $val->request_for;
-
-	// 		$state = State::where('id', '=', isset($val->comp_bill_state)?$val->comp_bill_state:0)->get();
-	// 		$array[$val->id]['ca_state'] = isset($state[0]->name)?$state[0]->name:"";
-			
-	// 		$city = City::where('id', '=', isset($val->comp_bill_city)?$val->comp_bill_city:0)->get();
-	// 		$array[$val->id]['ca_city'] = isset($city[0]->name)?$city[0]->name:"";
-
-	// 		$array[$val->id]['ca_assign_status'] = isset($val->ca_assign_status)?$val->ca_assign_status:0;
-			
-	// 	}
-	// 	$ca_details = json_decode(json_encode($array));
-	// 	// echo "<pre>";print_r($compDetails);die;
-
-	// 	return view('User.Companyprofile')->with([
-	// 		'countries'=>$countries,
-	// 		'states'=>$states,
-	// 		'states_bill'=>$states_bill,
-	// 		'cities_bill'=>$cities_bill,
-	// 		'states_ship'=>$states_ship,
-	// 		'cities_ship'=>$cities_ship,
-	// 		'compDetails' => $compDetails,		
-	// 		'bankDetails' => $bankDetails,		
-	// 		'ca_details' => $ca_details		
-	// 	]); 
-    // }
+    
 	
 	public function CompanyProfile()
 	{
@@ -227,6 +149,10 @@ class CompanyProfileController extends Controller
 
 		$companyDocs = DB::table('user_documents')
 						->where('user_id', $userId)
+						->where(function ($query) {
+								$query->whereNull('proprietorship_id')
+									->orWhere('proprietorship_id', '');
+							})
 						->where(function($q){
 							$q->where([
 								['document_type','=','Company & Ownership Documents'],
@@ -293,12 +219,13 @@ class CompanyProfileController extends Controller
 						->get();
 		$docs = [];
 		foreach($companyDocs as $doc){
-			$docs[$doc->file_type] = $doc;
+			$docs[$doc->document_name] = $doc;
 		}
 
 		$accountant_access = DB::table('accountant_access')->where('is_active', 1)->get();
-		//echo "<pre>";print_r($ca_details);die;
+		// echo "<pre>";print_r($docs);die;
 		// echo "<pre>";print_r($companyDocs);die;
+		// echo "<pre>";print_r($accountant_access);die;
 
 		return view('User.Companyprofile')->with([
 			'userId' => $userId,

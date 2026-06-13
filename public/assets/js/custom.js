@@ -2075,11 +2075,13 @@ $("form#addPurchaseFrmThree").bind("submit", function () {
     if (addPurchaseFrmThree.form()) {
         $("#loader").show();
         let signature_name = $("#addPurchaseFrmThree #signature_name").val();
+		let discount_amount = $("#addPurchaseFrmThree #discount_amount").val();
         var base_url = $("#base_url").val();
         let id = $("#sId").val();
         let sales_data = new FormData();
 
         sales_data.append("signature_name", signature_name);
+        sales_data.append("discount_amount", discount_amount);
         sales_data.append("id", id);
 
         $.ajax({
@@ -3509,3 +3511,317 @@ function changeRatePo(el) {
 		return annualTax / 12;
 	}
 
+	//start sales and purchase payment
+	let isViewPage = $("#isViewPage").val() == "1";
+
+	$(document).on('click', '.paymentModalBtn', function () {
+
+		let id = $(this).data('id');
+		let type = $(this).data('type');
+
+		$("#f_id").val(id);
+		$("#voucher_type").val(type);
+
+		loadPaymentVouchers(id, type);
+
+		$("#paymentVoucherModal").modal('show');
+	});
+
+	function loadPaymentVouchers(id, type)
+	{
+		$.get('/payment-invoice/' + type + '/' + id, function (res) {
+
+			$("#invoice_total").val(res.invoice_total);
+			$("#total_paid").val(res.total_paid);
+			$("#balance_due").val(res.balance_due);
+
+			let html = '';
+
+			$.each(res.payments, function (i, row) {
+
+				let actionBtn = '';
+
+				if (!isViewPage) {
+					actionBtn = `
+					<td>
+						<button
+							class="btn btn-danger deleteVoucher"
+							data-id="${row.id}">
+							X
+						</button>
+					</td>`;
+				}
+
+				html += `
+				<tr>
+					<td>
+						<input type="date"
+							class="form-control pay_date"
+							value="${row.date}"
+							${isViewPage ? 'readonly' : ''}>
+					</td>
+
+					<td>
+						<input type="number"
+							class="form-control pay_amount"
+							value="${row.amount}"
+							${isViewPage ? 'readonly' : ''}>
+					</td>
+
+					<td>
+						<select class="form-select payment_mode"
+							${isViewPage ? 'disabled' : ''}>
+							<option value="">Select</option>
+							<option value="Cash" ${row.payment_mode == 'Cash' ? 'selected' : ''}>Cash</option>
+							<option value="Bank" ${row.payment_mode == 'Bank' ? 'selected' : ''}>Bank</option>
+							<option value="UPI" ${row.payment_mode == 'UPI' ? 'selected' : ''}>UPI</option>
+						</select>
+					</td>
+
+					${actionBtn}
+				</tr>`;
+			});
+
+			$("#voucherRows").html(html);
+
+			if (isViewPage) {
+				$("#actionHeader").hide();
+				$("#addVoucherRow").hide();
+				$("#saveVoucherPayments").hide();
+			} else {
+				$("#actionHeader").show();
+				$("#addVoucherRow").show();
+				$("#saveVoucherPayments").show();
+			}
+		});
+	}
+
+	$("#addVoucherRow").click(function () {
+
+		let balance = parseFloat($("#balance_due").val()) || 0;
+
+		if (balance <= 0) {
+			alert('Invoice already fully paid');
+			return;
+		}
+
+		let row = `
+		<tr>
+			<td>
+				<input type="date"
+					class="form-control pay_date">
+			</td>
+
+			<td>
+				<input type="number"
+					class="form-control pay_amount">
+			</td>
+
+			<td>
+				<select class="form-select payment_mode">
+					<option value="">Select</option>
+					<option value="Cash">Cash</option>
+					<option value="Bank">Bank</option>
+					<option value="UPI">UPI</option>
+				</select>
+			</td>
+
+			<td>
+				<button
+					class="btn btn-danger removeRow">
+					X
+				</button>
+			</td>
+		</tr>`;
+
+		$("#voucherRows").append(row);
+	});
+
+	$(document).on('click', '.removeRow', function () {
+		$(this).closest('tr').remove();
+
+		$(".pay_amount:first").trigger('input');
+	});
+
+	$(document).on('input', '.pay_amount', function () {
+
+		let invoiceTotal = parseFloat($("#invoice_total").val()) || 0;
+
+		let total = 0;
+
+		$(".pay_amount").each(function () {
+			total += parseFloat($(this).val()) || 0;
+		});
+
+		if (total > invoiceTotal) {
+
+			alert('Amount exceeds invoice total');
+
+			$(this).val('');
+
+			total = 0;
+
+			$(".pay_amount").each(function () {
+				total += parseFloat($(this).val()) || 0;
+			});
+		}
+
+		$("#total_paid").val(total.toFixed(2));
+
+		$("#balance_due").val(
+			(invoiceTotal - total).toFixed(2)
+		);
+	});
+
+	$("#saveVoucherPayments").click(function () {
+
+		let rows = [];
+		let hasError = false;
+
+		$("#voucherRows tr").each(function () {
+
+			let paymentMode = $(this).find('.payment_mode').val();
+
+			if (!paymentMode) {
+				alert('Please select payment mode for all rows.');
+				hasError = true;
+				return false;
+			}
+
+			rows.push({
+				date: $(this).find('.pay_date').val(),
+				amount: $(this).find('.pay_amount').val(),
+				payment_mode: paymentMode
+			});
+		});
+
+		if (hasError) {
+			return;
+		}
+
+		$.ajax({
+
+			url: '/payment-invoice/store',
+
+			type: 'POST',
+
+			data: {
+				_token: $('meta[name="csrf-token"]').attr('content'),
+				f_id: $("#f_id").val(),
+				voucher_type: $("#voucher_type").val(),
+				rows: rows
+			},
+
+			success: function (res) {
+
+				alert(res.message);
+
+				loadPaymentVouchers(
+					$("#f_id").val(),
+					$("#voucher_type").val()
+				);
+			}
+		});
+	});
+	
+	$(document).on('click','.deleteVoucher',function(){
+
+		if(!confirm('Delete payment?'))
+		{
+			return;
+		}
+
+		let id=$(this).data('id');
+
+		$.ajax({
+
+			url:'/payment-invoice/'+id,
+
+			type:'DELETE',
+
+			data:{
+				_token:$('meta[name="csrf-token"]').attr('content')
+			},
+
+			success:function(res){
+
+				loadPaymentVouchers(
+					$("#f_id").val(),
+					$("#voucher_type").val()
+				);
+			}
+		});
+	});
+	
+	//end sales and purchase payment
+	
+	//start upload pdf
+    $(document).on('click','.upload-pdf-btn',function () {
+         $("#pdf_id").val($(this).data('id'));
+         $("#pdf_type").val($(this).data('type'));
+    });
+
+	$('#uploadPdfModal').on('hidden.bs.modal', function () {
+		$("#uploadPdfForm")[0].reset();
+		$("#pdf_id").val('');
+		$("#pdf_type").val('');
+		$("#uploadError").html('');
+	});
+
+	$("#uploadPdfForm").submit(function (e) {
+      e.preventDefault();
+	  var baseUrl = $("#base_url").val();
+      let file = $("#pdf_file")[0].files[0];
+      if (!file) {
+		 showToast("Select PDF file", "error");
+         return;
+      }
+
+      if (file.type !=="application/pdf") {
+		 showToast("Only PDF allowed", "error");
+         return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+		 showToast("Maximum 5MB allowed", "error");
+         return;
+      }
+
+      let formData = new FormData(this);
+	  $("#loader").show();
+      $.ajax({
+         url: baseUrl + "/upload-signed-pdf",
+         type: "POST",
+         data: formData,
+         processData: false,
+         contentType: false,
+		 headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		},
+         success: function (res) {
+			$("#loader").hide();
+            if (res.status) {
+               setTimeout(function () {
+					$('#uploadPdfModal').modal('hide');
+					showToast(
+						res.message,
+						"success"
+					);
+					setTimeout(function(){
+						location.reload();
+					},1000);
+				},2000);
+            }
+         },
+         error: function (xhr) {
+			 $("#loader").hide();
+            $("#uploadError").html(xhr.responseJSON.message);
+         }
+
+      });
+
+
+	});
+	//end upload pdf
+	
+	

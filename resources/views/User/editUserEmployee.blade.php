@@ -3,22 +3,23 @@
 @section('container')
 
 <div class="pc-content">
-
-<!-- [ breadcrumb ] start -->
+    <!-- [ breadcrumb ] start -->
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
-                        <li class="breadcrumb-item"><a href="#">HR, Payroll & Attendance</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit Employee</li>
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('user.Employeelist') }}">Employees</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Employee Profile</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-edit-user-employee-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <div class="page-header-title">
-                        <h2 class="mb-0">Edit Employee</h2>
+                        <h2 class="mb-0">Edit Employee Profile</h2>
                     </div>
                 </div>
             </div>
@@ -75,7 +76,7 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    <form action="javascript:void(0);" method="post" name="addUserEmployee" id="addUserEmployee" enctype="multipart/form-data">
+                    <form action="javascript:void(0);" method="post" name="addUserEmployee" id="addUserEmployee" enctype="multipart/form-data" novalidate>
                         <input type="hidden" name="id" id="empId" value="{{ $employee->id }}">
                         @csrf
                         <div class="tab-content">
@@ -562,19 +563,19 @@
                                                     class="form-control"
                                                     name="basic_percentage"
                                                     id="basic_percentage"
-                                                    value="{{ $employee->basic_percentage ?? '40' }}"
+                                                    value="{{ $employee->basic_percentage ?? '50' }}"
                                                     placeholder="Enter percentage"
                                                     min="30"
-                                                    max="40"
+                                                    max="50"
                                                     step="1"
                                                     oninput="
-                                                        if(this.value > 40) this.value = 40;
+                                                        if(this.value > 50) this.value = 50;
                                                         if(this.value < 30 && this.value !== '') this.value = 30;
                                                     "
                                                     required
                                                     />
                                                 <small class="text-danger">
-                                                    Percentage must be between 30 and 40
+                                                    Percentage must be between 30 and 50
                                                 </small>
                                             </div>
                                         </div>
@@ -1389,119 +1390,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <script>
 
-    function numberToWords(num) {
-        const a = [
-            '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
-            'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
-            'Seventeen', 'Eighteen', 'Nineteen'
-        ];
-        const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
-        const numberToWordsHelper = (n) => {
-            if (n < 20) return a[n];
-            if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? ' ' + a[n % 10] : '');
-            if (n < 1000) return a[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' and ' + numberToWordsHelper(n % 100) : '');
-            if (n < 100000) return numberToWordsHelper(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 ? ' ' + numberToWordsHelper(n % 1000) : '');
-            if (n < 10000000) return numberToWordsHelper(Math.floor(n / 100000)) + ' Lakh' + (n % 100000 ? ' ' + numberToWordsHelper(n % 100000) : '');
-            return numberToWordsHelper(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 ? ' ' + numberToWordsHelper(n % 10000000) : '');
-        };
-
-        return numberToWordsHelper(Math.floor(num)) + ' Rupees Only';
-    }
-
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const grossInput = document.getElementById("total_addition");
-		const basicPercentageInput = document.getElementById("basic_percentage");
-        const basicInput = document.getElementById("basic_sal");
-        const hraInput = document.getElementById("hra");
-        const medicalInput = document.getElementById("medical_allowance");
-        const convayanceInput = document.getElementById("convayance");
-        const specialInput = document.getElementById("special_bonus");
-
-        const pfInput = document.getElementById("provident_fund");
-        const esiInput = document.getElementById("esi");
-        const ptaxInput = document.getElementById("ptax");
-        const tdsInput = document.getElementById("tds");
-        const loanInput = document.getElementById("loan");
-
-        const totalDeductionInput = document.getElementById("total_deduction");
-        const netSalaryInput = document.getElementById("net_sal");
-        const netSalaryWordInput = document.getElementById("net_sal_word");
-
-        function calculateAll() {
-            const gross = parseFloat(grossInput.value) || 0;
-			const basicPercentage = parseFloat(basicPercentageInput.value) || 50;
-            const basic = parseFloat((gross * basicPercentage) / 100) || 0;
-            const tds = parseFloat(tdsInput.value) || 0;
-            const loan = parseFloat(loanInput.value) || 0;
-
-            // PF = 12% of Basic
-            const pf = basic * 0.12;
-
-            // ESI = 0.75% if Gross <= 21000
-            const esi = gross <= 21000 ? gross * 0.0075 : 0;
-
-            // PTAX based on slab
-            let ptax = 0;
-            if (gross > 10000 && gross <= 15000) ptax = 110;
-            else if (gross > 15000 && gross <= 25000) ptax = 130;
-            else if (gross > 25000 && gross <= 40000) ptax = 150;
-            else if (gross > 40000) ptax = 200;
-
-            // Total Deduction
-            const totalDeduction = pf + esi + ptax + tds + loan;
-            const netSalary = gross - totalDeduction;
-
-            pfInput.value = pf.toFixed(2);
-            esiInput.value = esi.toFixed(2);
-            ptaxInput.value = ptax.toFixed(2);
-            totalDeductionInput.value = totalDeduction.toFixed(2);
-            netSalaryInput.value = netSalary.toFixed(2);
-
-            // Optional: convert net salary to words (can be implemented or used with plugin)
-            // For now, just leave it empty or auto fill something like:
-            netSalaryWordInput.value = ""; // Leave blank or use a library
-            netSalaryWordInput.value = numberToWords(netSalary);
-        }
-
-        // Trigger on gross input (auto populate salary breakup)
-        grossInput.addEventListener("input", function () {
-            let gross = parseFloat(this.value);
-
-            if (isNaN(gross) || gross <= 0) {
-                basicInput.value = hraInput.value = medicalInput.value = convayanceInput.value = specialInput.value = "00.00";
-                return;
-            }
-
-            const medical = 1250;
-            const convayance = 1600;
-
-            const basic = gross * 0.5;
-            const hra = basic * 0.5;
-            let special = gross - (basic + hra + medical + convayance);
-            if (special < 0) special = 0;
-
-            basicInput.value = basic.toFixed(2);
-            hraInput.value = hra.toFixed(2);
-            medicalInput.value = medical.toFixed(2);
-            convayanceInput.value = convayance.toFixed(2);
-            specialInput.value = special.toFixed(2);
-
-            calculateAll();
-        });
-
-        // Trigger recalculation if any of the manual fields are updated
-        [basicInput, basicPercentageInput, tdsInput, loanInput].forEach(input => {
-            input.addEventListener("input", calculateAll);
-        });
-
-
-
-    });
-
-
-
 
      document.getElementById('fileUpload').addEventListener('change', function(event) {
         const file = event.target.files[0];
@@ -1676,6 +1564,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 let accNumber = $('#account_number').val().trim();
                 let confirmAccNumber = $('#confirm_account_no').val().trim();
 
+                let epfApplicable = $('#epf_check').is(':checked');
+                let epfNo = $('#epf_no').val().trim();
+                let esicApplicable = $('#esic_check').is(':checked');
+                let esicNo = $('#esic_no').val().trim();
+
                 let pan_number = $('#pan_number').val().trim();
                 let aadhaar_number = $('#aadhaar_number').val().trim();
 
@@ -1723,6 +1616,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (joiningDate === "") {
                     showToast("Employee Joining Date is required", "error");
                     $('#emp_joining_date').focus();
+                    return;
+                }
+
+                if (epfApplicable && epfNo === "") {
+                    showToast("Employee EPF No is required", "error");
+                    $('#epf_no').focus();
+                    return;
+                }
+
+                if (esicApplicable && esicNo === "") {
+                    showToast("Employee ESIC No is required", "error");
+                    $('#esic_no').focus();
                     return;
                 }
 
@@ -2173,5 +2078,37 @@ document.addEventListener("DOMContentLoaded", function () {
 		}
 
 	});
+
+    function startEditUserEmployeeTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Edit Employee Profile Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-info-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Modify job title, contact details, salary structure, and bank info.</p></div>'
+                },
+                {
+                    title: 'Edit Employee Profile',
+                    intro: 'Modify job title, contact details, salary structure, and bank info.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-edit-user-employee-tour').on('click', function(e) {
+            e.preventDefault();
+            startEditUserEmployeeTour();
+        });
+    });
 </script>
 @endsection

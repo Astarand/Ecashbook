@@ -127,6 +127,7 @@ class ExpensesController extends Controller
                 'payment_status' => $val->payment_status,
                 'expense_amt' => $val->expense_amt,
                 'tds_amount' => $val->tds_amount,
+                'deduction_amount' => $val->deduction_amount,
                 'approved_by' => $val->approved_by,
                 'status' => $val->status,
             ];
@@ -319,6 +320,7 @@ class ExpensesController extends Controller
 			'ledger'        => ucwords(str_replace(['_', '-'], ' ', $expense->expense_type)),
 			'party_name'    => $expense->approved_by,
 			'amount'        => $expense->expense_amt,
+			'payment_status'=> $expense->payment_status,
 			'tds_applicable'=> $expense->tds_applicable ?? 'no',
 			'tds_percent'   => $expense->tds_percentage ?? 0,
 			'tds_amt'       => $expense->tds_amount ?? 0,
@@ -856,7 +858,7 @@ class ExpensesController extends Controller
 				$this->paymentVoucherService->storePaymentVoucherEntries($eId,'Expense',$currentPayment);
 			}
 			//end payment voucher entry
-
+			
 			/*
 			|--------------------------------------------------------------------------
 			| Response
@@ -928,7 +930,12 @@ class ExpensesController extends Controller
 		];
 
         $delExpenses = DB::table('expenses')->where('id', $request->id)->delete();
-		$delJournalRec = DB::table('journals')->where('autoId', $request->id)->delete();
+		$delJournalRec = DB::table('journals')
+								->where('autoId', $request->id)
+								->where('source', 'Expense')->delete();
+		$delPaymentRec = DB::table('payment_vouchers')
+							->where('f_id', $request->id)
+							->where('source', 'Expense')->delete();
 		if($delExpenses)
 		{
 			// Capture log entry

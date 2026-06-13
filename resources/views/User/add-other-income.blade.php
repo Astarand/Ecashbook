@@ -7,12 +7,15 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/other-income-list') }}">Other Income</a></li>
-                        <li class="breadcrumb-item" aria-current="page">Add Other Income</li>
+                        <li class="breadcrumb-item active" aria-current="page">Add Other Income</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-add-other-income-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
             </div>
         </div>
@@ -55,16 +58,16 @@
 							<label class="form-label">Income Type <span class="text-danger">*</span></label>
 							<select id="incomeType" name="incomeType" class="form-select" required>
 								<option value="">Select</option>
-								<option value="Revenue">Revenue from Operations</option>
-								<option value="Other">Other Income</option>
+								<option value="Revenue">Other Operating Income</option>
+								<option value="Other">Other Non-Operating Income</option>
 							</select>
 						</div>
 						
 						<!-- SUB CATEGORY -->
 						<div class="col-sm-3 mb-3">
-                            <label class="form-label">Service Category<span class="text-danger">*</span></label>
+                            <label class="form-label">Income Category<span class="text-danger">*</span></label>
                             <select id="categoryIncome" name="categoryIncome" required class="form-select">
-                                <option value="">Select Services</option>
+                                <option value="">Select Category</option>
                                 <!--<option value="Other Income">Other Income</option>-->
                             </select>
                         </div>
@@ -75,15 +78,8 @@
                         </div>
 						
 						<div class="col-md-3 mb-3">
-							<label class="form-label">Customer / Party Name<span class="text-danger">*</span></label>
-							<select name="customer_id" id="customer_id" required class="form-control">
-								<option value="">Select</option>
-								@foreach($customers as $customer)
-									<option value="{{ $customer->id }}">
-										{{ $customer->cust_name }}
-									</option>
-								@endforeach
-							</select>
+							<label class="form-label">Party / Source Name<span class="text-danger"></span></label>
+							<input type="text" name="customer_name" id="customer_name" class="form-control">
 						</div>
 						<div class="col-md-3 mb-3">
 							<label class="form-label">Invoice / Reference Number</label>
@@ -249,28 +245,115 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('page-script')
 <script>
+    function startAddOtherIncomeTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Add Other Income',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-file-text" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Fill this form to register new auxiliary operating revenue or non-operating income.</p></div>'
+                },
+                {
+                    element: 'select[name="propId"]',
+                    title: 'Proprietorship Entity',
+                    intro: 'Select the specific proprietorship company entity receiving this income.'
+                },
+                {
+                    element: '#dateInput',
+                    title: 'Receipt Date',
+                    intro: 'Set the official date when the income was transactionally registered.'
+                },
+                {
+                    element: '#incomeType',
+                    title: 'Income Classification',
+                    intro: 'Choose Operating Revenue vs Non-operating Other Income categories.'
+                },
+                {
+                    element: '#categoryIncome',
+                    title: 'Service Subcategory',
+                    intro: 'Specify the subclass category (e.g. Service Income, Rental, Dividends).'
+                },
+                {
+                    element: '#customer_id',
+                    title: 'Paying Party',
+                    intro: 'Select the customer or entity paying this income amount.'
+                },
+                {
+                    element: '#amount',
+                    title: 'Transaction Amount',
+                    intro: 'Specify the total revenue amount received or receivable.'
+                },
+                {
+                    element: '#pay_status',
+                    title: 'Receipt Mode Status',
+                    intro: 'Set payment status (Full or Advance). Selecting Advance will display advance and receivable value fields.'
+                },
+                {
+                    element: '.currAsset',
+                    title: 'TDS & GST Taxes',
+                    intro: 'Toggle applicability flags to configure TDS calculations and add standard GST rate transaction details.'
+                },
+                {
+                    element: 'button[type="submit"]',
+                    title: 'Save Transaction',
+                    intro: 'Click here to save the income transaction to the registry ledger.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-add-other-income-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddOtherIncomeTour();
+        });
+    });
 
 	//Income Type and Sub category
 	$(document).ready(function () {
 
 		const revenueOptions = [
-			"Sales of Goods",
-			"Service Income",
-			"Contract / Job Work Income",
-			"Commission / Brokerage",
-			"Other Operating Income"
+			"Freight / Delivery Charges Recovery",
+			"Packing & Handling Charges Recovery",
+			"Installation Charges",
+			"Training Charges",
+			"AMC / Maintenance Charges",
+			"Commission Income",
+			"Service Recovery Charges",
+			"Documentation Charges",
+			"Processing Charges",
+			"Onboarding Charges",
+			"Platform / API Usage Charges",
+			"SMS / Communication Charges Recovery",
+			"Data Migration Charges",
+			"Scrap Sales",			
+			"Miscellaneous Operating Income"
 		];
 
 		const otherOptions = [
 			"Interest Income",
 			"Rental Income",
 			"Dividend Income",
-			"Net Gain on Sale of Investments",
-			"Net Gain on Sale of Fixed Assets",
-			"Royalty / License Income",
-			"Miscellaneous Income",
-			"Other Income"
+			"Profit on Sale of Fixed Assets",
+			"Profit on Sale of Investments",
+			"Foreign Exchange Gain",
+			"Insurance Claim Received",
+			"Bad Debts Recovered",
+			"Government Grant / Subsidy Income",
+			"Miscellaneous Non-Operating Income"
 		];
 
 		// Populate subcategory
@@ -307,8 +390,8 @@
 		$('#categoryIncome').on('change', function () {
 			let selected = $(this).val();
 			if (
-				selected === "Other Income" ||
-				selected === "Other Operating Income"
+				selected === "Miscellaneous Non-Operating Income" ||
+				selected === "Miscellaneous Operating Income"
 			) {
 				$('#otherIncomeCategory').show();
 			} else {

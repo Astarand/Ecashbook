@@ -7,15 +7,18 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
                         <li class="breadcrumb-item"><a href="#">HR, Payroll & Attendance</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Attendance History</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-attendance-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Attendance History</h2>
                     </div>
@@ -26,7 +29,7 @@
     <!-- [ breadcrumb ] end -->
 
     <!-- [ Stats Cards ] start -->
-    <div class="row mb-4">
+    <div class="row mb-4" id="today-stats-row">
         <div class="col-md-12">
             <!-- [ Date Header ] start -->
             <div class="row mb-3">
@@ -149,14 +152,14 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card table-card">
+            <div class="card table-card" id="attendance-table-card">
                 <!-- [ Date Filter Section ] start -->
                 <div class="card-header">
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <h5 class="mb-0">Employee Attendance Records</h5>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-4" id="date-filter-section">
                             <div class="row g-2 align-items-end">
                                 <div class="col-md-6">
                                     <label class="form-label mb-1">From Date</label>
@@ -295,6 +298,9 @@
     <!-- [ Main Content ] end -->
 </div>
 
+@endsection
+
+@section('page-script')
 <script>
     $(document).ready(function() {
         $('#filterSubmit').on('click', function() {
@@ -440,6 +446,53 @@
             });
         }
     });
-</script>
 
+    function startAttendanceTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Attendance History Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-activity" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Review employee attendance stats, track late/present counts, and search historical records.</p></div>'
+                },
+                {
+                    element: '#today-stats-row',
+                    title: 'Today\'s Attendance Cards',
+                    intro: 'Provides a quick summary of today\'s attendance status: Total Present, On-Time, Late entries, Absents, and Leaves.'
+                },
+                {
+                    element: '#date-filter-section',
+                    title: 'Date Range Filters',
+                    intro: 'Define the "From Date" and "To Date" boundaries to fetch specific historical log summaries for the table.'
+                },
+                {
+                    element: '#attendance-table-card',
+                    title: 'Attendance Sheet Table',
+                    intro: 'Lists overall metrics for each employee: Total working days in range, total present counts, on-time vs late ratios, and status indicators.'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Logs & Profiles',
+                    intro: 'Click here to view detailed check-in/out timestamps and profiles for individual employees.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-attendance-tour').on('click', function(e) {
+            e.preventDefault();
+            startAttendanceTour();
+        });
+    });
+</script>
 @endsection

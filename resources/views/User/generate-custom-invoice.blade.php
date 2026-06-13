@@ -6,14 +6,18 @@
 		<div class="page-header">
 			<div class="page-block">
 				<div class="row align-items-center">
-					<div class="col-md-12">
-						<ul class="breadcrumb">
+					<div class="col-md-12 d-flex justify-content-between align-items-center">
+						<ul class="breadcrumb mb-0">
 							<li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>                        
-							<li class="breadcrumb-item" aria-current="page">Accounting & Finance</li>
+							<li class="breadcrumb-item">Accounting & Finance</li>
 							<li class="breadcrumb-item"><a href="{{ url('/custom-invoice-list') }}">Custom Invoice</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Generate Custom Invoice</li>
 						</ul>
+						<a href="javascript:void(0);" id="start-generate-custom-invoice-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+							<u>How does this Page works?</u>
+						</a>
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-4 mt-2">
 						<div class="page-header-title">
 							<h2 class="mb-0">Generate Custom Invoice</h2>
 						</div>
@@ -45,7 +49,7 @@
                                             <input type="date" id="invoice_date" name="invoice_date" value="<?php echo date("Y-m-d") ?>" class="form-control" >
                                         </div>
                                     </div>
-                                    <div class="col-xl-4">
+                                    <div class="col-xl-4" id="issued-by-section">
                                         <div class="border rounded p-3 h-100">
                                             <div class="d-flex align-items-center justify-content-between mb-2">
                                                 <h6 class="mb-0">Issued By:</h6>
@@ -63,7 +67,7 @@
                                             <p class="mb-0"><strong>GST:</strong> {{ $comp_details[0]->gst_no ?? '' }}</p>
                                         </div>
                                     </div>
-                                    <div class="col-xl-4">
+                                    <div class="col-xl-4" id="issued-to-section">
                                         <div class="border rounded p-3 h-100">
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <h6 class="mb-0">Issued To:</h6>
@@ -86,7 +90,7 @@
                                             
                                         </div>
                                     </div>
-                                    <div class="col-xl-4">
+                                    <div class="col-xl-4" id="payment-details-section">
                                         <div class="border rounded p-3 h-100">
                                             <div class="d-flex align-items-center justify-content-between mb-2">
                                                 <h6 class="mb-0">Payment Details:</h6>
@@ -103,7 +107,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12">
+                                    <div class="col-12" id="items-table-section">
                                         <h5>Detail</h5>
                                         <div class="table-responsive">
                                             <table class="table table-hover mb-0">
@@ -152,7 +156,7 @@
                                             <button class="btn btn-light-primary gap-2 w-100" id="addNewItem"><i class="ti ti-plus"></i> Add new item</button>
                                         </div>
                                     </div>
-                                    <div class="col-12">
+                                    <div class="col-12" id="invoice-total-section">
                                         <div class="invoice-total ms-auto">
                                             <div class="row">
                                                 <div class="col-12">
@@ -204,7 +208,7 @@
                                     </div>
 
 
-                                    <div class="col-sm-6 col-xl-6 mb-3">
+                                    <div class="col-sm-6 col-xl-6 mb-3" id="payment-status-section">
                                         <div class="mb-0">
                                             <label class="form-label">Payment Status</label>
                                             <select class="form-select" id="paymentStatus" name="paymentStatus">
@@ -227,13 +231,13 @@
                                             <input type="text" class="form-control" placeholder="Due Amount" id="dueAmount" name="dueAmount">
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6" id="notes-section">
                                         <div class="mb-0">
                                             <label class="form-label">Note</label>
                                             <textarea class="form-control" rows="3" placeholder="Note" name="notes" id="notes"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6" id="terms-conditions-section">
                                         <div class="mb-0">
                                             <label class="form-label">Terms and Conditions</label>
                                             <textarea class="form-control" rows="3" name="terms_and_conditions" id="terms_and_conditions" placeholder="Terms and Conditions"></textarea>
@@ -492,7 +496,9 @@
             </div>
         </div>
     </div>
+@endsection
 
+@section('page-script')
 <script>
 
     //Add New Item
@@ -1053,10 +1059,92 @@
         });
     });
 
+    function startGenerateCustomInvoiceTour() {
+        if (typeof introJs !== 'function') return;
 
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Generate Custom Invoice',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-file-plus" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome! Use this page to customize, calculate, and issue new invoices directly to customers without pre-selected products.</p></div>'
+                },
+                {
+                    element: '#invoice_number',
+                    title: 'Invoice Number',
+                    intro: 'This is the auto-generated unique reference number for the custom invoice. You can edit this if required.'
+                },
+                {
+                    element: '#invoice_date',
+                    title: 'Invoice Date',
+                    intro: 'Select the billing date of issue for this custom invoice.'
+                },
+                {
+                    element: '#issued-by-section',
+                    title: 'Issued By',
+                    intro: 'Review your company profile details (contact, PAN/GST numbers, billing address) which will appear on the invoice.'
+                },
+                {
+                    element: '#issued-to-section',
+                    title: 'Issued To',
+                    intro: 'Click "Add" to select an existing customer from your registry, or type manual billing details for a new customer.'
+                },
+                {
+                    element: '#payment-details-section',
+                    title: 'Payment/Bank Details',
+                    intro: 'Click "Change" to select or add the bank account credentials that will be printed on the invoice for payment collection.'
+                },
+                {
+                    element: '#items-table-section',
+                    title: 'Item Details',
+                    intro: 'Input billing rows: type the Product/Service description, price per unit, HSN/SAC code, quantity, and choose the GST mode to compute taxes automatically.'
+                },
+                {
+                    element: '#addNewItem',
+                    title: 'Add New Item',
+                    intro: 'Click here to insert a new blank item row into the details table (up to 10 rows).'
+                },
+                {
+                    element: '#invoice-total-section',
+                    title: 'Invoice Totals & Signatures',
+                    intro: 'Review subtotal calculations, enter discount percentages, specify signee names, and optionally upload a digital signature image.'
+                },
+                {
+                    element: '#payment-status-section',
+                    title: 'Payment Status',
+                    intro: 'Record the current payment state (Paid, Unpaid, Partial Paid). If Partial Paid, specify paid vs due amounts.'
+                },
+                {
+                    element: '#notes-section',
+                    title: 'Internal Notes',
+                    intro: 'Enter internal notes, customer messages, or brief descriptions for reference.'
+                },
+                {
+                    element: '#terms-conditions-section',
+                    title: 'Terms & Conditions',
+                    intro: 'Specify standard billing, refund, or service agreements for this invoice.'
+                },
+                {
+                    element: '#customInvoiceDataSave',
+                    title: 'Save Invoice',
+                    intro: 'Click here to save the custom invoice. You will be redirected to the list page upon completion.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
 
-
-
-
+    $(document).ready(function() {
+        $('#start-generate-custom-invoice-tour').on('click', function(e) {
+            e.preventDefault();
+            startGenerateCustomInvoiceTour();
+        });
+    });
 </script>
 @endsection

@@ -46,7 +46,7 @@ class CheckSubscriptionPopup
 			{
 
 				// ✅ Fixed trial date
-				$trialEnd = Carbon::create(2026, 5, 31);
+				$trialEnd = Carbon::create(2026, 7, 31);
 
 				$daysLeft = $today->diffInDays($trialEnd, false);
 

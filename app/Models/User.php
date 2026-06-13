@@ -48,6 +48,7 @@ class User extends Authenticatable
         'compId',
         'trial_start_at',
         'trial_days',
+        'tour_completed',
     ];
 
 
@@ -75,5 +76,6 @@ class User extends Authenticatable
         'isdeleted' => 'boolean',
         'isCaActive' => 'boolean',
         'is_online' => 'boolean',
+        'tour_completed' => 'boolean',
     ];
 }

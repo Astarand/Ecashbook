@@ -170,23 +170,58 @@
                         <div class="col-12">
                             <div class="row justify-content-end mt-3">
                                 <div class="col-sm-4 text-end">
-                                    <img src="{{ asset('assets/images/signature.png') }}" class="img-fluid" alt="Signature" style="width: 150px; height: 80px;">
-                                    <div class="border-top border-2 pt-2">
+                                    @if(!empty($sales->signature) && file_exists(public_path('uploads/invoice-signature/'.$sales->signature)))
+                                        <img src="{{ asset('uploads/invoice-signature/'.$sales->signature) }}"
+                                            class="img-fluid"
+                                            alt="Signature"
+                                            style="width: 150px; height: 80px; object-fit: contain;">
+                                    @endif
+
+                                    <div class="border-top border-2 pt-2 mt-2">
                                         <p class="mb-0">Authorized Signatory</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-4">
-                            <div class="border rounded p-3">
+                        <div class="col-sm-3">
+                            {{-- <div class="border rounded p-3">
                                 <h6 class="mb-0">Payment Details:</h6>
                                 <p class="mb-0">Mode Of Payment: {{ $sales->mode_of_pay ?? '' }}</p>
                                 <p class="mb-0">Dispatch Document No:{{ $sales->dispa_docno_one ?? '' }}</p>
                                 <p class="mb-0">Dispatched Through:{{ $sales->disp_through ?? '' }}</p>
                                 <p class="mb-0">Destination:{{ $sales->ship_pin ?? '' }}</p>
-                            </div>
+                            </div> --}}
+
+                            @if(!empty($bankDetails))
+                                <div class="border rounded p-3">
+
+                                    <h6 class="mb-2">Bank Details</h6>
+                                    <p class="mb-0"><strong>Account Holder:</strong> {{ $bankDetails->accholder_name ?? '' }}</p>
+                                    <p class="mb-0"><strong>Bank Name:</strong> {{ $bankDetails->bank_name ?? '' }}</p>
+                                    <p class="mb-0"><strong>Branch:</strong> {{ $bankDetails->bank_branch ?? '' }}</p>
+                                    <p class="mb-0"><strong>Account No:</strong> {{ $bankDetails->bank_ac_no ?? '' }}</p>
+                                    <p class="mb-0"><strong>IFSC Code:</strong> {{ $bankDetails->ifsc_code ?? '' }}</p>
+                                </div>
+                            @else
+                                <div class="border rounded p-3">
+                                    <h6 class="mb-0">Bank Details:</h6>
+                                    <p class="mb-0">No bank details available.</p>
+                                </div>
+                            @endif
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
+                            @if(!empty($bankDetails) && !empty($bankDetails->bank_qr_code) && file_exists(public_path('storage/' . $bankDetails->bank_qr_code)))
+                            
+                                <div class="border rounded p-3 d-flex justify-content-center align-items-center">
+                                    <image src="{{ asset('storage/' . $bankDetails->bank_qr_code) }}" class="img-fluid" alt="QR Code" style="width: 100px; height: 100px;">
+                                </div>
+                            @else
+                                <div class="border rounded p-3 d-flex justify-content-center align-items-center" style="height: 135px;">
+                                    <p class="mb-0">No QR code available.</p>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="col-sm-3">
                             <div class="border rounded p-3">
                                 <h6 class="mb-0">Delivery Details:</h6>
                                 <p class="mb-0">Buyers Order No:{{ $sales->buyer_orderno ?? '' }}</p>
@@ -195,14 +230,20 @@
                                 <p class="mb-0">Other Reference(s): {{ $sales->other_refno ?? '' }}</p>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <div class="border rounded p-3" style="height: 135px;">
                                 <h6 class="mb-0">Terms of Delivery:</h6>
                                 <p class="mb-0">{{ $sales->terms_delivery ?? '' }}</p>
                             </div>
                         </div>
                         <div class="col-12 text-end d-print-none">
-                            <button class="btn btn-outline-secondary btn-print-invoice">Download</button>
+                            <a href="{{ url('sale-invoices') }}" class="btn btn-danger">
+                                Cancel
+                            </a>
+
+                            <button class="btn btn-outline-secondary btn-print-invoice">
+                                Download
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -3,29 +3,6 @@
 @section('container')
 
 <div class="pc-content">
-
-<!-- [ breadcrumb ] start -->
-    <div class="page-header">
-        <div class="page-block">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
-                        <li class="breadcrumb-item"><a href="">Sales & Revenue</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('user.SalesInvoices') }}">Sales Invoices</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">View Invoice</li>
-                    </ul>
-                </div>
-                <div class="col-md-12">
-                    <div class="page-header-title">
-                        <h2 class="mb-0">View Sales Invoice</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- [ breadcrumb ] end -->
     <div class="row align-item-center mb-4">
         <h2 class="text-muted">View Sales Invoice</h2>
     </div>
@@ -452,7 +429,7 @@
                                         <input type="file" name="signature" id="signature" value="{{ $sales->signature }}" class="form-control" placeholder="Enter Name">
                                         @if(@$sales->signature !="")
                                         <div class="downloadFile"><a target="_blank"
-                                                href="{{ asset('/public/uploads/invoice-signature/'.$sales->signature) }}">Download</a>
+                                                href="{{ asset('uploads/invoice-signature/'.$sales->signature) }}">Download</a>
                                         </div>
                                         @endif
                                     </div>
@@ -499,20 +476,14 @@
                                             <div class="form-group">
                                                 <select name="mode_of_pay" id="mode_of_pay" class="form-select has-success" aria-invalid="false">
                                                     <option value="">Select</option>
-                                                    <option value="IMPS" <?php echo ($sales->mode_of_pay == "IMPS") ?
-                                                                                "selected" : "" ?>>IMPS</option>
-                                                    <option value="RTGS" <?php echo ($sales->mode_of_pay == "RTGS") ?
-                                                                                "selected" : "" ?>>RTGS</option>
-                                                    <option value="NEFT" <?php echo ($sales->mode_of_pay == "NEFT") ?
-                                                                                "selected" : "" ?>>NEFT</option>
+                                                    <option value="Bank" <?php echo ($sales->mode_of_pay == "Bank") ?
+                                                                                "selected" : "" ?>>Bank</option>                                                    
                                                     <option value="UPI" <?php echo ($sales->mode_of_pay == "UPI") ?
-                                                                            "selected" : "" ?>>UPI</option>
-                                                    <option value="CARD" <?php echo ($sales->mode_of_pay == "CARD") ?
-                                                                                "selected" : "" ?>>Credit/Debit Card</option>
-                                                    <option value="CASH" <?php echo ($sales->mode_of_pay == "CASH") ?
+                                                                            "selected" : "" ?>>UPI</option>                                                   
+                                                    <option value="Cash" <?php echo ($sales->mode_of_pay == "Cash") ?
                                                                                 "selected" : "" ?>>Cash</option>
-                                                    <option value="OTHER" <?php echo ($sales->mode_of_pay == "OTHER") ?
-                                                                                "selected" : "" ?>>Other</option>
+                                                    <!--<option value="OTHER" <?php echo ($sales->mode_of_pay == "OTHER") ?
+                                                                                "selected" : "" ?>>Other</option>-->
                                                 </select>
                                             </div>
                                         </div>
@@ -535,35 +506,52 @@
                                                                                 "selected" : "" ?>>Full Payment</option>
                                                     <option value="Partial" <?php echo ($sales->pay_status == "Partial") ?
                                                                                 "selected" : "" ?>>Advance Payment</option>
+													<option value="Due" <?php echo ($sales->pay_status == "Due") ?
+                                                                                "selected" : "" ?>>Due</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- Payment Section -->
-									<div class="row" id="paymentSection" style="display:none;">
+									<div class="row align-items-end" id="paymentSection">
 										<div class="col-md-4 mb-3">
 											<label>Total Amount</label>
 											<input type="text" name="total_amount" id="total_amount" value="{{ $sales->total_amount }}" class="form-control">
 										</div>
-
-										<!-- Advance Only -->
-										<div class="col-md-4 mb-3 d-none" id="advanceBox">
-											<label>Advance Amount</label>
-											<input type="text"  name="advance_amount" id="advance_amount" value="{{ $sales->advance_amount }}" class="form-control">
-										</div>
-
-										<!-- Due Only -->
-										<div class="col-md-4 mb-3 d-none" id="dueBox">
-											<label>Balance Receivable</label>
-											<input type="text" name="due_amount" id="due_amount" value="{{ $sales->due_amount }}" class="form-control" readonly>
-										</div>
-
-										<!-- Adjusted Only -->
-										<div class="col-md-4 mb-3 d-none" id="adjustedBox">
-											<label>Adjusted Amount</label>
-											<input type="text" name="adjusted_amount" id="adjusted_amount" value="{{ $sales->adjusted_amount }}" class="form-control">
+										<div class="col-md-4 mb-3 d-flex align-items-end">
+											<button
+												type="button"
+												class="btn btn-primary paymentModalBtn"
+												data-id="{{ $sales->id }}"
+												data-type="Sales">
+												Click to Update Payment
+											</button>
 										</div>
 									</div>
+
+                                    {{-- Start Bank Details --}}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label>Select Bank <span class="text-danger">*</span></label>
+                                            <select name="bank_id" id="bank_id" class="form-control">
+                                                <option value="">-- Select Bank --</option>
+
+                                                @foreach($bankDetails as $bank)
+                                                    <option value="{{ $bank->id }}"
+                                                            data-qr="{{ asset('storage/' . $bank->bank_qr_code) }}"
+                                                            {{ $sales->bank_id == $bank->id ? 'selected' : '' }}>
+                                                        {{ $bank->bank_name }} - {{ $bank->bank_branch }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <img id="bankQrPreview" style="max-width:200px; display:none;">
+                                    </div>
+                                    
+                                    {{-- End Bank Details --}}
+
                                     <div class="col-md-6 mb-3">
                                         <div class="form-group ">
                                             <label>Buyer's Order Number</label>
@@ -728,6 +716,67 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="paymentVoucherModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Details</h5>
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="f_id">
+                <input type="hidden" id="voucher_type">
+				<input type="hidden" id="isViewPage" value="1">
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Total Invoice Amount</label>
+                        <input type="text"
+                            id="invoice_total"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Paid Amount</label>
+                        <input type="text"
+                            id="total_paid"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Balance Due</label>
+                        <input type="text"
+                            id="balance_due"
+                            class="form-control"
+                            readonly>
+                    </div>
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+						<th>Mode</th>
+                        <th id="actionHeader" width="80">Action</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="voucherRows">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 	$('#tab-B, #tab-C, #tab-D').addClass('disabled');
 	
@@ -772,6 +821,28 @@
             });
         }
     });
+	
+	
+	document.addEventListener("DOMContentLoaded", function () {
+		const paymentStatusDropdown = document.getElementById("pay_status");
+		const paymentBtn = document.querySelector(".paymentModalBtn");
+
+		function toggleFields() {
+			const status = paymentStatusDropdown.value;
+			if (status === "Due") {
+				paymentBtn.style.display = "none";
+			} else {
+				paymentBtn.style.display = "inline-block";
+			}
+		}
+
+		if (paymentStatusDropdown) {
+			paymentStatusDropdown.addEventListener("change", toggleFields);
+			toggleFields(); // Initial page load
+		}
+	});
+	
+	
     document.addEventListener("DOMContentLoaded", function() {
         var base_url = "{{ url('/') }}";
 
@@ -814,8 +885,26 @@
         });
 
     });
+
+    $(document).ready(function () {
+        let qr = $('#bank_id option:selected').data('qr');
+
+        if (qr) {
+            $('#bankQrPreview').attr('src', qr).show();
+        }
+
+        $('#bank_id').on('change', function () {
+            let qr = $(this).find(':selected').data('qr');
+
+            if (qr) {
+                $('#bankQrPreview').attr('src', qr).show();
+            } else {
+                $('#bankQrPreview').hide();
+            }
+        });
+    });
 	
-	document.addEventListener("DOMContentLoaded", function() {
+	/*document.addEventListener("DOMContentLoaded", function() {
 		
 		const payStatus = document.getElementById("pay_status");
 
@@ -919,6 +1008,6 @@
 		advanceAmount.addEventListener("input", calculateDue);
 		togglePaymentUI(false);
 		
-    });
+    });*/
 </script>
 @endsection

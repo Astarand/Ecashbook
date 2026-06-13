@@ -8,12 +8,17 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Assets Management</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/assets-voucher-list') }}">Assets Voucher</a></li>
                         <li class="breadcrumb-item" aria-current="page">Add Asset Voucher</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-add-assets-voucher-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -365,6 +370,42 @@
             // },
         });
 
+    });
+
+    function startAddAssetsVoucherTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Add Asset Voucher Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-info-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Record purchase or depreciation entries for assets.</p></div>'
+                },
+                {
+                    title: 'Add Asset Voucher',
+                    intro: 'Record purchase or depreciation entries for assets.'
+                },
+                {
+                    element: 'form', title: 'Voucher Details',
+                    intro: 'Enter date, select asset, and input transaction details.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-add-assets-voucher-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddAssetsVoucherTour();
+        });
     });
 </script>
 @endsection

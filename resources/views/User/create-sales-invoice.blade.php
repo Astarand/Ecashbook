@@ -7,14 +7,17 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Sales & Revenue</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('user.SalesInvoices') }}">Sales Invoices</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Create Invoice</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-create-sales-invoice-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -681,8 +684,92 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('page-script')
 <script>
+    function startCreateSalesInvoiceTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Create Sales Invoice',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-file-text" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Follow this 4-step wizard to create and record a new sales invoice.</p></div>'
+                },
+                {
+                    element: '#inv_num',
+                    title: 'Invoice Number',
+                    intro: 'This is the auto-generated unique reference number for the sales invoice.'
+                },
+                {
+                    element: '#quotation_ref_num',
+                    title: 'Quotation Reference',
+                    intro: 'Select a previously saved quotation to convert it automatically to this invoice.'
+                },
+                {
+                    element: '#inv_date',
+                    title: 'Invoice Date',
+                    intro: 'Select the billing date of issue for this sales invoice.'
+                },
+                {
+                    element: '#sellerDetail',
+                    title: 'Step 1: Seller Details',
+                    intro: 'Review your company profile details (contact, PAN/GST numbers, billing address).'
+                },
+                {
+                    element: '#customerDetails',
+                    title: 'Step 2: Customer Details',
+                    intro: 'Select the customer entity and specify their billing and shipping address options.'
+                },
+                {
+                    element: '#itemDetails',
+                    title: 'Step 3: Item Entries',
+                    intro: 'Input item details, type (Product or Service), billing model, prices, discount percentages, and taxes.'
+                },
+                {
+                    element: '#others',
+                    title: 'Step 4: Payments & Delivery',
+                    intro: 'Specify pay mode (NEFT, UPI, Cash), transaction status, shipping agent/dispatch details, and terms.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).onbeforechange(function(targetElement) {
+            if (targetElement.id === 'sellerDetail' || targetElement.id === 'customerDetails' || targetElement.id === 'itemDetails' || targetElement.id === 'others') {
+                $('.tab-pane').removeClass('show active');
+                $('.nav-pills .nav-link').removeClass('active');
+                
+                $(targetElement).addClass('show active');
+                
+                // Highlight corresponding nav-link tab header
+                let tabIndexMap = {
+                    'sellerDetail': 0,
+                    'customerDetails': 1,
+                    'itemDetails': 2,
+                    'others': 3
+                };
+                let idx = tabIndexMap[targetElement.id];
+                $('.nav-pills .nav-link').eq(idx).addClass('active');
+            }
+        }).start();
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
+        const tourBtn = document.getElementById('start-create-sales-invoice-tour');
+        if (tourBtn) {
+            tourBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                startCreateSalesInvoiceTour();
+            });
+        }
+
         const addressTypeDropdown = document.getElementById("InvoiceaddressType");
 
         if (addressTypeDropdown) {

@@ -110,6 +110,7 @@ class OtherIncomeController extends Controller
 
     public function store(Request $request)
     {
+		//echo"<pre>";print_r($request->all());exit;
         $userId = currentOwnerId();
 		$propId = $request->propId;
 
@@ -130,7 +131,7 @@ class OtherIncomeController extends Controller
             $income->pay_status = $request->input('pay_status');
             $income->due_date = $request->input('due_date');
             $income->pay_mode = $request->input('pay_mode');
-            $income->customer_id = $request->input('customer_id');
+            $income->customer_name = $request->input('customer_name');
             $income->specification = $request->input('specification');
             $income->tds_applicable = $tdsData['tds_applicable'];
 			$income->tds_percentage = $tdsData['tds_percentage'];
@@ -144,7 +145,7 @@ class OtherIncomeController extends Controller
 			$income->gst_allocation = ($gstApplicable === 'yes') ? ($request->input('gst_allocation') ?? null) : null;
 
             // Save 'other_income' only if 'Other Income' category is selected
-            if ($request->input('categoryIncome') == 'Other Income' || $request->input('categoryIncome') == 'Other Operating Income') {
+            if ($request->input('categoryIncome') == 'Miscellaneous Operating Income' || $request->input('categoryIncome') == 'Miscellaneous Non-Operating Income') {
                 $income->other_income = $request->input('other_income');
             } else {
                 $income->other_income = null;
@@ -320,7 +321,7 @@ class OtherIncomeController extends Controller
             $income->invoice_no = $request->input('invoice_no');
             $income->pay_status = $request->input('pay_status');
             $income->pay_mode = $request->input('pay_mode');
-            $income->customer_id = $request->input('customer_id');
+            $income->customer_name = $request->input('customer_name');
             $income->specification = $request->input('specification');
             if ($request->input('categoryIncome') == 'Other Income' || $request->input('categoryIncome') == 'Other Operating Income') {
                 $income->other_income = $request->input('other_income');
@@ -499,6 +500,12 @@ class OtherIncomeController extends Controller
         $decodedId = base64_decode($id);
 
         $income = Income::find($decodedId);
+		$delJournalRec = DB::table('journals')
+								->where('autoId', $decodedId)
+								->where('source', 'Income')->delete();
+		$delPaymentRec = DB::table('payment_vouchers')
+							->where('f_id', $decodedId)
+							->where('source', 'Income')->delete();
 
         if (!$income) {
 			return response()->json(['message' => 'Income not found'], 404);
@@ -572,8 +579,9 @@ class OtherIncomeController extends Controller
 	public function journalEntry($id)
 	{
 		$income = DB::table('income')->where('id', $id)->first();
-		$party = ($income->customer_id ?? '');
-		$customerName = $party ? DB::table('customers')->where('id', $party)->value('cust_name') : '';
+		//$party = ($income->customer_id ?? '');
+		//$customerName = $party ? DB::table('customers')->where('id', $party)->value('cust_name') : '';
+		$customerName = $income->customer_name ?? '';
 		$this->journalService->storeIncomeJournalEntries([
 			'source'        => 'Income',
 			'autoId'        => $income->id,
@@ -585,6 +593,7 @@ class OtherIncomeController extends Controller
 			'ledger'        => $income->categoryIncome ?? 'Income',
 			'party_name'    => $customerName,
 			'amount'        => (float)$income->amount,
+			'payment_status'=> $income->pay_status ?? '',
 			'tds_applicable'=> $income->tds_applicable ?? 'no',
 			'tds_percent'   => (float)$income->tds_percentage ?? 0,
 			'tds_amt'       => (float)$income->tds_amount ?? 0,

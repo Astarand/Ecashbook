@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Sales;
 use App\Models\Customers;
@@ -16,7 +17,7 @@ use App\Models\City;
 use App\Models\Sales_values;
 
 use Redirect;
-use DB;
+// use DB;
 use Auth;
 use Validator;
 use App\User;
@@ -101,6 +102,12 @@ class InvoiceController extends Controller
 								->select(DB::raw('sales_values.*'))
 								->where('sid', '=', $sid)
 								->get();
+		
+		//--------- Fetch Bank Details -------------
+		$bankDetails = DB::table('banks')
+							->select(DB::raw('banks.*'))
+							->where('banks.id', '=', $sales->bank_id)
+							->first();
 								
 		$array = array();
 		foreach($sales_values as $k=>$val)
@@ -139,6 +146,8 @@ class InvoiceController extends Controller
 			$array[$k]['signature_name'] = $sales->signature_name;
 		}
 		$sales_values = json_decode(json_encode($array));
+
+		// echo "<pre>";print_r($bankDetails);exit;
 		
 		if($invType == "invoice"){
 		    
@@ -158,12 +167,13 @@ class InvoiceController extends Controller
 				'special_discount' => $special_discount,
 				'special_discount_amount' => $special_discount_amount,
 				'special_discount_type' => $special_discount_type,
+				'bankDetails' => $bankDetails,
 			]);
 		}else{
 			
 			$inv_num = str_replace('/', '-', $inv_num);
 			$pdf = \PDF::loadView('User.sales-invoice-pdf', 
-			compact('sales','sales_values','inv_num','invDate','compDetails','custDetails','stateBill','cityBill','stateShip','cityShip'))
+			compact('sales','sales_values','inv_num','invDate','compDetails','custDetails','stateBill','cityBill','stateShip','cityShip','bankDetails'))
 			->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
 			$pdfName = 'Sales-Inv-'.$inv_num.'.pdf';
 			return $pdf->stream($pdfName);

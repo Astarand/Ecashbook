@@ -7,22 +7,25 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('user.VendorList') }}">Vendors & Payables</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Vendors & Payables List</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-vendor-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Vendors & Payables List</h2>
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
-                    <a href="{{ route('user.AddVendor') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Vendor / Seller</a>
+                    <a href="{{ route('user.AddVendor') }}" class="btn btn-primary" id="add-vendor-btn"><i class="ti ti-square-plus"></i> Add New Vendor / Seller</a>
                 </div>
             </div>
         </div>
@@ -33,7 +36,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card" id="vendor-table-card">
                 <div class="table-responsive">
                     <table class="table tbl-product" id="pc-dt-simple">
                         <thead>
@@ -177,7 +180,9 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('page-script')
 <script>
     //------------- Status Update ---------
     let statusId = null;
@@ -242,8 +247,48 @@
         });
     });
     
-    //-----------------
+    function startVendorListTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Vendors Directory Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-users" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage company vendor directory, track outstanding bills and transaction invoices, and check status.</p></div>'
+                },
+                {
+                    element: '#add-vendor-btn',
+                    title: 'Add New Vendor',
+                    intro: 'Click here to record a new business vendor profile, including basic contact, billing address, and bank accounts.'
+                },
+                {
+                    element: '#vendor-table-card',
+                    title: 'Vendor Directory Records',
+                    intro: 'View information about your vendors, including their ID, name, email, contact number, total invoices, and active/inactive status.'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Vendor Action controls',
+                    intro: 'Select these controls to view a vendor\'s ledger, edit profiles, or toggle active/inactive status.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            skipIfNoElement: true,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-vendor-list-tour').on('click', function(e) {
+            e.preventDefault();
+            startVendorListTour();
+        });
+    });
 </script>
-
-
 @endsection

@@ -511,6 +511,8 @@
             $('<input>', { type: 'hidden', name: 'download_format', value: $('#pfDownloadFormat').val() })
         ).appendTo('body').submit().remove();
     });
+
+
 </script>
 
 @endsection

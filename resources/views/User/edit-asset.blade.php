@@ -6,15 +6,17 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-												<li class="breadcrumb-item"><a href="#">Assets Management</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('user.AssetList') }}">Assets List</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit Asset</li>
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/assets-list') }}">Assets</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Edit Asset</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-edit-asset-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Edit Asset</h2>
                     </div>
@@ -201,9 +203,8 @@
 
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Invoice Date</label>
-													<input type="date" name="invoice_date" value="{{ $asset->invoice_date ?? '' }}" class="form-control">
+                                                    <input type="date" name="invoice_date" id="invoice_date" value="{{ $asset->invoice_date ?? '' }}" class="form-control">
 												</div>
-
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Asset Amount Value<span class="text-danger">*</span></label>
 													<input type="number" name="invoice_value" id="invoice_value" value="{{ $asset->invoice_value ?? '' }}" class="form-control">
@@ -265,35 +266,46 @@
 												</div>
 
 												<div class="col-xl-4 mb-3">
-													<label class="form-label">Depreciation Frequency</label>
-													<select name="depreciation_frequency" id="depreciation_frequency" class="form-select">
-														<option value="">Select</option>														
-														<option value="Yearly" {{ $asset->depreciation_frequency == 'Yearly' ? 'selected' : '' }}>Yearly</option>
+													<label class="form-label">Depreciation Method</label>
+													<select name="depreciation_method" id="depreciation_method" class="form-select">
+														<option value="">Select</option>
+														<option value="SLM" {{ $asset->depreciation_method == 'SLM' ? 'selected' : '' }}>Straight Line Method (SLM)</option>
+														<option value="WDV" {{ $asset->depreciation_method == 'WDV' ? 'selected' : '' }}>Written Down Value (WDV)</option>
 													</select>
 												</div>
 
 												<div class="col-xl-4 mb-3">
+													<label class="form-label">Depreciation Frequency</label>
+													<select name="depreciation_frequency" id="depreciation_frequency" class="form-select">
+														<option value="">Select</option>
+														<option value="Yearly" {{ $asset->depreciation_frequency == 'Yearly' ? 'selected' : '' }}>Yearly</option>
+														<option value="Half Year" {{ $asset->depreciation_frequency == 'Half Year' ? 'selected' : '' }}>180 days & Below</option>
+													</select>
+												</div>
+
+												<div class="col-xl-4 mb-3" id="usefulLifeDiv">
 													<label class="form-label">Useful Life (Years)</label>
 													<input type="number" name="useful_life_years" id="useful_life_years" value="{{ $asset->useful_life_years ?? '' }}" class="form-control">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Depreciation Method</label>
-													<select name="depreciation_method" id="depreciation_method" class="form-select">
-														<option value="">Select</option>
-														<option value="SLM" {{ $asset->depreciation_method == 'SLM' ? 'selected' : '' }}>Straight Line Method</option>
-														<option value="WDV" {{ $asset->depreciation_method == 'WDV' ? 'selected' : '' }}>Written Down Value</option>
-													</select>
-												</div>
-
-												<div class="col-xl-4 mb-3">
+												<div class="col-xl-4 mb-3" id="residualValueDiv">
 													<label class="form-label">Residual Value</label>
 													<input type="number" name="residual_value" id="residual_value"  value="{{ $asset->residual_value ?? '' }}" class="form-control">
 												</div>
-												
+
+												<div class="col-xl-4 mb-3" id="depreciationRateDiv" style="display:none;">
+													<label class="form-label">Depreciation Rate (%)</label>
+													<input type="number" name="depreciation_rate" id="depreciation_rate" value="{{ $asset->depreciation_rate ?? '' }}" class="form-control">
+												</div>
+
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Depreciation Value</label>
 													<input type="number" name="depreciation_value" id="depreciation_value" value="{{ $asset->depreciation_value ?? '' }}" class="form-control">
+												</div>
+
+												<div class="col-xl-4 mb-3">
+													<label class="form-label">Net Book Asset Value </label>
+													<input type="number" name="net_book_value" id="net_book_value" value="{{ $asset->net_book_value ?? '' }}" class="form-control">
 												</div>
                                                 
                                             </div>
@@ -425,7 +437,7 @@
 												<div class="col-md-4 mb-3">
 													<label>Amount</label>
 													<input type="number" name="cash_amount" class="form-control"
-														   value="{{ $asset->cash_amount ?? '' }}">
+														    value="{{ $asset->cash_amount ?? '' }}">
 												</div>
 												<div class="col-md-4 mb-3 d-flex align-items-end">
 													<a href="/cash-management" target="_blank" class="btn btn-primary">Details</a>
@@ -1724,18 +1736,20 @@
 	});
 	
 	// Depreciation calculation (Depreciation Value = (Asset Cost – Residual Value) ÷ Useful Life)
+
 	$(document).ready(function () {
 
+		// =========================
+		// SLM CALCULATION
+		// =========================
 		function calculateDepreciation() {
 
-			let cost     = parseFloat($('#invoice_value').val()) || 0;
+			let cost = parseFloat($('#invoice_value').val()) || 0;
 			let residual = parseFloat($('#residual_value').val()) || 0;
-			let life     = parseFloat($('#useful_life_years').val()) || 0;
+			let life = parseFloat($('#useful_life_years').val()) || 0;
 
-			// Only calculate if all values exist
 			if (cost > 0 && life > 0) {
 
-				// ❗ Validation
 				if (residual > cost) {
 					alert('Residual value cannot be greater than Asset Amount Value');
 					$('#residual_value').val(cost);
@@ -1745,14 +1759,165 @@
 				let depreciation = (cost - residual) / life;
 
 				$('#depreciation_value').val(depreciation.toFixed(2));
+
 			} else {
 				$('#depreciation_value').val('');
 			}
 		}
 
-		//Trigger calculation on input
-		$('#invoice_value, #residual_value, #useful_life_years').on('input', function () {
-			calculateDepreciation();
+		// =========================
+		// WDV CALCULATION
+		// =========================
+		function calculateWDV() {
+
+			let cost = parseFloat($('#invoice_value').val()) || 0;
+			let rate = parseFloat($('#depreciation_rate').val()) || 0;
+			let frequency = $('#depreciation_frequency').val();
+
+			if (cost <= 0 || rate <= 0) {
+				$('#depreciation_value').val('');
+				return;
+			}
+
+			// Half Year
+			if (frequency === 'Half Year') {
+
+				let invoiceDate = $('#invoice_date').val();
+				let depDate = $('#depreciation_start_date').val();
+				rate = 50; // Set rate to 50% for half-yearly
+				$('#depreciation_rate').val(50).prop('readonly', true);
+
+				if (invoiceDate && depDate) {
+
+					let invDate = new Date(invoiceDate);
+					let startDate = new Date(depDate);
+
+					let diffDays = Math.abs(startDate - invDate) / (1000 * 60 * 60 * 24);
+
+					// if (diffDays <= 180) {
+					// 	rate = rate / 2;
+					// }
+				}
+			}
+
+			let depreciation = (cost * rate) / 100;
+			// let closingWDV = cost - depreciation;
+
+			// $('#depreciation_value').val(closingWDV.toFixed(2));
+
+
+			let netBookValue = cost - depreciation;
+			$('#depreciation_value').val(depreciation.toFixed(2));
+			$('#net_book_value').val(netBookValue.toFixed(2));
+		}
+
+		// =========================
+		// TOGGLE FIELDS
+		// =========================
+		function toggleDepreciationFields() {
+
+			let method = $('#depreciation_method').val();
+
+			if (method === 'WDV') {
+
+				$('#depreciationRateDiv').show();
+				$('#residualValueDiv').hide();
+				$('#usefulLifeDiv').hide();
+				$('#depreciation_rate').prop('readonly', false);
+				$('#residual_value').val('');
+				$('#useful_life_years').val('');
+
+				if ($('#depreciation_frequency option[value="Half Year"]').length === 0) {
+					$('#depreciation_frequency').append(
+						'<option value="Half Year">180 days & Below</option>'
+					);
+				}
+
+				calculateWDV();
+			}
+
+			else if (method === 'SLM') {
+
+				$('#depreciationRateDiv').hide();
+				$('#residualValueDiv').show();
+				$('#usefulLifeDiv').show();
+
+				$('#depreciation_frequency option[value="Half Year"]').remove();
+
+				if ($('#depreciation_frequency').val() === 'Half Year') {
+					$('#depreciation_frequency').val('');
+				}
+
+				calculateDepreciation();
+			}
+
+			else {
+
+				$('#depreciationRateDiv').hide();
+				$('#residualValueDiv').show();
+				$('#usefulLifeDiv').show();
+
+				$('#depreciation_value').val('');
+			}
+		}
+
+		// =========================
+		// METHOD CHANGE
+		// =========================
+		$('#depreciation_method').on('change', function () {
+			toggleDepreciationFields();
+		});
+
+		// =========================
+		// SLM EVENTS
+		// =========================
+		$('#invoice_value, #residual_value, #useful_life_years')
+			.on('input', function () {
+
+				if ($('#depreciation_method').val() === 'SLM') {
+					calculateDepreciation();
+				}
+			});
+
+		// =========================
+		// WDV EVENTS
+		// =========================
+		$('#invoice_value, #depreciation_rate')
+			.on('input', function () {
+
+				if ($('#depreciation_method').val() === 'WDV') {
+					calculateWDV();
+				}
+			});
+
+		$('#depreciation_frequency, #invoice_date, #depreciation_start_date')
+			.on('change', function () {
+
+				if ($('#depreciation_method').val() === 'WDV') {
+					calculateWDV();
+				}
+			});
+
+		// =========================
+		// PAGE LOAD
+		// =========================
+		toggleDepreciationFields();
+
+		$('#depreciation_frequency').on('change', function () {
+
+			if ($(this).val() === 'Half Year') {
+
+				$('#depreciation_rate')
+					.val(50)
+					.prop('readonly', true);
+
+			} else {
+
+				$('#depreciation_rate')
+					.prop('readonly', false);
+			}
+
+			calculateWDV();
 		});
 
 	});
@@ -1770,5 +1935,69 @@
 		allowDecimal(this);
 	});
 
+    function startEditAssetTour() {
+        if (typeof introJs !== 'function') return;
+
+        let tour = introJs().setOptions({
+            steps: [
+                {
+                    title: 'Edit Asset Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-edit" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Modify existing company asset details, update GST & TDS configurations, replace documents, or modify audit trail records.</p></div>'
+                },
+                {
+                    element: '#asset-information-tab',
+                    title: 'Asset Info Section',
+                    intro: 'Define the asset type (current/non-current), purchase date, cost, depreciation method, and useful life.'
+                },
+                {
+                    element: '#gst-tds-tab',
+                    title: 'GST & TDS Configurations',
+                    intro: 'Configure tax properties, state transactions, tax rates, and TDS deduction details.'
+                },
+                {
+                    element: '#documentation-tab',
+                    title: 'Attachments & Docs',
+                    intro: 'Upload digital copies of purchase invoices, registration certificates, or warrant documents.'
+                },
+                {
+                    element: '#submitBtn',
+                    title: 'Submit Changes',
+                    intro: 'Click here to save the changes in the asset profile.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        });
+
+        tour.onbeforechange(function(targetElement) {
+            if (!targetElement) return;
+
+            // Find the closest tab-pane containing the target element
+            let tabPane = targetElement.closest('.tab-pane');
+            if (tabPane) {
+                let tabId = tabPane.getAttribute('id');
+                let tabTrigger = document.getElementById(tabId + '-tab');
+                if (tabTrigger && !tabTrigger.classList.contains('active')) {
+                    let tab = new bootstrap.Tab(tabTrigger);
+                    tab.show();
+                }
+            }
+        });
+
+        tour.start();
+    }
+
+    $(document).ready(function() {
+        $('#start-edit-asset-tour').on('click', function(e) {
+            e.preventDefault();
+            startEditAssetTour();
+        });
+    });
 </script>
 @endsection

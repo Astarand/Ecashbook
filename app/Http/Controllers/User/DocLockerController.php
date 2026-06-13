@@ -80,7 +80,8 @@ class DocLockerController extends Controller
 				])
 
 				->orderBy('user_documents.id','desc')
-				->paginate(10);
+				// ->paginate(10);
+				->get();
 		}
 
 		/*

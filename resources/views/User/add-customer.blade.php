@@ -7,16 +7,19 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/customer-list') }}">Customer & Receivables</a></li>
                         <li class="breadcrumb-item" aria-current="page">Add Customer & Receivables</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-add-customer-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Add Customer & Receivables</h2>
                     </div>
@@ -290,7 +293,7 @@
                                     <div class="col-lg-6 col-sm-12">
                                         <div class="d-flex justify-content-between align-items-center mb-4">
                                             <h5>Shipping Address</h5>
-                                            <div class="btn btn-primary" onclick="copyBillingAddress()">Same as Billing Address</div>
+                                            <div class="btn btn-primary" id="copy-billing-address-btn" onclick="copyBillingAddress()">Same as Billing Address</div>
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-6">
@@ -499,7 +502,9 @@
             </div>
         </div>
     </div>
+@endsection
 
+@section('page-script')
 <script>
     //GST YES/ NO
     document.addEventListener("DOMContentLoaded", function() {
@@ -1126,5 +1131,99 @@
 		value = value.replace(/\D/g, '');
 		this.value = value.substring(0, 10);
 	});
+
+    function startAddCustomerTour() {
+        if (typeof introJs !== 'function') return;
+
+        let tour = introJs().setOptions({
+            steps: [
+                {
+                    title: 'Add Customer Wizard Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-user-plus" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Follow this step-by-step guide to fill in the customer registration details, billing/shipping addresses, and banking info.</p></div>'
+                },
+                {
+                    element: 'a[href="#basicDetail"]',
+                    title: 'Personal Details Tab',
+                    intro: 'This tab holds the customer\'s company profile, PAN, contact information, and GST status.'
+                },
+                {
+                    element: '#cust_name',
+                    title: 'Company Name',
+                    intro: 'Enter the official name of the company or buyer.'
+                },
+                {
+                    element: '#gst_reg',
+                    title: 'GST Status',
+                    intro: 'Indicate whether the customer is GST registered. Selecting "Yes" opens additional fields to fetch GST details automatically.'
+                },
+                {
+                    element: 'a[href="#billingDetails"]',
+                    title: 'Billing Details Tab',
+                    intro: 'This tab is where you enter the billing and shipping addresses.'
+                },
+                {
+                    element: '#cust_bill_addone',
+                    title: 'Billing Address',
+                    intro: 'Fill in the customer\'s primary billing address, state, city, and zip code.'
+                },
+                {
+                    element: '#copy-billing-address-btn',
+                    title: 'Same as Billing Address',
+                    intro: 'If the shipping address is the same as the billing address, click here to copy all fields instantly.'
+                },
+                {
+                    element: 'a[href="#bankDetails"]',
+                    title: 'Bank Details Tab',
+                    intro: 'Register and manage bank account info, IFSC codes, and UPI IDs for this customer.'
+                },
+                {
+                    element: '#addBankAccount',
+                    title: 'Manage Bank Accounts',
+                    intro: 'You can add up to 3 bank accounts for each customer using this button.'
+                },
+                {
+                    element: '#nxtBtnVThree',
+                    title: 'Save Customer',
+                    intro: 'After filling out all three sections, click this button to submit and save the customer details.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        });
+
+        tour.onbeforechange(function(targetElement) {
+            if (!targetElement) return;
+
+            // Find the closest tab-pane containing the target element
+            let tabPane = targetElement.closest('.tab-pane');
+            if (tabPane) {
+                let tabId = tabPane.getAttribute('id');
+                let tabTrigger = document.querySelector(`a[href="#${tabId}"]`);
+                if (tabTrigger && !tabTrigger.classList.contains('active')) {
+                    let tab = new bootstrap.Tab(tabTrigger);
+                    tab.show();
+                }
+            } else if (targetElement.getAttribute('href') && targetElement.getAttribute('data-bs-toggle') === 'tab') {
+                // If the target element is the tab trigger itself
+                let tab = new bootstrap.Tab(targetElement);
+                tab.show();
+            }
+        });
+
+        tour.start();
+    }
+
+    $(document).ready(function() {
+        $('#start-add-customer-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddCustomerTour();
+        });
+    });
 </script>
 @endsection

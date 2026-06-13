@@ -7,22 +7,25 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Purchase & Procurement</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Purchase Invoice List</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-purchase-invoice-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
                         <h2 class="mb-0">Purchase Invoice List</h2>
                     </div>
                 </div>
-				@if ($invoice_create_status == "true")
+				@if ($invoice_create_status == "true" && (Auth::user()->u_type == 2 || Auth::user()->u_type == 5))
                 <div class="col-md-8 text-end">
-                    <a href="{{ route('user.CreatePurchaseInvoices') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Purchase Invoice</a>
+                    <a href="{{ route('user.CreatePurchaseInvoices') }}" id="add-purchase-invoice-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Purchase Invoice</a>
                 </div>
 				@endif
             </div>
@@ -54,6 +57,7 @@
                                 <th>Invoice Date</th>
                                 <th>Transation Type</th>
                                 <th>Grand Total</th>
+                                <th>Due</th>
                                 <th>Payment Status</th>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -84,13 +88,14 @@
                                     </span>
                                 </td>
                                 <td><span class="text-muted text-hover-primary">₹{{ $sale->grandTotal }}</span></td>
+                                <td><span class="text-muted text-hover-primary">₹{{ $sale->due_amount ?? 0 }}</span></td>
                                 <td>
                                     @if ($sale->pay_status == 'Full')
                                     <span class="badge bg-success">Full</span>
                                     @elseif ($sale->pay_status == 'Partial')
                                     <span class="badge bg-warning text-dark">Advance</span>                                    
                                     @else
-                                    <span class="badge bg-secondary">Incomplete</span>
+                                    <span class="badge bg-secondary">Due</span>
                                     @endif
                                 </td>
 								<td>
@@ -177,8 +182,52 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('page-script')
 <script>
+    function startPurchaseInvoiceTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Purchase Invoices Directory',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-receipt" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Review and manage incoming purchase invoices received from your suppliers and vendors.</p></div>'
+                },
+                {
+                    element: '#add-purchase-invoice-btn',
+                    title: 'New Purchase Invoice',
+                    intro: 'Click here to log a new purchase invoice details, billing lines, and set payment states.'
+                },
+                {
+                    element: '#pc-dt-simple',
+                    title: 'Invoices Listing',
+                    intro: 'Browse history logs of vendor bills, displaying dates, reference codes, totals, and payment status badges.'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Action Controls',
+                    intro: 'Generate PDF summaries, view detailed invoice layouts, edit fields (if allowed), or delete records.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            skipIfNoElement: true,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
     $(document).ready(function () {
+        $('#start-purchase-invoice-tour').on('click', function(e) {
+            e.preventDefault();
+            startPurchaseInvoiceTour();
+        });
         let deleteId = null; // Store the ID of the customer to be deleted
 
         // Capture the customer ID when the delete button is clicked

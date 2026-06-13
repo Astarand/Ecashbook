@@ -123,77 +123,75 @@ class PoController extends Controller
         }
     }
 	
+	private function buildPoPrefix($raw, $financialYear, $companyName)
+	{
+		$parts = explode('/', trim($raw, '/'));
+
+		// remove FY if exists
+		$parts = array_values(array_filter($parts, function ($p) {
+			return !preg_match('/^\d{2}-\d{2}$/', $p);
+		}));
+
+		$companyCode = $parts[0] ?? strtoupper(substr($companyName, 0, 3));
+		$seriesType  = $parts[1] ?? 'PO';
+
+		return $companyCode . '/' . $financialYear . '/' . $seriesType . '/';
+	}
+	
 	public function create_po_invoice_number($userId)
 	{
-		// Check company profile
 		$this->companyInfoFill($userId);
 
-		// Fetch company settings
 		$company = DB::table('company_profiles')
 			->where('userId', $userId)
 			->first(['comp_name', 'comp_po_digits']);
 
-		if (!$company) {
-			return false;
-		}
+		if (!$company) return false;
 
-		/* ===============================
-		   1. FINANCIAL YEAR (APR–MAR)
-		=============================== */
-
-		$month = date('n');
+		/* FY */
 		$year  = date('Y');
+		$month = date('n');
 
-		if ($month >= 4) {
-			$startYear = substr($year, 2);
-			$endYear   = substr($year + 1, 2);
+		$fyStart = substr($month >= 4 ? $year : $year - 1, 2);
+		$fyEnd   = substr($month >= 4 ? $year + 1 : $year, 2);
+
+		$financialYear = $fyStart . '-' . $fyEnd;
+
+		/* PREFIX */
+		$prefix = !empty($company->comp_po_digits)
+			? $this->buildPoPrefix($company->comp_po_digits, $financialYear, $company->comp_name)
+			: strtoupper(substr($company->comp_name, 0, 3)) . '/' . $financialYear . '/PO/';
+
+		/* LAST SAFE NUMBER */
+		$last = DB::table('puos')
+			->where('added_by', $userId)
+			->where('inv_num', 'like', $prefix . '%')
+			->orderBy('id', 'desc')
+			->value('inv_num');
+
+		$next = 1;
+
+		if ($last) {
+			$parts = explode('/', $last);
+			$lastNum = end($parts);
+
+			if (preg_match('/^\d+$/', $lastNum)) {
+				$next = ((int)$lastNum) + 1;
+			}
 		} else {
-			$startYear = substr($year - 1, 2);
-			$endYear   = substr($year, 2);
-		}
 
-		$financialYear = $startYear . '-' . $endYear;
+			// config fallback
+			if (!empty($company->comp_po_digits)) {
+				$parts = explode('/', trim($company->comp_po_digits, '/'));
+				$lastPart = end($parts);
 
-
-		/* ===============================
-		   2. PREFIX GENERATION
-		=============================== */
-
-		if (!empty($company->comp_po_digits)) {
-
-			// Example stored: BIN/PO
-			$basePrefix = trim($company->comp_po_digits, '/');
-			$parts = explode('/', $basePrefix);
-
-			// Remove existing financial year if present
-			foreach ($parts as $key => $part) {
-				if (preg_match('/^\d{2}-\d{2}$/', $part)) {
-					unset($parts[$key]);
+				if (preg_match('/^\d+$/', $lastPart)) {
+					$next = ((int)$lastPart) + 1;
 				}
 			}
-
-			$parts = array_values($parts);
-
-			$companyCode = $parts[0] ?? strtoupper(substr($company->comp_name, 0, 3));
-			$seriesType  = $parts[1] ?? 'PO';
-
-		} else {
-
-			$companyCode = strtoupper(substr($company->comp_name, 0, 3));
-			$seriesType  = 'PO';
 		}
 
-		$finalPrefix = $companyCode . '/' . $financialYear . '/' . $seriesType . '/';
-
-		$lastIncrement = DB::table('puos')
-			->where('added_by', $userId)
-			//->where('inv_num', 'like', $finalPrefix . '%')
-			->select(DB::raw("MAX(CAST(SUBSTRING_INDEX(inv_num,'/',-1) AS UNSIGNED)) as max_num"))
-			->value('max_num');
-
-		$nextIncrement = $lastIncrement ? $lastIncrement + 1 : 1;
-		$increment = str_pad($nextIncrement, 4, '0', STR_PAD_LEFT);
-		return $finalPrefix . $increment;
+		return $prefix . str_pad($next, 4, '0', STR_PAD_LEFT);
 	}
 	
 	public function create_po_invoice_number_proprietorship($id, $userId)
@@ -202,65 +200,53 @@ class PoController extends Controller
 			->where('id', $id)
 			->first(['comp_name', 'comp_po_digits']);
 
-		if (!$company) {
-			return false;
-		}
+		if (!$company) return false;
 
-		$month = date('n');
+		/* FY */
 		$year  = date('Y');
+		$month = date('n');
 
-		if ($month >= 4) {
-			$startYear = substr($year, 2);
-			$endYear   = substr($year + 1, 2);
+		$fyStart = substr($month >= 4 ? $year : $year - 1, 2);
+		$fyEnd   = substr($month >= 4 ? $year + 1 : $year, 2);
+
+		$financialYear = $fyStart . '-' . $fyEnd;
+
+		/* PREFIX */
+		$prefix = !empty($company->comp_po_digits)
+			? $this->buildPoPrefix($company->comp_po_digits, $financialYear, $company->comp_name)
+			: strtoupper(substr($company->comp_name, 0, 3)) . '/' . $financialYear . '/PO/';
+
+		/* LAST SAFE NUMBER */
+		$last = DB::table('puos')
+			->where('added_by', $userId)
+			->where('propId', $id)
+			->where('inv_num', 'like', $prefix . '%')
+			->orderBy('id', 'desc')
+			->value('inv_num');
+
+		$next = 1;
+
+		if ($last) {
+			$parts = explode('/', $last);
+			$lastNum = end($parts);
+
+			if (preg_match('/^\d+$/', $lastNum)) {
+				$next = ((int)$lastNum) + 1;
+			}
 		} else {
-			$startYear = substr($year - 1, 2);
-			$endYear   = substr($year, 2);
-		}
 
-		$financialYear = $startYear . '-' . $endYear;
+			if (!empty($company->comp_po_digits)) {
+				$parts = explode('/', trim($company->comp_po_digits, '/'));
+				$lastPart = end($parts);
 
-
-		/* ===============================
-		   2. PREFIX GENERATION
-		=============================== */
-
-		if (!empty($company->comp_po_digits)) {
-
-			// Example stored: BIN/PO
-			$basePrefix = trim($company->comp_po_digits, '/');
-			$parts = explode('/', $basePrefix);
-
-			// Remove existing financial year if present
-			foreach ($parts as $key => $part) {
-				if (preg_match('/^\d{2}-\d{2}$/', $part)) {
-					unset($parts[$key]);
+				if (preg_match('/^\d+$/', $lastPart)) {
+					$next = ((int)$lastPart) + 1;
 				}
 			}
-
-			$parts = array_values($parts);
-
-			$companyCode = $parts[0] ?? strtoupper(substr($company->comp_name, 0, 3));
-			$seriesType  = $parts[1] ?? 'PO';
-
-		} else {
-
-			$companyCode = strtoupper(substr($company->comp_name, 0, 3));
-			$seriesType  = 'PO';
 		}
 
-		$finalPrefix = $companyCode . '/' . $financialYear . '/' . $seriesType . '/';
-
-		$lastIncrement = DB::table('puos')
-			->where('added_by', $userId)
-			//->where('inv_num', 'like', $finalPrefix . '%')
-			->select(DB::raw("MAX(CAST(SUBSTRING_INDEX(inv_num,'/',-1) AS UNSIGNED)) as max_num"))
-			->value('max_num');
-
-		$nextIncrement = $lastIncrement ? $lastIncrement + 1 : 1;
-		$increment = str_pad($nextIncrement, 4, '0', STR_PAD_LEFT);
-		return $finalPrefix . $increment;
+		return $prefix . str_pad($next, 4, '0', STR_PAD_LEFT);
 	}
-
 
     public function CreatePurchaseOrder()
     {

@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Redirect;
-use DB;
+// use DB;
 // use Auth;
-use Validator;
+// use Validator;
 use App\User;
 use App\Models\Loans;
 
@@ -32,6 +34,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Helpers\AuditLogger;
+use Illuminate\Support\Facades\Storage;
 
 class ContraController extends Controller
 {
@@ -187,17 +190,34 @@ class ContraController extends Controller
 
 	protected function validatorBank(array $data)
     {
-		//echo "<pre>"; print_r($data);exit;
-			return Validator::make($data, [
+		return Validator::make(
+			$data,
+			[
 				'bank_name' => 'required',
 				'bank_branch' => 'required',
 				'accholder_name' => 'required',
 				'bank_ac_no' => 'required',
 				'ifsc_code' => 'required',
-				'curr_bal' => 'required'
-			]);
+				'curr_bal' => 'required',
+				'bank_qr_code' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+			],
+			[
+				'bank_name.required' => 'Bank Name is required.',
+				'bank_branch.required' => 'Branch is required.',
+				'accholder_name.required' => 'Account Name is required.',
+				'bank_ac_no.required' => 'Account Number is required.',
+				'ifsc_code.required' => 'IFSC Code is required.',
+				'curr_bal.required' => 'Current Bank Balance is required.',
+				'bank_qr_code.required' => 'Please upload Bank QR Code.',
+				'bank_qr_code.image' => 'QR Code must be an image.',
+				'bank_qr_code.mimes' => 'Only JPG, JPEG, PNG and WEBP files are allowed.',
+				'bank_qr_code.max' => 'QR Code size must not exceed 2 MB.',
+			]
+		);
 
     }
+
+	
 
 	protected function createBank(array $data)
     {
@@ -215,84 +235,178 @@ class ContraController extends Controller
 			'swift_code' => $data['swift_code'],
 			'upi_id'  => $data['upi_id'],
 			'curr_bal' => $data['curr_bal'],
+			'bank_qr_code' => $data['bank_qr_code'] ?? '',
 			'created_at' => date('Y-m-d H:i:s'),
 			'status' => '1',
         ]);
     }
 
-	public function save_bank(Request $request)  {
+	// public function save_bank(Request $request)  {
 
-		//echo "<pre>";print_r($request->file('prod_image'));exit;
-		//$input = Input::all();
-		//dd($input);
-		$redirectUrl = !empty($request->redirectUrl) ? url('/' . $request->redirectUrl) : url('/bank-list');
+	// 	//echo "<pre>";print_r($request->file('prod_image'));exit;
+	// 	//$input = Input::all();
+	// 	//dd($input);
+	// 	$redirectUrl = !empty($request->redirectUrl) ? url('/' . $request->redirectUrl) : url('/bank-list');
+	// 	$validation = $this->validatorBank($request->all());
+    //     if ($validation->fails())  {
+    //         return response()->json($validation->errors()->toArray());
+    //     }
+    //     else{
+	// 		$insertBank = $this->createBank($request->all());
+	// 		$sId = DB::getPdo()->lastInsertId();
+
+	// 		if ($insertBank){
+	// 			$msg = array(
+	// 				'status' => 'success',
+	// 				'class' => 'succ',
+	// 				'redirect' => $redirectUrl,
+	// 				'message' => 'Bank account added successfully'
+	// 			);
+	// 			return response()->json($msg);
+	// 		}else{
+	// 			$msg = array(
+	// 				'status' => 'error',
+	// 				'class' => 'err',
+	// 				'redirect' => url('/'),
+	// 				'message' => 'Bank add failed'
+	// 			);
+	// 			return response()->json($msg);
+	// 		}
+	// 	}
+    // }
+
+	public function save_bank(Request $request)
+	{	
+		// echo "<pre>";print_r($request->all());exit;
+		$redirectUrl = !empty($request->redirectUrl)
+			? url('/' . $request->redirectUrl)
+			: url('/bank-list');
+
 		$validation = $this->validatorBank($request->all());
-        if ($validation->fails())  {
-            return response()->json($validation->errors()->toArray());
-        }
-        else{
-			$insertBank = $this->createBank($request->all());
-			$sId = DB::getPdo()->lastInsertId();
 
-			if ($insertBank){
-				$msg = array(
-					'status' => 'success',
-					'class' => 'succ',
-					'redirect' => $redirectUrl,
-					'message' => 'Bank account added successfully'
-				);
-				return response()->json($msg);
-			}else{
-				$msg = array(
-					'status' => 'error',
-					'class' => 'err',
-					'redirect' => url('/'),
-					'message' => 'Bank add failed'
-				);
-				return response()->json($msg);
-			}
+		if ($validation->fails()) {
+			return response()->json($validation->errors()->toArray());
 		}
-    }
 
+		$qrCodePath = '';
 
-	public function update_bank(Request $request)  {
+		if ($request->hasFile('bank_qr_code')) {
 
-		//echo "<pre>";print_r($_POST);exit;
-		$bankId = $request->id;
-		$propId = $request->propId ?? null;
-		$redirectUrl = !empty($request->redirectUrl) ? url('/' . $request->redirectUrl) : url('/bank-list');
-		
-		$validation = $this->validatorBank($request->all());
-        if ($validation->fails())  {
-            return response()->json($validation->errors()->toArray());
-        }
-        else{
-			//start update project
-			$update = DB::table('banks')
-					->where('id', $bankId)
-					->update(
-						array(
-							'propId' => $propId,
-							'bank_name' => $request->bank_name,
-							'bank_branch' => $request->bank_branch,
-							'accholder_name' => $request->accholder_name,
-							'bank_ac_no' => $request->bank_ac_no,
-							'ifsc_code' => $request->ifsc_code,
-							'swift_code' => $request->swift_code,
-							'upi_id'  => $request->upi_id,
-							'curr_bal' => $request->curr_bal
-						)
-					);
-			$msg = array(
+			$file = $request->file('bank_qr_code');
+
+			$qrCodePath = $file->store('bank_qr_code', 'public');
+
+			// Example:
+			// bank_qr_code/1717845214_qr.png
+		}
+
+		$data = $request->all();
+		$data['bank_qr_code'] = $qrCodePath;
+
+		$insertBank = $this->createBank($data);
+
+		if ($insertBank) {
+
+			return response()->json([
 				'status' => 'success',
 				'class' => 'succ',
 				'redirect' => $redirectUrl,
-				'message' => 'Record updated successfully'
-			);
-			return response()->json($msg);
+				'message' => 'Bank account added successfully'
+			]);
 
+		} else {
+
+			return response()->json([
+				'status' => 'error',
+				'class' => 'err',
+				'redirect' => url('/'),
+				'message' => 'Bank add failed'
+			]);
 		}
-    }
+	}
+
+
+	// public function update_bank(Request $request)  {
+
+	// 	//echo "<pre>";print_r($_POST);exit;
+	// 	$bankId = $request->id;
+	// 	$propId = $request->propId ?? null;
+	// 	$redirectUrl = !empty($request->redirectUrl) ? url('/' . $request->redirectUrl) : url('/bank-list');
+		
+	// 	$validation = $this->validatorBank($request->all());
+    //     if ($validation->fails())  {
+    //         return response()->json($validation->errors()->toArray());
+    //     }
+    //     else{
+	// 		//start update project
+	// 		$update = DB::table('banks')
+	// 				->where('id', $bankId)
+	// 				->update(
+	// 					array(
+	// 						'propId' => $propId,
+	// 						'bank_name' => $request->bank_name,
+	// 						'bank_branch' => $request->bank_branch,
+	// 						'accholder_name' => $request->accholder_name,
+	// 						'bank_ac_no' => $request->bank_ac_no,
+	// 						'ifsc_code' => $request->ifsc_code,
+	// 						'swift_code' => $request->swift_code,
+	// 						'upi_id'  => $request->upi_id,
+	// 						'curr_bal' => $request->curr_bal
+	// 					)
+	// 				);
+	// 		$msg = array(
+	// 			'status' => 'success',
+	// 			'class' => 'succ',
+	// 			'redirect' => $redirectUrl,
+	// 			'message' => 'Record updated successfully'
+	// 		);
+	// 		return response()->json($msg);
+
+	// 	}
+    // }
+
+	public function update_bank(Request $request)
+	{
+		$bank = Banks::findOrFail($request->id);
+		// $bankId = $request->id;
+		// $propId = $request->propId ?? null;
+		$redirectUrl = !empty($request->redirectUrl) ? url('/' . $request->redirectUrl) : url('/bank-list');
+
+		$updateData = [
+			'bank_name'      => $request->bank_name,
+			'bank_branch'    => $request->bank_branch,
+			'accholder_name' => $request->accholder_name,
+			'bank_ac_no'     => $request->bank_ac_no,
+			'ifsc_code'      => $request->ifsc_code,
+			'swift_code'     => $request->swift_code,
+			'upi_id'         => $request->upi_id,
+			'curr_bal'       => $request->curr_bal,
+		];
+
+		if ($request->hasFile('bank_qr_code')) {
+
+			// Delete old QR
+			if (!empty($bank->bank_qr_code) &&
+				Storage::disk('public')->exists($bank->bank_qr_code)) {
+
+				Storage::disk('public')->delete($bank->bank_qr_code);
+			}
+
+			// Upload new QR
+			$updateData['bank_qr_code'] =
+				$request->file('bank_qr_code')
+						->store('bank_qr_code', 'public');
+		}
+
+		$bank->update($updateData);
+
+		return response()->json([
+			'status' => 'success',
+			'class' => 'succ',
+			'redirect' => $redirectUrl,
+			'message' => 'Bank account updated successfully'
+		]);
+	}
 	
 	public function deleteBank($id)
 	{
@@ -1369,152 +1483,139 @@ class ContraController extends Controller
     }
 	//End loan section
 
-    public function CashManagement(Request $request)
-    {
-        $title = 'Cash Management';
+   
+	public function CashManagement(Request $request)
+	{
+		$title = 'Cash Management';
+
 		$userId = currentOwnerId();
 		checkCoreAccess('Cash & Banking');
 
 		$req_type = 0;
-		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {  // CA or CA Employee
+
+		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 			$userId = getAccessCompanyId($request);
 			$req_type = 1;
 		}
 
-		$format="Y";
-		$today = date('Y-m-d');
-		$date=date_create($today);
-		$financial_year = "";
-		if (date_format($date,"m") >= 4) {//On or After April (FY is current year - next year)
-			$financial_year = (date_format($date,$format)) . '-' . (date_format($date,$format)+1);
+		/* -------------------------------------------------
+			FINANCIAL YEAR
+		--------------------------------------------------*/
+		$year = date('Y');
+		$month = date('m');
+
+		if ($month >= 4) {
+			$startYear = $year;
+			$endYear = $year + 1;
 		} else {
-			//On or Before March (FY is previous year - current year)
-			$financial_year = (date_format($date,$format)-1) . '-' . date_format($date,$format);
+			$startYear = $year - 1;
+			$endYear = $year;
 		}
-		$financial_year = explode("-",$financial_year);
 
-		$financialStart = carbon::parse($financial_year[0]."-04-01");
-		$financialEnd = carbon::parse($financial_year[1]."-03-31");
-		$totalCredit =  DB::table('cash_credit_debits')
-							->select(DB::raw('SUM(cash_credit_debits.cd_amount) as totalCredit'))
-							->where('cash_credit_debits.cd_type','=',"cr")
-							->WhereBetween('cd_date', [$financialStart, $financialEnd])
-							->get();
-		$totalCredit = $totalCredit[0]->totalCredit;
+		$financialStart = Carbon::create($startYear, 4, 1);
+		$financialEnd   = Carbon::create($endYear, 3, 31);
 
-		$totalDebit =  DB::table('cash_credit_debits')
-							->select(DB::raw('SUM(cash_credit_debits.cd_amount) as totalDebit'))
-							->where('cash_credit_debits.cd_type','=',"dr")
-							->WhereBetween('cd_date', [$financialStart, $financialEnd])
-							->get();
-		$totalDebit = $totalDebit[0]->totalDebit;
-		
-		$cashInHandData = 0;
-		$cashInHandDate = "";
-		$cashAsOnDate = "";
+		/* -------------------------------------------------
+			CASH CREDIT / DEBIT (FY TOTALS)
+		--------------------------------------------------*/
+		$totalCredit = DB::table('cash_credit_debits')
+			->where('cd_type', 'cr')
+			->whereBetween('cd_date', [$financialStart, $financialEnd])
+			->sum('cd_amount');
 
-		if(Auth::user()->u_type ==2 || Auth::user()->u_type ==5){ //user
-			$proprietorships = DB::table('proprietorship_profiles')
-						->select('id','comp_name')
-						->where('userId',$userId)
-						->get();
-			$cash_trans_data = DB::table('mcash_credit_debits as m')
-							->leftJoin('company_profiles as cp', 'm.added_by', '=', 'cp.userId')
-							->leftJoin('proprietorship_profiles as pp', 'pp.userId', '=', 'm.added_by')
+		$totalDebit = DB::table('cash_credit_debits')
+			->where('cd_type', 'dr')
+			->whereBetween('cd_date', [$financialStart, $financialEnd])
+			->sum('cd_amount');
+
+		/* -------------------------------------------------
+			CASH TRANSACTIONS (NO DUPLICATES SAFE QUERY)
+		--------------------------------------------------*/
+		$cash_trans_data = DB::table('mcash_credit_debits as m')
+							->leftJoin('company_profiles as cp', function ($join) {
+								$join->on('m.added_by', '=', 'cp.userId')
+									 ->whereRaw('cp.id = (select max(id) from company_profiles where userId = m.added_by)');
+							})
+							->leftJoin('proprietorship_profiles as pp', function ($join) {
+								$join->on('m.propId', '=', 'pp.id');
+							})
 							->select(
 								'm.*',
-								DB::raw("
-									CASE
-										WHEN m.propId IS NOT NULL AND m.propId != ''
-										THEN pp.comp_name
-										ELSE cp.comp_name
-									END as comp_name
-								")
+								DB::raw('COALESCE(pp.comp_name, cp.comp_name) as comp_name')
 							)
 							->where('m.added_by', $userId)
 							->orderBy('m.cd_date', 'DESC')
 							->paginate(10);
 
-			$cashAsOnDate =  DB::table('mcash_credit_debits')
-							->select(DB::raw('mcash_credit_debits.cd_date'))
-							->where('mcash_credit_debits.added_by', '=', $userId)
-							->orderBy('mcash_credit_debits.cd_date', 'DESC')
-							->get();
-			$cashInHand =  DB::table('cash_hands')
-							->select(DB::raw('cash_hands.amount_in_hand,cash_hands.updated_at'))
-							->where('cash_hands.added_by', '=', $userId)
-							->get();
-			$cashInHandData = (isset($cashInHand) && (count($cashInHand)>0))?$cashInHand[0]->amount_in_hand:0;
-			$cashInHandDate = (isset($cashInHand) && (count($cashInHand)>0))? date("d-m-Y",strtotime($cashInHand[0]->updated_at)):"";
-			$cashAsOnDate = (isset($cashAsOnDate) && (count($cashAsOnDate)>0))? date("d-m-Y",strtotime($cashAsOnDate[0]->cd_date)):"";
+		/* -------------------------------------------------
+			CASH IN HAND
+		--------------------------------------------------*/
+		$cashInHandRow = DB::table('cash_hands')
+			->where('added_by', $userId)
+			->first();
 
-			$total_credit_raw = $cash_trans_data->where('cd_type', 'cr')->sum('cd_amount');
-			$total_debit_raw = $cash_trans_data->where('cd_type', 'dr')->sum('cd_amount');
-			$total_cash_hand_raw = $total_credit_raw - $total_debit_raw;
+		$cashInHandData = $cashInHandRow->amount_in_hand ?? 0;
+		$cashInHandDate = $cashInHandRow
+			? Carbon::parse($cashInHandRow->updated_at)->format('d-m-Y')
+			: '';
 
-			$total_credit = number_format($total_credit_raw ?? 0, 2);
-			$total_debit = number_format($total_debit_raw ?? 0, 2);
-			$total_cash_hand = number_format($total_cash_hand_raw ?? 0, 2);
+		$cashAsOnDateRow = DB::table('mcash_credit_debits')
+			->where('added_by', $userId)
+			->orderByDesc('cd_date')
+			->first();
 
+		$cashAsOnDate = $cashAsOnDateRow
+			? Carbon::parse($cashAsOnDateRow->cd_date)->format('d-m-Y')
+			: '';
 
-		}else if(Auth::user()->u_type ==1 || Auth::user()->u_type ==4){
-			$proprietorships = DB::table('proprietorship_profiles')
-						->select('id','comp_name')
-						->where('userId',$userId)
-						->get();
-			$cash_trans_data = DB::table('mcash_credit_debits as m')
-							->leftJoin('company_profiles as cp', 'm.added_by', '=', 'cp.userId')
-							->leftJoin('proprietorship_profiles as pp', 'pp.userId', '=', 'm.added_by')
-							->select(
-								'm.*',
-								DB::raw("
-									CASE
-										WHEN m.propId IS NOT NULL AND m.propId != ''
-										THEN pp.comp_name
-										ELSE cp.comp_name
-									END as comp_name
-								")
-							)
-							->where('m.added_by', $userId)
-							->orderBy('m.cd_date', 'DESC')
-							->paginate(10);
+		/* -------------------------------------------------
+			CORRECT TOTALS (NO PAGINATION DEPENDENCY)
+		--------------------------------------------------*/
+		$total_credit_raw = DB::table('mcash_credit_debits')
+			->where('added_by', $userId)
+			->where('cd_type', 'cr')
+			->sum('cd_amount');
 
-			$cashAsOnDate =  DB::table('mcash_credit_debits')
-							->select(DB::raw('mcash_credit_debits.cd_date'))
-							->where('mcash_credit_debits.added_by', '=', $userId)
-							->orderBy('mcash_credit_debits.cd_date', 'DESC')
-							->get();
-			$cashInHand =  DB::table('cash_hands')
-							->select(DB::raw('cash_hands.amount_in_hand,cash_hands.updated_at'))
-							->where('cash_hands.added_by', '=', $userId)
-							->get();
-			$cashInHandData = (isset($cashInHand) && (count($cashInHand)>0))?$cashInHand[0]->amount_in_hand:0;
-			$cashInHandDate = (isset($cashInHand) && (count($cashInHand)>0))? date("d-m-Y",strtotime($cashInHand[0]->updated_at)):"";
-			$cashAsOnDate = (isset($cashAsOnDate) && (count($cashAsOnDate)>0))? date("d-m-Y",strtotime($cashAsOnDate[0]->cd_date)):"";
+		$total_debit_raw = DB::table('mcash_credit_debits')
+			->where('added_by', $userId)
+			->where('cd_type', 'dr')
+			->sum('cd_amount');
 
-			$total_credit_raw = $cash_trans_data->where('cd_type', 'cr')->sum('cd_amount');
-			$total_debit_raw = $cash_trans_data->where('cd_type', 'dr')->sum('cd_amount');
-			$total_cash_hand_raw = $total_credit_raw - $total_debit_raw;
+		$total_cash_hand_raw = $total_credit_raw - $total_debit_raw;
 
-			$total_credit = number_format($total_credit_raw ?? 0, 2);
-			$total_debit = number_format($total_debit_raw ?? 0, 2);
-			$total_cash_hand = number_format($total_cash_hand_raw ?? 0, 2);
-		}
-		
-		return view('User.cash-management')->with([
-			'totalCredit' => $totalCredit,
-			'totalDebit' => $totalDebit,
-			'cashInHand' => $cashInHandData,
-			'cashInHandDate' => $cashInHandDate,
-			'cashAsOnDate' => $cashAsOnDate,
-			'cash_trans_data' => $cash_trans_data,
-			'proprietorships' => $proprietorships,
-			'total_debit' => $total_debit,
-			'total_credit' => $total_credit,
-			'cash_in_hand' => $total_cash_hand,
-			'req_type' => $req_type
-		]);
-    }
+		$total_credit = number_format($total_credit_raw, 2);
+		$total_debit = number_format($total_debit_raw, 2);
+		$total_cash_hand = number_format($total_cash_hand_raw, 2);
+
+		/* -------------------------------------------------
+			PROPRIETORSHIP LIST
+		--------------------------------------------------*/
+		$proprietorships = DB::table('proprietorship_profiles')
+			->select('id', 'comp_name')
+			->where('userId', $userId)
+			->get();
+			
+		$cash_in_hand = $total_cash_hand;
+
+		/* -------------------------------------------------
+			RETURN VIEW
+		--------------------------------------------------*/
+		return view('User.cash-management', compact(
+			'title',
+			'cash_trans_data',
+			'totalCredit',
+			'totalDebit',
+			'cashInHandData',
+			'cashInHandDate',
+			'cashAsOnDate',
+			'total_credit',
+			'total_debit',
+			'total_cash_hand',
+			'cash_in_hand',
+			'proprietorships',
+			'req_type'
+		));
+	}
 
 	protected function validatorCash(array $data)
     {
@@ -2298,8 +2399,7 @@ class ContraController extends Controller
 
 		$data = $query
 			->orderBy('payment_vouchers.id', 'DESC')
-			->paginate(10)
-			->appends($request->all());
+			->get();
 
 		return view('User.payment-voucher-list', compact('data','proprietorships','banks', 'req_type'));
 	}

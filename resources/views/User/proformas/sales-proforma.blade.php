@@ -23,14 +23,17 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Sales & Revenue</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/proform-invoice') }}">Proforma Invoice</a></li>
-                        <li class="breadcrumb-item" aria-current="page">Proforma Invoice List</li>
+                        <li class="breadcrumb-item active" aria-current="page">Proforma Invoice List</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-sales-proforma-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
@@ -38,7 +41,7 @@
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
-                    <a href="{{ route('user.CreateProformaInvoice') }}" class="btn btn-primary">
+                    <a href="{{ route('user.CreateProformaInvoice') }}" id="add-proforma-btn" class="btn btn-primary">
                         <i class="ti ti-square-plus"></i> Add New Proforma Invoice
                     </a>
                 </div>
@@ -239,8 +242,53 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('page-script')
 <script>
+    function startSalesProformaTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Proforma Invoices',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-file-analytics" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage proforma invoices, draft agreements, payment totals, and client acceptances.</p></div>'
+                },
+                {
+                    element: '#add-proforma-btn',
+                    title: 'New Proforma',
+                    intro: 'Click here to draft a new proforma invoice specifying goods, payment schedules, and tax rules.'
+                },
+                {
+                    element: '.table-responsive',
+                    title: 'Proforma Registry',
+                    intro: 'Review all issued proforma invoices, customer links, advance payment states, and totals.'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Actions',
+                    intro: 'View/download PDFs, change active status, edit properties, or delete records.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            skipIfNoElement: true,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-sales-proforma-tour').on('click', function(e) {
+            e.preventDefault();
+            startSalesProformaTour();
+        });
+    });
 
 
 	$(document).on('click', '.status-btn', function () {

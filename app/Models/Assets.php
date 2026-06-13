@@ -56,6 +56,7 @@ class Assets extends Model
 		'depreciation_rate',
 		'residual_value',
 		'depreciation_value',
+		'net_book_value',
 
 		// ================= CWIP =================
 		'project_name',

@@ -8,9 +8,8 @@
             <div class="row align-items-center">
                 <div class="col-md-12">
                     <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-												<li class="breadcrumb-item"><a href="#">Assets Management</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('user.AssetList') }}">Assets List</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/assets-list') }}">Assets</a></li>
                         <li class="breadcrumb-item" aria-current="page">View Asset</li>
                     </ul>
                 </div>
@@ -49,7 +48,7 @@
                 </div>
                 <div class="col-lg-7 col-xxl-9">
 					
-                    <form data-route="{{ route('user.UpdateAsset', $assetId) }}" name="addAssetFrm" id="addAssetFrm" enctype="multipart/form-data">
+                    <form  name="addAssetFrm" id="addAssetFrm" enctype="multipart/form-data">
                         @csrf
 						<div class="message-container"></div>
                         <div class="tab-content" id="company-profile-set-tabContent">
@@ -201,9 +200,8 @@
 
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Invoice Date</label>
-													<input type="date" name="invoice_date" value="{{ $asset->invoice_date ?? '' }}" class="form-control">
+                                                    <input type="date" name="invoice_date" id="invoice_date" value="{{ $asset->invoice_date ?? '' }}" class="form-control">
 												</div>
-
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Asset Amount Value<span class="text-danger">*</span></label>
 													<input type="number" name="invoice_value" id="invoice_value" value="{{ $asset->invoice_value ?? '' }}" class="form-control">
@@ -265,35 +263,46 @@
 												</div>
 
 												<div class="col-xl-4 mb-3">
-													<label class="form-label">Depreciation Frequency</label>
-													<select name="depreciation_frequency" id="depreciation_frequency" class="form-select">
-														<option value="">Select</option>														
-														<option value="Yearly" {{ $asset->depreciation_frequency == 'Yearly' ? 'selected' : '' }}>Yearly</option>
+													<label class="form-label">Depreciation Method</label>
+													<select name="depreciation_method" id="depreciation_method" class="form-select">
+														<option value="">Select</option>
+														<option value="SLM" {{ $asset->depreciation_method == 'SLM' ? 'selected' : '' }}>Straight Line Method (SLM)</option>
+														<option value="WDV" {{ $asset->depreciation_method == 'WDV' ? 'selected' : '' }}>Written Down Value (WDV)</option>
 													</select>
 												</div>
 
 												<div class="col-xl-4 mb-3">
+													<label class="form-label">Depreciation Frequency</label>
+													<select name="depreciation_frequency" id="depreciation_frequency" class="form-select">
+														<option value="">Select</option>
+														<option value="Yearly" {{ $asset->depreciation_frequency == 'Yearly' ? 'selected' : '' }}>Yearly</option>
+														<option value="Half Year" {{ $asset->depreciation_frequency == 'Half Year' ? 'selected' : '' }}>180 days & Below</option>
+													</select>
+												</div>
+
+												<div class="col-xl-4 mb-3" id="usefulLifeDiv">
 													<label class="form-label">Useful Life (Years)</label>
 													<input type="number" name="useful_life_years" id="useful_life_years" value="{{ $asset->useful_life_years ?? '' }}" class="form-control">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Depreciation Method</label>
-													<select name="depreciation_method" id="depreciation_method" class="form-select">
-														<option value="">Select</option>
-														<option value="SLM" {{ $asset->depreciation_method == 'SLM' ? 'selected' : '' }}>Straight Line Method</option>
-														<option value="WDV" {{ $asset->depreciation_method == 'WDV' ? 'selected' : '' }}>Written Down Value</option>
-													</select>
-												</div>
-
-												<div class="col-xl-4 mb-3">
+												<div class="col-xl-4 mb-3" id="residualValueDiv">
 													<label class="form-label">Residual Value</label>
 													<input type="number" name="residual_value" id="residual_value"  value="{{ $asset->residual_value ?? '' }}" class="form-control">
 												</div>
-												
+
+												<div class="col-xl-4 mb-3" id="depreciationRateDiv" style="display:none;">
+													<label class="form-label">Depreciation Rate (%)</label>
+													<input type="number" name="depreciation_rate" id="depreciation_rate" value="{{ $asset->depreciation_rate ?? '' }}" class="form-control">
+												</div>
+
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Depreciation Value</label>
 													<input type="number" name="depreciation_value" id="depreciation_value" value="{{ $asset->depreciation_value ?? '' }}" class="form-control">
+												</div>
+
+												<div class="col-xl-4 mb-3">
+													<label class="form-label">Net Book Asset Value </label>
+													<input type="number" name="net_book_value" id="net_book_value" value="{{ $asset->net_book_value ?? '' }}" class="form-control">
 												</div>
                                                 
                                             </div>
@@ -425,7 +434,7 @@
 												<div class="col-md-4 mb-3">
 													<label>Amount</label>
 													<input type="number" name="cash_amount" class="form-control"
-														   value="{{ $asset->cash_amount ?? '' }}">
+														    value="{{ $asset->cash_amount ?? '' }}">
 												</div>
 												<div class="col-md-4 mb-3 d-flex align-items-end">
 													<a href="/cash-management" target="_blank" class="btn btn-primary">Details</a>
@@ -583,7 +592,7 @@
 												</div>
 											</div>
                                             <div class="tds-container col-md-12"  id="tdsContainer">
-                                                <div class="row">
+												<div class="row">
 													<div class="col-md-6">
 														<div id="tds_dropdown_universal">
 															<label for="tds_percent" class="form-label">TDS Percentage</label>
@@ -598,7 +607,7 @@
 													</div>
 													<div class="col-md-6">
 														<label for="tds_amt">TDS Amount</label>
-														<input type="text" id="tds_amt" value="{{$asset->tds_amt}}" class="form-control" readonly>
+														<input type="text"  id="tds_amt"  value="{{$asset->tds_amt}}" class="form-control" readonly>
 													</div>
 												</div>
                                             </div>
@@ -629,7 +638,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="row mb-3">
-                                                    <div class="col-md-4">
+													<div class="col-md-4">
                                                         <label for="gst_trans">GST Transaction Mode</label>
                                                         <select class="form-select" name="gst_trans" id="gst_trans">
                                                             <option value="">Select</option>
@@ -649,7 +658,7 @@
                                                     <div class="col-md-4">
                                                         <label for="gst_amt">Total GST Amount</label>
                                                         <input type="text" name="gst_amt" id="gst_amt" value="{{$asset->gst_amt}}" class="form-control" readonly>
-                                                    </div>
+                                                    </div>                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -799,9 +808,11 @@
                                                         <i class="ti ti-arrow-up-circle me-2"></i> Back To Previous
                                                     </a>
                                                 </div>
-                                                <div class="last">
-                                                    
-                                                </div>
+                                                {{-- <div class="last">
+                                                    <button type='submit' class="btn btn-primary d-flex align-items-center justify-content-center">
+                                                        Save Changes <i class="ti ti-arrow-up-right-circle ms-2"></i>
+                                                    </button>
+                                                </div> --}}
                                             </div>
                                         </div>
                                     </div>
@@ -818,18 +829,54 @@
 </div>
 <script>
 	var assetData = @json($asset);
-	
-	document.querySelectorAll('input, textarea').forEach(el => {
-		el.readOnly = true;
-	});
+	 
+	function resetHiddenFields() {
 
-	document.querySelectorAll('select').forEach(el => {
-		el.setAttribute('disabled', true); // keep select disabled if needed
-	});	
-	
-	document.querySelectorAll('input[type="radio"]').forEach(el => {
-		el.disabled = true;
-	});
+		let assetType     = $('#assetType').val();
+		let selectedValue = $('#currentAssetsType').val();
+
+		const sectionMap = {
+			'Cash in Hand': '#cashInHandSection',
+			'Bank Accounts': '#bankAccountSection',
+			'Trade Receivables': '#tradeReceivableSection',
+			'Advance to Vendor': '#advanceVendorSection',
+			'Employee Advance': '#employeeAdvanceSection',
+			'Prepaid Expenses': '#prepaidExpenseSection',
+			'Input GST Credit': '#itcSection',
+			'TDS Receivable': '#tdsReceivableSection',
+			'Inventories': '#inventorySection'
+		};
+
+		// ================= CURRENT ASSET LOGIC =================
+		if (assetType === 'current') {
+
+			// Clear non-selected current sections
+			Object.keys(sectionMap).forEach(function(key) {
+
+				if (key === selectedValue) return;
+
+				let section = sectionMap[key];
+
+				$(section).find('input[type="text"], input[type="date"], input[type="number"], textarea').val('');
+				$(section).find('select').prop('selectedIndex', 0);
+			});
+
+			//  ALSO clear non-current sections
+			$('#commonSection').find('input, select, textarea').val('').prop('selectedIndex', 0);
+			$('#WorkinProgressSection').find('input, select, textarea').val('').prop('selectedIndex', 0);
+		}
+
+		// ================= NON-CURRENT ASSET LOGIC =================
+		if (assetType === 'non-current') {
+
+			// ❌ Clear ALL current sections
+			Object.values(sectionMap).forEach(function(section) {
+
+				$(section).find('input[type="text"], input[type="date"], input[type="number"], textarea').val('');
+				$(section).find('select').prop('selectedIndex', 0);
+			});
+		}
+	}
 
    
     document.addEventListener("DOMContentLoaded", function() {
@@ -871,6 +918,7 @@
 		if (assetType == "current") {
 			$('#commonSection').hide();
 			$('#WorkinProgressSection').hide();
+			$('#nextBtn1').text('Submit');
 			// Disable other tabs
 			$('#gst-tds-tab, #documentation-tab, #audit-trail-tab')
 			.addClass('disabled-tab')
@@ -882,20 +930,21 @@
 		} else {
 			$('#commonSection').hide();
 			$('#WorkinProgressSection').hide();
+			$('#nextBtn1').html('Next <i class="ti ti-arrow-up-right-circle ms-2"></i>');
 			// Enable tabs
 			$('#gst-tds-tab, #documentation-tab, #audit-trail-tab')
 			.removeClass('disabled-tab')
 			.css({
 				'pointer-events': 'auto',
 				'opacity': '1'
-			});
+			});			
 		}
 	}
 	
-	// 🔥 Run on dropdown change
+	//  Run on dropdown change
 	document.getElementById("assetType").addEventListener("change", toggleAssetSections);
 
-	// 🔥 Run on page load
+	//  Run on page load
 	document.addEventListener("DOMContentLoaded", function () {
 		toggleAssetSections();
 	});
@@ -908,14 +957,38 @@
 		$('#currentAssetsSection').toggle(assetType === "current");
 		$('#nonCurrentAssetsSection').toggle(assetType === "non-current");
 
-		// ✅ RESET DROPDOWNS
+		// RESET DROPDOWNS
 		if (assetType === "current") {
 			$('#nonCurrentAssetsType').val('').trigger('change');
+			$('#nextBtn1').text('Submit');
+			// Disable other tabs
+			$('#gst-tds-tab, #documentation-tab, #audit-trail-tab')
+			.addClass('disabled-tab')
+			.css({
+				'pointer-events': 'none',
+				'opacity': '0.5'
+			});
 		} else if (assetType === "non-current") {
 			$('#currentAssetsType').val('').trigger('change');
+			$('#nextBtn1').html('Next <i class="ti ti-arrow-up-right-circle ms-2"></i>');
+			// Enable tabs
+			$('#gst-tds-tab, #documentation-tab, #audit-trail-tab')
+			.removeClass('disabled-tab')
+			.css({
+				'pointer-events': 'auto',
+				'opacity': '1'
+			});
 		} else {
 			$('#currentAssetsType').val('');
 			$('#nonCurrentAssetsType').val('');
+			$('#nextBtn1').html('Next <i class="ti ti-arrow-up-right-circle ms-2"></i>');
+			// Enable tabs
+			$('#gst-tds-tab, #documentation-tab, #audit-trail-tab')
+			.removeClass('disabled-tab')
+			.css({
+				'pointer-events': 'auto',
+				'opacity': '1'
+			});
 		}
 
 		//Hide all dependent sections
@@ -954,9 +1027,60 @@
 				event.preventDefault();
 
 				const currentTab = document.querySelector(".tab-pane.active");
-				const currentTabId = currentTab.getAttribute("id");				
+				const currentTabId = currentTab.getAttribute("id");
 
-				// ✅ NORMAL FLOW
+				const assetType = document.getElementById("assetType").value;
+
+				// ✅ CONDITION: First tab + current asset → submit
+				if (currentTabId === 'asset-information' && assetType === 'current') {
+					let form = $('#addAssetFrm')[0];
+					let formData = new FormData(form);
+					let formAction = $("#addAssetFrm").data("route");
+					resetHiddenFields();
+					$("#loader").show();
+					$.ajax({
+						url: formAction,
+						type: 'POST',
+						data: formData,
+						processData: false,
+						contentType: false,
+						beforeSend: function () {
+							$('.next-btn').prop('disabled', true).text('Submitting...');
+						},												
+						success: function(response) {
+							$("#loader").hide();
+							$('.next-btn').prop('disabled', false).text('Submit');
+							if (response.status === "success") {
+								showToast(response.message, "success");
+								setTimeout(() => {
+									window.location.href = response.redirect;
+								}, 2000);
+							} else {
+								if (typeof response === 'object' && response.message === undefined) {
+									let errorMessages = [];
+									for (let field in response) {
+										if (Array.isArray(response[field])) {
+											errorMessages.push(response[field][0]); // Get first error for each field
+										}
+									}
+									let combinedMessage = errorMessages.length > 0 ? errorMessages.join('\n') : "Validation error occurred.";
+									showToast(combinedMessage, "error");
+								} else {
+									showToast(response.message || "An error occurred.", "error");
+								}
+								console.error("Error Response:", response);
+							}
+						},
+						error: function(xhr, status, error) {
+							$("#loader").hide();
+							$('.next-btn').prop('disabled', false).text('Submit');
+							showToast("Something went wrong! Please try again.", "error");
+						}
+					});
+					return;
+				}
+
+				// NORMAL FLOW
 				const nextTab = currentTab.nextElementSibling;
 
 				if (nextTab && nextTab.classList.contains("tab-pane")) {
@@ -990,6 +1114,7 @@
 
     $(document).on("submit", "#addAssetFrm", function(e) {
         e.preventDefault();
+		resetHiddenFields();
 
         let date = $("#date").val().trim();
         let assetType = $("#assetType").val();
@@ -1097,38 +1222,57 @@
 	$('select[name="propId"]').on('change', function () {
 		loadCashInHand();
 	});
+	
 	//Bank Accounts
 	function loadBankAccounts(selectedBankId = null, selectedBalance = null) {
 
 		$.get('/bank-accounts', function (data) {
 
-			let html = '<option value="">Select</option>';
+			let html = '<option value="">All Banks</option>';
+			let totalBalance = 0;
 
 			data.forEach(row => {
 
+				let bal = parseFloat(row.curr_bal) || 0;
+				totalBalance += bal;
+
 				let selected = (row.id == selectedBankId) ? 'selected' : '';
 
-				html += `<option value="${row.id}" ${selected} data-balance="${row.curr_bal}">
+				html += `<option value="${row.id}" ${selected} data-balance="${bal}">
 							${row.bank_name}
 						 </option>`;
 			});
 
 			$('#bank_id').html(html);
 
-			// ✅ Set balance on first load
 			if (selectedBankId) {
-
 				let balance = $('#bank_id option:selected').data('balance');
-
-				// If DB value exists → use it, else use dropdown balance
-				$('#bank_balance').val(selectedBalance ?? balance);
+				$('#bank_balance').val(
+					(selectedBalance ?? balance ?? 0).toFixed(2)
+				);
+			} else {
+				$('#bank_balance').val(totalBalance.toFixed(2));
 			}
 		});
 	}
 
 	$('#bank_id').on('change', function () {
-		let balance = $(this).find(':selected').data('balance');
-		$('#bank_balance').val(balance);
+
+		let selected = $(this).val();
+		if (selected === "") {
+			let total = 0;
+
+			$('#bank_id option').each(function () {
+				let bal = parseFloat($(this).data('balance')) || 0;
+				total += bal;
+			});
+
+			$('#bank_balance').val(total.toFixed(2));
+
+		} else {
+			let balance = $(this).find(':selected').data('balance') || 0;
+			$('#bank_balance').val(parseFloat(balance).toFixed(2));
+		}
 	});
 	
 	//Trade Receivable
@@ -1321,8 +1465,21 @@
 
 		function handlePaymentLogic(prefix, amountField) {
 
+			let isInitialLoad = true;
+
+			// correct ID generator
 			function getId(name) {
 				return prefix ? `#${prefix}_${name}` : `#${name}`;
+			}
+
+			function resetFields() {
+				$(`${getId('advance_amt')}, ${getId('payable_amt')}, ${getId('adjusted_amt')}`)
+					.val('')
+					.prop({ readonly: true, required: false });
+
+				$(getId('advance_amt')).closest('.col-xl-4').hide();
+				$(getId('payable_amt')).closest('.col-xl-4').hide();
+				$(getId('adjusted_amt')).closest('.col-xl-4').hide();
 			}
 
 			function calculate() {
@@ -1332,18 +1489,17 @@
 				let adjusted = parseFloat($(getId('adjusted_amt')).val()) || 0;
 				let status   = $(getId('pay_status')).val();
 
-				// Hide all first
-				$(getId('advance_amt')).closest('.col-xl-4').hide();
-				$(getId('payable_amt')).closest('.col-xl-4').hide();
-				$(getId('adjusted_amt')).closest('.col-xl-4').hide();
-
 				// ================= FULL =================
 				if (status === 'Full') {
 
 					$(getId('adjusted_amt')).closest('.col-xl-4').show();
+					$(getId('advance_amt')).closest('.col-xl-4').hide();
+					$(getId('payable_amt')).closest('.col-xl-4').hide();
 
-					// Force correct values
-					$(getId('adjusted_amt')).val(amount);
+					$(getId('adjusted_amt'))
+						.val(amount)
+						.prop({ readonly: true, required: true });
+
 					$(getId('advance_amt')).val(0);
 					$(getId('payable_amt')).val(0);
 				}
@@ -1355,27 +1511,64 @@
 					$(getId('payable_amt')).closest('.col-xl-4').show();
 					$(getId('adjusted_amt')).closest('.col-xl-4').show();
 
-					// If DB has value → use it, else fallback
-					if (!adjusted || adjusted == 0) {
+					$(getId('advance_amt')).prop({ readonly: false, required: true });
+					$(getId('adjusted_amt')).prop({ readonly: false, required: true });
+					$(getId('payable_amt')).prop({ readonly: true, required: true });
+
+					if (advance > amount) {
+						advance = amount;
+						$(getId('advance_amt')).val(amount);
+						alert('Advance cannot exceed total amount');
+					}
+
+					if (adjusted > advance) {
 						adjusted = advance;
+						$(getId('adjusted_amt')).val(advance);
+						alert('Adjusted cannot exceed Advance Amount');
 					}
 
 					let payable = amount - advance;
 
-					// Force display values
-					$(getId('adjusted_amt')).val(adjusted);
-					$(getId('payable_amt')).val(payable.toFixed(2));
+					$(getId('payable_amt'))
+						.val(payable.toFixed(2))
+						.prop('readonly', true);
 				}
+
+				// ================= DEFAULT =================
+				else {
+					resetFields();
+				}
+
+				isInitialLoad = false;
 			}
 
-			// RUN ONLY ON LOAD (no events needed in view)
+			// ================= EVENTS =================
+			$(getId('pay_status')).on('change', function () {
+				resetFields();
+				calculate();
+			});
+
+			$(amountField).on('input', calculate);
+
+			$(getId('advance_amt')).on('input', function () {
+				$(getId('adjusted_amt')).val($(this).val());
+				calculate();
+			});
+
+			$(getId('adjusted_amt')).on('input', calculate);
+
+			// ================= INIT (EDIT MODE FIX) =================
+			if (!$(getId('pay_status')).val()) {
+				resetFields();
+			}
+
 			calculate();
 		}
 
-		// ================= NORMAL ASSET =================
+		// NORMAL ASSET
 		handlePaymentLogic('', '#invoice_value');
 
-		// ================= CWIP =================
+		// CWIP
 		handlePaymentLogic('cwip', '#cwip_amount');
 
 	});
@@ -1534,6 +1727,210 @@
 		}
 	}
 	
+	$('#assetType, #nonCurrentAssetsType, #invoice_value, input[name="cwip_amount"], #gst_rate, #gst_trans')
+	.on('change keyup', function () {
+		calculateGST();
+	});
+	
+	// Depreciation calculation (Depreciation Value = (Asset Cost – Residual Value) ÷ Useful Life)
+
+	$(document).ready(function () {
+
+		// =========================
+		// SLM CALCULATION
+		// =========================
+		function calculateDepreciation() {
+
+			let cost = parseFloat($('#invoice_value').val()) || 0;
+			let residual = parseFloat($('#residual_value').val()) || 0;
+			let life = parseFloat($('#useful_life_years').val()) || 0;
+
+			if (cost > 0 && life > 0) {
+
+				if (residual > cost) {
+					alert('Residual value cannot be greater than Asset Amount Value');
+					$('#residual_value').val(cost);
+					residual = cost;
+				}
+
+				let depreciation = (cost - residual) / life;
+
+				$('#depreciation_value').val(depreciation.toFixed(2));
+
+			} else {
+				$('#depreciation_value').val('');
+			}
+		}
+
+		// =========================
+		// WDV CALCULATION
+		// =========================
+		function calculateWDV() {
+
+			let cost = parseFloat($('#invoice_value').val()) || 0;
+			let rate = parseFloat($('#depreciation_rate').val()) || 0;
+			let frequency = $('#depreciation_frequency').val();
+
+			if (cost <= 0 || rate <= 0) {
+				$('#depreciation_value').val('');
+				return;
+			}
+
+			// Half Year
+			if (frequency === 'Half Year') {
+
+				let invoiceDate = $('#invoice_date').val();
+				let depDate = $('#depreciation_start_date').val();
+				rate = 50; // Set rate to 50% for half-yearly
+				$('#depreciation_rate').val(50).prop('readonly', true);
+
+				if (invoiceDate && depDate) {
+
+					let invDate = new Date(invoiceDate);
+					let startDate = new Date(depDate);
+
+					let diffDays = Math.abs(startDate - invDate) / (1000 * 60 * 60 * 24);
+
+					// if (diffDays <= 180) {
+					// 	rate = rate / 2;
+					// }
+				}
+			}
+
+			let depreciation = (cost * rate) / 100;
+			// let closingWDV = cost - depreciation;
+
+			// $('#depreciation_value').val(closingWDV.toFixed(2));
+
+
+			let netBookValue = cost - depreciation;
+			$('#depreciation_value').val(depreciation.toFixed(2));
+			$('#net_book_value').val(netBookValue.toFixed(2));
+		}
+
+		// =========================
+		// TOGGLE FIELDS
+		// =========================
+		function toggleDepreciationFields() {
+
+			let method = $('#depreciation_method').val();
+
+			if (method === 'WDV') {
+
+				$('#depreciationRateDiv').show();
+				$('#residualValueDiv').hide();
+				$('#usefulLifeDiv').hide();
+				$('#depreciation_rate').prop('readonly', false);
+				$('#residual_value').val('');
+				$('#useful_life_years').val('');
+
+				if ($('#depreciation_frequency option[value="Half Year"]').length === 0) {
+					$('#depreciation_frequency').append(
+						'<option value="Half Year">180 days & Below</option>'
+					);
+				}
+
+				calculateWDV();
+			}
+
+			else if (method === 'SLM') {
+
+				$('#depreciationRateDiv').hide();
+				$('#residualValueDiv').show();
+				$('#usefulLifeDiv').show();
+
+				$('#depreciation_frequency option[value="Half Year"]').remove();
+
+				if ($('#depreciation_frequency').val() === 'Half Year') {
+					$('#depreciation_frequency').val('');
+				}
+
+				calculateDepreciation();
+			}
+
+			else {
+
+				$('#depreciationRateDiv').hide();
+				$('#residualValueDiv').show();
+				$('#usefulLifeDiv').show();
+
+				$('#depreciation_value').val('');
+			}
+		}
+
+		// =========================
+		// METHOD CHANGE
+		// =========================
+		$('#depreciation_method').on('change', function () {
+			toggleDepreciationFields();
+		});
+
+		// =========================
+		// SLM EVENTS
+		// =========================
+		$('#invoice_value, #residual_value, #useful_life_years')
+			.on('input', function () {
+
+				if ($('#depreciation_method').val() === 'SLM') {
+					calculateDepreciation();
+				}
+			});
+
+		// =========================
+		// WDV EVENTS
+		// =========================
+		$('#invoice_value, #depreciation_rate')
+			.on('input', function () {
+
+				if ($('#depreciation_method').val() === 'WDV') {
+					calculateWDV();
+				}
+			});
+
+		$('#depreciation_frequency, #invoice_date, #depreciation_start_date')
+			.on('change', function () {
+
+				if ($('#depreciation_method').val() === 'WDV') {
+					calculateWDV();
+				}
+			});
+
+		// =========================
+		// PAGE LOAD
+		// =========================
+		toggleDepreciationFields();
+
+		$('#depreciation_frequency').on('change', function () {
+
+			if ($(this).val() === 'Half Year') {
+
+				$('#depreciation_rate')
+					.val(50)
+					.prop('readonly', true);
+
+			} else {
+
+				$('#depreciation_rate')
+					.prop('readonly', false);
+			}
+
+			calculateWDV();
+		});
+
+	});
+	
+	function allowDecimal(el) {
+		let val = el.value.replace(/[^0-9.]/g, '');
+		let parts = val.split('.');
+		if (parts.length > 2) {
+			val = parts[0] + '.' + parts.slice(1).join('');
+		}
+		el.value = val;
+	}
+
+	$('#invoice_value, #residual_value, #useful_life_years').on('input', function () {
+		allowDecimal(this);
+	});
 
 </script>
 @endsection

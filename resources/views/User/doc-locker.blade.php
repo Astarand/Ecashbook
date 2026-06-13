@@ -8,13 +8,16 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Secure Documents Locker</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-locker-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Secure Documents Locker</h2>
                     </div>
@@ -24,7 +27,7 @@
     </div>
     <!-- [ breadcrumb ] end -->
 		@if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
-			<div class="card alert {{ $lockerSecured ? 'alert-success' : 'alert-danger' }} p-0">
+			<div class="card alert {{ $lockerSecured ? 'alert-success' : 'alert-danger' }} p-0" id="locker-security-status">
 			<div class="card-body">
 				<div class="d-flex align-items-center">
 					<div class="flex-grow-1 me-3">
@@ -66,7 +69,7 @@
 						<div class="col-md-12">
 					<form name="uploadDocumentForm" id="uploadDocumentForm" action="javascript:void(0);" method="post" enctype="multipart/form-data" >
 					@csrf
-						<div class="card">
+						<div class="card" id="upload-doc-card">
 							<div class="card-header">
 								<h5>Upload New Document</h5>
 							</div>
@@ -114,7 +117,7 @@
 									<div class="col-md-6 d-flex flex-column justify-content-between">
 										<div class="mb-3 flex-grow-1 d-flex flex-column">
 											<label class="form-label">Upload Document <span class="text-danger">*</span></label>
-											<label class="upload-area flex-grow-1 d-flex flex-column align-items-center justify-content-center" for="document_file" style="min-height: 180px;">
+											<label class="upload-area flex-grow-1 d-flex flex-column align-items-center justify-content-center" for="document_file">
 												<i class="ti ti-cloud-upload text-muted mb-2" id="locker_file_icon" style="font-size: 2.2rem;"></i>
 												<span class="upload-text text-center px-3" id="locker_file_label" style="font-weight: 500;">
 													Drag & Drop or Click to Upload File
@@ -138,7 +141,7 @@
 				@endif
         <!-- Second Row - Documents List (Placeholder) -->
         <div class="col-md-12 mt-4">
-            <div class="card">
+            <div class="card" id="uploaded-docs-card">
                 <div class="card-header">
                     <h5>Uploaded Documents</h5>
                 </div>
@@ -182,7 +185,7 @@
 																			{{ !empty($doc->comp_name) ? 'Proprietorship ('.$doc->comp_name.')' : '' }}
 																		</span>
 																	</td>
-																	
+
 																	<td>
 																		{{ $doc->granted_to_name ?? 'Not Shared' }}
 																	</td>
@@ -311,7 +314,7 @@
                     <img src="../assets/images/application/img-accout-password-alert.png" alt="Security" class="img-fluid" style="max-width: 100px;">
                     <p class="text-muted mt-3">Create a secure 6-digit passcode to protect your documents</p>
                 </div>
-                
+
                 <form id="passcodeForm">
                     <div class="mb-4">
                         <label class="form-label">Enter 6-Digit Passcode <span class="text-danger">*</span></label>
@@ -359,7 +362,7 @@
                     <img src="../assets/images/application/img-accout-password-alert.png" alt="Security" class="img-fluid" style="max-width: 100px;">
                     <p class="text-muted mt-3">Enter Your  6-digit passcode to perform your action</p>
                 </div>
-                
+
                 <form id="passcodeForm2">
                     <div class="mb-4">
                         <label class="form-label">Enter 6-Digit Passcode <span class="text-danger">*</span></label>
@@ -454,7 +457,7 @@
                         </select>
                         <div class="invalid-feedback" id="error-ca_id"></div>
                     </div>
-					
+
 					<div class="mb-3">
 						<label class="form-label">Document Type <span class="text-danger">*</span></label>
 						<select class="form-select" id="documentType" name="documentType">
@@ -503,9 +506,10 @@
 </div>
 
 
+@endsection
 
 
-
+@section('page-script')
 <script>
 	// Toast Notification Function
 	function showToast(message, type = 'success') {
@@ -545,18 +549,18 @@
 	let currentDocumentId = null;
 	let fileExtension = null;
 	let fileUrl = null;
-	
+
 	$.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-	
+
 	$('#viewDocumentModal').on('hidden.bs.modal', function () {
 		$('#documentViewer').attr('src', '');
 	});
 
-	
+
 	// Wait for modal to be shown, then setup inputs
 	$('#passcodeModal').on('shown.bs.modal', function () {
 		// Focus on first input when modal opens
@@ -566,17 +570,17 @@
 	// Setup auto-focus for passcode inputs
 	$(document).on('input', '.passcode-input, .passcode-input-confirm', function(e) {
 		let $this = $(this);
-		
+
 		// Only allow numbers
 		let value = $this.val().replace(/[^0-9]/g, '');
 		$this.val(value);
-		
+
 		// If value entered, move to next input
 		if (value.length >= 1) {
 			// Get all inputs in the same group
 			let $inputs = $this.closest('.d-flex').find('input');
 			let currentIndex = $inputs.index($this);
-			
+
 			// Move to next input if available
 			if (currentIndex < $inputs.length - 1) {
 				$inputs.eq(currentIndex + 1).focus().select();
@@ -587,13 +591,13 @@
 	// Handle backspace
 	$(document).on('keydown', '.passcode-input, .passcode-input-confirm', function(e) {
 		let $this = $(this);
-		
+
 		if (e.key === 'Backspace' || e.keyCode === 8) {
 			if ($this.val().length === 0) {
 				// Get all inputs in the same group
 				let $inputs = $this.closest('.d-flex').find('input');
 				let currentIndex = $inputs.index($this);
-				
+
 				// Move to previous input if available
 				if (currentIndex > 0) {
 					$inputs.eq(currentIndex - 1).focus().select();
@@ -608,18 +612,18 @@
 		let $this = $(this);
 		let pasteData = e.originalEvent.clipboardData.getData('text');
 		let digits = pasteData.replace(/[^0-9]/g, '').split('');
-		
+
 		// Get all inputs in the same group
 		let $inputs = $this.closest('.d-flex').find('input');
 		let currentIndex = $inputs.index($this);
-		
+
 		// Fill inputs with pasted digits
 		digits.forEach(function(digit, i) {
 			if (currentIndex + i < $inputs.length) {
 				$inputs.eq(currentIndex + i).val(digit);
 			}
 		});
-		
+
 		// Focus on next empty or last input
 		let nextIndex = Math.min(currentIndex + digits.length, $inputs.length - 1);
 		$inputs.eq(nextIndex).focus().select();
@@ -629,7 +633,7 @@
 	$(document).on('click', '#setPasscodeBtn', function() {
         let passcode = '';
         let confirmPasscode = '';
-        
+
         // Get passcode
         for(let i = 1; i <= 6; i++) {
             let digit = $('#digit' + i).val();
@@ -640,7 +644,7 @@
             }
             passcode += digit;
         }
-        
+
         // Get confirm passcode
         for(let i = 1; i <= 6; i++) {
             let digit = $('#confirm_digit' + i).val();
@@ -651,7 +655,7 @@
             }
             confirmPasscode += digit;
         }
-        
+
         // Check if passcodes match
         if(passcode !== confirmPasscode) {
             showToast('Passcodes do not match! Please try again.', 'error');
@@ -662,7 +666,7 @@
             $('#confirm_digit1').focus();
             return;
         }
-        
+
         // Success - Here you can add AJAX call to save passcode
 		$.ajax({
 			url: '/document-locker/set-passcode',
@@ -684,7 +688,7 @@
     $('#passcodeModal').on('hidden.bs.modal', function () {
         $('.passcode-input, .passcode-input-confirm').val('');
     });
-	
+
 	//start upload document
 	$('form#uploadDocumentForm').on('submit', function (e) {
 		e.preventDefault();
@@ -738,7 +742,7 @@
 		});
 	});
 
-	
+
 	$(document).on('click', '.verify-passcode', function () {
 		currentAction = $(this).data('action');
 		currentDocumentId = $(this).data('id');
@@ -767,7 +771,7 @@
 				$("#loader").hide();
 				$('#verifypasscodeModal').modal('hide');
 
-				if (currentAction === 'view' || currentAction === 'print') {			
+				if (currentAction === 'view' || currentAction === 'print') {
 					let ts = new Date().getTime();
 					let url = fileUrl + '?v=' + ts;
 					if (fileExtension === 'pdf') {
@@ -780,7 +784,7 @@
 					$('#documentViewer').attr('src', url);
 					$('#viewDocumentModal').modal('show');
 				}
-				
+
 				if (currentAction === 'share') {
 					$('#access_document_id').val(currentDocumentId);
 					loadCAList();
@@ -817,7 +821,7 @@
 			}
 		});
 	});
-	
+
 	function loadCAList() {
 		$.get('/cas/list', function (res) {
 			let options = '<option value="">Select CA</option>';
@@ -827,7 +831,7 @@
 			$('#ca_id').html(options);
 		});
 	}
-	
+
 	$('#giveAccessForm').on('submit', function (e) {
 		e.preventDefault();
 
@@ -867,7 +871,7 @@
 
 	$(document).on('click', '.direct-view', function () {
 		let ext = $(this).data('ext').toLowerCase();
-		let path = $(this).data('path'); 
+		let path = $(this).data('path');
 
 		let absoluteUrl = window.location.origin + path;
 		let viewUrl = absoluteUrl;
@@ -1087,139 +1091,73 @@
 		}
 	});
 
+	function startLockerTour() {
+		if (typeof introJs !== 'function') return;
+
+		introJs().setOptions({
+			steps: [
+				{
+					title: 'Secure Document Locker Guide',
+					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-lock" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to your Secure Document Locker. Here you can upload, protect, and share legal, regulatory, and banking documents.</p></div>'
+				},
+				{
+					element: '#locker-security-status',
+					title: 'Locker Security Status',
+					intro: 'This panel shows if your locker is passcode protected. Ensure you set a 6-digit passcode to encrypt your documents and prevent unauthorized access.'
+				},
+				{
+					element: '#upload-doc-card',
+					title: 'Upload New Document',
+					intro: 'Use this card to upload and store new documents in your secure vault.'
+				},
+				{
+					element: '#document_type',
+					title: 'Document Type',
+					intro: 'Select the general compliance category for your document (e.g. ROC, GST, KYC, Audit).'
+				},
+				{
+					element: '#file_type',
+					title: 'Specific File Type',
+					intro: 'Choose the specific sub-type matching your document (e.g., PAN Card, Memorandum of Association).'
+				},
+				{
+					element: '#document_name',
+					title: 'Custom Name (Optional)',
+					intro: 'Enter an optional friendly label to quickly identify this file.'
+				},
+				{
+					element: '.upload-area',
+					title: 'Drag & Drop Upload Zone',
+					intro: 'Drag your file here or click to select from your files. We accept PDF, Images, and Word docs up to 5MB.'
+				},
+				{
+					element: '#uploadDocumentForm button[type=submit]',
+					title: 'Upload Trigger',
+					intro: 'Click here to securely upload and encrypt your document.'
+				},
+				{
+					element: '#uploaded-docs-card',
+					title: 'Uploaded Vault',
+					intro: 'Here you can view, download, share access with your CA/Accountant, or delete uploaded documents. Accessing these requires entering your 6-digit security passcode.'
+				}
+			],
+			showBullets: true,
+			showProgress: true,
+			helperElementPadding: 5,
+			exitOnOverlayClick: false,
+			doneLabel: 'Done',
+			nextLabel: 'Next',
+			prevLabel: 'Prev',
+			skipLabel: 'Skip'
+		}).start();
+	}
+
+	$(document).ready(function() {
+		$('#start-locker-tour').on('click', function(e) {
+			e.preventDefault();
+			startLockerTour();
+		});
+	});
 
 </script>
-
-<style>
-  /* 💎 Premium Secure Document Locker Style Overrides 💎 */
-
-  /* Alert Cards - Modern warning and success styles with left borders */
-  .alert-success.card {
-    background-color: #ecfdf5 !important; /* Emerald soft bg */
-    border: 1px solid #a7f3d0 !important; /* Emerald outline */
-    border-left: 6px solid #10b981 !important; /* Emerald accent bar */
-    border-radius: 12px !important;
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.04) !important;
-    overflow: hidden !important;
-  }
-  .alert-success .alert-heading {
-    color: #065f46 !important;
-    font-weight: 700 !important;
-    font-size: 1.1rem !important;
-  }
-  .alert-success p {
-    color: #047857 !important;
-    font-weight: 500 !important;
-    font-size: 0.9rem !important;
-  }
-  .alert-success .alert-link {
-    color: #065f46 !important;
-    font-weight: 600 !important;
-  }
-
-  .alert-danger.card {
-    background-color: #fef2f2 !important; /* Rose soft bg */
-    border: 1px solid #fecaca !important; /* Rose outline */
-    border-left: 6px solid #ef4444 !important; /* Rose accent bar */
-    border-radius: 12px !important;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.04) !important;
-    overflow: hidden !important;
-  }
-  .alert-danger .alert-heading {
-    color: #991b1b !important;
-    font-weight: 700 !important;
-    font-size: 1.1rem !important;
-  }
-  .alert-danger p {
-    color: #b91c1c !important;
-    font-weight: 500 !important;
-    font-size: 0.9rem !important;
-  }
-  .alert-danger .alert-link {
-    color: #991b1b !important;
-    font-weight: 600 !important;
-  }
-
-  /* Form controls styling */
-  .form-control, .form-select {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    padding: 10px 14px !important;
-    font-size: 0.9rem !important;
-    transition: all 0.2s ease !important;
-  }
-
-  .form-control:focus, .form-select:focus {
-    border-color: #422f90 !important;
-    box-shadow: 0 0 0 3px rgba(66, 47, 144, 0.15) !important;
-    outline: none !important;
-  }
-
-  /* Upload Dropzone styling */
-  .upload-area {
-    border: 2px dashed #cbd5e1 !important;
-    padding: 30px 20px !important;
-    border-radius: 12px !important;
-    color: #5e6e82 !important;
-    background-color: #f8fafc !important;
-    transition: all 0.2s ease-in-out !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    cursor: pointer !important;
-  }
-  .upload-area:hover {
-    border-color: #422f90 !important;
-    background-color: #f5f4fa !important;
-    color: #422f90 !important;
-  }
-  .upload-area.is-invalid {
-    border-color: #ef4444 !important;
-    background-color: #fef2f2 !important;
-    color: #ef4444 !important;
-  }
-
-  /* Standardizing primary buttons to match brand styling */
-  .btn-primary {
-    background-color: #422f90 !important;
-    border-color: #422f90 !important;
-    border-radius: 8px !important;
-    padding: 10px 20px !important;
-    font-weight: 600 !important;
-    transition: all 0.2s ease !important;
-    color: #ffffff !important;
-  }
-  .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
-    background-color: #2d1f6a !important;
-    border-color: #2d1f6a !important;
-    color: #ffffff !important;
-  }
-
-  /* Passcode Inputs in Modals */
-  .passcode-input,
-  .passcode-input-confirm {
-    font-size: 24px !important;
-    font-weight: 700 !important;
-    height: 50px !important;
-    width: 50px !important;
-    padding: 0 !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    text-align: center !important;
-    transition: all 0.2s ease !important;
-  }
-  .passcode-input:focus,
-  .passcode-input-confirm:focus {
-    border-color: #422f90 !important;
-    box-shadow: 0 0 0 3px rgba(66, 47, 144, 0.15) !important;
-    outline: none !important;
-  }
-
-
-</style>
-
 @endsection

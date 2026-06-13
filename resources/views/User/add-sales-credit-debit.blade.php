@@ -7,14 +7,17 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Sales & Revenue</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('user.SalesCreditDebit') }}">Credit & Debit Note</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Add Credit/Debit Note</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-add-sales-credit-debit-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -350,9 +353,75 @@
 </div>
 
 @endsection
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+@section('page-script')
 <script>
+    function startAddSalesCreditDebitTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Add Credit/Debit Note',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-file-text" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Issue a credit or debit note adjustment against a previously recorded sales invoice.</p></div>'
+                },
+                {
+                    element: '#inv_num',
+                    title: 'Reference Invoice',
+                    intro: 'Select the original invoice number for this note.'
+                },
+                {
+                    element: '#note_type',
+                    title: 'Note Type',
+                    intro: 'Choose Credit (refund/discount) or Debit (additional charge).'
+                },
+                {
+                    element: '#sellerDetail',
+                    title: 'Step 1: Seller Details',
+                    intro: 'Review your company details automatically loaded from the selected invoice.'
+                },
+                {
+                    element: '#customerDetails',
+                    title: 'Step 2: Customer Details',
+                    intro: 'Confirm customer info, reason for issuance, and note date.'
+                },
+                {
+                    element: '#others',
+                    title: 'Step 3: Note Details',
+                    intro: 'Provide voucher number, product details, taxable value, tax rates, total amount, transport info, and upload supporting docs.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).onbeforechange(function(targetElement) {
+            if (targetElement.id === 'sellerDetail' || targetElement.id === 'customerDetails' || targetElement.id === 'others') {
+                $('#sellerDetail, #customerDetails, #others').hide().removeClass('show active');
+                $('.nav-pills .nav-link').removeClass('active');
+                
+                $(targetElement).show().addClass('show active');
+                
+                let tabIndexMap = {
+                    'sellerDetail': '#tab-A',
+                    'customerDetails': '#tab-B',
+                    'others': '#tab-C'
+                };
+                let linkId = tabIndexMap[targetElement.id];
+                $(linkId).addClass('active');
+            }
+        }).start();
+    }
+
     $(document).ready(function() {
+        $('#start-add-sales-credit-debit-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddSalesCreditDebitTour();
+        });
 
         $("#nxtBtnVOne").on("click", function() {
             $("#tab-A").removeClass("active");
@@ -614,3 +683,4 @@
 
     });
 </script>
+@endsection

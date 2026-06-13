@@ -7,24 +7,25 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Cash & Banking</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('user.BankList') }}">Bank Account Master</a></li>
                         <li class="breadcrumb-item active" aria-current="page">View Bank Details</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-bank-details-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">View Bank Details</h2>
                     </div>
                 </div>
-                </div>
-                <div class="col-md-8 text-end">
-                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-transaction-modal"><i class="ti ti-square-plus f-20"></i> Add New Transaction</a>
-                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#upload-statement-modal"><i class="ti ti-file-upload f-20"></i> Upload Statement</a>
-
+                <div class="col-md-8 text-end mt-2">
+                    <a href="#" class="btn btn-primary" id="add-transaction-btn" data-bs-toggle="modal" data-bs-target="#add-transaction-modal"><i class="ti ti-square-plus f-20"></i> Add New Transaction</a>
+                    <a href="#" class="btn btn-primary" id="upload-statement-btn" data-bs-toggle="modal" data-bs-target="#upload-statement-modal"><i class="ti ti-file-upload f-20"></i> Upload Statement</a>
                 </div>
             </div>
         </div>
@@ -35,7 +36,7 @@
     <div class=" row">
         <div class="col-md-4 col-xxl-4">
             <div class="col-md-12">
-                <div class="card">
+                <div class="card" id="bank-info-card">
                     <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <h5 class="mb-0">Bank Details</h5>
@@ -100,6 +101,24 @@
                                         <p class="text-white text-sm text-opacity-50 mb-0">Account Balance</p>
                                         <h6 class="text-white mb-0">₹{{ $bank->curr_bal }}</h6>
                                     </div>
+                                    @if(!empty($bank->bank_qr_code))
+                                        <div class="col-auto">
+                                            <p class="text-white text-sm text-opacity-50 mb-2">Bank QR Code</p>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-light toggleQrBtn"
+                                                    data-target="qrCode{{ $bank->id }}">
+                                                <i class="ti ti-eye"></i> View
+                                            </button>
+
+                                            <div id="qrCode{{ $bank->id }}" class="mt-2 d-none">
+                                                <img src="{{ asset('storage/'.$bank->bank_qr_code) }}"
+                                                    alt="Bank QR Code"
+                                                    class="img-fluid bg-white p-2 rounded"
+                                                    style="width:120px;height:120px;object-fit:contain;">
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -108,7 +127,7 @@
             </div>
             <div class="col-md-12">
                 <div class="row">
-                    <div class="card">
+                    <div class="card" id="credit-debit-summary-card">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-6">
@@ -141,7 +160,7 @@
 
         </div>
         <div class="col-md-8 col-xxl-8">
-            <div class="card table-card">
+            <div class="card table-card" id="transaction-history-card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="mb-0">Transaction History</h5>
                     <button class="btn btn-sm btn-link-primary">View All</button>
@@ -411,11 +430,19 @@
 							<p><strong>Uploaded File:</strong> <span id="uploadedFileName"></span></p>
 						</div>
 						
-						<small class="fw-semibold mt-2 d-block" style="color:#0b3d91;">
-							⚠ Notes:
-							<br>• Please ensure the bank statement belongs to the selected bank before uploading.
-							<br>• Password-protected or encrypted Excel files are not supported. Please upload an unlocked file only.
-						</small>
+						<div class="alert border-0 shadow-sm"
+							 style="background:#f0fdf4;border-left:4px solid #198754 !important;">
+							
+							<div class="fw-bold text-success mb-2">
+								<i class="fas fa-shield-alt me-1"></i> Before Uploading
+							</div>
+
+							<ul class="mb-0 text-dark">
+								<li>Upload the statement for the selected bank account only.</li>
+								<li>Password-protected or encrypted Excel files are not supported.</li>
+								<li>Please upload a valid, unlocked Excel file (.xlsx or .xls).</li>
+							</ul>
+						</div>
 					<!--</form>-->
 					<!--<a href="{{asset('uploads/bank_statement/bankstatement.xlsx')}}" download>Download Sample Excel</a>-->
 				</div>
@@ -491,7 +518,9 @@
 }
 </style>
 <!-- Bootstrap 5 -->
+@endsection
 
+@section('page-script')
 <script>
 
 	document.addEventListener("DOMContentLoaded", function() {
@@ -674,6 +703,82 @@
 
 	});
 	//End Bank statement upload
-	
+
+    function startBankDetailsTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Bank Details Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-building-bank" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Review your bank account particulars, monitor credits/debits, log manual transactions, or upload statements.</p></div>'
+                },
+                {
+                    element: '#bank-info-card',
+                    title: 'Bank Profile Card',
+                    intro: 'Shows the registered bank name, account number, branch, IFSC code, and current book balance.'
+                },
+                {
+                    element: '#credit-debit-summary-card',
+                    title: 'Flow Overview',
+                    intro: 'A quick tally of the total credit and total debit amounts logged in this account.'
+                },
+                {
+                    element: '#add-transaction-btn',
+                    title: 'Manual Entry',
+                    intro: 'Click here to manually record a transaction, specifying transaction date, purpose, amount, type, and reference.'
+                },
+                {
+                    element: '#upload-statement-btn',
+                    title: 'Import Bank Statement',
+                    intro: 'Click here to upload an Excel bank statement. The system will parse and import all transactions automatically.'
+                },
+                {
+                    element: '#transaction-history-card',
+                    title: 'Transaction Logs',
+                    intro: 'Lists all transaction history. Check entry dates, amounts, credit/debit badges, and actions to edit/delete/view details.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-bank-details-tour').on('click', function(e) {
+            e.preventDefault();
+            startBankDetailsTour();
+        });
+    });
+
+    //----- Toggle QR Code -----
+    $(document).on('click', '.toggleQrBtn', function () {
+
+        let target = $('#' + $(this).data('target'));
+        let icon = $(this).find('i');
+
+        if (target.hasClass('d-none')) {
+
+            target.removeClass('d-none');
+
+            $(this).contents().last()[0].textContent = ' Hide';
+
+            icon.removeClass('ti-eye').addClass('ti-eye-off');
+
+        } else {
+
+            target.addClass('d-none');
+
+            $(this).contents().last()[0].textContent = ' View';
+
+            icon.removeClass('ti-eye-off').addClass('ti-eye');
+        }
+    });
 </script>
 @endsection

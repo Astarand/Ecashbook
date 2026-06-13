@@ -882,7 +882,147 @@ class EmployeeHolidayController extends Controller
         }
     }
 
+    /**
+     * Get list of completed tasks for an employee
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
 
+    public function completedTaskList(Request $request): JsonResponse
+    {
+        try {
+            // 1) Validate inputs
+            $validator = Validator::make($request->all(), [
+                'empId'       => 'required|string|max:50',
+                'secure'      => 'required|string|min:8',
+                'toDayDate'   => 'required|date_format:Y-m-d',
+                'currentTime' => 'required|date_format:H:i:s',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors'  => $validator->errors(),
+                ], 422);
+            } // validation per Laravel query builder/validation rules [12]
+
+            $empId       = $request->input('empId');
+            $secureKey   = $request->input('secure');
+            $todayDate   = $request->input('toDayDate');   // Y-m-d
+            $currentTime = $request->input('currentTime'); // H:i:s
+
+            // 2) Security
+            if (!$this->validateSecureAccess($empId, $secureKey)) {
+                Log::warning('Task list access - Security validation failed', [
+                    'user_id' => Auth::id(),
+                    'empId'   => $empId,
+                    'ip'      => $request->ip(),
+                ]);
+                return response()->json([
+                    'success'    => false,
+                    'message'    => 'Unauthorized access. Invalid security credentials.',
+                    'error_code' => 'SECURITY_VALIDATION_FAILED'
+                ], 403);
+            } // consistent secure access [12]
+
+            // 3) Ensure employee exists
+            $employee = DB::table('employees')
+                ->where('employee_id', $empId)
+                ->select(['employee_id'])
+                ->first();
+            if (!$employee) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Employee not found.',
+                ], 404);
+            } // existence check [12]
+
+            // 4) Build reference datetimes
+            $nowRef     = Carbon::createFromFormat('Y-m-d H:i:s', $todayDate.' '.$currentTime);
+            $overdueRef = $nowRef->copy()->subDays(2); // “more than 2 days pending” threshold [2]
+
+            // 5) Overview metrics across ALL tasks (no date filter)
+            $allTasks = DB::table('employee_task_managment')
+                ->where('employee_id', $employee->employee_id);
+
+            $totalDueTask = (clone $allTasks)
+                ->where('status', 'Pending')
+                ->count(); // all pending [12]
+
+            $totalOngoingTask = (clone $allTasks)
+                ->where('status', 'In Progress')
+                ->count(); // all in progress [12]
+
+            $completeTask = (clone $allTasks)
+                ->whereIn('status', ['Complete','complete','Completed'])
+                ->count(); // all completed [12]
+
+            // Overdue > 2 days: Pending with due_date < (toDayDate currentTime - 2 days), compare full datetime
+            $totalOverdueTask = (clone $allTasks)
+                ->where('status', 'Pending')
+                ->where('due_date', '<', $overdueRef->toDateTimeString())
+                ->count(); // datetime comparison older than interval [2][8]
+
+            // 6) Task list: ALL pending and in-progress tasks, not limited by date
+            $taskList = DB::table('employee_task_managment')
+                    ->join('users', 'users.id', '=', 'employee_task_managment.added_by')
+                    ->where('employee_id', $employee->employee_id)
+                    ->whereIn('employee_task_managment.status', ['Completed'])
+                    ->select([
+                        'employee_task_managment.id','employee_task_managment.title',
+                        'employee_task_managment.priority','employee_task_managment.due_date',
+                        'employee_task_managment.description','employee_task_managment.status',
+                        'employee_task_managment.added_by','employee_task_managment.completed_date',
+                        'employee_task_managment.created_at','employee_task_managment.updated_at',
+                        DB::raw('users.name as added_by_name'),
+                    ])
+                    ->orderByRaw("FIELD(employee_task_managment.priority, 'High', 'Medium', 'Low') ASC")
+                    ->orderBy('employee_task_managment.due_date', 'desc')
+                    ->get(); // join + alias for creator name [1]
+
+
+            // Optionally annotate due_status per row (overdue, dueSoon, upcoming) in PHP if desired:
+            // foreach ($taskList as $t) { ... } // omitted here to keep DB-only response
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task list fetched successfully.',
+                'data'    => [
+                    'taskOverView' => [
+                        'totalDueTask'      => $totalDueTask,
+                        'totalOngoingTask'  => $totalOngoingTask,
+                        'completeTask'      => $completeTask,
+                        'totalOverdueTask'  => $totalOverdueTask,
+                    ],
+                    'taskList' => $taskList,
+                    'context'  => [
+                        'now_reference' => $nowRef->toDateTimeString(),
+                        'overdue_after' => $overdueRef->toDateTimeString(),
+                    ],
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Task list error', [
+                'user_id' => Auth::id(),
+                'error'   => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+                'ip'      => $request->ip()
+            ]);
+            return response()->json([
+                'success'    => false,
+                'message'    => 'An error occurred while fetching task list.',
+                'error_code' => 'INTERNAL_SERVER_ERROR'
+            ], 500);
+        }
+    }
+
+    /**
+    * Get list of completed tasks for an employee
+    *
+    * @param Request $request
+    * @return JsonResponse
+    */
 
 
     

@@ -9,8 +9,8 @@
 		  <div class="row align-items-center">
 			<div class="col-md-12">
 			  <ul class="breadcrumb">
-				<li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-				<li class="breadcrumb-item active" aria-current="page">Business Health Check-up</li>
+				<li class="breadcrumb-item"><a href="#">Home</a></li>
+				<li class="breadcrumb-item"><a href="{{ route('admin.company.checks') }}"> Business Health Check-up</a></li>
 			  </ul>
 			</div>
 			@if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5)

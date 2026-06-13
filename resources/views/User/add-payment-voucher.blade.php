@@ -8,12 +8,17 @@
 		<div class="page-block">
 			<div class="row align-items-center">
 				<div class="col-md-12">
-					<ul class="breadcrumb">
-						<li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
+					<div class="d-flex justify-content-between align-items-center w-100">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
 						<li class="breadcrumb-item"><a href="#">Cash & Banking</a></li>
 						<li class="breadcrumb-item"><a href="{{ route('user.PaymentVoucherList') }}">Payment Vouchers</a></li>
 						<li class="breadcrumb-item active" aria-current="page">Add Payment Voucher</li>
-					</ul>
+                    </ul>
+                    <a href="javascript:void(0);" id="start-add-payment-voucher-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
 				</div>
 				<div class="col-md-12">
 					<div class="page-header-title">
@@ -138,6 +143,54 @@
 			toggleBankAccountField();
 		}
 	});
+
+    function startAddPaymentVoucherTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Add Payment Voucher Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-info-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Record a manual cash or bank payment.</p></div>'
+                },
+                {
+                    title: 'Add Payment Voucher',
+                    intro: 'Record a manual cash or bank payment.'
+                },
+                {
+                    element: '#date', title: 'Transaction Date',
+                    intro: 'Specify the date of the transaction.'
+                },
+                {
+                    element: '#party_name', title: 'Party Name',
+                    intro: 'Enter the recipient party name.'
+                },
+                {
+                    element: '#amount', title: 'Voucher Amount',
+                    intro: 'Enter the transaction amount.'
+                },
+                {
+                    element: 'button[type="submit"]', title: 'Save Voucher',
+                    intro: 'Click here to save the payment voucher.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-add-payment-voucher-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddPaymentVoucherTour();
+        });
+    });
 </script>
 
 @endsection

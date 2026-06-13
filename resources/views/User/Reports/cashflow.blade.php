@@ -5,15 +5,21 @@
 <div class="pc-content">
 
 <!-- [ breadcrumb ] start -->
+    <!-- [ breadcrumb ] start -->
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Financial Reports</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Cash Flow Statement</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Financial Reports</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Cash Flow Statement</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-cf-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <i class="ti ti-help-circle f-18"></i> <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -30,7 +36,7 @@
         <div class="col-md-12">
 
             <!-- FILTER CARD -->
-            <div class="card mb-4">
+            <div class="card mb-4 cf-filter-card">
                 <div class="card-header py-3">
                     <h4 class="text-center mb-0">Generate Cashflow Statement</h4>
                 </div>
@@ -126,7 +132,7 @@
             </div>
 
             <!-- CASHFLOW TABLE -->
-            <div class="card">
+            <div class="card cf-table-card">
                 <div class="card-body">
                     <div class="table-responsive">
 
@@ -477,6 +483,49 @@
 			.toLowerCase()                   // optional: normalize case
 			.replace(/\b\w/g, char => char.toUpperCase()); // capitalize first letter of each word
 	}
+
+	function startCfTour() {
+		if (typeof introJs !== 'function') return;
+
+		introJs().setOptions({
+			steps: [
+				{
+					title: 'Cash Flow Guide',
+					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-activity" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Cash Flow Statement generator. Monitor cash inflows and outflows categorized by activities.</p></div>'
+				},
+				{
+					element: '.cf-filter-card',
+					title: 'Filter Period & Options',
+					intro: 'Select dates, activity type (Operating, Investing, Financing), and payment mode to generate the statement.'
+				},
+				{
+					element: '.cf-table-card',
+					title: 'Statement Table',
+					intro: 'View all ledger flows, inflow, outflow, and net cash flow details.'
+				},
+				{
+					element: 'button[onclick="exportCashFlowToExcel()"]',
+					title: 'Download Excel',
+					intro: 'Click here to export the generated Cash Flow report directly to Excel.'
+				}
+			],
+			showBullets: true,
+			showProgress: true,
+			helperElementPadding: 5,
+			exitOnOverlayClick: false,
+			doneLabel: 'Done',
+			nextLabel: 'Next',
+			prevLabel: 'Prev',
+			skipLabel: 'Skip'
+		}).start();
+	}
+
+	$(document).ready(function() {
+		$('#start-cf-tour').on('click', function(e) {
+			e.preventDefault();
+			startCfTour();
+		});
+	});
 
 </script>
 @endsection

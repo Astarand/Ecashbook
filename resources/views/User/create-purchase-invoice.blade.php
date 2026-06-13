@@ -7,14 +7,17 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Purchase & Procurement</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('user.PurchaseInvoices') }}">Purchase Invoice</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Create Purchase Invoice</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-create-purchase-invoice-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -660,8 +663,92 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('page-script')
 <script>
+    function startCreatePurchaseInvoiceTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Create Purchase Invoice',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-file-text" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Record a supplier purchase invoice using this 4-step wizard.</p></div>'
+                },
+                {
+                    element: '#inv_num',
+                    title: 'Invoice Number',
+                    intro: 'Input the unique invoice number as printed on the supplier\'s physical invoice.'
+                },
+                {
+                    element: '#po_ref_num',
+                    title: 'PO Reference',
+                    intro: 'If applicable, select a pre-existing Purchase Order to import and auto-fill lines.'
+                },
+                {
+                    element: '#inv_date',
+                    title: 'Invoice Date',
+                    intro: 'Set the official billing date of the vendor invoice.'
+                },
+                {
+                    element: '#buyerDetail',
+                    title: 'Step 1: Purchaser Details',
+                    intro: 'Confirm your own business details (PAN/GST numbers, address details).'
+                },
+                {
+                    element: '#sellerDetails',
+                    title: 'Step 2: Seller/Vendor Details',
+                    intro: 'Select the supplying vendor and review billing/shipping addresses.'
+                },
+                {
+                    element: '#itemDetails',
+                    title: 'Step 3: Item Entries',
+                    intro: 'Record items purchased, specifying quantity, pricing, discounts, and input tax details.'
+                },
+                {
+                    element: '#others',
+                    title: 'Step 4: Payments & ITC',
+                    intro: 'Choose payment mode/status, input buyer references, delivery terms, and upload scanned invoice images.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).onbeforechange(function(targetElement) {
+            if (targetElement.id === 'buyerDetail' || targetElement.id === 'sellerDetails' || targetElement.id === 'itemDetails' || targetElement.id === 'others') {
+                $('.tab-pane').removeClass('show active');
+                $('.nav-pills .nav-link').removeClass('active');
+                
+                $(targetElement).addClass('show active');
+                
+                // Highlight corresponding nav-link tab header
+                let tabIndexMap = {
+                    'buyerDetail': 0,
+                    'sellerDetails': 1,
+                    'itemDetails': 2,
+                    'others': 3
+                };
+                let idx = tabIndexMap[targetElement.id];
+                $('.nav-pills .nav-link').eq(idx).addClass('active');
+            }
+        }).start();
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
+        const tourBtn = document.getElementById('start-create-purchase-invoice-tour');
+        if (tourBtn) {
+            tourBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                startCreatePurchaseInvoiceTour();
+            });
+        }
+
         const addressTypeDropdown = document.getElementById("InvoiceaddressType");
 
         if (addressTypeDropdown) {

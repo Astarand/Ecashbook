@@ -7,15 +7,18 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/expenses-list') }}">Expenses Management</a></li>
                         <li class="breadcrumb-item" aria-current="page">Add New Expenses</li>
                     </ul>
+                    <a href="javascript:void(0);" id="start-add-expenses-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-				<div class="col-md-4">
+				<div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Add New Expenses</h2>
                     </div>
@@ -216,7 +219,7 @@
                                 </div>
                             </div> --}}
 
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-12 mb-3" id="tds-applicability-container">
                                 <label class="form-label">TDS Applicable</label>
                                 <div class="row">
                                     <div class="col-6">
@@ -252,7 +255,7 @@
                                     <input type="hidden" id="tds_threshold_limit" value="">
                             </div>
 
-                            <div class="gst-container col-md-12">
+                            <div class="gst-container col-md-12" id="gst-applicability-container">
                                 <div class="mb-3">
                                     <label class="form-label">GST Applicable <span class="text-danger">*</span></label>
                                     <div class="row">
@@ -356,7 +359,7 @@
                             <div class="btn btn-primary">Save Changes</div> --}}
 
                         <a href="{{ url('/expenses-list') }}" class="btn btn-danger customer-btn-cancel">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary" id="save-expense-btn">Save</button>
                     </div>
 
                 </div>
@@ -365,6 +368,9 @@
     </div>
 </div>
 
+@endsection
+
+@section('page-script')
 <script>
     //------ start Pan No auto fill logic based on vendor selection ------
     document.getElementById('vendor_id').addEventListener('change', function () {
@@ -1275,5 +1281,77 @@
         toggleOtherField();
     });
 
+    function startAddExpensesTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Add Expense Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-square-plus" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Record business expenses by setting categories, transaction modes, TDS/GST details, and vendor assignments.</p></div>'
+                },
+                {
+                    element: '#expense_cat',
+                    title: 'Expense Category',
+                    intro: 'Choose whether this is a Direct Expense (manufacturing/labor cost) or an Indirect Expense (rent/salaries/office expenses).'
+                },
+                {
+                    element: '#expense_amt',
+                    title: 'Expense Amount',
+                    intro: 'Enter the base transaction amount of this business expense.'
+                },
+                {
+                    element: '#payment_status',
+                    title: 'Payment Status',
+                    intro: 'Indicate whether this is fully paid ("Full") or partially paid ("Advance"), which displays fields for balance payables.'
+                },
+                {
+                    element: '#mode_of_expense',
+                    title: 'Payment Method',
+                    intro: 'Select the mode of payment used (e.g., NEFT, UPI, Cash, Cheque).'
+                },
+                {
+                    element: '#vendor_id',
+                    title: 'Vendor / Party Selection',
+                    intro: 'Assign this expense to a specific vendor. Selecting a vendor will automatically fill their PAN details if available.'
+                },
+                {
+                    element: '#tds-applicability-container',
+                    title: 'TDS Applicability',
+                    intro: 'Toggle TDS applicability. If the amount exceeds legal thresholds, TDS is calculated and applied automatically.'
+                },
+                {
+                    element: '#gst-applicability-container',
+                    title: 'GST Applicability',
+                    intro: 'Toggle GST applicability. Setting this to "Yes" allows selecting intra/inter-state transaction modes and GST rates.'
+                },
+                {
+                    element: '#approved_by',
+                    title: 'Approver Details',
+                    intro: 'Specify the manager or admin name who authorized this expense, along with approval date and special comments.'
+                },
+                {
+                    element: '#save-expense-btn',
+                    title: 'Save Record',
+                    intro: 'Submit the form to log this expense. The entry will then appear in the Expenses Management List.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-add-expenses-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddExpensesTour();
+        });
+    });
 </script>
 @endsection

@@ -220,7 +220,7 @@ class ProprietorshipProfileController extends Controller
 						->get();
 		$docs = [];
 		foreach($companyDocs as $doc){
-			$docs[$doc->file_type] = $doc;
+			$docs[$doc->document_name] = $doc;
 		}
 
 		
