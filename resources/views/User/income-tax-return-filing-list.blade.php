@@ -29,7 +29,7 @@
                 </div>
 				@if(Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
 				<div class="col-md-8 text-end">
-                    <a href="{{ route('user.IncomeTaxFiling') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Apply</a>
+                    <a href="{{ route('user.IncomeTaxFiling') }}" class="btn btn-primary btn-apply-itr"><i class="ti ti-square-plus"></i> Apply</a>
                 </div>
 				@endif
             </div>
@@ -41,19 +41,22 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card itr-table-card">
                 <div class="table-responsive">
-					<table class="table table-bordered" id="pc-dt-simple">
-						<tr>
-							<th>#</th>
-							<th>Legal Name</th>
-							<th>Created Date</th>
-							<th>Application Status</th>
-							<th>Process Date</th>
-							<th>Payment</th>
-							<th>Chat Status</th>
-							<th>Action</th>
-						</tr>
+					<table class="table tbl-product my-3" id="pc-dt-simple">
+						<thead>
+							<tr style="background-color: #cbcbcb;">
+								<th>#</th>
+								<th>Legal Name</th>
+								<th>Created Date</th>
+								<th>Application Status</th>
+								<th>Process Date</th>
+								<th>Payment</th>
+								<th>Chat Status</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
 
 						@foreach($applications as $row)
 						<tr id="row{{ $row->id }}">
@@ -95,57 +98,64 @@
 								@endif
 							</td>
 							<td>
-								<!--<a href="{{ route('itr.view', $row->id) }}" class="btn btn-sm btn-primary">View</a>
-								@if(Auth::user()->u_type == 2)
-								<button class="btn btn-danger btn-sm deleteBtn" data-id="{{ $row->id }}">Delete</button>
-								@endif-->
-								<div class="d-flex align-items-center gap-2">
+								<span><i class="ti ti-dots-vertical f-20"></i></span>
+								<div class="prod-action-links">
+									<ul class="list-inline me-auto mb-0">
+										<!-- View -->
+										<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="View">
+											<a href="{{ route('itr.view', $row->id) }}"
+											   class="avtar avtar-xs btn-link-warning btn-pc-default itr-view-btn">
+												<i class="ti ti-eye f-18"></i>
+											</a>
+										</li>
 
-									<!-- View -->
-									<a href="{{ route('itr.view', $row->id) }}"
-									   class="btn btn-sm btn-primary"
-									   title="View">
-										<i class="ti ti-eye"></i>
-									</a>
+										<!-- Chat -->
+										<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Chat">
+											<a href="javascript:void(0)"
+											   class="avtar avtar-xs btn-link-warning btn-pc-default itr-chat-btn"
+											   data-bs-toggle="modal"
+											   data-bs-target="#ticketChatModal"
+											   onclick="openChat({{ $row->id }}, '{{ $row->status }}')">
+												<i class="ti ti-message-circle f-18"></i>
+											</a>
+										</li>
 
-									<!-- Chat -->
-									<a href="javascript:void(0)"
-									   class="btn btn-sm btn-warning"
-									   title="Chat"
-									   data-bs-toggle="modal"
-									   data-bs-target="#ticketChatModal"
-									   onclick="openChat({{ $row->id }}, '{{ $row->status }}')">
-										<i class="ti ti-message-circle"></i>
-									</a>
+										<!-- Status -->
+										@if(Auth::user()->u_type == 3 || Auth::user()->u_type == 6)
+										<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Change Status">
+											<a href="javascript:void(0)"
+											   class="statusBtn avtar avtar-xs btn-link-secondary btn-pc-default"
+											   data-id="{{ $row->id }}"
+											   data-status="{{ $row->status }}">
+												<i class="ti ti-refresh f-18"></i>
+											</a>
+										</li>
+										
+										<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Update Status Details">
+											<a href="javascript:void(0)"
+											   class="avtar avtar-xs btn-link-primary btn-pc-default"
+											   onclick="openStatusModal({{ $row->id }}, 'itr_filings')">
+												<i class="ti ti-edit f-18"></i>
+											</a>
+										</li>
+										@endif
 
-									<!-- Status -->
-									@if(Auth::user()->u_type == 3 || Auth::user()->u_type == 6)
-									<button class="btn btn-sm btn-info statusBtn"
-											title="Change Status"
-											data-id="{{ $row->id }}"
-											data-status="{{ $row->status }}">
-										<i class="ti ti-refresh"></i>
-									</button>
-									
-									<a href="javascript:void(0)"
-										   class="avtar avtar-xs btn-link-primary btn-pc-default"
-										   onclick="openStatusModal({{ $row->id }}, 'itr_filings')">
-											<i class="ti ti-edit f-18"></i>
-									</a>
-									@endif
-									<!-- Delete -->
-									@if(Auth::user()->u_type == 2)
-									<button class="btn btn-sm btn-danger deleteBtn"
-											title="Delete"
-											data-id="{{ $row->id }}">
-										<i class="ti ti-trash"></i>
-									</button>
-									@endif
-
+										<!-- Delete -->
+										@if(Auth::user()->u_type == 2)
+										<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
+											<a href="javascript:void(0)"
+											   class="deleteBtn avtar avtar-xs btn-link-danger btn-pc-default"
+											   data-id="{{ $row->id }}">
+												<i class="ti ti-trash f-18"></i>
+											</a>
+										</li>
+										@endif
+									</ul>
 								</div>
 							</td>
 						</tr>
 						@endforeach
+						</tbody>
 					</table>
 					<div class="mt-3">
 						
@@ -763,36 +773,52 @@
 	});
 
 
-    function startIncomeTaxReturnFilingListTour() {
-        if (typeof introJs !== 'function') return;
+	function startIncomeTaxReturnFilingListTour() {
+		if (typeof introJs !== 'function') return;
 
-        introJs().setOptions({
-            steps: [
-                {
-                    title: 'Income Tax Filing Logs Guide',
-                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-info-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Review past assessment years, filed status, and download links.</p></div>'
-                },
-                {
-                    title: 'Income Tax Filing Logs',
-                    intro: 'Review past assessment years, filed status, and download links.'
-                }
-            ],
-            showBullets: true,
-            showProgress: true,
-            helperElementPadding: 5,
-            exitOnOverlayClick: false,
-            doneLabel: 'Done',
-            nextLabel: 'Next',
-            prevLabel: 'Prev',
-            skipLabel: 'Skip'
-        }).start();
-    }
+		introJs().setOptions({
+			steps: [
+				{
+					title: 'Income Tax Filings List',
+					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-help-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage and track your Income Tax Return (ITR) filing applications and processing status.</p></div>'
+				},
+				{
+					element: '.btn-apply-itr',
+					title: 'Apply for ITR Filing',
+					intro: 'Click here to submit a new Income Tax Return filing request by filling out the application details.'
+				},
+				{
+					element: '.itr-table-card',
+					title: 'Filing Records',
+					intro: 'Track all your submitted ITR applications, applicant legal names, PAN details, payment statuses, and processing dates.'
+				},
+				{
+					element: '.itr-view-btn',
+					title: 'View Details',
+					intro: 'Click this button to view the full details of the ITR application, including income sources and declarations.'
+				},
+				{
+					element: '.itr-chat-btn',
+					title: 'ITR Filing Desk Chat',
+					intro: 'Click here to start a live conversation with accounting professionals, ask questions, or upload tax documents.'
+				}
+			],
+			showBullets: true,
+			showProgress: true,
+			helperElementPadding: 5,
+			exitOnOverlayClick: false,
+			doneLabel: 'Done',
+			nextLabel: 'Next',
+			prevLabel: 'Prev',
+			skipLabel: 'Skip'
+		}).start();
+	}
 
-    $(document).ready(function() {
-        $('#start-income-tax-return-filing-list-tour').on('click', function(e) {
-            e.preventDefault();
-            startIncomeTaxReturnFilingListTour();
-        });
-    });
+	$(document).ready(function() {
+		$('#start-income-tax-return-filing-list-tour').on('click', function(e) {
+			e.preventDefault();
+			startIncomeTaxReturnFilingListTour();
+		});
+	});
 </script>
 @endsection

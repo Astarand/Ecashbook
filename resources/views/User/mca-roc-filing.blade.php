@@ -8,12 +8,17 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Tax Filing & Returns</a></li>
-                        <li class="breadcrumb-item"><a href="{{ url('/mca-roc/list') }}">MCA/ROC Filings</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Apply for MCA/ROC Filings</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Tax Filing & Returns</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url('/mca-roc/list') }}">MCA/ROC Filings</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Apply for MCA/ROC Filings</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-mca-filing-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <i class="ti ti-help-circle f-18"></i> <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -28,7 +33,7 @@
     <!-- [ Main Content ] start -->
     <div class="row">
         <div class="col-lg-12">
-            <div class="card">
+            <div class="card mca-form-card">
                 <div class="card-body px-4 py-4">
 
                     <form id="mcaRocForm" action="javascript:void(0);" method="post" enctype="multipart/form-data">
@@ -147,7 +152,7 @@
                         <hr>
 
                         <!-- C. Required Documents Upload -->
-                        <h5 class="text-primary fw-bold mb-3">
+                        <h5 class="text-primary fw-bold mb-3 mca-doc-upload-section">
                             Required Documents Upload
                         </h5>
 
@@ -190,7 +195,7 @@
                         <hr>
 
                         <!-- D. Declaration -->
-                        <h5 class="text-primary fw-bold mb-2">
+                        <h5 class="text-primary fw-bold mb-2 mca-declaration-section">
                             Declaration by Client
                         </h5>
 
@@ -308,6 +313,49 @@ $('#mcaRocForm').submit(function(e){
 		}
     });
 });
+
+	function startMcaFilingTour() {
+		if (typeof introJs !== 'function') return;
+
+		introJs().setOptions({
+			steps: [
+				{
+					title: 'Apply for MCA/ROC Filing',
+					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-edit" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Submit your company details and upload required documents to request MCA/ROC filings.</p></div>'
+				},
+				{
+					element: '.mca-form-card',
+					title: 'Company Basic Details',
+					intro: 'Fill in your company name, CIN, PAN, address, mobile number, and event-based filing options here.'
+				},
+				{
+					element: '.mca-doc-upload-section',
+					title: 'Documents Upload',
+					intro: 'Tick the checkboxes to reveal file upload options for MOA/AOA, Certificate of Incorporation, DSC Authorization, etc.'
+				},
+				{
+					element: '.mca-declaration-section',
+					title: 'Declaration & Signature',
+					intro: 'Read the client declaration, fill out the client name, designation, signature, and submit the application.'
+				}
+			],
+			showBullets: true,
+			showProgress: true,
+			helperElementPadding: 5,
+			exitOnOverlayClick: false,
+			doneLabel: 'Done',
+			nextLabel: 'Next',
+			prevLabel: 'Prev',
+			skipLabel: 'Skip'
+		}).start();
+	}
+
+	$(document).ready(function() {
+		$('#start-mca-filing-tour').on('click', function(e) {
+			e.preventDefault();
+			startMcaFilingTour();
+		});
+	});
 </script>
 
 @endsection

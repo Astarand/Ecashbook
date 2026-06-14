@@ -11,11 +11,16 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Tax Filing & Returns</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">MCA/ROC Filings</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Tax Filing & Returns</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">MCA/ROC Filings</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-mca-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <i class="ti ti-help-circle f-18"></i> <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
@@ -24,7 +29,7 @@
                 </div>
 				@if(Auth::user()->u_type == 2)
 				<div class="col-md-8 text-end">
-                    <a href="{{ route('user.MCAROCFiling') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Apply</a>
+                    <a href="{{ route('user.MCAROCFiling') }}" class="btn btn-primary btn-apply-mca"><i class="ti ti-square-plus"></i> Apply</a>
                 </div>
 				@endif
             </div>
@@ -36,7 +41,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card mca-table-card">
                 <div class="table-responsive">
 					<table class="table table-bordered mt-3" id="pc-dt-simple">
 						<thead>
@@ -96,14 +101,14 @@
 
 										<!-- View -->
 										<a href="{{ url('/mca-roc/view/'.$row->id) }}"
-										   class="btn btn-sm btn-primary"
+										   class="btn btn-sm btn-primary mca-view-btn"
 										   title="View">
 											<i class="ti ti-eye"></i>
 										</a>
 
 										<!-- Chat -->
 										<a href="javascript:void(0)"
-										   class="btn btn-sm btn-warning"
+										   class="btn btn-sm btn-warning mca-chat-btn"
 										   title="Chat"
 										   data-bs-toggle="modal"
 										   data-bs-target="#ticketChatModal"
@@ -750,6 +755,54 @@
 				$('#row'+id).remove();
 				showToast(res.message,'success');
 			}
+		});
+	});
+
+	function startMcaListTour() {
+		if (typeof introJs !== 'function') return;
+
+		introJs().setOptions({
+			steps: [
+				{
+					title: 'MCA/ROC Filings List',
+					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-help-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage and monitor your MCA/ROC filing applications and compliance status.</p></div>'
+				},
+				{
+					element: '.btn-apply-mca',
+					title: 'Apply for Filing',
+					intro: 'Click here to start a new MCA/ROC filing request by filling out the application form.'
+				},
+				{
+					element: '.mca-table-card',
+					title: 'Filing Records',
+					intro: 'Monitor all your submitted company filings, CIN/PAN details, processing status, and payment records.'
+				},
+				{
+					element: '.mca-view-btn',
+					title: 'View Details',
+					intro: 'Click this button to see the complete application details and verified credentials.'
+				},
+				{
+					element: '.mca-chat-btn',
+					title: 'Filing Desk Chat',
+					intro: 'Interact directly with professionals, ask questions, and upload required documents for this specific filing.'
+				}
+			],
+			showBullets: true,
+			showProgress: true,
+			helperElementPadding: 5,
+			exitOnOverlayClick: false,
+			doneLabel: 'Done',
+			nextLabel: 'Next',
+			prevLabel: 'Prev',
+			skipLabel: 'Skip'
+		}).start();
+	}
+
+	$(document).ready(function() {
+		$('#start-mca-list-tour').on('click', function(e) {
+			e.preventDefault();
+			startMcaListTour();
 		});
 	});
 </script>

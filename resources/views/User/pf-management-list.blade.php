@@ -2,33 +2,30 @@
 
 @section('container')
 
-
-
-
 <div class="pc-content">
     
     <!-- [ breadcrumb ] start -->
-    <div class="page-header">
+    <div class="page-header mb-4">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
+                <div class="col-md-12 mb-2">
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Tax Filing & Returns</a></li>
-                        <li class="breadcrumb-item" aria-current="page">Provident Fund (PF / EPF)</li>
+                        <li class="breadcrumb-item active" aria-current="page">Provident Fund (PF / EPF)</li>
                     </ul>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-5">
                     <div class="page-header-title">
-                        <h2 class="mb-0">Provident Fund (PF / EPF) List</h2>
+                        <h2 class="mb-0 text-dark fw-bold">Provident Fund (PF / EPF)</h2>
                     </div>
                 </div>
-                <div class="col-md-8 text-end">
-                    <a href="#pfFilterOffcanvas" class="btn btn-primary shadow" style="font-size: 16px;" data-bs-toggle="offcanvas" data-bs-target="#pfFilterOffcanvas" aria-controls="pfFilterOffcanvas">
-                        Summary of Return
+                <div class="col-md-7 text-end">
+                    <a href="#pfFilterOffcanvas" class="btn btn-outline-secondary px-3 py-2 rounded-3 me-2 shadow-sm" data-bs-toggle="offcanvas" data-bs-target="#pfFilterOffcanvas" aria-controls="pfFilterOffcanvas">
+                        <i class="ti ti-filter f-16"></i> Summary of Return
                     </a>
-                     <a href="https://unifiedportal-emp.epfindia.gov.in" target="_blank" class="btn btn-primary shadow" style="font-size: 16px;" data-bs-toggle="offcanvas" >
-                        PF /EPF Payment
+                    <a href="https://unifiedportal-emp.epfindia.gov.in" target="_blank" class="btn btn-primary px-3 py-2 rounded-3 shadow-sm">
+                        <i class="ti ti-credit-card f-16"></i> PF / EPF Payment
                     </a>
                 </div>
             </div>
@@ -36,78 +33,78 @@
     </div>
     <!-- [ breadcrumb ] end -->
 
-    <div class="row">
+    <!-- Premium Static Alert (Visible by default, no collapse) -->
+    <div class="row mb-4">
         <div class="col-lg-12">
-            <div class="card alert alert-warning p-0">
-                <div class="card-body">
+            <div class="card premium-warning-alert border-0 shadow-sm rounded-4 overflow-hidden mb-0">
+                <div class="card-body p-4">
                     <div class="d-flex align-items-start flex-column flex-lg-row gap-3">
                         <div class="flex-grow-1 me-3">
-                            <h4 class="alert-heading mb-3">Steps for payment of EPF:</h4>
-                            <ol class="list-unstyled mb-0">
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">1</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Login to <a href="https://unifiedportal-emp.epfindia.gov.in" target="_blank">https://unifiedportal-emp.epfindia.gov.in</a> or click on "PF /EPF Payment" Button</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">2</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Enter Establishment ID, username, password and Captcha code for login to employer portal.</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">3</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Click on "Payments" from Dashboard and go to "ECR (Electronic Challan cum Return)".</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">4</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Select wage month and return type.</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">5</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Download ECR template from portal.</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">6</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Upload the MC Excel file filled with contribution details.</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">7</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Click on "Submit" button.</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">8</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Check all the details and contribution amount, then click on final submit button.</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">9</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Click on Generate Challan.</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">10</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Click on "View" button.</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 mb-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">11</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Select contribution amount and mode of payment.</span>
-                                </li>
-                                <li class="d-flex align-items-start gap-2 text-dark">
-                                    <span class="badge rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center" style="width:24px;height:24px;">12</span>
-                                    <span class="text-dark fw-bold">&rarr;</span>
-                                    <span>Click on "Submit".</span>
-                                </li>
-                            </ol>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="avtar avtar-s btn-light-warning rounded-circle"><i class="ti ti-help-circle f-18"></i></span>
+                                <h5 class="mb-0 fw-bold text-dark">Steps for payment of EPF:</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ol class="list-unstyled mb-0">
+                                        <li class="d-flex align-items-start gap-2 mb-2 text-dark font-14">
+                                            <span class="step-num-badge-new">1</span>
+                                            <span>Login to <a href="https://unifiedportal-emp.epfindia.gov.in" target="_blank" class="fw-semibold text-primary text-decoration-none">https://unifiedportal-emp.epfindia.gov.in</a> or click the "PF /EPF Payment" button above.</span>
+                                        </li>
+                                        <li class="d-flex align-items-start gap-2 mb-2 text-dark font-14">
+                                            <span class="step-num-badge-new">2</span>
+                                            <span>Enter Establishment ID, username, password and Captcha code.</span>
+                                        </li>
+                                        <li class="d-flex align-items-start gap-2 mb-2 text-dark font-14">
+                                            <span class="step-num-badge-new">3</span>
+                                            <span>Click on "Payments" from Dashboard and go to "ECR (Electronic Challan cum Return)".</span>
+                                        </li>
+                                        <li class="d-flex align-items-start gap-2 mb-2 text-dark font-14">
+                                            <span class="step-num-badge-new">4</span>
+                                            <span>Select wage month and return type.</span>
+                                        </li>
+                                        <li class="d-flex align-items-start gap-2 mb-2 text-dark font-14">
+                                            <span class="step-num-badge-new">5</span>
+                                            <span>Download ECR template from portal.</span>
+                                        </li>
+                                        <li class="d-flex align-items-start gap-2 mb-2 mb-md-0 text-dark font-14">
+                                            <span class="step-num-badge-new">6</span>
+                                            <span>Upload the MC Excel file filled with contribution details.</span>
+                                        </li>
+                                    </ol>
+                                </div>
+                                <div class="col-md-6">
+                                    <ol class="list-unstyled mb-0">
+                                        <li class="d-flex align-items-start gap-2 mb-2 text-dark font-14">
+                                            <span class="step-num-badge-new">7</span>
+                                            <span>Click on "Submit" button.</span>
+                                        </li>
+                                        <li class="d-flex align-items-start gap-2 mb-2 text-dark font-14">
+                                            <span class="step-num-badge-new">8</span>
+                                            <span>Check all the details and contribution amount, then click on final submit button.</span>
+                                        </li>
+                                        <li class="d-flex align-items-start gap-2 mb-2 text-dark font-14">
+                                            <span class="step-num-badge-new">9</span>
+                                            <span>Click on "Generate Challan".</span>
+                                        </li>
+                                        <li class="d-flex align-items-start gap-2 mb-2 text-dark font-14">
+                                            <span class="step-num-badge-new">10</span>
+                                            <span>Click on "View" button next to challan.</span>
+                                        </li>
+                                        <li class="d-flex align-items-start gap-2 mb-2 text-dark font-14">
+                                            <span class="step-num-badge-new">11</span>
+                                            <span>Select contribution amount and mode of payment.</span>
+                                        </li>
+                                        <li class="d-flex align-items-start gap-2 text-dark font-14">
+                                            <span class="step-num-badge-new">12</span>
+                                            <span>Click on "Submit" to complete payment.</span>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex-shrink-0 align-self-lg-center">
-                            <img src="../assets/images/application/img-accout-alert.png" alt="img" class="img-fluid wid-80">
+                        <div class="flex-shrink-0 align-self-lg-center d-none d-lg-block">
+                            <img src="../assets/images/application/img-accout-alert.png" alt="img" class="img-fluid wid-80 opacity-85">
                         </div>
                     </div>
                 </div>
@@ -116,227 +113,159 @@
     </div>
 
     <!-- [ Main Content ] start -->
-    <div class=" row">
-        <!-- [ sample-page ] start -->
+    <div class="row">
         <div class="col-sm-12">
-            <div class="card card-body table-card">
-                <div class="table-responsive">
-                    <table class="table tbl-product my-3" id="pc-dt-simple">
-                        <thead>
-                            <tr style="background-color: #cbcbcb;">
-                                <th class="text-end">#</th>
-                                <th>Employee ID</th>
-                                <th>Employee Name</th>
-                                <th>UAN</th>
-                                <th>Gross Wages</th>
-                                <th>PF Wages</th>
-                                <th>PF Employee Contribution</th>
-                                <th>PF Employer Contribution</th>
-                                <th>Challan No</th>
-                                <th>Payment Date</th>
-                                <th>Remarks</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($employees as $key => $emp)
-                                <tr>
-                                    <td class="text-end">{{ $key + 1 }}</td>
-
-                                    <td>
-                                        <span class="text-muted text-hover-primary">
-                                            {{ $emp->employee_id }}
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <h6 class="mb-1">{{ $emp->name }}</h6>
-                                    </td>
-
-                                    {{-- UAN --}}
-                                    <td>
-                                        <span class="text-muted text-hover-primary">
-                                            {{ $emp->epf_no }}
-                                        </span>
-                                    </td>
-
-                                    {{-- Gross Wages --}}
-                                    <td>
-                                        <span class="text-muted text-hover-primary">
-                                            ₹{{ number_format($emp->total_addition, 2) }}
-                                        </span>
-                                    </td>
-
-                                    {{-- PF Wages (same as gross or you can cap later) --}}
-                                    <td>
-                                        <span class="text-muted text-hover-primary">
-                                            ₹{{ number_format($emp->total_addition, 2) }}
-                                        </span>
-                                    </td>
-
-                                    {{-- PF Employee Contribution --}}
-                                    <td>
-                                        <span class="text-muted text-hover-primary">
-                                            ₹{{ number_format($emp->provident_fund, 2) }}
-                                        </span>
-                                    </td>
-
-                                    {{-- PF Employer Contribution (same value or modify later) --}}
-                                    <td>
-                                        <span class="text-muted text-hover-primary">
-                                            ₹{{ number_format($emp->provident_fund, 2) }}
-                                        </span>
-                                    </td>
-
-                                    {{-- Challan No --}}
-                                    <td>
-                                        <span class="text-muted text-hover-primary">
-                                            {{ $emp->payslip_no }}
-                                        </span>
-                                    </td>
-
-                                    {{-- Payment Date --}}
-                                    <td>
-                                        <span class="text-muted text-hover-primary">
-                                            {{ \Carbon\Carbon::parse($emp->payment_date)->format('d-m-Y') }}
-                                        </span>
-                                    </td>
-
-                                    {{-- Remarks --}}
-                                    <td>
-                                        <span class="badge bg-success">Done</span>
-                                    </td>
-
-                                    {{-- Action --}}
-                                    <td>
-                                        <a href="javascript:void(0)"
-   class="avtar avtar-xs btn-link-secondary viewPF"
-   data-bs-toggle="modal"
-   data-bs-target="#viewDetailsModal"
-
-   data-month="{{ \Carbon\Carbon::parse($emp->payment_date)->format('F Y') }}"
-   data-name="{{ $emp->name }} ({{ $emp->employee_id }})"
-   data-uan="{{ $emp->epf_no }}"
-   data-basic="{{ number_format($emp->total_addition, 2) }}"
-   data-emp_pf="{{ number_format($emp->provident_fund, 2) }}"
-   data-employer_pf="{{ number_format($emp->provident_fund, 2) }}"
-   data-pension="{{ number_format(($emp->total_addition * 8.33) / 100, 2) }}"
-   data-total="{{ number_format(($emp->provident_fund * 2), 2) }}"
-   data-challan="{{ $emp->payslip_no }}"
->
-    <i class="ti ti-eye f-20"></i>
-</a>
-                                    </td>
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table tbl-product m-0 custom-list-table align-middle" id="pc-dt-simple">
+                            <thead>
+                                <tr class="bg-light-header">
+                                    <th class="text-end py-3 ps-4" style="width: 60px;">#</th>
+                                    <th class="py-3">Employee ID</th>
+                                    <th class="py-3">Employee Name</th>
+                                    <th class="py-3">UAN</th>
+                                    <th class="py-3">Gross Wages</th>
+                                    <th class="py-3">PF Wages</th>
+                                    <th class="py-3">Employee Contribution</th>
+                                    <th class="py-3">Employer Contribution</th>
+                                    <th class="py-3">Challan No</th>
+                                    <th class="py-3">Payment Date</th>
+                                    <th class="py-3">Status</th>
+                                    <th class="text-center py-3 pe-4" style="width: 100px;">Action</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="12" class="text-center text-muted">
-                                        No PF records found for this month
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse ($employees as $key => $emp)
+                                    <tr>
+                                        <td class="text-end ps-4 fw-medium text-muted">{{ $key + 1 }}</td>
+                                        <td class="fw-bold text-dark">{{ $emp->employee_id }}</td>
+                                        <td>{{ $emp->name }}</td>
+                                        <td class="text-muted">{{ $emp->epf_no }}</td>
+                                        <td class="fw-semibold text-dark">₹ {{ number_format($emp->total_addition, 2) }}</td>
+                                        <td class="fw-semibold text-dark">₹ {{ number_format($emp->total_addition, 2) }}</td>
+                                        <td class="text-primary fw-semibold">₹ {{ number_format($emp->provident_fund, 2) }}</td>
+                                        <td class="text-success fw-semibold">₹ {{ number_format($emp->provident_fund, 2) }}</td>
+                                        <td class="text-muted">{{ $emp->payslip_no }}</td>
+                                        <td class="text-muted">{{ \Carbon\Carbon::parse($emp->payment_date)->format('d-m-Y') }}</td>
+                                        <td><span class="badge-pill-custom badge-pill-resolved">Done</span></td>
+                                        <td class="text-center pe-4">
+                                            <a href="javascript:void(0)"
+                                                class="btn-action-detail viewPF"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewDetailsModal"
+                                                data-month="{{ \Carbon\Carbon::parse($emp->payment_date)->format('F Y') }}"
+                                                data-name="{{ $emp->name }} ({{ $emp->employee_id }})"
+                                                data-uan="{{ $emp->epf_no }}"
+                                                data-basic="{{ number_format($emp->total_addition, 2) }}"
+                                                data-emp_pf="{{ number_format($emp->provident_fund, 2) }}"
+                                                data-employer_pf="{{ number_format($emp->provident_fund, 2) }}"
+                                                data-pension="{{ number_format(($emp->total_addition * 8.33) / 100, 2) }}"
+                                                data-total="{{ number_format(($emp->provident_fund * 2), 2) }}"
+                                                data-challan="{{ $emp->payslip_no }}"
+                                                title="View Details">
+                                                <i class="ti ti-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="12" class="text-center text-muted py-4">
+                                            No PF records found for this month
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- [ sample-page ] end -->
     </div>
     <!-- [ Main Content ] end -->
 </div>
 
+<!-- Modal -->
 <div class="modal custom-modal fade" id="viewDetailsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">PF Filing Details</h5>
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark font-20">PF Filing Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="modal-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="fw-bold">PF Month:</label>
-                        <p class="text-muted" id="pf_month"></p>
+            <div class="modal-body py-4">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">PF Month</label>
+                        <p class="text-dark fw-semibold mb-0" id="pf_month"></p>
                     </div>
-                    <div class="col-md-6">
-                        <label class="fw-bold">Employee Name & ID:</label>
-                        <p class="text-muted" id="emp_name_id"></p>
+                    <div class="col-6">
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">Employee Name & ID</label>
+                        <p class="text-dark fw-semibold mb-0" id="emp_name_id"></p>
                     </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="fw-bold">UAN:</label>
-                        <p class="text-muted" id="uan"></p>
+                    <div class="col-12"><hr class="my-1 border-light"></div>
+                    <div class="col-6">
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">UAN</label>
+                        <p class="text-dark fw-semibold mb-0" id="uan"></p>
                     </div>
-                    <div class="col-md-6">
-                        <label class="fw-bold">Basic Salary:</label>
-                        <p class="text-muted" id="basic_salary"></p>
+                    <div class="col-6">
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">Basic Salary</label>
+                        <p class="text-dark fw-semibold mb-0" id="basic_salary"></p>
                     </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="fw-bold">Employee PF (12%):</label>
-                        <p class="text-muted" id="emp_pf"></p>
+                    <div class="col-12"><hr class="my-1 border-light"></div>
+                    <div class="col-6">
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">Employee PF (12%)</label>
+                        <p class="text-primary fw-bold mb-0" id="emp_pf"></p>
                     </div>
-                    <div class="col-md-6">
-                        <label class="fw-bold">Employer PF (3.67%):</label>
-                        <p class="text-muted" id="employer_pf"></p>
+                    <div class="col-6">
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">Employer PF (3.67%)</label>
+                        <p class="text-success fw-bold mb-0" id="employer_pf"></p>
                     </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label class="fw-bold">Pension (8.33%):</label>
-                        <p class="text-muted" id="pension_pf"></p>
+                    <div class="col-12"><hr class="my-1 border-light"></div>
+                    <div class="col-6">
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">Pension (8.33%)</label>
+                        <p class="text-dark fw-semibold mb-0" id="pension_pf"></p>
                     </div>
-                    <div class="col-md-6">
-                        <label class="fw-bold">Total Contribution:</label>
-                        <p class="text-muted" id="total_pf"></p>
+                    <div class="col-6">
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">Total Contribution</label>
+                        <p class="text-dark fw-bold mb-0" id="total_pf"></p>
                     </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-12">
-                        <label class="fw-bold">PF Challan Reference:</label>
-                        <p class="text-muted" id="challan_no"></p>
+                    <div class="col-12"><hr class="my-1 border-light"></div>
+                    <div class="col-12">
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">PF Challan Reference</label>
+                        <p class="text-dark fw-bold mb-0" id="challan_no"></p>
                     </div>
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <div class="modal-footer border-top-0 pt-0">
+                <button class="btn btn-secondary rounded-3 px-4" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
-
-
-
 <div class="offcanvas offcanvas-end" tabindex="-1" id="pfFilterOffcanvas" aria-labelledby="pfFilterOffcanvasLabel">
     <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="pfFilterOffcanvasLabel">Filter PF Filing Records</h5>
+        <h5 class="offcanvas-title fw-bold text-dark" id="pfFilterOffcanvasLabel">Filter PF Filing Records</h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
         <form id="pfFilterForm">
             <div class="row g-3 mb-4">
                 <div class="col-12">
-                    <label for="filterPfName" class="form-label">Employee Name</label>
+                    <label for="filterPfName" class="form-label fw-semibold text-dark">Employee Name</label>
                     <input type="text" class="form-control" id="filterPfName" name="name" placeholder="Filter by name">
                 </div>
                 <div class="col-12">
-                    <label for="filterPfEmployeeId" class="form-label">Employee ID</label>
+                    <label for="filterPfEmployeeId" class="form-label fw-semibold text-dark">Employee ID</label>
                     <input type="text" class="form-control" id="filterPfEmployeeId" name="employee_id" placeholder="Filter by employee ID">
                 </div>
             </div>
 
             <div class="mb-4">
-                <h6 class="mb-3">Filter By Period</h6>
+                <h6 class="mb-3 fw-bold text-dark">Filter By Period</h6>
                 <div class="d-flex gap-3 flex-wrap">
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="pfPeriodType" id="pfPeriodMonth" value="month" checked>
@@ -355,7 +284,7 @@
 
             <div class="row g-3 mb-4">
                 <div class="col-12" id="filterPfMonthGroup">
-                    <label for="filterPfMonth" class="form-label">Select Month</label>
+                    <label for="filterPfMonth" class="form-label fw-semibold text-dark">Select Month</label>
                     <select class="form-select" id="filterPfMonth" name="month">
                         <option value="">Choose month</option>
                         <option value="january">January</option>
@@ -373,7 +302,7 @@
                     </select>
                 </div>
                 <div class="col-12 d-none" id="filterPfQuarterGroup">
-                    <label for="filterPfQuarter" class="form-label">Select Quarter</label>
+                    <label for="filterPfQuarter" class="form-label fw-semibold text-dark">Select Quarter</label>
                     <select class="form-select" id="filterPfQuarter" name="quarter">
                         <option value="">Choose quarter</option>
                         <option value="q1">Quarter 1 (Apr - Jun)</option>
@@ -383,7 +312,7 @@
                     </select>
                 </div>
                 <div class="col-12 d-none" id="filterPfYearGroup">
-                    <label for="filterPfYear" class="form-label">Select Year</label>
+                    <label for="filterPfYear" class="form-label fw-semibold text-dark">Select Year</label>
                     <select class="form-select" id="filterPfYear" name="year">
                         <option value="">Choose year</option>
                         <option value="2023-2024">2023-2024</option>
@@ -395,10 +324,10 @@
             </div>
 
             <div class="mb-4">
-                <h6 class="mb-3">Download Options</h6>
+                <h6 class="mb-3 fw-bold text-dark">Download Options</h6>
                 <div class="row g-3 align-items-end">
                     <div class="col-12">
-                        <label for="pfDownloadFormat" class="form-label">Choose format</label>
+                        <label for="pfDownloadFormat" class="form-label fw-semibold text-dark">Choose format</label>
                         <select class="form-select" id="pfDownloadFormat" name="download_format">
                             <option value="">Select format</option>
                             <option value="pdf">PDF</option>
@@ -418,26 +347,105 @@
         <button type="button" class="btn btn-light" id="pfFilterReset">Reset</button>
         <div class="d-flex gap-2">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas">Close</button>
-            
         </div>
     </div>
 </div>
 
+<style>
+/* Premium Alert Styles (Visible by default) */
+.premium-warning-alert {
+    background: #fffdf5;
+    border-left: 4px solid #f59e0b !important;
+    border: 1px solid #ffeeba;
+}
+.step-num-badge-new {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
 
+/* Custom Table Styles */
+.bg-light-header {
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+.custom-list-table th {
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.custom-list-table td {
+    padding: 14px 12px !important;
+}
+.custom-list-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+.custom-list-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+.btn-action-detail {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #4f46e5;
+    background: rgba(79, 70, 229, 0.08);
+    border: none;
+    transition: all 0.2s;
+}
+.btn-action-detail:hover {
+    color: #ffffff;
+    background: #4f46e5;
+}
+
+/* Custom Badge Styling */
+.badge-pill-custom {
+    padding: 4px 12px;
+    border-radius: 50rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.badge-pill-resolved {
+    background: rgba(16, 185, 129, 0.08);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.font-12 {
+    font-size: 12px;
+}
+.font-14 {
+    font-size: 14px;
+}
+</style>
 
 <script>
      $(document).on('click', '.viewPF', function () {
-
         $('#pf_month').text($(this).data('month'));
         $('#emp_name_id').text($(this).data('name'));
         $('#uan').text($(this).data('uan'));
-        $('#basic_salary').text('₹' + $(this).data('basic'));
-        $('#emp_pf').text('₹' + $(this).data('emp_pf'));
-        $('#employer_pf').text('₹' + $(this).data('employer_pf'));
-        $('#pension_pf').text('₹' + $(this).data('pension'));
-        $('#total_pf').text('₹' + $(this).data('total'));
+        $('#basic_salary').text('₹ ' + $(this).data('basic'));
+        $('#emp_pf').text('₹ ' + $(this).data('emp_pf'));
+        $('#employer_pf').text('₹ ' + $(this).data('employer_pf'));
+        $('#pension_pf').text('₹ ' + $(this).data('pension'));
+        $('#total_pf').text('₹ ' + $(this).data('total'));
         $('#challan_no').text($(this).data('challan'));
-
     });
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -478,11 +486,9 @@
                 });
             }
 
-            // Initial toggle
             toggleGroups();
         };
 
-        // Initialize immediately and also when offcanvas is shown
         initPfPeriodToggle();
 
         const offcanvasElement = document.getElementById('pfFilterOffcanvas');
@@ -494,9 +500,6 @@
     });
 
     $('#pfFilterForm button').on('click', function () {
-
-        let form = $('#pfFilterForm');
-
         $('<form>', {
             action: "{{ route('download.pf.filing') }}",
             method: 'POST'
@@ -511,8 +514,6 @@
             $('<input>', { type: 'hidden', name: 'download_format', value: $('#pfDownloadFormat').val() })
         ).appendTo('body').submit().remove();
     });
-
-
 </script>
 
 @endsection

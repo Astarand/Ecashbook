@@ -1941,3 +1941,254 @@ label[for="fileUpload"].btn-primary.btn-icon:active {
     box-shadow: 0 0 0 3px rgba(66, 47, 144, 0.15) !important;
     outline: none !important;
 }
+
+/* Premium Ticket Chat Modal styling */
+#ticketChatModal .modal-content {
+    border-radius: 16px !important;
+    border: none !important;
+    overflow: hidden !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+#ticketChatModal .modal-header {
+    background: linear-gradient(135deg, #4f46e5, #3b82f6) !important;
+    color: #fff !important;
+    padding: 18px 24px !important;
+    border-bottom: none !important;
+}
+
+#ticketChatModal .modal-header .modal-title {
+    font-weight: 700 !important;
+    color: #fff !important;
+    font-size: 1.15rem !important;
+    letter-spacing: 0.3px !important;
+}
+
+#ticketChatModal .modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%) !important;
+}
+
+#ticketChatModal .chat-wrapper {
+    background: #f8fafc !important;
+}
+
+#ticketChatModal .chat-content {
+    background: #ffffff !important;
+}
+
+#ticketChatModal .chat-content .border-bottom {
+    background: #ffffff !important;
+    padding: 16px 24px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+#ticketChatModal .chat-content h6 {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+}
+
+#ticketChatModal .chat-avtar {
+    position: relative !important;
+}
+
+#ticketChatModal .chat-badge {
+    position: absolute !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    width: 12px !important;
+    height: 12px !important;
+    border: 2px solid #fff !important;
+    border-radius: 50% !important;
+}
+
+#ticketChatModal .chat-message {
+    padding: 24px !important;
+    background-color: #f8fafc !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #cbd5e1 #f1f5f9 !important;
+}
+
+#ticketChatModal .chat-message::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+#ticketChatModal .chat-message::-webkit-scrollbar-track {
+    background: #f1f5f9 !important;
+}
+
+#ticketChatModal .chat-message::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 4px !important;
+}
+
+/* Chat Bubbles */
+#ticketChatModal .message-out,
+#ticketChatModal .message-in {
+    margin-bottom: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+}
+
+#ticketChatModal .message-out {
+    align-items: flex-end !important;
+}
+
+#ticketChatModal .message-in {
+    align-items: flex-start !important;
+}
+
+#ticketChatModal .message-out > div,
+#ticketChatModal .message-in > div,
+#ticketChatModal .message-out .message,
+#ticketChatModal .message-in .message,
+#ticketChatModal .chat-msg {
+    width: 100% !important;
+}
+
+#ticketChatModal .message-in .chat-msg .flex-grow-1 {
+    width: 100% !important;
+}
+
+#ticketChatModal .message-out .msg-content {
+    background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+    color: #ffffff !important;
+    padding: 12px 18px !important;
+    border-radius: 16px 16px 4px 16px !important;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15) !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    display: inline-block !important;
+    width: auto !important;
+    max-width: 80% !important;
+    min-width: 50px !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+}
+
+#ticketChatModal .message-out .msg-content p {
+    color: #ffffff !important;
+    margin-bottom: 0 !important;
+}
+
+#ticketChatModal .message-in .msg-content {
+    background: #ffffff !important;
+    color: #334155 !important;
+    padding: 12px 18px !important;
+    border-radius: 16px 16px 16px 4px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    display: inline-block !important;
+    width: auto !important;
+    max-width: 80% !important;
+    min-width: 50px !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+}
+
+#ticketChatModal .msg-content img {
+    max-width: 200px !important;
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 8px !important;
+    margin-top: 8px !important;
+    display: block !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+#ticketChatModal .message-in .msg-content p {
+    color: #334155 !important;
+    margin-bottom: 0 !important;
+}
+
+#ticketChatModal .message-out p.text-muted,
+#ticketChatModal .message-in p.text-muted {
+    font-size: 0.75rem !important;
+    margin-bottom: 4px !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+}
+
+/* Modal Footer & Input Area */
+#ticketChatModal .modal-footer {
+    background: #ffffff !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding: 16px 24px !important;
+}
+
+#ticketChatModal .modal-footer .input-group {
+    background: #f1f5f9 !important;
+    border-radius: 30px !important;
+    padding: 4px 6px 4px 16px !important;
+    border: 1px solid #cbd5e1 !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: all 0.2s ease !important;
+    width: 100% !important;
+}
+
+#ticketChatModal .modal-footer .input-group:focus-within {
+    background: #ffffff !important;
+    border-color: #4f46e5 !important;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12) !important;
+}
+
+#ticketChatModal .modal-footer .form-control {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 10px 0 !important;
+    font-size: 0.95rem !important;
+    color: #1e293b !important;
+}
+
+#ticketChatModal .modal-footer .form-control:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+#ticketChatModal .modal-footer .form-control::placeholder {
+    color: #94a3b8 !important;
+}
+
+#ticketChatModal .modal-footer .btn-outline-secondary {
+    border: none !important;
+    color: #64748b !important;
+    background: transparent !important;
+    padding: 8px 12px !important;
+    border-radius: 50% !important;
+    transition: all 0.2s ease !important;
+}
+
+#ticketChatModal .modal-footer .btn-outline-secondary:hover {
+    color: #4f46e5 !important;
+    background: #f1f5f9 !important;
+}
+
+#ticketChatModal .modal-footer .btn-primary {
+    background: #4f46e5 !important;
+    border: none !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25) !important;
+    transition: all 0.2s ease !important;
+}
+
+#ticketChatModal .modal-footer .btn-primary:hover {
+    background: #4338ca !important;
+    transform: scale(1.05) !important;
+}
+
+#ticketChatModal .modal-footer .btn-primary i {
+    font-size: 1.1rem !important;
+}
+

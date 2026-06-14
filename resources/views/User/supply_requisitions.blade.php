@@ -7,19 +7,24 @@
             <div class="page-block">
                 <div class="row align-items-center">
                     <div class="col-md-12">
-                        <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Purchase Requisitions</li>
-                        </ul>
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <ul class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                                <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Purchase Requisitions</li>
+                            </ul>
+                            <a href="javascript:void(0);" id="start-supply-requisitions-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                                <u>How does this Page works?</u>
+                            </a>
+                        </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4 mt-2">
                         <div class="page-header-title">
                             <h2 class="mb-0">Purchase Requisition</h2>
                         </div>
                     </div>
-                    <div class="col-md-8 text-end">
-                        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRequisitionModal"><i class="ti ti-square-plus"></i> Add New Purchase Requisition</a>
+                    <div class="col-md-8 text-end mt-2">
+                        <a href="#" class="btn btn-primary tour-add-requisition" data-bs-toggle="modal" data-bs-target="#addRequisitionModal"><i class="ti ti-square-plus"></i> Add New Purchase Requisition</a>
                     </div>
                 </div>
             </div>
@@ -68,7 +73,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="#" class="btn btn-sm btn-light-primary" data-bs-toggle="modal" data-bs-target="#viewRequisitionModal{{ $req->id }}"><i class="ti ti-eye"></i></a>
+                                        <a href="#" class="btn btn-sm btn-light-primary tour-requisition-actions" data-bs-toggle="modal" data-bs-target="#viewRequisitionModal{{ $req->id }}"><i class="ti ti-eye"></i></a>
                                         <a href="#" class="btn btn-sm btn-light-warning" data-bs-toggle="modal" data-bs-target="#editRequisitionModal{{ $req->id }}"><i class="ti ti-edit"></i></a>
                                         {{-- <a href="#" class="btn btn-sm btn-light-danger"><i class="ti ti-trash"></i></a> --}}
                                     </td>
@@ -847,7 +852,9 @@
         @endforeach
 
     </div>
+@endsection
 
+@section('page-script')
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.querySelector("form[action='{{ route('requisition.store') }}']");
@@ -909,8 +916,51 @@
                     .catch(() => showToast("Server error", "error"));
                 });
             });
+        });
 
+        // --- Interactive Tour ---
+        function startSupplyRequisitionsTour() {
+            if (typeof introJs !== 'function') return;
+
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Purchase Requisitions Guide',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-shopping-cart" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Request new office supplies, technological equipment, or inventory materials.</p></div>'
+                    },
+                    {
+                        element: '.tour-add-requisition',
+                        title: 'Add Purchase Requisition',
+                        intro: 'Click here to submit a new requisition request, specify items, quantity, budget, and attach catalogs.'
+                    },
+                    {
+                        element: '#pc-dt-simple',
+                        title: 'Requisitions Table',
+                        intro: 'Track submission dates, requisition categories, priority, and current status of all requests.'
+                    },
+                    {
+                        element: '.tour-requisition-actions',
+                        title: 'View Requisition',
+                        intro: 'Click here to view detailed specifications, comments, and reference documents for this request.',
+                        position: 'left'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            }).start();
+        }
+
+        $(document).ready(function() {
+            $('#start-supply-requisitions-tour').on('click', function(e) {
+                e.preventDefault();
+                startSupplyRequisitionsTour();
+            });
         });
     </script>
-
-    @endsection
+@endsection

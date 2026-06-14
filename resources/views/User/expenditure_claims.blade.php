@@ -7,19 +7,24 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Expense Reimbursements</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Expense Reimbursements</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-expenditure-claims-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Expenditure Claims</h2>
                     </div>
                 </div>
-                <div class="col-md-8 text-end">
-                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenditureModal"><i class="ti ti-square-plus"></i> Add New Expenditure Claim</a>
+                <div class="col-md-8 text-end mt-2">
+                    <a href="#" class="btn btn-primary tour-add-claim" data-bs-toggle="modal" data-bs-target="#addExpenditureModal"><i class="ti ti-square-plus"></i> Add New Expenditure Claim</a>
                 </div>
             </div>
         </div>
@@ -70,7 +75,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="#" class="avtar avtar-xs btn-link-secondary" data-bs-toggle="modal" data-bs-target="#viewClaimModal{{ $claim->id }}"><i class="ti ti-eye f-20"></i> </a>
+                                    <a href="#" class="avtar avtar-xs btn-link-secondary tour-claim-actions" data-bs-toggle="modal" data-bs-target="#viewClaimModal{{ $claim->id }}"><i class="ti ti-eye f-20"></i> </a>
                                     <a href="#" class="avtar avtar-xs btn-link-secondary" data-bs-toggle="modal" data-bs-target="#editClaimModal{{ $claim->id }}"><i class="ti ti-edit f-20"></i> </a>
                                 </td>
                             </tr>
@@ -749,6 +754,7 @@
 </div>
 @endsection
 
+@section('page-script')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         // Edit claim AJAX
@@ -820,4 +826,50 @@
                 });
         });
     });
+
+    // --- Interactive Tour ---
+    function startExpenditureClaimsTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Expenditure Claims Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-receipt" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Submit and manage expense claims and reimbursement requests for employees.</p></div>'
+                },
+                {
+                    element: '.tour-add-claim',
+                    title: 'Add Expenditure Claim',
+                    intro: 'Click here to record a new expenditure claim, select categories, upload receipts, and enter amounts.'
+                },
+                {
+                    element: '#pc-dt-simple',
+                    title: 'Expenditure Claims Table',
+                    intro: 'Track the status (Pending, Approved, or Rejected) and details of all expenditure claims.'
+                },
+                {
+                    element: '.tour-claim-actions',
+                    title: 'View Details',
+                    intro: 'Click here to view receipt attachments, comments, and full details of the claim.',
+                    position: 'left'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-expenditure-claims-tour').on('click', function(e) {
+            e.preventDefault();
+            startExpenditureClaimsTour();
+        });
+    });
 </script>
+@endsection

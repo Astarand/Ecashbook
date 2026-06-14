@@ -27,7 +27,7 @@
                 </div>
 								@if(Auth::user()->u_type == 2)
 								<div class="col-md-4 text-end">
-                    <a href="{{ route('user.StartupFiling') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Apply</a>
+                    <a href="{{ route('user.StartupFiling') }}" class="btn btn-primary tour-apply-btn"><i class="ti ti-square-plus"></i> Apply</a>
                 </div>
 				@endif
             </div>
@@ -41,68 +41,89 @@
         <div class="col-sm-12">
             <div class="card card-body table-card">
                 <div class="table-responsive">
-					<table class="table table-bordered mt-3" id="pc-dt-simple">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>Business Name</th>
-								<th>Founder Name</th>
-								<th>Date</th>
-								<th>Application Status</th>
-								<th>Process Date</th>
-								<th>Payment</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody>
-							@foreach($applications as $row)
-							<tr id="row{{ $row->id }}">
-								<td>{{ $loop->iteration }}</td>
-								<td>{{ $row->business_name }}</td>
-								<td>{{ $row->founder_name }}</td>
-								<td>{{ $row->created_at->format('d-m-Y') }}</td>
-								<td>
-									<span class="badge bg-{{ $row->app_status == 'Processed' ? 'success' : 'warning' }}">
-										{{ $row->app_status }}
-									</span>
-								</td>
-								<td>
-									{{ $row->process_date ? \Carbon\Carbon::parse($row->process_date)->format('d-m-Y') : '-' }}
-								</td>
-								<td>
-									@if($row->payment_status == 'Full')
-										<span class="badge bg-success">Full</span>
-									@elseif($row->payment_status == 'Advance')
-										<span class="badge bg-warning text-dark">Advance</span>
-									@else
-										<span class="badge bg-secondary">Pending</span>
-									@endif
-								</td>
-								<td>
-									<a href="{{ url('/startup-filing/view/'.$row->id) }}"
-									   class="btn btn-primary btn-sm">
-										View
-									</a>
-									@if(Auth::user()->u_type == 3 || Auth::user()->u_type == 6)
-									<a href="javascript:void(0)"
-									   class="avtar avtar-xs btn-link-primary btn-pc-default"
-									   onclick="openStatusModal({{ $row->id }}, 'startup_incubator_applications')">
-										<i class="ti ti-edit f-18"></i>
-									</a>
-									@endif
-									@if(Auth::user()->u_type == 2)
-									<button class="btn btn-danger btn-sm deleteBtn"
-											data-id="{{ $row->id }}">
-										Delete
-									</button>
-									@endif
-								</td>
-							</tr>
-							@endforeach
-						</tbody>
-					</table>
-					
-
+                    <table class="table tbl-product table-hover mb-0" id="pc-dt-simple">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Business Name</th>
+                                <th>Founder Name</th>
+                                <th>Date Added</th>
+                                <th>Application Status</th>
+                                <th>Process Date</th>
+                                <th>Payment Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($applications as $row)
+                            <tr id="row{{ $row->id }}">
+                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td>
+                                    <div class="row align-items-center">
+                                        <div class="col-auto pe-0">
+                                            <div class="avtar avtar-s btn-light-primary">
+                                                <i class="ti ti-rocket f-20"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <h6 class="mb-0">{{ $row->business_name }}</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ $row->founder_name }}</td>
+                                <td>
+                                    <span class="text-muted"><i class="ti ti-calendar me-1"></i>{{ $row->created_at->format('d-m-Y') }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light-{{ $row->app_status == 'Processed' ? 'success text-success' : 'warning text-warning' }}">
+                                        {{ $row->app_status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">
+                                        <i class="ti ti-calendar-event me-1"></i>{{ $row->process_date ? \Carbon\Carbon::parse($row->process_date)->format('d-m-Y') : '-' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($row->payment_status == 'Full')
+                                        <span class="badge bg-light-success text-success">Full</span>
+                                    @elseif($row->payment_status == 'Advance')
+                                        <span class="badge bg-light-warning text-warning">Advance</span>
+                                    @else
+                                        <span class="badge bg-light-secondary text-secondary">Pending</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center gap-2">
+                                        <a href="{{ url('/startup-filing/view/'.$row->id) }}"
+                                           class="avtar avtar-xs btn-link-success btn-pc-default"
+                                           data-bs-toggle="tooltip"
+                                           title="View Details">
+                                            <i class="ti ti-eye f-18"></i>
+                                        </a>
+                                        @if(Auth::user()->u_type == 3 || Auth::user()->u_type == 6)
+                                        <a href="javascript:void(0)"
+                                           class="avtar avtar-xs btn-link-warning btn-pc-default"
+                                           onclick="openStatusModal({{ $row->id }}, 'startup_incubator_applications')"
+                                           data-bs-toggle="tooltip"
+                                           title="Update Status">
+                                            <i class="ti ti-edit-circle f-18"></i>
+                                        </a>
+                                        @endif
+                                        @if(Auth::user()->u_type == 2)
+                                        <button class="avtar avtar-xs btn-link-danger btn-pc-default deleteBtn"
+                                                data-id="{{ $row->id }}"
+                                                data-bs-toggle="tooltip"
+                                                title="Delete Application">
+                                            <i class="ti ti-trash f-18"></i>
+                                        </button>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -221,23 +242,29 @@
 function startStartupFilingListTour() {
     if (typeof introJs !== 'function') return;
 
+    let steps = [
+        {
+            title: 'Incubator Applications Guide',
+            intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-rocket" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Review incubator application logs, filing states, payment details, and processed status indicators.</p></div>'
+        }
+    ];
+
+    if (document.querySelector('.tour-apply-btn')) {
+        steps.push({
+            element: '.tour-apply-btn',
+            title: 'Apply New Service',
+            intro: 'Click here to start a new Startup Incubator Service engagement.'
+        });
+    }
+
+    steps.push({
+        element: '.table-responsive',
+        title: 'Applications Table',
+        intro: 'Review business name, founder details, application statuses, and process dates.'
+    });
+
     introJs().setOptions({
-        steps: [
-            {
-                title: 'Incubator Applications Guide',
-                intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-rocket" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Review incubator application logs, filing states, payment details, and processed status indicators.</p></div>'
-            },
-            {
-                element: 'a[href="{{ route('user.StartupFiling') }}"]',
-                title: 'Apply New Service',
-                intro: 'Click here to start a new Startup Incubator Service engagement.'
-            },
-            {
-                element: '.table-responsive',
-                title: 'Applications Table',
-                intro: 'Review business name, founder details, application statuses, and process dates.'
-            }
-        ],
+        steps: steps,
         showBullets: true,
         showProgress: true,
         helperElementPadding: 5,

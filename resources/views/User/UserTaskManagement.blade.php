@@ -8,19 +8,24 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Employee Task Management</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Employee Task Management</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-task-management-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Task Management</h2>
                     </div>
                 </div>
-                 <div class="col-md-8 text-end">
-                    <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal"><i class="ti ti-square-plus"></i> Assign New Task</a>
+                 <div class="col-md-8 text-end mt-2">
+                    <a href="#" class="btn btn-primary tour-assign-task" data-bs-toggle="modal" data-bs-target="#addTaskModal"><i class="ti ti-square-plus"></i> Assign New Task</a>
                 </div>
             </div>
         </div>
@@ -68,7 +73,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="#" class="btn btn-sm btn-light-primary" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ $task->id }}"><i class="ti ti-eye"></i></a>                                            
+                                            <a href="#" class="btn btn-sm btn-light-primary tour-task-actions" data-bs-toggle="modal" data-bs-target="#viewTaskModal{{ $task->id }}"><i class="ti ti-eye"></i></a>                                            
 											<a href="javascript:void(0);" class="btn btn-sm btn-light-warning edit-task-btn" data-id="{{ $task->id }}"><i class="ti ti-edit"></i></a>
                                             <a href="javascript:void(0);" class="btn btn-sm btn-light-danger delete-task-btn" data-id="{{ $task->id }}"> <i class="ti ti-trash"></i> </a>
                                         </td>
@@ -669,7 +674,51 @@
 				});
 			});
 		});
-
 	});
+
+    // --- Interactive Tour ---
+    function startTaskManagementTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Task Management Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-list-check" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Delegate, assign, and monitor tasks assigned to your employees.</p></div>'
+                },
+                {
+                    element: '.tour-assign-task',
+                    title: 'Assign New Task',
+                    intro: 'Click here to assign a new task to your employees, set deadlines, and configure priority levels.'
+                },
+                {
+                    element: '#pc-dt-simple',
+                    title: 'Tasks List',
+                    intro: 'View and track all assigned tasks, including priorities, deadlines, and current completion status.'
+                },
+                {
+                    element: '.tour-task-actions',
+                    title: 'Task Actions',
+                    intro: 'Use these controls to view complete details, edit task status, or delete task assignments.',
+                    position: 'left'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-task-management-tour').on('click', function(e) {
+            e.preventDefault();
+            startTaskManagementTour();
+        });
+    });
 </script>
 @endsection
