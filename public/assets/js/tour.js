@@ -23,6 +23,14 @@ $(document).ready(function() {
     // Only run tour if introJs function is defined
     if (typeof introJs !== 'function') return;
     
+    // Defer tour if any modal is currently visible on screen
+    if ($('.modal.show').length > 0) {
+      $('.modal.show').one('hidden.bs.modal', function() {
+        setTimeout(startIntroTour, 500);
+      });
+      return;
+    }
+    
     // Only run tour if elements exist on page (specifically for dashboard page tour)
     if (!document.getElementById('start-tour-btn') && !document.querySelector('.tour-search')) return;
 
