@@ -11,11 +11,16 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Tax Filing & Returns</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">MSME Compliance Reports</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Tax Filing & Returns</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">MSME Compliance Reports</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-msme-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <i class="ti ti-help-circle f-18"></i> <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
@@ -24,7 +29,7 @@
                 </div>
 				@if(Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
 				<div class="col-md-8 text-end">
-                    <a href="{{ route('user.MSMECompliance') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Apply</a>
+                    <a href="{{ route('user.MSMECompliance') }}" class="btn btn-primary btn-apply-msme"><i class="ti ti-square-plus"></i> Apply</a>
                 </div>
 				@endif
             </div>
@@ -36,7 +41,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card msme-table-card">
                 <div class="table-responsive">
                     <table class="table table-product mt-3">
 						<thead>
@@ -97,7 +102,7 @@
 										<ul class="list-inline me-auto mb-0">
 											<li class="list-inline-item" data-bs-toggle="tooltip" title="View Reply">
 												<a href="#ticketChatModal"
-												   class="avtar avtar-xs btn-link-warning btn-pc-default"
+												   class="avtar avtar-xs btn-link-warning btn-pc-default msme-chat-btn"
 												   data-bs-toggle="modal"
 												   data-bs-target="#ticketChatModal"
 												   onclick="openChat({{ $row->id }},'{{ $row->status }}')">
@@ -672,6 +677,49 @@
 					location.reload();
 				}
 			}
+		});
+	});
+
+	function startMsmeListTour() {
+		if (typeof introJs !== 'function') return;
+
+		introJs().setOptions({
+			steps: [
+				{
+					title: 'MSME Compliance Reports',
+					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-help-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage and track your MSME application requests, status updates, and compliance support chats.</p></div>'
+				},
+				{
+					element: '.btn-apply-msme',
+					title: 'Submit Application',
+					intro: 'Click here to apply for a new MSME compliance support request and select preferred services.'
+				},
+				{
+					element: '.msme-table-card',
+					title: 'Applications Log',
+					intro: 'Track the status of all your submitted MSME application requests, including processing dates and payment records.'
+				},
+				{
+					element: '.msme-chat-btn',
+					title: 'Compliance Chat',
+					intro: 'Click this icon to converse directly with our experts, respond to queries, and attach compliance documents.'
+				}
+			],
+			showBullets: true,
+			showProgress: true,
+			helperElementPadding: 5,
+			exitOnOverlayClick: false,
+			doneLabel: 'Done',
+			nextLabel: 'Next',
+			prevLabel: 'Prev',
+			skipLabel: 'Skip'
+		}).start();
+	}
+
+	$(document).ready(function() {
+		$('#start-msme-list-tour').on('click', function(e) {
+			e.preventDefault();
+			startMsmeListTour();
 		});
 	});
 </script>
