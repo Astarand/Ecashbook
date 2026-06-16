@@ -45,8 +45,8 @@
                                 <td>{{ date('F', mktime(0, 0, 0, $payslip->month, 1)) }}</td>
                                 <td>{{ $payslip->financial_year }}</td>
                                 <td>
-                                    <a href="/download-payslip/{{ $payslip->id }}" class="btn btn-success" target="_blank">
-                                        Download Payslip
+                                    <a href="/download-payslip/{{ $payslip->id }}" class="avtar avtar-xs btn-link-secondary" target="_blank" data-bs-toggle="tooltip" title="Download">
+                                        <i class="ti ti-download f-20"></i>
                                     </a>
                                 </td>
                             </tr>
@@ -76,7 +76,7 @@
                 {
                     element: '#payslips-table-card',
                     title: 'Payslips Table',
-                    intro: 'List of all generated payslips showing the month, year, and a direct download button for PDF format.'
+                    intro: 'List of all generated payslips showing the month, year, and a direct download icon for PDF format.'
                 }
             ],
             showBullets: true,

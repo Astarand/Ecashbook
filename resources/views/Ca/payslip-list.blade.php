@@ -39,7 +39,7 @@
 								<th>Payslip No.</th>								
 								<th>Year</th>
 								<th>Month</th>
-								<th>Download</th>
+								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -51,7 +51,9 @@
 								<td>{{ $row->financial_year }}</td>
 								<td>{{ date('F', mktime(0, 0, 0, $row->month, 1)) }}</td>
 								<td>
-									<a href="{{ url('download-payslip/'.$row->id) }}" target="_blank" class="btn btn-sm btn-primary">Download</a>
+									<a href="{{ url('download-payslip/'.$row->id) }}" target="_blank" class="avtar avtar-xs btn-link-secondary" data-bs-toggle="tooltip" title="Download">
+										<i class="ti ti-download f-20"></i>
+									</a>
 								</td>
 							</tr>
 							@endforeach
@@ -144,7 +146,7 @@ $('#confirmDeleteTask').on('click', function () {
                 {
                     element: '#payslips-table-card',
                     title: 'Payslips Table',
-                    intro: 'List of all generated payslips showing the employee name, payslip number, financial year, month, and a direct download button for PDF format.'
+                    intro: 'List of all generated payslips showing the employee name, payslip number, financial year, month, and a direct download icon for PDF format.'
                 }
             ],
             showBullets: true,
