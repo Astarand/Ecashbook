@@ -13,10 +13,13 @@
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
+                    <a href="javascript:void(0);" id="start-ca-tasks-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-3" style="font-size: 0.95rem; vertical-align: middle;">
+                        <u>How does this Page works?</u>
+                    </a>
                     <a href="#" class="btn btn-success me-2" data-bs-toggle="tooltip" title="Whatsapp"><i class="ti ti-brand-whatsapp"></i></a>
                     <a href="#" class="btn btn-secondary me-2" data-bs-toggle="tooltip" title="Download Now"><i class="ti ti-download"></i></a>
                     @if (Auth::user()->u_type == 1)
-					<a href="{{ route('ca.AddTask') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Task</a>
+					<a href="{{ route('ca.AddTask') }}" class="btn btn-primary" id="add-task-btn"><i class="ti ti-square-plus"></i> Add New Task</a>
 					@endif
                 </div>
             </div>
@@ -28,7 +31,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card table-card">
+            <div class="card table-card" id="tasks-table-card">
                 <div class="card-body table-card">
                     <table class="table tbl-product" id="pc-dt-simple">
                         <thead>
@@ -150,7 +153,9 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('page-script')
 <script>
     $(document).on('click', '.delete-task-btn', function () {
     var taskId = $(this).data('id');
@@ -186,4 +191,49 @@ $('#confirmDeleteTask').on('click', function () {
 
 </script>
 
+<script>
+    function startCATasksTour() {
+        if (typeof introJs !== 'function') return;
+
+        const steps = [
+            {
+                title: 'Task Management Portal',
+                intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-list-check" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Oversee and manage client tasks, update progress status, and monitor deadlines.</p></div>'
+            },
+            {
+                element: '#tasks-table-card',
+                title: 'Tasks Database Table',
+                intro: 'View a detailed list of tasks including Task ID, Date/Time, Client Name, Category, Assigned Employee, Due Date, and Project Status.'
+            }
+        ];
+
+        // If add task button exists (for CA admin u_type 1)
+        if (document.getElementById('add-task-btn')) {
+            steps.splice(1, 0, {
+                element: '#add-task-btn',
+                title: 'Create New Task',
+                intro: 'Click here to initialize and delegate a new task for a client and assign it to an employee.'
+            });
+        }
+
+        introJs().setOptions({
+            steps: steps,
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-ca-tasks-tour').on('click', function(e) {
+            e.preventDefault();
+            startCATasksTour();
+        });
+    });
+</script>
 @endsection

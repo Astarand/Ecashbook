@@ -13,6 +13,9 @@
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
+                    <a href="javascript:void(0);" id="start-employee-payslip-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-3" style="font-size: 0.95rem; vertical-align: middle;">
+                        <u>How does this Page works?</u>
+                    </a>
                     <a href="#" class="btn btn-success me-2" data-bs-toggle="tooltip" title="Whatsapp"><i class="ti ti-brand-whatsapp"></i></a>
                     <a href="#" class="btn btn-secondary me-2" data-bs-toggle="tooltip" title="Download Now"><i class="ti ti-download"></i></a>
                     
@@ -26,7 +29,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card table-card">
+            <div class="card table-card" id="payslips-table-card">
                 <div class="card-body table-card">
                     <table class="table tbl-product" id="pc-dt-simple">
                         <thead>
@@ -125,4 +128,41 @@ $('#confirmDeleteTask').on('click', function () {
 
 </script>
 
+@endsection
+
+@section('page-script')
+<script>
+    function startEmployeePayslipTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'View & Download Payslips',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-file-text" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Access and download your monthly generated salary payslips here.</p></div>'
+                },
+                {
+                    element: '#payslips-table-card',
+                    title: 'Payslips Table',
+                    intro: 'List of all generated payslips showing the employee name, payslip number, financial year, month, and a direct download button for PDF format.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-employee-payslip-tour').on('click', function(e) {
+            e.preventDefault();
+            startEmployeePayslipTour();
+        });
+    });
+</script>
 @endsection

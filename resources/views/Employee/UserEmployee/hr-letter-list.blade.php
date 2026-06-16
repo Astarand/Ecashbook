@@ -6,11 +6,16 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('userEmployee.hr-letters') }}">HR Letters</a></li>
-                        <li class="breadcrumb-item" aria-current="page">HR Letter List</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('userEmployee.hr-letters') }}">HR Letters</a></li>
+                            <li class="breadcrumb-item" aria-current="page">HR Letter List</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-employee-hr-letter-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
@@ -26,7 +31,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card" id="hr-letters-table-card">
                 <div class="table-responsive">
                     <table class="table tbl-product" id="pc-dt-simple">
                         <thead>
@@ -67,4 +72,38 @@
 @endsection
 
 @section('page-script')
+<script>
+    function startEmployeeHrLetterTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'HR Letters Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-mail" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Access formal letters, documents, policy changes, and notifications sent to you by the HR team.</p></div>'
+                },
+                {
+                    element: '#hr-letters-table-card',
+                    title: 'HR Letters Table',
+                    intro: 'View the sending date, letter subject, and click the view eye icon to read the full letter in detail.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-employee-hr-letter-tour').on('click', function(e) {
+            e.preventDefault();
+            startEmployeeHrLetterTour();
+        });
+    });
+</script>
 @endsection

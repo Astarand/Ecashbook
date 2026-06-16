@@ -363,9 +363,15 @@
 
 <div class="pc-content py-3">
     <div class="container-fluid px-1">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0 text-secondary fw-semibold">Employee Dashboard</h4>
+            <a href="javascript:void(0);" id="start-employee-dashboard-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                <u>How does this Page works?</u>
+            </a>
+        </div>
         
         <!-- 1. Employee Welcome Panel (Top Banner) -->
-        <div class="card border-0 shadow-sm profile-banner mb-4">
+        <div class="card border-0 shadow-sm profile-banner mb-4" id="employee-welcome-banner">
             <div class="card-body p-4">
                 <div class="d-flex flex-column flex-md-row align-items-center gap-4">
                     <div class="position-relative">
@@ -429,7 +435,7 @@
                         <div class="row g-3 align-items-center">
                             <!-- Clock details (Today) -->
                             <div class="col-lg-4 col-md-12">
-                                <div class="border rounded p-3 bg-light">
+                                <div class="border rounded p-3 bg-light" id="clock-details-card">
                                     <h6 class="fw-bold text-primary mb-3 border-bottom pb-2 text-uppercase fs-11 letter-spacing-05">
                                         <i class="ph-duotone ph-clock me-1.5"></i>Today's Clock Details
                                     </h6>
@@ -451,7 +457,7 @@
                             </div>
                             <!-- Static summary counters (Toggled via JS) -->
                             <div class="col-lg-8 col-md-12">
-                                <div class="border rounded p-3 bg-white h-100">
+                                <div class="border rounded p-3 bg-white h-100" id="attendance-summary-card">
                                     <h6 class="fw-bold text-primary mb-3 border-bottom pb-2 text-uppercase fs-11 letter-spacing-05">
                                         <i class="ph-duotone ph-chart-bar me-1.5"></i>
                                         <span id="atten-summary-title">Weekly Summary Details</span>
@@ -491,7 +497,7 @@
             <div class="col-lg-8 col-md-12">
                 
                 <!-- 3. My Tasks & Projects -->
-                <div class="card dashboard-card">
+                <div class="card dashboard-card" id="tasks-projects-card">
                     <div class="card-header card-header-gradient">
                         <h5>
                             <i class="ph-duotone ph-kanban"></i>
@@ -554,7 +560,7 @@
                 </div>
 
                 <!-- 4. Upcoming Tasks (Filtered Date wise / Weekly / Monthly) -->
-                <div class="card dashboard-card">
+                <div class="card dashboard-card" id="upcoming-tasks-card">
                     <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
                         <h5 class="mb-0 fw-semibold text-dark d-flex align-items-center gap-2">
                             <i class="ph-duotone ph-list-bullets text-primary fs-5"></i>
@@ -598,7 +604,7 @@
             <div class="col-lg-4 col-md-12">
                 
                 <!-- 5. Performance & Review (Month wise) -->
-                <div class="card dashboard-card">
+                <div class="card dashboard-card" id="performance-review-card">
                     <div class="card-header card-header-gradient">
                         <h5>
                             <i class="ph-duotone ph-chart-line-up"></i>
@@ -688,7 +694,7 @@
                 </div>
 
                 <!-- 6. Calendar & Events -->
-                <div class="card dashboard-card">
+                <div class="card dashboard-card" id="calendar-events-card">
                     <div class="card-header card-header-gradient">
                         <h5>
                             <i class="ph-duotone ph-calendar"></i>
@@ -1073,6 +1079,69 @@
             $('#editTaskModal').modal('hide');
             alert('Task status updated successfully (Mock)!');
         }
+    });
+
+    function startEmployeeDashboardTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Welcome to Employee Dashboard',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-dashboard" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage your attendance, daily clock, tasks, performance reviews, and company events here.</p></div>'
+                },
+                {
+                    element: '#employee-welcome-banner',
+                    title: 'Employee Profile Summary',
+                    intro: 'View your profile picture, designation, department, work location, and manager information.'
+                },
+                {
+                    element: '#clock-details-card',
+                    title: 'Today\'s Clock Details',
+                    intro: 'Monitor your check-in time, check-out time, and total working hours for today.'
+                },
+                {
+                    element: '#attendance-summary-card',
+                    title: 'Attendance Summary',
+                    intro: 'Analyze your weekly or monthly attendance summary, including present, late, and absent days.'
+                },
+                {
+                    element: '#tasks-projects-card',
+                    title: 'Tasks KPI Cards',
+                    intro: 'Keep track of your pending, in-progress, completed, and overdue tasks at a glance.'
+                },
+                {
+                    element: '#upcoming-tasks-card',
+                    title: 'Upcoming Tasks Listing',
+                    intro: 'A table listing your upcoming tasks with title, category, due date, priority, and actions to update status.'
+                },
+                {
+                    element: '#performance-review-card',
+                    title: 'Performance & Review Score',
+                    intro: 'View your performance rating percentages and overall performance score assigned by your manager.'
+                },
+                {
+                    element: '#calendar-events-card',
+                    title: 'Calendar & Corporate Events',
+                    intro: 'Keep up with upcoming corporate events, holidays, and official updates.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-employee-dashboard-tour').on('click', function(e) {
+            e.preventDefault();
+            startEmployeeDashboardTour();
+        });
     });
 </script>
 

@@ -6,11 +6,16 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Payroll Management</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Leave Management</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">Payroll Management</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Leave Management</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-employee-leave-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
@@ -18,7 +23,7 @@
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
-                    <a href="#" class="btn btn-primary" data-bs-toggle="modal"
+                    <a href="#" class="btn btn-primary" id="add-leave-btn" data-bs-toggle="modal"
                         data-bs-target="#addLeaveModal"><i class="ti ti-square-plus"></i> Add Leave Request</a>
                 </div>
             </div>
@@ -29,7 +34,7 @@
     <!-- [ Main Content ] start -->
     <div class="row">
         <!-- Statistics Cards -->
-        <div class="col-md-12 col-xxl-3">
+        <div class="col-md-12 col-xxl-3" id="leave-stats-row">
             <div class="card statistics-card-1">
                 <div class="card-body"><img src="../assets/images/widget/img-status-2.svg" alt="img" class="img-fluid img-bg">
                     <div class="d-flex align-items-center">
@@ -94,7 +99,7 @@
     <!-- Leave Management Table -->
     <div class="row">
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card" id="leave-table-card">
                 <div class="table-responsive">
                     <table class="table tbl-product my-3" id="pc-dt-simple">
                         <thead class="table-light">
@@ -351,8 +356,9 @@
     </div>
 
 </div>
+@endsection
 
-
+@section('page-script')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('leaveformadd');
@@ -1049,6 +1055,49 @@
             showToast('An error occurred while deleting leave request', 'error');
         });
     }
+
+    function startEmployeeLeaveTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Leave Management Guide',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-calendar-event" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage your leave applications, track pending/approved requests, and view balances.</p></div>'
+                },
+                {
+                    element: '#leave-stats-row',
+                    title: 'Leave Statistics',
+                    intro: 'Monitor your total, pending, approved, and rejected leave requests at a glance.'
+                },
+                {
+                    element: '#add-leave-btn',
+                    title: 'Apply for Leave',
+                    intro: 'Click here to open the Leave Request Modal, choose your leave type (Sick, Casual, Annual, etc.), duration, and write a reason.'
+                },
+                {
+                    element: '#leave-table-card',
+                    title: 'Leave Request Logs',
+                    intro: 'A complete table of your leave applications showing types, dates, total days, status, and options to edit or cancel pending applications.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-employee-leave-tour').on('click', function(e) {
+            e.preventDefault();
+            startEmployeeLeaveTour();
+        });
+    });
 </script>
 
 @endsection

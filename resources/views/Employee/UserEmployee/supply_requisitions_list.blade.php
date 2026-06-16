@@ -7,11 +7,16 @@
             <div class="page-block">
                 <div class="row align-items-center">
                     <div class="col-md-12">
-                        <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="">Home</a></li>
-                            <li class="breadcrumb-item"><a href="#">Payroll Management</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Supply Requisitions</li>
-                        </ul>
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <ul class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="">Home</a></li>
+                                <li class="breadcrumb-item"><a href="#">Payroll Management</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Supply Requisitions</li>
+                            </ul>
+                            <a href="javascript:void(0);" id="start-employee-requisitions-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                                <u>How does this Page works?</u>
+                            </a>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <div class="page-header-title">
@@ -19,7 +24,7 @@
                         </div>
                     </div>
                     <div class="col-md-8 text-end">
-                        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRequisitionModal"><i class="ti ti-square-plus"></i> Add New Supply Requisitions</a>
+                        <a href="#" class="btn btn-primary" id="add-requisition-btn" data-bs-toggle="modal" data-bs-target="#addRequisitionModal"><i class="ti ti-square-plus"></i> Add New Supply Requisitions</a>
                     </div>
                 </div>
             </div>
@@ -28,7 +33,7 @@
         <!-- Table + Add button -->
         <div class="row">
             <div class="col-sm-12">
-                <div class="card card-body table-card">
+                <div class="card card-body table-card" id="requisitions-table-card">
                     <div class="table-responsive">
                         <table class="table tbl-product my-3" id="pc-dt-simple">
                             <thead>
@@ -811,7 +816,9 @@
         @endforeach
 
     </div>
+@endsection
 
+@section('page-script')
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById("addRequisitionForm");
@@ -872,6 +879,44 @@
                 });
             });
 
+        });
+
+        function startEmployeeRequisitionsTour() {
+            if (typeof introJs !== 'function') return;
+
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Supply Requisitions Guide',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-shopping-cart" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Request new assets, stationery, technological gadgets, or other office supplies here.</p></div>'
+                    },
+                    {
+                        element: '#add-requisition-btn',
+                        title: 'New Supply Requisition',
+                        intro: 'Click here to submit a request for new supplies. Choose the category, quantity, estimated budget, priority, and include reference attachments.'
+                    },
+                    {
+                        element: '#requisitions-table-card',
+                        title: 'Requisitions History Logs',
+                        intro: 'Track the status of all your supply requests (Approved, Pending, Rejected), view requested details, and edit pending entries.'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            }).start();
+        }
+
+        $(document).ready(function() {
+            $('#start-employee-requisitions-tour').on('click', function(e) {
+                e.preventDefault();
+                startEmployeeRequisitionsTour();
+            });
         });
     </script>
 

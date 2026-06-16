@@ -2,9 +2,14 @@
 
 @section('container')
 <div class="container">
-    <h3>Attendance Details</h3>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Attendance Details</h3>
+        <a href="javascript:void(0);" id="start-employee-attendance-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+            <u>How does this Page works?</u>
+        </a>
+    </div>
         <!-- Attendance Summary Cards -->
-        <div class="row mb-4">
+        <div class="row mb-4" id="attendance-summary-cards">
             <div class="col-lg-3 col-md-6">
                 <div class="card bg-primary text-white">
                     <div class="card-body">
@@ -71,7 +76,7 @@
         <!-- Attendance Calendar & Details -->
                             <div class="row">
                                 <div class="col-lg-8">
-                                    <div class="card">
+                                    <div class="card" id="attendance-calendar-card">
                                         <div class="card-header">
                                             <div class="d-flex align-items-center justify-content-between">
                                                 <h5 class="mb-0">Attendance Calendar</h5>
@@ -160,7 +165,7 @@
 
                                 <div class="col-lg-4">
                                     <!-- Daily Activity Details -->
-                                    <div class="card">
+                                    <div class="card" id="daily-activity-card">
                                         <div class="card-header">
                                             <h6 class="mb-0">Daily Activity Details</h6>
                                             <small class="text-muted">Click on a calendar date to view details</small>
@@ -403,7 +408,6 @@ document.addEventListener('click', function(e) {
 
 
 </script>
-@endsection
 <script>
     // Calendar functionality
 let currentAttendanceData = [];
@@ -828,6 +832,48 @@ function displayDailyActivity(data) {
     activityContent.innerHTML = activityHTML;
 }
 
+function startEmployeeAttendanceTour() {
+    if (typeof introJs !== 'function') return;
+
+    introJs().setOptions({
+        steps: [
+            {
+                title: 'Attendance Details Tour',
+                intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-calendar" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Track and review your monthly attendance, leaves, absent days, and daily activity logs.</p></div>'
+            },
+            {
+                element: '#attendance-summary-cards',
+                title: 'Monthly Summary Cards',
+                intro: 'Overview of your total present days, late arrivals, absent days, and approved leave days for the current month.'
+            },
+            {
+                element: '#attendance-calendar-card',
+                title: 'Interactive Attendance Calendar',
+                intro: 'View your calendar color-coded by attendance status (Present, Late, Absent, Leave, Holiday). Use year and month filters to change display.'
+            },
+            {
+                element: '#daily-activity-card',
+                title: 'Daily Activity Details',
+                intro: 'Select any calendar date to see check-in/out times, office hours, and specific leave or holiday remarks.'
+            }
+        ],
+        showBullets: true,
+        showProgress: true,
+        helperElementPadding: 5,
+        exitOnOverlayClick: false,
+        doneLabel: 'Done',
+        nextLabel: 'Next',
+        prevLabel: 'Prev',
+        skipLabel: 'Skip'
+    }).start();
+}
+
+$(document).ready(function() {
+    $('#start-employee-attendance-tour').on('click', function(e) {
+        e.preventDefault();
+        startEmployeeAttendanceTour();
+    });
+});
 </script>
 
 <style>
@@ -1020,3 +1066,4 @@ function displayDailyActivity(data) {
         border-radius: 50%;
     }
 </style>
+@endsection

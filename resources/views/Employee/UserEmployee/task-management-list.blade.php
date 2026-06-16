@@ -8,10 +8,15 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Task Management</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Task Management</li>
+                        </ul>
+                        <a href="javascript:void(0);" id="start-employee-task-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                            <u>How does this Page works?</u>
+                        </a>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
@@ -27,7 +32,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card" id="tasks-table-card">
                 <div class="table-responsive">
                     <table class="table tbl-product my-3" id="pc-dt-simple">
                           <thead>
@@ -343,6 +348,45 @@ $('#updateTaskForm').on('submit', function(e) {
         error: function() {
             showToast('Something went wrong while updating task.', 'error');
         }
+    });
+});
+
+function startEmployeeTaskTour() {
+    if (typeof introJs !== 'function') return;
+
+    introJs().setOptions({
+        steps: [
+            {
+                title: 'Task Management Guide',
+                intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-clipboard" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Track and manage all official tasks assigned to you by company administrators or department managers.</p></div>'
+            },
+            {
+                element: '#tasks-table-card',
+                title: 'Assigned Tasks Table',
+                intro: 'List of your tasks showing titles, priorities (High, Medium, Low), deadlines, and current progress status.'
+            },
+            {
+                element: '.avtar.btn-link-success',
+                title: 'Update Task Progress',
+                intro: 'Click the edit icon on any task to open the status updater modal. You can toggle the status between Pending, In Progress, and Completed.',
+                skipIfNoElement: true
+            }
+        ],
+        showBullets: true,
+        showProgress: true,
+        helperElementPadding: 5,
+        exitOnOverlayClick: false,
+        doneLabel: 'Done',
+        nextLabel: 'Next',
+        prevLabel: 'Prev',
+        skipLabel: 'Skip'
+    }).start();
+}
+
+$(document).ready(function() {
+    $('#start-employee-task-tour').on('click', function(e) {
+        e.preventDefault();
+        startEmployeeTaskTour();
     });
 });
 </script>

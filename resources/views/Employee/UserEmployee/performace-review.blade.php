@@ -6,10 +6,15 @@
     <div class="page-block">
       <div class="row align-items-center">
         <div class="col-md-12">
-          <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Performance & Review</li>
-          </ul>
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <ul class="breadcrumb mb-0">
+              <li class="breadcrumb-item"><a href="">Home</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Performance & Review</li>
+            </ul>
+            <a href="javascript:void(0);" id="start-employee-performance-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+              <u>How does this Page works?</u>
+            </a>
+          </div>
         </div>
         <div class="col-md-12 d-flex justify-content-between align-items-center">
           <div class="page-header-title">
@@ -23,7 +28,7 @@
   <!-- [ Main Content ] start -->
   <div class="row mt-3">
     <div class="col-sm-12">
-      <div class="card card-body table-card">
+      <div class="card card-body table-card" id="performance-table-card">
 
         <div class="table-responsive">
           <table class="table tbl-product" id="pc-dt-simple">
@@ -58,9 +63,9 @@
                   <div class="rating-readonly"><span style="color:#f7b731;  font-size:20px;">{!! str_repeat('★', $rat->teamwork_rating) !!}</span></div>
                 </td>
                 <td>
-                  <button class="btn btn-sm btn-primary view-rating-btn" data-id="{{ $rat->id }}">
-                    <i class="ti ti-eye"></i> View
-                  </button>
+                  <a href="#" class="avtar avtar-xs btn-link-secondary view-rating-btn" data-id="{{ $rat->id }}" data-bs-toggle="tooltip" title="View">
+                    <i class="ti ti-eye f-20"></i>
+                  </a>
                 </td>
               </tr>
               @endforeach
@@ -239,6 +244,45 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Fetch error:', err);
       alert('Something went wrong while loading rating data.');
     });
+  });
+
+  function startEmployeePerformanceTour() {
+      if (typeof introJs !== 'function') return;
+
+      introJs().setOptions({
+          steps: [
+              {
+                  title: 'Performance & Review Guide',
+                  intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-star" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Track and review monthly performance scores and feedback provided by your manager.</p></div>'
+              },
+              {
+                  element: '#performance-table-card',
+                  title: 'Performance Review History Table',
+                  intro: 'List of all monthly performance evaluations, featuring detailed star ratings for Work Performance, Skill & Knowledge, Attendance, and Teamwork/Behavior.'
+              },
+              {
+                  element: '.view-rating-btn',
+                  title: 'View Remarks & Score',
+                  intro: 'Click the view icon to open the detailed rating card showing the calculated percentage score and manager remarks.',
+                  skipIfNoElement: true
+              }
+          ],
+          showBullets: true,
+          showProgress: true,
+          helperElementPadding: 5,
+          exitOnOverlayClick: false,
+          doneLabel: 'Done',
+          nextLabel: 'Next',
+          prevLabel: 'Prev',
+          skipLabel: 'Skip'
+      }).start();
+  }
+
+  $(document).ready(function() {
+      $('#start-employee-performance-tour').on('click', function(e) {
+          e.preventDefault();
+          startEmployeePerformanceTour();
+      });
   });
 
 });
