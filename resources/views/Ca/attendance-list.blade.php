@@ -19,6 +19,11 @@
                         <h2 class="mb-0">Employee Attendance List</h2>
                     </div>
                 </div>
+                <div class="col-md-8 text-end">
+                    <a href="javascript:void(0);" id="start-employee-attendance-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-3" style="font-size: 0.95rem; vertical-align: middle;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -28,7 +33,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card table-card">
+            <div class="card table-card" id="attendance-table-card">
                 <div class="card-body table-card">
                     <div class="table-responsive">
                         <table class="table tbl-product" id="pc-dt-simple">
@@ -39,9 +44,9 @@
                                     <th>Contact Number</th>
                                     <th>Deperatment</th>
                                     <th>Designation</th>
-                                    <th>On-time Day Count</th>
-                                    <th>Late Day Count</th>
-                                    <th>Absent Day Count</th>
+                                    <th id="ontime-header">On-time Day Count</th>
+                                    <th id="late-header">Late Day Count</th>
+                                    <th id="absent-header">Absent Day Count</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -93,4 +98,56 @@
     <!-- [ Main Content ] end -->
 </div>
 
+@endsection
+
+@section('page-script')
+<script>
+    function startEmployeeAttendanceTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Employee Attendance Register',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-calendar-event" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Oversee the monthly logs, late count registers, absences, and presence stats for all employees.</p></div>'
+                },
+                {
+                    element: '#attendance-table-card',
+                    title: 'Attendance History Roster',
+                    intro: 'View a database table containing employee details, department, designation, and presence records.'
+                },
+                {
+                    element: '#ontime-header',
+                    title: 'On-time Counts',
+                    intro: 'Indicates the number of days the employee clocked in on time during the current month.'
+                },
+                {
+                    element: '#late-header',
+                    title: 'Late Clock-ins',
+                    intro: 'Displays how many days the employee arrived late at work.'
+                },
+                {
+                    element: '#absent-header',
+                    title: 'Absent Counters',
+                    intro: 'Monitors absolute absences and missing logs.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-employee-attendance-tour').on('click', function(e) {
+            e.preventDefault();
+            startEmployeeAttendanceTour();
+        });
+    });
+</script>
 @endsection

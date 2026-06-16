@@ -55,8 +55,11 @@
 
 
 <div class="pc-content">
-  <div class="col-md-6 col-sm-12">
+  <div class="col-md-6 col-sm-12 d-flex align-items-center gap-3">
     <h5 class="mb-0 ms-2 d-md-block d-none">Dashboard</h5>
+    <a href="javascript:void(0);" id="start-ca-dashboard-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+        <u>How does this Page works?</u>
+    </a>
 
     {{-- Search Options --}}
     <div class="px-3 py-2 position-relative">
@@ -77,7 +80,7 @@
     <div class="col-md-6">
       <div class="row">
         <div class="col-md-12">
-          <div class="card statistics-card-1 overflow-hidden">
+          <div class="card statistics-card-1 overflow-hidden" id="payment-status-card">
             
             <div class="card-body">
               <img src="../assets/images/widget/img-status-8.svg" alt="img" class="img-fluid img-bg">
@@ -125,7 +128,7 @@
         </div>
 		
 		<div class="col-lg-12">
-          <div class="card">
+          <div class="card" id="attendance-list-card">
             <div class="card-header d-flex align-items-center justify-content-between">
               <h5>Employee Attendance List</h5>
               <div class="date-picker-container">
@@ -164,7 +167,7 @@
       </div>
     </div>
     <div class="col-md-6">
-      <div class="card">
+      <div class="card" id="platform-usages-card">
         <div class="card-header">
           <h5>Task wise Platform Usages</h5>
         </div>
@@ -174,7 +177,7 @@
       </div>
     </div>
     <div class="col-md-5">
-      <div class="card">
+      <div class="card" id="payment-usages-card">
         <div class="card-header">
           <h5 class="mb-3">Platform Usage Payment Status</h5>
           <div class="dropdown">
@@ -218,7 +221,7 @@
       </div>
     </div>
     <div class="col-md-7">
-      <div class="card">
+      <div class="card" id="onboard-usages-card">
         <div class="card-header">
           <h5 class="mb-3">Month wise Onboard Platform Usages Details</h5>
           <div class="dropdown">
@@ -261,7 +264,7 @@
       </div>
     </div>
     <div class="col-md-12">
-      <div class="card">
+      <div class="card" id="task-status-card">
         <div class="card-header">
           <h5 class="mb-3">Task Status</h5>
           <div class="dropdown">
@@ -450,7 +453,68 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-	
+	function startCADashboardTour() {
+		if (typeof introJs !== 'function') return;
+
+		introJs().setOptions({
+			steps: [
+				{
+					title: 'CA Admin Dashboard',
+					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-dashboard" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Chartered Accountant Control Center. Manage clients, track cashbook transactions, and oversee assigned staff.</p></div>'
+				},
+				{
+					element: '#sidebarMenuSearch',
+					title: 'Quick Menu Navigation',
+					intro: 'Search and navigate instantly to any sub-section or accounting module using this search bar.'
+				},
+				{
+					element: '#payment-status-card',
+					title: 'Monthwise Payment Status',
+					intro: 'Review summary of government fees paid, total amount received from clients, and outstanding dues.'
+				},
+				{
+					element: '#attendance-list-card',
+					title: 'Employee Attendance Summary',
+					intro: 'Monitor daily attendance summary of your staff (ontime, late, absent) at a glance.'
+				},
+				{
+					element: '#platform-usages-card',
+					title: 'Platform Usages Overview',
+					intro: 'Analyze task categories and company engagement statistics on the E-Cashbook platform.'
+				},
+				{
+					element: '#payment-usages-card',
+					title: 'Platform Subscription Ledger',
+					intro: 'Overview of platform usage credits, pending balances, and overdue invoices.'
+				},
+				{
+					element: '#onboard-usages-card',
+					title: 'Onboard Engagement Analytics',
+					intro: 'Analyze monthly trends of client onboardings, split by own engagements vs requested client mappings.'
+				},
+				{
+					element: '#task-status-card',
+					title: 'Tasks Status Registry',
+					intro: 'Roster of active client compliance tasks, featuring upcoming due dates and real-time status tracking.'
+				}
+			],
+			showBullets: true,
+			showProgress: true,
+			helperElementPadding: 5,
+			exitOnOverlayClick: false,
+			doneLabel: 'Done',
+			nextLabel: 'Next',
+			prevLabel: 'Prev',
+			skipLabel: 'Skip'
+		}).start();
+	}
+
+	$(document).ready(function() {
+		$('#start-ca-dashboard-tour').on('click', function(e) {
+			e.preventDefault();
+			startCADashboardTour();
+		});
+	});
 
 </script>
 

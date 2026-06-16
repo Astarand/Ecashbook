@@ -19,6 +19,11 @@
                         <h2 class="mb-0">Statutory Compliance</h2>
                     </div>
                 </div>          
+                <div class="col-md-8 text-end">
+                    <a href="javascript:void(0);" id="start-ca-compliances-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-3" style="font-size: 0.95rem; vertical-align: middle;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -27,14 +32,14 @@
 
         @if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4)
         <div class="col-sm-12 pb-4 d-flex justify-content-end">
-            <a class="btn btn-primary" href="{{ url('/addstatutory') }}">
+            <a class="btn btn-primary" id="add-compliance-btn" href="{{ url('/addstatutory') }}">
                 <i class="fa fa-plus-circle me-2"></i>Add Compliances / Statutory
             </a>
         </div>
         @endif
 
         <div class="col-sm-12">
-            <div class="card card-body table-card">
+            <div class="card card-body table-card" id="compliances-table-card">
 
                 <!-- Notification Bell -->
                 <div class="d-flex justify-content-end mb-3">
@@ -45,7 +50,7 @@
                         $count = count((array)$notifications);
                     @endphp
 
-                    <div class="dropdown">
+                    <div class="dropdown" id="notification-bell-dropdown">
 
                         <a class="dropdown-toggle bell-wrapper" data-bs-toggle="dropdown">
                             <i class="ph-duotone ph-bell bell-icon"></i>
@@ -274,4 +279,58 @@
 
 </style>
 
+@endsection
+
+@section('page-script')
+<script>
+    function startCACompliancesTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Statutory Compliance Register',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-shield-check" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Oversee tax filings, corporate compliance registries, and due dates for your onboarded client accounts.</p></div>'
+                },
+                {
+                    element: '#add-compliance-btn',
+                    title: 'Record New Compliance',
+                    intro: 'Click here to create a new compliance task, assign client companies, specify due dates, and input custom statutory criteria.',
+                    skipIfNoElement: true
+                },
+                {
+                    element: '#notification-bell-dropdown',
+                    title: 'Notifications Hub',
+                    intro: 'Real-time notification indicator for compliance updates, client submissions, and feedback responses.'
+                },
+                {
+                    element: '#compliances-table-card',
+                    title: 'Compliances Registry',
+                    intro: 'Roster of compliance documents showing the filing date, client name, statutory title, due date, message indicators, and completion status.'
+                },
+                {
+                    element: '.mcCircle',
+                    title: 'Client Conversations',
+                    intro: 'The message circle indicates unread messages. Click the action button to launch the client communication thread for specific filings.',
+                    skipIfNoElement: true
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-ca-compliances-tour').on('click', function(e) {
+            e.preventDefault();
+            startCACompliancesTour();
+        });
+    });
+</script>
 @endsection

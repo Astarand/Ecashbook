@@ -8,8 +8,11 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div>
-                        <h5 class="mb-1">Company Assignment List</h5>
+                        <div class="d-flex align-items-center gap-3">
+                            <h5 class="mb-1">Company Assignment List</h5>
+                            <a href="javascript:void(0);" id="start-ca-assignment-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.90rem;">
+                                <u>How does this Page works?</u>
+                            </a>
                         </div>
                         <select class="form-select rounded-3 form-select-sm w-auto" id="compAssignList" onChange="getAssignRequestChart();">
                         <option value="daily">Daily</option>
@@ -23,7 +26,7 @@
             </div>
         </div>
         <div class="col-md-7">
-            <div class="card table-card">
+            <div class="card table-card" id="pending-requests-card">
               <div class="card-header d-flex align-items-center justify-content-between py-3">
                 <h5>Request Company/User List</h5>
               </div>
@@ -65,7 +68,7 @@
         </div>
 
         <div class="col-sm-12">
-            <div class="card table-card">
+            <div class="card table-card" id="assigned-companies-card">
                 <div class="card-body table-card">
                     <table class="table tbl-product" id="pc-dt-simple">
                         <thead>
@@ -217,4 +220,51 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('page-script')
+<script>
+    function startCAAssignmentTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Company Assignment',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-link" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage incoming customer service requests, accept assignments, and view assignment metrics.</p></div>'
+                },
+                {
+                    element: '#assign_chart',
+                    title: 'Assignment Metrics Chart',
+                    intro: 'Provides a daily, monthly, or yearly breakdown of your assignments and requests.'
+                },
+                {
+                    element: '#pending-requests-card',
+                    title: 'Assignment Requests',
+                    intro: 'List of companies requesting your CA services. View their specific service needs (GST, ROC, Audit) and click Accept (check icon) or Reject (cross icon).'
+                },
+                {
+                    element: '#assigned-companies-card',
+                    title: 'Active Mapped Clients',
+                    intro: 'Registry of all currently active company assignments showing their profile parameters, extra business nature, status, and communication links.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-ca-assignment-tour').on('click', function(e) {
+            e.preventDefault();
+            startCAAssignmentTour();
+        });
+    });
+</script>
 @endsection

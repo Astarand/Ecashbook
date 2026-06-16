@@ -20,9 +20,12 @@
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
+                    <a href="javascript:void(0);" id="start-ca-companies-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-3" style="font-size: 0.95rem; vertical-align: middle;">
+                        <u>How does this Page works?</u>
+                    </a>
                     <a href="#" class="btn btn-success me-2" data-bs-toggle="tooltip" title="Whatsapp"><i class="ti ti-brand-whatsapp"></i></a>
                     <a href="#" class="btn btn-secondary me-2" data-bs-toggle="tooltip" title="Download Now"><i class="ti ti-download"></i></a>
-                    <a href="{{ route('CA.CompanyAdd') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Company</a>
+                    <a href="{{ route('CA.CompanyAdd') }}" id="add-company-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Company</a>
                 </div>
             </div>
         </div>
@@ -33,7 +36,7 @@
     <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="card table-card">
+            <div class="card table-card" id="companies-table-card">
                 <div class="card-body table-card">
                     <div class="table-responsive">
                         <table class="table tbl-product" id="pc-dt-simple">
@@ -152,4 +155,52 @@
     <!-- [ Main Content ] end -->
 </div>
 
+@endsection
+
+@section('page-script')
+<script>
+    function startCACompaniesTour() {
+        if (typeof introJs !== 'function') return;
+
+        introJs().setOptions({
+            steps: [
+                {
+                    title: 'Company List',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-building" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage all companies and clients assigned to you or added by your firm.</p></div>'
+                },
+                {
+                    element: '#add-company-btn',
+                    title: 'Onboard New Company',
+                    intro: 'Click here to register a new client company profile under your CA firm.'
+                },
+                {
+                    element: '#companies-table-card',
+                    title: 'Companies Roster',
+                    intro: 'List of all clients showing company name, contact numbers, email, assignment source (own or requested), status, and actions.'
+                },
+                {
+                    element: '.prod-action-links',
+                    title: 'Action Panel',
+                    intro: 'Quick actions to view client profile details, start a real-time chat, or activate/deactivate the company account.',
+                    skipIfNoElement: true
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        }).start();
+    }
+
+    $(document).ready(function() {
+        $('#start-ca-companies-tour').on('click', function(e) {
+            e.preventDefault();
+            startCACompaniesTour();
+        });
+    });
+</script>
 @endsection

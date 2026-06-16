@@ -2,8 +2,14 @@
 
 @section('container')
     <div class="pc-content">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Set & Send Reminder</h5>
+            <a href="javascript:void(0);" id="start-ca-reminder-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                <u>How does this Page works?</u>
+            </a>
+        </div>
         <div class="row">
-            <div class="card mb-3">
+            <div class="card mb-3" id="reminder-settings-card">
                 <div class="card-body">
                 <form action="javascript:void(0);" method="post" name="setReminderFrmCA" id="setReminderFrmCA"
                         enctype="multipart/form-data">
@@ -79,7 +85,7 @@
                     
                 </div>
             </div>
-            <div class="card">
+            <div class="card" id="reminder-composer-card">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12 mb-3">
@@ -122,7 +128,7 @@
             document.getElementById("reminder_type").addEventListener("change", function () {
                 var selectField = document.querySelector(".select.tagging");
                 var options = selectField.options;
-
+ 
                 if (this.value === "1") { // Bulk
                     for (var i = 0; i < options.length; i++) {
                         options[i].selected = true;
@@ -130,6 +136,44 @@
                 } else if (this.value === "2") { // Specific
                     // You will manually select options
                 }
+            });
+        });
+
+        function startCAReminderTour() {
+            if (typeof introJs !== 'function') return;
+
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Broadcast Reminders',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-bell-ringing" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Broadcasting tool to notify client companies about tax deadlines, document collections, and outstanding updates.</p></div>'
+                    },
+                    {
+                        element: '#reminder-settings-card',
+                        title: 'Reminder Settings',
+                        intro: 'Define the reminder type (Bulk or Specific), target users by module (GST, ROC, Audit), status (Active, Inactive), and preferred communication channel (WhatsApp, Email, Notification).'
+                    },
+                    {
+                        element: '#reminder-composer-card',
+                        title: 'Message Composer',
+                        intro: 'Enter subject, write your message, upload templates/documents via drag & drop, and dispatch to selected recipients.'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            }).start();
+        }
+
+        $(document).ready(function() {
+            $('#start-ca-reminder-tour').on('click', function(e) {
+                e.preventDefault();
+                startCAReminderTour();
             });
         });
     </script>
