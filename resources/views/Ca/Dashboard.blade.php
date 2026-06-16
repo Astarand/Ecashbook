@@ -55,29 +55,32 @@
 
 
 <div class="pc-content">
-  <div class="col-md-6 col-sm-12 d-flex align-items-center gap-3">
-    <h5 class="mb-0 ms-2 d-md-block d-none">Dashboard</h5>
-    <a href="javascript:void(0);" id="start-ca-dashboard-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
-        <u>How does this Page works?</u>
-    </a>
-
-    {{-- Search Options --}}
-    <div class="px-3 py-2 position-relative">
-      <div class="input-group">
-          <span class="input-group-text bg-white border-end-0">
-              <i class="ph-duotone ph-magnifying-glass"></i>
-          </span>
-          <input id="sidebarMenuSearch" type="text" class="form-control border-start-0"
-              placeholder="Search menu..." autocomplete="off">
+  <div class="page-header">
+    <div class="page-block">
+      <div class="row align-items-center">
+        <div class="col-md-4 col-sm-12">
+          <h2 class="mb-0 ms-2 d-md-block d-none">Dashboard & Overview</h2>
+        </div>
+        <div class="col-md-8 col-sm-12">
+          <div class="d-flex flex-nowrap align-items-center justify-content-md-end justify-content-center flex-md-nowrap flex-wrap gap-2 mt-md-0 mt-2 pe-md-2">
+            {{-- Search Options --}}
+            <div class="form-search tour-search" style="max-height: 35px;">
+              <i class="ph-duotone ph-magnifying-glass icon-search" style="color: #422f90;"></i>
+              <input type="search" class="form-control" placeholder="Search.." id="sidebarMenuSearch" autocomplete="off">
+              <div id="sidebarSearchResults" class="dropdown-menu w-100 mt-1 shadow" style="display: none; max-height: 240px; overflow-y: auto;"></div>
+            </div>
+            <button id="start-ca-dashboard-tour" class="btn btn-outline-primary btn-sm flex-shrink-0 d-flex align-items-center" data-bs-toggle="tooltip" title="Take a Tour">
+              <i class="ti ti-help me-1"></i> <span class="d-md-inline d-none">Guide Tour</span>
+            </button>
+          </div>
+        </div>
       </div>
-
-      <div id="sidebarSearchResults" class="dropdown-menu w-100 mt-1 shadow" style="display: none; max-height: 240px; overflow-y: auto;"></div>
     </div>
   </div>
 
 
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-lg-6">
       <div class="row">
         <div class="col-md-12">
           <div class="card statistics-card-1 overflow-hidden" id="payment-status-card">
@@ -166,7 +169,7 @@
        
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-lg-6">
       <div class="card" id="platform-usages-card">
         <div class="card-header">
           <h5>Task wise Platform Usages</h5>
@@ -176,7 +179,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-5">
+    <div class="col-lg-5">
       <div class="card" id="payment-usages-card">
         <div class="card-header">
           <h5 class="mb-3">Platform Usage Payment Status</h5>
@@ -220,7 +223,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-7">
+    <div class="col-lg-7">
       <div class="card" id="onboard-usages-card">
         <div class="card-header">
           <h5 class="mb-3">Month wise Onboard Platform Usages Details</h5>
