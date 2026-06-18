@@ -1075,89 +1075,123 @@
 		]
 	};
 
-	document.getElementById('document_type').addEventListener('change', function () {
-		let type = this.value;
-		let fileTypeSelect = document.getElementById('file_type');
+	const docTypeEl = document.getElementById('document_type');
+	if (docTypeEl) {
+		docTypeEl.addEventListener('change', function () {
+			let type = this.value;
+			let fileTypeSelect = document.getElementById('file_type');
 
-		fileTypeSelect.innerHTML = '<option value="">Select File Name</option>';
+			fileTypeSelect.innerHTML = '<option value="">Select File Name</option>';
 
-		if (fileTypes[type]) {
-			fileTypes[type].forEach(function (item) {
-				let option = document.createElement('option');
-				option.value = item;
-				option.text = item;
-				fileTypeSelect.appendChild(option);
-			});
-		}
-	});
-
-	function startLockerTour() {
-		if (typeof introJs !== 'function') return;
-
-		introJs().setOptions({
-			steps: [
-				{
-					title: 'Secure Document Locker Guide',
-					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-lock" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to your Secure Document Locker. Here you can upload, protect, and share legal, regulatory, and banking documents.</p></div>'
-				},
-				{
-					element: '#locker-security-status',
-					title: 'Locker Security Status',
-					intro: 'This panel shows if your locker is passcode protected. Ensure you set a 6-digit passcode to encrypt your documents and prevent unauthorized access.'
-				},
-				{
-					element: '#upload-doc-card',
-					title: 'Upload New Document',
-					intro: 'Use this card to upload and store new documents in your secure vault.'
-				},
-				{
-					element: '#document_type',
-					title: 'Document Type',
-					intro: 'Select the general compliance category for your document (e.g. ROC, GST, KYC, Audit).'
-				},
-				{
-					element: '#file_type',
-					title: 'Specific File Type',
-					intro: 'Choose the specific sub-type matching your document (e.g., PAN Card, Memorandum of Association).'
-				},
-				{
-					element: '#document_name',
-					title: 'Custom Name (Optional)',
-					intro: 'Enter an optional friendly label to quickly identify this file.'
-				},
-				{
-					element: '.upload-area',
-					title: 'Drag & Drop Upload Zone',
-					intro: 'Drag your file here or click to select from your files. We accept PDF, Images, and Word docs up to 5MB.'
-				},
-				{
-					element: '#uploadDocumentForm button[type=submit]',
-					title: 'Upload Trigger',
-					intro: 'Click here to securely upload and encrypt your document.'
-				},
-				{
-					element: '#uploaded-docs-card',
-					title: 'Uploaded Vault',
-					intro: 'Here you can view, download, share access with your CA/Accountant, or delete uploaded documents. Accessing these requires entering your 6-digit security passcode.'
-				}
-			],
-			showBullets: true,
-			showProgress: true,
-			helperElementPadding: 5,
-			exitOnOverlayClick: false,
-			doneLabel: 'Done',
-			nextLabel: 'Next',
-			prevLabel: 'Prev',
-			skipLabel: 'Skip'
-		}).start();
+			if (fileTypes[type]) {
+				fileTypes[type].forEach(function (item) {
+					let option = document.createElement('option');
+					option.value = item;
+					option.text = item;
+					fileTypeSelect.appendChild(option);
+				});
+			}
+		});
 	}
 
-	$(document).ready(function() {
-		$('#start-locker-tour').on('click', function(e) {
-			e.preventDefault();
-			startLockerTour();
-		});
-	});
+	function startLockerTour() {
+		function launch() {
+			introJs().setOptions({
+				steps: [
+					{
+						title: 'Secure Document Locker Guide',
+						intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-lock" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to your Secure Document Locker. Here you can upload, protect, and share legal, regulatory, and banking documents.</p></div>'
+					},
+					{
+						element: '#locker-security-status',
+						title: 'Locker Security Status',
+						intro: 'This panel shows if your locker is passcode protected. Ensure you set a 6-digit passcode to encrypt your documents and prevent unauthorized access.'
+					},
+					{
+						element: '#upload-doc-card',
+						title: 'Upload New Document',
+						intro: 'Use this card to upload and store new documents in your secure vault.'
+					},
+					{
+						element: '#document_type',
+						title: 'Document Type',
+						intro: 'Select the general compliance category for your document (e.g. ROC, GST, KYC, Audit).'
+					},
+					{
+						element: '#file_type',
+						title: 'Specific File Type',
+						intro: 'Choose the specific sub-type matching your document (e.g., PAN Card, Memorandum of Association).'
+					},
+					{
+						element: '#document_name',
+						title: 'Custom Name (Optional)',
+						intro: 'Enter an optional friendly label to quickly identify this file.'
+					},
+					{
+						element: '.upload-area',
+						title: 'Drag & Drop Upload Zone',
+						intro: 'Drag your file here or click to select from your files. We accept PDF, Images, and Word docs up to 5MB.'
+					},
+					{
+						element: '#uploadDocumentForm button[type=submit]',
+						title: 'Upload Trigger',
+						intro: 'Click here to securely upload and encrypt your document.'
+					},
+					{
+						element: '#uploaded-docs-card',
+						title: 'Uploaded Vault',
+						intro: 'Here you can view, download, share access with your CA/Accountant, or delete uploaded documents. Accessing these requires entering your 6-digit security passcode.'
+					}
+				],
+				showBullets: true,
+				showProgress: true,
+				helperElementPadding: 5,
+				exitOnOverlayClick: false,
+				skipIfNoElement: true,
+				doneLabel: 'Done',
+				nextLabel: 'Next',
+				prevLabel: 'Prev',
+				skipLabel: 'Skip'
+			}).start();
+		}
+
+		if (typeof introJs === 'function') {
+			launch();
+		} else {
+			// CSS
+			if (!document.getElementById('introjs-cdn-css')) {
+				let css = document.createElement('link');
+				css.id = 'introjs-cdn-css';
+				css.rel = 'stylesheet';
+				css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+				document.head.appendChild(css);
+			}
+
+			// JS
+			let js = document.createElement('script');
+			js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+			js.onload = function() {
+				launch();
+			};
+			document.body.appendChild(js);
+		}
+	}
+
+	function bindLockerTour() {
+		const btn = document.getElementById('start-locker-tour');
+		if (btn) {
+			btn.addEventListener('click', function(e) {
+				e.preventDefault();
+				startLockerTour();
+			});
+		}
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', bindLockerTour);
+	} else {
+		bindLockerTour();
+	}
 
 </script>
 @endsection

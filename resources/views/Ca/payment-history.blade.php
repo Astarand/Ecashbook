@@ -3,18 +3,31 @@
 @section('container')
 
 <div class="pc-content">
-    <!-- [ Main Content ] start -->
-    <div class="d-flex justify-content-end align-items-center gap-3 mb-3">
-        <a href="javascript:void(0);" id="start-ca-payment-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-auto" style="font-size: 0.95rem;">
-            <u>How does this Page works?</u>
-        </a>
-        <a href="{{ route('ca_add.payment') }}" id="add-payment-btn" class="btn btn-primary" >
-            <i class="ti ti-plus"></i> Add a payment
-        </a>
-        {{-- <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
-            <i class="ti ti-plus"></i> Add a payment
-        </a> --}}
+    <!-- [ breadcrumb ] start -->
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url('/ca-dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Payment History</li>
+                    </ul>
+                    <a href="javascript:void(0);" onclick="startCAPaymentTour();" id="start-ca-payment-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
+                <div class="col-md-4 mt-2">
+                    <div class="page-header-title">
+                        <h2 class="mb-0">Payment History</h2>
+                    </div>
+                </div>
+                <div class="col-md-8 text-end mt-2">
+                    <a href="{{ route('ca_add.payment') }}" id="add-payment-btn" class="btn btn-primary"><i class="ti ti-plus"></i> Add a payment</a>
+                </div>
+            </div>
+        </div>
     </div>
+    <!-- [ breadcrumb ] end -->
     <div class="row">
         <div class="col-12">
             <div class="card table-card" id="payments-table-card">
@@ -371,40 +384,58 @@
 	});
 
     function startCAPaymentTour() {
-        if (typeof introJs !== 'function') return;
+        function launch() {
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Payment Management',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-wallet" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Keep track of incoming client payments, agent commissions, government fees, and service charges.</p></div>'
+                    },
+                    {
+                        element: '#add-payment-btn',
+                        title: 'Add New Payment Record',
+                        intro: 'Click here to log a new credit or debit transaction, specifying payment purpose, method, and client metadata.'
+                    },
+                    {
+                        element: '#payments-table-card',
+                        title: 'Payment Logs Registry',
+                        intro: 'Overview of all billing and transactional logs including transaction date, client name, user type, phone, payment type, purpose, and amount.'
+                    },
+                    {
+                        element: '.delete-payment-btn',
+                        title: 'Payment Entry Actions',
+                        intro: 'Standard controls to inspect payment invoice data, edit details, or delete logs.',
+                        skipIfNoElement: true
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            }).start();
+        }
 
-        introJs().setOptions({
-            steps: [
-                {
-                    title: 'Payment Management',
-                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-wallet" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Keep track of incoming client payments, agent commissions, government fees, and service charges.</p></div>'
-                },
-                {
-                    element: '#add-payment-btn',
-                    title: 'Add New Payment Record',
-                    intro: 'Click here to log a new credit or debit transaction, specifying payment purpose, method, and client metadata.'
-                },
-                {
-                    element: '#payments-table-card',
-                    title: 'Payment Logs Registry',
-                    intro: 'Overview of all billing and transactional logs including transaction date, client name, user type, phone, payment type, purpose, and amount.'
-                },
-                {
-                    element: '.delete-payment-btn',
-                    title: 'Payment Entry Actions',
-                    intro: 'Standard controls to inspect payment invoice data, edit details, or delete logs.',
-                    skipIfNoElement: true
-                }
-            ],
-            showBullets: true,
-            showProgress: true,
-            helperElementPadding: 5,
-            exitOnOverlayClick: false,
-            doneLabel: 'Done',
-            nextLabel: 'Next',
-            prevLabel: 'Prev',
-            skipLabel: 'Skip'
-        }).start();
+        if (typeof introJs === 'function') {
+            launch();
+        } else {
+            if (!document.getElementById('introjs-cdn-css')) {
+                let css = document.createElement('link');
+                css.id = 'introjs-cdn-css';
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+                document.head.appendChild(css);
+            }
+            let js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+            js.onload = function() {
+                launch();
+            };
+            document.body.appendChild(js);
+        }
     }
 
     $(document).ready(function() {

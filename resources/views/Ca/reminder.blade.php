@@ -4,7 +4,7 @@
     <div class="pc-content">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Set & Send Reminder</h5>
-            <a href="javascript:void(0);" id="start-ca-reminder-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+            <a href="javascript:void(0);" onclick="startCAReminderTour();" id="start-ca-reminder-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
                 <u>How does this Page works?</u>
             </a>
         </div>

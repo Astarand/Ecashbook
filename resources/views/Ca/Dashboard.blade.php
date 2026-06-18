@@ -48,6 +48,23 @@
     box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
   }
+
+  /* Premium dashboard card metrics transitions */
+  .metric-box {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+  }
+  .metric-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+  }
+  .hover-badge {
+    transition: all 0.2s ease;
+  }
+  .hover-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
 </style>
 
 <!-- Flatpickr CSS -->
@@ -80,97 +97,137 @@
 
 
   <div class="row">
+    <!-- Left Column -->
     <div class="col-lg-6">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="card statistics-card-1 overflow-hidden" id="payment-status-card">
-            
-            <div class="card-body">
-              <img src="../assets/images/widget/img-status-8.svg" alt="img" class="img-fluid img-bg">
-              <div class="d-flex align-items-center">
-                <img src="../assets/images/widget/takeover.png" alt="img" class="img-fluid">
-                <div class="flex-grow-1 ms-3">
-                  <h4 class="mb-2">Monthwise Payment Status <i class="ph-duotone ph-question" data-bs-toggle="tooltip" aria-label="View" data-bs-original-title="View"></i></h4>
-                  <div class="row">
-                    <div class="col-md-6"></div>
-                    <div class="col-md-6 d-flex align-items-end justify-content-end">
-                      <select class="form-control form-control-xxl border-1 " id="total_receivales">
-                        <option value="1">January</option>
-						<option value="2">February</option>
-						<option value="3">March</option>
-						<option value="4">April</option>
-						<option value="5">May</option>
-						<option value="6">June</option>
-						<option value="7">July</option>
-						<option value="8">August</option>
-						<option value="9">September</option>
-						<option value="10">October</option>
-						<option value="11">November</option>
-						<option value="12">December</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row g-3 mt-3 text-center">
-                <div class="col-4">
-                  <p class="mb-0 text-muted">Total Govt. Fees Paid</p>
-                  <h5 class="mb-0 text-primary" id="govFees">₹0</h5>
-                </div>
-                <div class="col-4 border-start">
-                  <p class="mb-0 text-muted">Total Amount Received</p>
-                  <h5 class="mb-0 text-success" id="totalReceived">₹0</h5>
-                </div>
-                <div class="col-4 border-start">
-                  <p class="mb-0 text-muted">Total Amount Due</p>
-                  <h5 class="mb-0 text-danger" id="totalDue">₹0</h5>
+      
+      <!-- Monthwise Payment Status -->
+      <div class="card statistics-card-1 overflow-hidden mb-4" id="payment-status-card">
+        <div class="card-body">
+          <img src="../assets/images/widget/img-status-8.svg" alt="img" class="img-fluid img-bg">
+          <div class="d-flex align-items-center">
+            <img src="../assets/images/widget/takeover.png" alt="img" class="img-fluid">
+            <div class="flex-grow-1 ms-3">
+              <h4 class="mb-2">Monthwise Payment Status <i class="ph-duotone ph-question" data-bs-toggle="tooltip" aria-label="View" data-bs-original-title="View"></i></h4>
+              <div class="row">
+                <div class="col-md-6"></div>
+                <div class="col-md-6 d-flex align-items-end justify-content-end">
+                  <select class="form-control form-control-xxl border-1 " id="total_receivales">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                  </select>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-		
-		<div class="col-lg-12">
-          <div class="card" id="attendance-list-card">
-            <div class="card-header d-flex align-items-center justify-content-between">
-              <h5>Employee Attendance List</h5>
-              <div class="date-picker-container">
-                <div class="input-group">
-                  <input type="text" id="attendance_date_display" class="form-control" readonly>
-                  <button type="button" class="input-group-text calendar-trigger" id="calendar-btn">
-                    <i class="ti ti-calendar"></i>
-                  </button>
-                  <input type="hidden" id="attendence_count" name="attendence_count">
-                </div>
-              </div>
+          <div class="row g-3 mt-3 text-center">
+            <div class="col-4">
+              <p class="mb-0 text-muted">Total Govt. Fees Paid</p>
+              <h5 class="mb-0 text-primary" id="govFees">₹0</h5>
             </div>
-
-
-            <div class="card-body">
-              <div class="bg-body mt-3 py-2 px-3 rounded d-flex align-items-center justify-content-between">
-                <p class="mb-0"><i class="ph-duotone ph-circle text-purple-500 f-12"></i> Total Employees</p>
-                <h5 class="mb-0 ms-1" id="totalEmployee">0</h5>
-              </div>
-              <div class="bg-body mt-1 py-2 px-3 rounded d-flex align-items-center justify-content-between">
-                <p class="mb-0"><i class="ph-duotone ph-circle text-primary f-12"></i> Ontime Employees</p>
-                <h5 class="mb-0 ms-1" id="ontimeEmployee">0</h5>
-              </div>
-              <div class="bg-body mt-1 py-2 px-3 rounded d-flex align-items-center justify-content-between">
-                <p class="mb-0"><i class="ph-duotone ph-circle text-warning f-12"></i> Late Employees</p>
-                <h5 class="mb-0 ms-1" id="lateEmployee">0</h5>
-              </div>
-              <div class="bg-body mt-1 py-2 px-3 rounded d-flex align-items-center justify-content-between">
-                <p class="mb-0"><i class="ph-duotone ph-circle text-danger f-12"></i> Absent Employees</p>
-                <h5 class="mb-0 ms-1" id="absentEmployee">0</h5>
-              </div>
+            <div class="col-4 border-start">
+              <p class="mb-0 text-muted">Total Amount Received</p>
+              <h5 class="mb-0 text-success" id="totalReceived">₹0</h5>
+            </div>
+            <div class="col-4 border-start">
+              <p class="mb-0 text-muted">Total Amount Due</p>
+              <h5 class="mb-0 text-danger" id="totalDue">₹0</h5>
             </div>
           </div>
         </div>
-       
       </div>
+
+      <!-- Employee Attendance List -->
+      <div class="card mb-4" id="attendance-list-card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h5>Employee Attendance List</h5>
+          <div class="date-picker-container">
+            <div class="input-group">
+              <input type="text" id="attendance_date_display" class="form-control" readonly>
+              <button type="button" class="input-group-text calendar-trigger" id="calendar-btn">
+                <i class="ti ti-calendar"></i>
+              </button>
+              <input type="hidden" id="attendence_count" name="attendence_count">
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="bg-body mt-3 py-2 px-3 rounded d-flex align-items-center justify-content-between">
+            <p class="mb-0"><i class="ph-duotone ph-circle text-purple-500 f-12"></i> Total Employees</p>
+            <h5 class="mb-0 ms-1" id="totalEmployee">0</h5>
+          </div>
+          <div class="bg-body mt-1 py-2 px-3 rounded d-flex align-items-center justify-content-between">
+            <p class="mb-0"><i class="ph-duotone ph-circle text-primary f-12"></i> Ontime Employees</p>
+            <h5 class="mb-0 ms-1" id="ontimeEmployee">0</h5>
+          </div>
+          <div class="bg-body mt-1 py-2 px-3 rounded d-flex align-items-center justify-content-between">
+            <p class="mb-0"><i class="ph-duotone ph-circle text-warning f-12"></i> Late Employees</p>
+            <h5 class="mb-0 ms-1" id="lateEmployee">0</h5>
+          </div>
+          <div class="bg-body mt-1 py-2 px-3 rounded d-flex align-items-center justify-content-between">
+            <p class="mb-0"><i class="ph-duotone ph-circle text-danger f-12"></i> Absent Employees</p>
+            <h5 class="mb-0 ms-1" id="absentEmployee">0</h5>
+          </div>
+        </div>
+      </div>
+
+      <!-- Month wise Onboard Platform Usages Details -->
+      <div class="card mb-4" id="onboard-usages-card">
+        <div class="card-header d-flex align-items-center justify-content-between py-3">
+          <h5 class="mb-0">Month wise Onboard Platform Usages Details</h5>
+          <select class="form-select form-select-sm" id="onboard-month-filter" style="width: 130px;">
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+        <div class="card-body">
+          <div id="monthwise-onboard-chart"></div>
+          <div class="d-flex justify-content-center flex-wrap gap-2 mt-4">
+            <div class="px-3 py-2 rounded-pill d-flex align-items-center hover-badge cursor-pointer" style="background-color: rgba(79, 70, 229, 0.05); border: 1px solid rgba(79, 70, 229, 0.1);">
+              <span class="me-2 rounded-circle" style="width: 8px; height: 8px; background-color: #4f46e5; display: inline-block;"></span>
+              <span class="text-muted f-12 fw-500">Total Engagement:</span>
+              <h5 class="mb-0 ms-2 text-primary fw-600" style="font-size: 14px;">0</h5>
+            </div>
+            <div class="px-3 py-2 rounded-pill d-flex align-items-center hover-badge cursor-pointer" style="background-color: rgba(13, 148, 136, 0.05); border: 1px solid rgba(13, 148, 136, 0.1);">
+              <span class="me-2 rounded-circle" style="width: 8px; height: 8px; background-color: #0d9488; display: inline-block;"></span>
+              <span class="text-muted f-12 fw-500">Request Engagement:</span>
+              <h5 class="mb-0 ms-2 text-success fw-600" style="font-size: 14px;">0</h5>
+            </div>
+            <div class="px-3 py-2 rounded-pill d-flex align-items-center hover-badge cursor-pointer" style="background-color: rgba(249, 115, 22, 0.05); border: 1px solid rgba(249, 115, 22, 0.1);">
+              <span class="me-2 rounded-circle" style="width: 8px; height: 8px; background-color: #f97316; display: inline-block;"></span>
+              <span class="text-muted f-12 fw-500">Own Engagement:</span>
+              <h5 class="mb-0 ms-2 text-warning fw-600" style="font-size: 14px;">0</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+
+    <!-- Right Column -->
     <div class="col-lg-6">
-      <div class="card" id="platform-usages-card">
+
+      <!-- Task wise Platform Usages -->
+      <div class="card mb-4" id="platform-usages-card">
         <div class="card-header">
           <h5>Task wise Platform Usages</h5>
         </div>
@@ -178,153 +235,129 @@
           <div id="task-wise-clients-chart"></div>
         </div>
       </div>
-    </div>
-    <div class="col-lg-5">
-      <div class="card" id="payment-usages-card">
-        <div class="card-header">
-          <h5 class="mb-3">Platform Usage Payment Status</h5>
-          <div class="dropdown">
-            <select class="form-select" id="payment-month-filter">
-              <option value="January">January</option>
-              <option value="February">February</option>
-              <option value="March">March</option>
-              <option value="April">April</option>
-              <option value="May">May</option>
-              <option value="June">June</option>
-              <option value="July">July</option>
-              <option value="August">August</option>
-              <option value="September">September</option>
-              <option value="October">October</option>
-              <option value="November">November</option>
-              <option value="December">December</option>
-            </select>
-          </div>
+
+      <!-- Platform Usage Payment Status -->
+      <div class="card mb-4" id="payment-usages-card">
+        <div class="card-header d-flex align-items-center justify-content-between py-3">
+          <h5 class="mb-0">Platform Usage Payment Status</h5>
+          <select class="form-select form-select-sm" id="payment-month-filter" style="width: 130px;">
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
         </div>
         <div class="card-body">
-          <div class="row g-3 text-center">
+          <div class="row g-2 text-center align-items-center">
+            <!-- Platform Usage Credit -->
             <div class="col-3">
-              <p class="mb-0 text-muted">Platform Usage Credit</p>
-              <h5 class="mb-0 text-primary" id="total-earning">₹0.00</h5>
+              <div class="py-2 px-1 rounded metric-box" style="background-color: rgba(66, 47, 144, 0.03); border-radius: 8px;">
+                <p class="text-muted mb-1" style="font-size: 10px; font-weight: 500; white-space: nowrap;">Platform Usage Credit</p>
+                <h5 class="mb-0 text-primary fw-600" style="font-size: 14px;" id="total-earning">₹0.00</h5>
+              </div>
             </div>
+            <!-- Received -->
             <div class="col-3">
-              <p class="mb-0 text-muted">Received</p>
-              <h5 class="mb-0 text-success" id="received-amount">₹0.00</h5>
+              <div class="py-2 px-1 rounded metric-box" style="background-color: rgba(16, 185, 129, 0.03); border-radius: 8px;">
+                <p class="text-muted mb-1" style="font-size: 10px; font-weight: 500; white-space: nowrap;">Received</p>
+                <h5 class="mb-0 text-success fw-600" style="font-size: 14px;" id="received-amount">₹0.00</h5>
+              </div>
             </div>
+            <!-- Pending -->
             <div class="col-3">
-              <p class="mb-0 text-muted">Pending</p>
-              <h5 class="mb-0 text-danger" id="pending-amount">₹0.00</h5>
+              <div class="py-2 px-1 rounded metric-box" style="background-color: rgba(245, 158, 11, 0.03); border-radius: 8px;">
+                <p class="text-muted mb-1" style="font-size: 10px; font-weight: 500; white-space: nowrap;">Pending</p>
+                <h5 class="mb-0 text-warning fw-600" style="font-size: 14px;" id="pending-amount">₹0.00</h5>
+              </div>
             </div>
+            <!-- Overdue -->
             <div class="col-3">
-              <p class="mb-0 text-muted">Overdue</p>
-              <h5 class="mb-0 text-dark" id="overdue-amount">₹0.00</h5>
+              <div class="py-2 px-1 rounded metric-box" style="background-color: rgba(244, 63, 94, 0.03); border-radius: 8px;">
+                <p class="text-muted mb-1" style="font-size: 10px; font-weight: 500; white-space: nowrap;">Overdue</p>
+                <h5 class="mb-0 text-danger fw-600" style="font-size: 14px;" id="overdue-amount">₹0.00</h5>
+              </div>
             </div>
           </div>
           <div id="customer-payment-chart" class="mt-4"></div>
         </div>
       </div>
+
     </div>
-    <div class="col-lg-7">
-      <div class="card" id="onboard-usages-card">
-        <div class="card-header">
-          <h5 class="mb-3">Month wise Onboard Platform Usages Details</h5>
-          <div class="dropdown">
-            <select class="form-select" id="onboard-month-filter">
-				<option value="January">January</option>
-				<option value="February">February</option>
-				<option value="March">March</option>
-				<option value="April">April</option>
-				<option value="May">May</option>
-				<option value="June">June</option>
-				<option value="July">July</option>
-				<option value="August">August</option>
-				<option value="September">September</option>
-				<option value="October">October</option>
-				<option value="November">November</option>
-				<option value="December">December</option>
-            </select>
-          </div>
-        </div>
-        <div class="card-body">
-          <div id="monthwise-onboard-chart"></div>
-          <div class="d-flex justify-content-center mt-3">
-            <div class="mx-3 d-flex align-items-center">
-              <span class="me-2 chart-legend" style="background-color: #2196f3;"></span>
-              <span>Total Engagement Enabled</span>
-              <h5 class="mb-0 ms-2">0</h5>
-            </div>
-            <div class="mx-3 d-flex align-items-center">
-              <span class="me-2 chart-legend" style="background-color: #00e396;"></span>
-              <span>Request Engagement Enabled</span>
-              <h5 class="mb-0 ms-2">0</h5>
-            </div>
-            <div class="mx-3 d-flex align-items-center">
-              <span class="me-2 chart-legend" style="background-color: #ff4560;"></span>
-              <span>Own Engagement Enabled</span>
-              <h5 class="mb-0 ms-2">0</h5>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+
+    <!-- Full Width Row at the bottom -->
     <div class="col-md-12">
-      <div class="card" id="task-status-card">
-        <div class="card-header">
-          <h5 class="mb-3">Task Status</h5>
-          <div class="dropdown">
-            <select class="form-select" id="task-month-filter">
-              <option value="January">January</option>
-              <option value="February">February</option>
-              <option value="March">March</option>
-              <option value="April">April</option>
-              <option value="May">May</option>
-              <option value="June">June</option>
-              <option value="July">July</option>
-              <option value="August">August</option>
-              <option value="September">September</option>
-              <option value="October">October</option>
-              <option value="November">November</option>
-              <option value="December">December</option>
-            </select>
-          </div>
+      <div class="card shadow-sm mb-4" id="task-status-card">
+        <div class="card-header d-flex align-items-center justify-content-between py-3 border-0 bg-transparent">
+          <h5 class="mb-0 fw-600 text-dark">Task Status</h5>
+          <select class="form-select form-select-sm" id="task-month-filter" style="width: 130px;">
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
         </div>
-        <div class="card-body">
+        <div class="card-body pt-0">
+          <!-- Premium Metric Boxes in a single row -->
           <div class="row g-3 text-center mb-4">
-            <div class="col-3">
-              <p class="mb-0 text-muted">Total Task</p>
-              <h3 class="mb-0 text-primary">0</h3>
+            <!-- Total Tasks -->
+            <div class="col-6 col-md-3">
+              <div class="py-3 px-2 rounded metric-box" style="background-color: rgba(66, 47, 144, 0.03); border-radius: 12px;">
+                <p class="text-muted mb-1 fw-500" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Total Tasks</p>
+                <h3 class="mb-0 text-primary fw-700" id="task-total-count">0</h3>
+              </div>
             </div>
-            <div class="col-3">
-              <p class="mb-0 text-muted">Completed Task</p>
-              <h3 class="mb-0 text-success">0</h3>
+            <!-- Completed Tasks -->
+            <div class="col-6 col-md-3">
+              <div class="py-3 px-2 rounded metric-box" style="background-color: rgba(16, 185, 129, 0.03); border-radius: 12px;">
+                <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Completed Tasks</p>
+                <h3 class="mb-0 text-success fw-700" id="task-completed-count">0</h3>
+              </div>
             </div>
-            <div class="col-3">
-              <p class="mb-0 text-muted">Pending Task</p>
-              <h3 class="mb-0 text-warning">0</h3>
+            <!-- Pending Tasks -->
+            <div class="col-6 col-md-3">
+              <div class="py-3 px-2 rounded metric-box" style="background-color: rgba(245, 158, 11, 0.03); border-radius: 12px;">
+                <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Pending Tasks</p>
+                <h3 class="mb-0 text-warning fw-700" id="task-pending-count">0</h3>
+              </div>
             </div>
-            <div class="col-3">
-              <p class="mb-0 text-muted">Overdue Task</p>
-              <h3 class="mb-0 text-danger">0</h3>
+            <!-- Overdue Tasks -->
+            <div class="col-6 col-md-3">
+              <div class="py-3 px-2 rounded metric-box" style="background-color: rgba(244, 63, 94, 0.03); border-radius: 12px;">
+                <p class="text-muted mb-1" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Overdue Tasks</p>
+                <h3 class="mb-0 text-danger fw-700" id="task-overdue-count">0</h3>
+              </div>
             </div>
           </div>
 
-          <div class="task-status-legends d-flex align-items-center justify-content-center mb-4">
-            <span class="me-3"><i class="fa fa-circle text-success me-2"></i> Completed Task</span>
-            <span class="me-3"><i class="fa fa-circle text-warning me-2"></i> Pending Task</span>
-            <span><i class="fa fa-circle text-danger me-2"></i> Overdue Task</span>
-          </div>
-
+          <!-- Table with premium header and row styles -->
           <div class="table-responsive">
-            <table class="table align-middle">
-              <thead>
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light-primary" style="background-color: rgba(66, 47, 144, 0.02); border-radius: 6px;">
                 <tr>
-                  <th>Platform Usage Name</th>
-                  <th>Task Type</th>
-                  <th>Due Date</th>
-                  <th>Status</th>
+                  <th class="py-3 text-muted fw-600" style="font-size: 11px; letter-spacing: 0.5px; border-bottom: none;">PLATFORM USAGE NAME</th>
+                  <th class="py-3 text-muted fw-600" style="font-size: 11px; letter-spacing: 0.5px; border-bottom: none;">TASK TYPE</th>
+                  <th class="py-3 text-muted fw-600" style="font-size: 11px; letter-spacing: 0.5px; border-bottom: none;">DUE DATE</th>
+                  <th class="py-3 text-muted fw-600" style="font-size: 11px; letter-spacing: 0.5px; border-bottom: none;">STATUS</th>
                 </tr>
               </thead>
               <tbody id="caTasks">
-                 
+                 <!-- Populated dynamically via AJAX -->
               </tbody>
             </table>
           </div>

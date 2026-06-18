@@ -7,9 +7,19 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-4">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url('/ca-dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('ca.PaymentHistory') }}">Payment History</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Add Payment</li>
+                    </ul>
+                    <a href="javascript:void(0);" onclick="startCAAddPaymentTour();" id="start-ca-add-payment-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
-                        <h2 class="mb-0">Add New Payment</h2>
+                        <h2 class="mb-0">Add Payment</h2>
                     </div>
                 </div>
             </div>
@@ -128,9 +138,100 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('page-script')
 <script>
+    function startCAAddPaymentTour() {
+        function launch() {
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Add Payment Record',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-square-plus" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Onboard and log a new billing payment transaction details for clients or agents.</p></div>'
+                    },
+                    {
+                        element: '#paymentDate',
+                        title: 'Payment Date',
+                        intro: 'Select the date when this transaction occurred.'
+                    },
+                    {
+                        element: '#entityType',
+                        title: 'Entity Classification',
+                        intro: 'Specify the recipient or source category: choose Company for client firms, Agent for commissions, or Other.'
+                    },
+                    {
+                        element: '#paymentPhone',
+                        title: 'Contact Mobile',
+                        intro: 'Enter a valid mobile number for correspondence logs.'
+                    },
+                    {
+                        element: '#paymentType',
+                        title: 'Credit / Debit Designation',
+                        intro: 'Designate the transaction type: choose Credit for incoming revenue and Debit for outgoing expenses.'
+                    },
+                    {
+                        element: '#paymentGovtFees',
+                        title: 'Government Fees Portion',
+                        intro: 'Portion of the payment allocated to official government taxes or registry dues.'
+                    },
+                    {
+                        element: '#paymentServiceFees',
+                        title: 'Service Fees Portion',
+                        intro: 'Portion allocated to your firm\'s professional charges.'
+                    },
+                    {
+                        element: '#paymentAmount',
+                        title: 'Total Settlement Amount',
+                        intro: 'The net total amount of the transaction (calculated government fees + service charges).'
+                    },
+                    {
+                        element: '#paymentMethod',
+                        title: 'Payment Method',
+                        intro: 'Mode of settlement chosen (Cash, UPI, Bank Transfer, Cheque, or Card).'
+                    },
+                    {
+                        element: '#paymentPurpose',
+                        title: 'Payment Purpose',
+                        intro: 'Summarize the context or description of this transaction.'
+                    },
+                    {
+                        element: '#addPaymentBtn',
+                        title: 'Save Payment Record',
+                        intro: 'Click here to save and publish the transaction ledger entry.'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            }).start();
+        }
+
+        if (typeof introJs === 'function') {
+            launch();
+        } else {
+            if (!document.getElementById('introjs-cdn-css')) {
+                let css = document.createElement('link');
+                css.id = 'introjs-cdn-css';
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+                document.head.appendChild(css);
+            }
+            let js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+            js.onload = function() {
+                launch();
+            };
+            document.body.appendChild(js);
+        }
+    }
+
     $(document).ready(function() {
-        
         // When dropdown value changes
         $('#entityType').on('change', function() {
             var type = $(this).val();
@@ -148,8 +249,6 @@
                     url: '/fetch-customers',  // This is your API endpoint to fetch customers
                     method: 'GET',
                     success: function(response) {
-                        // console.log(response);
-                        
                         $('#customerSelect').empty();
                         $('#customerSelect').append('<option value="">Select Customer</option>');
                         
@@ -206,29 +305,21 @@
                 method: 'POST',
                 data: formData,
                 success: function(response) {
-                    // console.log(response);
-                    
-                    // alert(response.success);
                     showToast(response.success, 'success');
                     setTimeout(function() {
                         window.location.href = response.redirect_url;  // Redirect to the returned URL
                     }, 3000);
-                    
                 },
                 error: function(xhr, status, error) {
-                    // console.log(xhr.responseText);
-                    
                     showToast('Something went wrong. Please try again.', 'error');
                 }
             });
         });
 
+        $('#start-ca-add-payment-tour').on('click', function(e) {
+            e.preventDefault();
+            startCAAddPaymentTour();
+        });
     });
-
-    
-
 </script>
-
-
-
 @endsection

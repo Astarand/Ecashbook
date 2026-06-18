@@ -14,7 +14,7 @@
                         <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Agent & Channel Partner</li>
                     </ul>
-                    <a href="javascript:void(0);" id="start-agent-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                    <a href="javascript:void(0);" onclick="startAgentListTour();" id="start-agent-list-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
                         <u>How does this Page works?</u>
                     </a>
                 </div>

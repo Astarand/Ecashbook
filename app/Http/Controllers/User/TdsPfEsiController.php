@@ -81,7 +81,7 @@ class TdsPfEsiController extends Controller
 			)
 			->get();
 
-		return view('User.tds-returns-filing', compact('employees', 'req_type'));
+		return view('User.tds-returns-filing', compact('employees', 'req_type', 'userId'));
 	}
 
 
@@ -309,7 +309,7 @@ class TdsPfEsiController extends Controller
 			)
 			->get();
 
-		return view('User.pf-management-list', compact('employees', 'req_type'));
+		return view('User.pf-management-list', compact('employees', 'req_type', 'userId'));
 	}
 
 	public function download_pf_filing(Request $request)
@@ -517,7 +517,7 @@ class TdsPfEsiController extends Controller
 			->get();
 			// echo "<pre>"; print_r($employees); echo "</pre>"; exit;
 
-		return view('User.esi-management-list', compact('employees', 'req_type'));
+		return view('User.esi-management-list', compact('employees', 'req_type', 'userId'));
 	}
 
 	public function download_esi_filing(Request $request)
@@ -721,7 +721,7 @@ class TdsPfEsiController extends Controller
 			->get();
 			// echo "<pre>"; print_r($employees); echo "</pre>"; exit;
 
-		return view('User.ptax-management-list', compact('employees', 'req_type'));
+		return view('User.ptax-management-list', compact('employees', 'req_type', 'userId'));
 	}
 
 

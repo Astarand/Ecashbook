@@ -7,7 +7,17 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-4">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url('/ca-dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/task-list') }}">Tasks</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Add Task</li>
+                    </ul>
+                    <a href="javascript:void(0);" onclick="startAddTaskTour();" id="start-add-task-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Add New Task</h2>
                     </div>
@@ -134,7 +144,99 @@
     </div>
 </div>
 
+@endsection
+
+@section('page-script')
 <script>
+    function startAddTaskTour() {
+        function launch() {
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Add New Task',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-square-plus" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Initialize a new customer task entry, specify budget particulars, and assign it to an employee.</p></div>'
+                    },
+                    {
+                        element: '#company_id',
+                        title: 'Platform User Name',
+                        intro: 'Choose the client company or user profile associated with this task.'
+                    },
+                    {
+                        element: '#task_category',
+                        title: 'Task Category Selection',
+                        intro: 'Select the task classification (e.g. Income Tax Return, GST Return, Audit) for appropriate billing.'
+                    },
+                    {
+                        element: '#agent_id',
+                        title: 'Agent Assignment',
+                        intro: 'Select an onboarding agent if applicable, or choose None.'
+                    },
+                    {
+                        element: '#gov_fees',
+                        title: 'Government Fees',
+                        intro: 'Specify the official government fee portion (read-only base values calculated dynamically).'
+                    },
+                    {
+                        element: '#services_charges',
+                        title: 'Service Charges',
+                        intro: 'The fee charged by your firm for processing this task.'
+                    },
+                    {
+                        element: '#emp_id',
+                        title: 'Assign Employee',
+                        intro: 'Select the employee from your registry who will execute this task.'
+                    },
+                    {
+                        element: '#due_date',
+                        title: 'Due Date',
+                        intro: 'Set the deadline date for the task assignment completion.'
+                    },
+                    {
+                        element: '#project_priority',
+                        title: 'Priority Metric',
+                        intro: 'Set task urgency classification to High or Average.'
+                    },
+                    {
+                        element: '#project_status',
+                        title: 'Task Status',
+                        intro: 'Set initial status to Pending, Ongoing, or Done.'
+                    },
+                    {
+                        element: '#message',
+                        title: 'Task Descriptions & Comments',
+                        intro: 'Add additional descriptions, instructions, or footnotes regarding the task assignment.'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            }).start();
+        }
+
+        if (typeof introJs === 'function') {
+            launch();
+        } else {
+            if (!document.getElementById('introjs-cdn-css')) {
+                let css = document.createElement('link');
+                css.id = 'introjs-cdn-css';
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+                document.head.appendChild(css);
+            }
+            let js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+            js.onload = function() {
+                launch();
+            };
+            document.body.appendChild(js);
+        }
+    }
+
     $(document).ready(function () {
         $.ajax({
             url: '/get-task-categories',
@@ -154,8 +256,11 @@
                 alert('Failed to load task categories.');
             }
         });
+
+        $('#start-add-task-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddTaskTour();
+        });
     });
 </script>
-
-
 @endsection

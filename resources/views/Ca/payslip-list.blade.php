@@ -7,18 +7,24 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-4">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Payroll Management</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Payslip List</li>
+                    </ul>
+                    <a href="javascript:void(0);" onclick="startEmployeePayslipTour();" id="start-employee-payslip-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Payslip List</h2>
                     </div>
                 </div>
-                <div class="col-md-8 text-end">
-                    <a href="javascript:void(0);" id="start-employee-payslip-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-3" style="font-size: 0.95rem; vertical-align: middle;">
-                        <u>How does this Page works?</u>
-                    </a>
+                <div class="col-md-8 text-end mt-2">
                     <a href="#" class="btn btn-success me-2" data-bs-toggle="tooltip" title="Whatsapp"><i class="ti ti-brand-whatsapp"></i></a>
                     <a href="#" class="btn btn-secondary me-2" data-bs-toggle="tooltip" title="Download Now"><i class="ti ti-download"></i></a>
-                    
                 </div>
             </div>
         </div>

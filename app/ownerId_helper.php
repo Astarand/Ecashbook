@@ -64,6 +64,7 @@ function checkCoreAccess($featureName)
 //For CA-Accountant access
 function getAccessCompanyId($request)
 {
+    $userId = null;
     if ($request->filled('compId')) {
         try {
             $compId = decrypt($request->compId);

@@ -15,7 +15,7 @@
                         <li class="breadcrumb-item"><a href="{{ url('/agent-list') }}">Agent & Channel Partner</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Add Agent</li>
                     </ul>
-                    <a href="javascript:void(0);" id="start-add-agent-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                    <a href="javascript:void(0);" onclick="startAddAgentTour();" id="start-add-agent-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
                         <u>How does this Page works?</u>
                     </a>
                 </div>

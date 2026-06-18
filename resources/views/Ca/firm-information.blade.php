@@ -15,13 +15,16 @@
 	<div class="page-header">
 		<div class="page-block">
 			<div class="row align-items-center">
-				<div class="col-md-12">
-					<ul class="breadcrumb">
+				<div class="col-md-12 d-flex justify-content-between align-items-center">
+					<ul class="breadcrumb mb-0">
 						<li class="breadcrumb-item"><a href="">Home</a></li>
 						<li class="breadcrumb-item active" aria-current="page">Firm Profile</li>
 					</ul>
+					<a href="javascript:void(0);" onclick="startFirmInfoTour();" id="start-firm-info-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+						<u>How does this Page works?</u>
+					</a>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-4 mt-2">
 					<div class="page-header-title">
 						<h2 class="mb-0">Firm Profile</h2>
 					</div>
@@ -44,14 +47,12 @@
 										<form action="javascript:void(0);" id="frmprofileimageCA" name="frmprofileimageCA">
                                             @csrf
                                             <div class="message-container"></div>
-                                            <div class="position-absolute top-50 start-100 translate-middle">
+                                            <div class="position-absolute top-50 start-100 translate-middle" style="z-index: 10;">
                                                 <!-- File Upload Button -->
-                                                <button class="btn btn-sm btn-primary btn-icon" id="triggerFileUpload">
+                                                <button type="button" class="btn btn-sm btn-primary btn-icon" id="triggerFileUpload">
                                                     <i class="ti ti-pencil"></i>
                                                 </button>
-                                                <!--<input type="file" name="comp_logo" id="comp_logo_ca" class="d-none" onchange="handleFileUpload(this)" accept="image/*" />-->
-                                                <input type="file" name="comp_logo" id="comp_logo_ca" class="d-none" />
-                                                <!--<a class="btn btn-remove compimagedelCA">Remove</a>-->
+                                                <input type="file" name="comp_logo" id="comp_logo_ca" class="d-none" accept=".jpg, .jpeg, .png" />
                                             </div>
 										</form>
 											@if(isset($compDetails->comp_logo) && $compDetails->comp_logo !="")
@@ -529,95 +530,95 @@
                             <form action="javascript:void(0);" name="CAfrmbankdet" id="CAfrmbankdet" method="post">
                                 @csrf
                                 <div class="message-container"></div>
-								<?php  
-								if(!empty($bankDetails)) { 
-								$i = 1;	
-										foreach($bankDetails as $bankData ) {
-								?>
-								<div class="containerVariant">
-									<div class="row">
-										<div class="col-lg-12 col-sm-12">
-											<div class="card bank-account">
-												<div class="card-header d-flex justify-content-between align-items-center">
-													<h5>Bank Account <?php echo $i; ?></h5>
-													<!--<span class="btn btn-primary" onclick="addBankAccount()">Add New Bank Account</span>-->
-												</div>
-												<div class="card-body">
-													<div class="row">
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Bank Name <span class="text-danger">*</span></label>
-															<input type="text" name="bank_name[]" id="" value="{{ $bankData->bank_name }}" class="form-control" placeholder="Bank Name">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Branch <span class="text-danger">*</span></label>
-															<input type="text" name="bank_branch[]" id="" value="{{ $bankData->bank_branch }}" class="form-control" placeholder="Enter Branch">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Account Holder Name <span class="text-danger">*</span></label>
-															<input type="text" name="bank_holder_name[]" id="" value="{{ $bankData->bank_holder_name }}"  class="form-control" placeholder="Enter Name">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Account Number <span class="text-danger">*</span></label>
-															<input type="text" name="ac_no[]" id="" value="{{ $bankData->ac_no }}" class="form-control" placeholder="Enter Account Number">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">IFSC Code <span class="text-danger">*</span></label>
-															<input type="text" name="ifsc_code[]" id="" value="{{ $bankData->ifsc_code }}" class="form-control" placeholder="Enter IFSC Code ">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">VPA / UPI ID</label>
-															<input type="text" name="ac_upid[]" id="" value="{{ $bankData->ac_upid }}" class="form-control" placeholder="Enter VPA / UPI ID">
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<?php $i++;} }?>
-								<div class="containerVariant">
-									<div class="row">
-										<div class="col-lg-12 col-sm-12">
-											<div class="card bank-account">
-												<div class="card-header d-flex justify-content-between align-items-center">
-													<h5>Bank Account 1</h5>
-													<!--<span class="btn btn-primary" onclick="addBankAccount()">Add New Bank Account</span>-->
-												</div>
-												<div class="card-body">
-													<div class="row">
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Bank Name <span class="text-danger">*</span></label>
-															<input type="text" name="bank_name[]" id=""  class="form-control" placeholder="Bank Name">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Branch <span class="text-danger">*</span></label>
-															<input type="text" name="bank_branch[]" id=""  class="form-control" placeholder="Enter Branch">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Account Holder Name <span class="text-danger">*</span></label>
-															<input type="text" name="bank_holder_name[]" id=""   class="form-control" placeholder="Enter Name">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Account Number <span class="text-danger">*</span></label>
-															<input type="text" name="ac_no[]" id=""  class="form-control" placeholder="Enter Account Number">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">IFSC Code <span class="text-danger">*</span></label>
-															<input type="text" name="ifsc_code[]" id="" class="form-control" placeholder="Enter IFSC Code ">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">VPA / UPI ID</label>
-															<input type="text" name="ac_upid[]" id=""  class="form-control" placeholder="Enter VPA / UPI ID">
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<span class="btn btn-primary" onclick="addBankAccount()">Add New Bank Account</span>
-                                <div class="d-flex wizard justify-content-between mt-3">
-                                    
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Bank Account Details</h5>
+                                    <a href="javascript:void(0);" class="btn btn-primary" onclick="addBankAccount()">
+                                        <i class="ti ti-square-plus f-20"></i> Add New Bank
+                                    </a>
+                                </div>
+                                <div id="bankAccountsContainer" class="row">
+									<?php  
+									if(!empty($bankDetails)) { 
+									$i = 1;	
+											foreach($bankDetails as $bankData ) {
+									?>
+                                    <div class="col-lg-12 col-sm-12 bank-account mb-3">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h5>Bank Account <?php echo $i; ?></h5>
+                                                <?php if($i > 1) { ?>
+                                                <span class="btn btn-danger btn-sm" onclick="removeBankAccount(this)"><i class="ti ti-trash"></i></span>
+                                                <?php } ?>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+                                                        <input type="text" name="bank_name[]" id="" value="{{ $bankData->bank_name }}" class="form-control" placeholder="Bank Name">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Branch <span class="text-danger">*</span></label>
+                                                        <input type="text" name="bank_branch[]" id="" value="{{ $bankData->bank_branch }}" class="form-control" placeholder="Enter Branch">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Account Holder Name <span class="text-danger">*</span></label>
+                                                        <input type="text" name="bank_holder_name[]" id="" value="{{ $bankData->bank_holder_name }}"  class="form-control" placeholder="Enter Name">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Account Number <span class="text-danger">*</span></label>
+                                                        <input type="text" name="ac_no[]" id="" value="{{ $bankData->ac_no }}" class="form-control" placeholder="Enter Account Number">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
+                                                        <input type="text" name="ifsc_code[]" id="" value="{{ $bankData->ifsc_code }}" class="form-control" placeholder="Enter IFSC Code ">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">VPA / UPI ID</label>
+                                                        <input type="text" name="ac_upid[]" id="" value="{{ $bankData->ac_upid }}" class="form-control" placeholder="Enter VPA / UPI ID">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+									<?php $i++;} } else { ?>
+                                    <div class="col-lg-12 col-sm-12 bank-account mb-3">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h5>Bank Account 1</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+                                                        <input type="text" name="bank_name[]" id=""  class="form-control" placeholder="Bank Name">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Branch <span class="text-danger">*</span></label>
+                                                        <input type="text" name="bank_branch[]" id=""  class="form-control" placeholder="Enter Branch">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Account Holder Name <span class="text-danger">*</span></label>
+                                                        <input type="text" name="bank_holder_name[]" id=""   class="form-control" placeholder="Enter Name">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Account Number <span class="text-danger">*</span></label>
+                                                        <input type="text" name="ac_no[]" id=""  class="form-control" placeholder="Enter Account Number">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
+                                                        <input type="text" name="ifsc_code[]" id="" class="form-control" placeholder="Enter IFSC Code ">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">VPA / UPI ID</label>
+                                                        <input type="text" name="ac_upid[]" id=""  class="form-control" placeholder="Enter VPA / UPI ID">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php } ?>
+                                </div>
+                                <div class="d-flex wizard justify-content-end mt-3">
                                     <div class="last">
 										<button type="submit" id="save_bankDetBtn" class="btn btn-primary next-btn d-flex align-items-center justify-content-center">
 										Save Changes <i class="ti ti-arrow-right-circle ms-2"></i>
@@ -2304,7 +2305,7 @@
 
 
     //Bank Account Add/Remove
-    let bankAccountCount = 1;
+    let bankAccountCount = {{ !empty($bankDetails) ? count($bankDetails) : 1 }};
     const maxBankAccounts = 3;
     function addBankAccount() {
         if (bankAccountCount >= maxBankAccounts) {
@@ -2313,9 +2314,9 @@
         }
         
         bankAccountCount++;
-        const bankAccountContainer = document.querySelector("#bank-details .row");
+        const bankAccountContainer = document.getElementById("bankAccountsContainer");
         const newAccount = document.createElement("div");
-        newAccount.classList.add("col-lg-12", "col-sm-12", "bank-account");
+        newAccount.classList.add("col-lg-12", "col-sm-12", "bank-account", "mb-3");
         newAccount.innerHTML = `
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -3399,6 +3400,97 @@
         document.getElementById('mapSearchInput').value = '';
         document.getElementById('useLocationBtn').disabled = true;
     });
+
+	function startFirmInfoTour() {
+		function launch() {
+			introJs().setOptions({
+				steps: [
+					{
+						title: 'CA Firm Profile',
+						intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-building" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Firm Information panel. Configure your CA practice details, partner registry, day schedules, and banking credentials.</p></div>'
+					},
+					{
+						element: '#company-profile-set-tab',
+						title: 'Firm Settings Tabs',
+						intro: 'Use these tabs to switch between different profile sections: Firm Details, Services Offered, Bank details, Partners, Attachments, Holidays, Schedules, and Locations.'
+					},
+					{
+						element: '#firm-details-tab',
+						title: 'Firm Details & Address',
+						intro: 'Fill in your basic CA firm registration details, constitution type, software licenses, tax registration numbers, and billing address here.'
+					},
+					{
+						element: '#speclization-tab',
+						title: 'Services Offered',
+						intro: 'Configure the accounting, auditing, taxation, and consulting services your firm offers to clients.'
+					},
+					{
+						element: '#bank-details-tab',
+						title: 'Bank Credentials',
+						intro: 'Add your firm\'s bank account details and UPI IDs for client fee receivables.'
+					},
+					{
+						element: '#partner-details-tab',
+						title: 'Partner Registry',
+						intro: 'Register and manage details of all practicing partners in your firm.'
+					},
+					{
+						element: '#attachment-tab',
+						title: 'KYC Attachments',
+						intro: 'Upload firm KYC documents such as PAN card, GST registration, signature, and stamp copies.'
+					},
+					{
+						element: '#holidays-tab',
+						title: 'Company Holidays',
+						intro: 'Set your firm\'s annual holiday calendar for employees and client operations.'
+					},
+					{
+						element: '#schedule-tab',
+						title: 'Weekly Schedule',
+						intro: 'Manage the weekly work hours and schedule settings for your offices.'
+					},
+					{
+						element: '#locations-tab',
+						title: 'Office Locations',
+						intro: 'Register different office locations and branches for location-tracked attendance.'
+					}
+				],
+				showBullets: true,
+				showProgress: true,
+				helperElementPadding: 5,
+				exitOnOverlayClick: false,
+				doneLabel: 'Done',
+				nextLabel: 'Next',
+				prevLabel: 'Prev',
+				skipLabel: 'Skip'
+			}).start();
+		}
+
+		if (typeof introJs === 'function') {
+			launch();
+		} else {
+			if (!document.getElementById('introjs-cdn-css')) {
+				let css = document.createElement('link');
+				css.id = 'introjs-cdn-css';
+				css.rel = 'stylesheet';
+				css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+				document.head.appendChild(css);
+			}
+			let js = document.createElement('script');
+			js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+			js.onload = function() {
+				launch();
+			};
+			document.body.appendChild(js);
+		}
+	}
+
+	$(document).ready(function() {
+		$('#start-firm-info-tour').on('click', function(e) {
+			e.preventDefault();
+			startFirmInfoTour();
+		});
+	});
 
 </script>
 @endsection

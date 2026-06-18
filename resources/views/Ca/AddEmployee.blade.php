@@ -7,14 +7,17 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Payroll Management</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Add Employee</li>
                     </ul>
+                    <a href="javascript:void(0);" onclick="startAddEmployeeTour();" id="start-add-employee-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-12 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Add Employee</h2>
                     </div>
@@ -2559,6 +2562,94 @@
             if (this.checked) {
                 checkCompanyPolicy("tds");
             }
+        });
+    });
+
+    function startAddEmployeeTour() {
+        if (typeof introJs !== 'function') return;
+
+        let tour = introJs();
+        tour.setOptions({
+            steps: [
+                {
+                    title: 'Employee Onboarding Wizard',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-user-plus" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">This wizard helps you register new employees and configure their profiles, payroll details, bank accounts, and system access.</p></div>'
+                },
+                {
+                    element: 'a[href="#personalDetail"]',
+                    title: '1. Personal Details Tab',
+                    intro: 'This tab captures personal information including Name, Email, DOB, Aadhaar/PAN details, and qualification.'
+                },
+                {
+                    element: '#name',
+                    title: 'Employee Name',
+                    intro: 'Enter the full legal name of the employee.'
+                },
+                {
+                    element: '#phone',
+                    title: 'Contact Number',
+                    intro: 'Provide a valid 10-digit mobile number for communication and login.'
+                },
+                {
+                    element: 'a[href="#address"]',
+                    title: '2. Address & Emergency Contacts',
+                    intro: 'This tab is for current/permanent addresses, reference contacts, and emergency details.'
+                },
+                {
+                    element: 'a[href="#jobDetails"]',
+                    title: '3. Payroll & Statutory Info',
+                    intro: 'Assign the department, designation, joining date, work location, gross salary, and statutory checks (EPF, ESIC, P-Tax, TDS).'
+                },
+                {
+                    element: 'a[href="#bankDetails"]',
+                    title: '4. Bank Account Details',
+                    intro: 'Enter the employee\'s bank name, branch, account holder name, account number, and IFSC code for salary deposits.'
+                },
+                {
+                    element: 'a[href="#attachments"]',
+                    title: '5. Document Uploads',
+                    intro: 'Upload copies of qualification certificates, Aadhaar, PAN, and address proof for digital records.'
+                },
+                {
+                    element: 'a[href="#access"]',
+                    title: '6. Portal Access Permissions',
+                    intro: 'Check the features (e.g. Dashboard, Secure Locker, Compliances) this employee is permitted to access.'
+                }
+            ],
+            showBullets: true,
+            showProgress: true,
+            helperElementPadding: 5,
+            exitOnOverlayClick: false,
+            doneLabel: 'Done',
+            nextLabel: 'Next',
+            prevLabel: 'Prev',
+            skipLabel: 'Skip'
+        });
+
+        tour.onbeforechange(function(targetElement) {
+            if (targetElement) {
+                let tabPane = targetElement.closest('.tab-pane');
+                if (tabPane) {
+                    let tabId = tabPane.getAttribute('id');
+                    let tabTrigger = document.querySelector(`[data-bs-toggle="tab"][href="#${tabId}"]`);
+                    if (tabTrigger && !tabTrigger.classList.contains('active')) {
+                        let tabToShow = new bootstrap.Tab(tabTrigger);
+                        tabToShow.show();
+                    }
+                } else if (targetElement.getAttribute('data-bs-toggle') === 'tab') {
+                    let tabToShow = new bootstrap.Tab(targetElement);
+                    tabToShow.show();
+                }
+            }
+        });
+
+        tour.start();
+    }
+
+    $(document).ready(function() {
+        $('#start-add-employee-tour').on('click', function(e) {
+            e.preventDefault();
+            startAddEmployeeTour();
         });
     });
 </script>

@@ -3,6 +3,29 @@
 @section('container')
 
 <div class="pc-content">
+    <!-- [ breadcrumb ] start -->
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url('/ca-dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Company Assignment</li>
+                    </ul>
+                    <a href="javascript:void(0);" onclick="startCAAssignmentTour();" id="start-ca-assignment-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
+                <div class="col-md-4 mt-2">
+                    <div class="page-header-title">
+                        <h2 class="mb-0">Company Assignment</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ breadcrumb ] end -->
+
     <div class="row">
         <div class="col-md-5">
             <div class="card">
@@ -10,9 +33,6 @@
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <div class="d-flex align-items-center gap-3">
                             <h5 class="mb-1">Company Assignment List</h5>
-                            <a href="javascript:void(0);" id="start-ca-assignment-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.90rem;">
-                                <u>How does this Page works?</u>
-                            </a>
                         </div>
                         <select class="form-select rounded-3 form-select-sm w-auto" id="compAssignList" onChange="getAssignRequestChart();">
                         <option value="daily">Daily</option>
@@ -225,39 +245,57 @@
 @section('page-script')
 <script>
     function startCAAssignmentTour() {
-        if (typeof introJs !== 'function') return;
+        function launch() {
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Company Assignment',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-link" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage incoming customer service requests, accept assignments, and view assignment metrics.</p></div>'
+                    },
+                    {
+                        element: '#assign_chart',
+                        title: 'Assignment Metrics Chart',
+                        intro: 'Provides a daily, monthly, or yearly breakdown of your assignments and requests.'
+                    },
+                    {
+                        element: '#pending-requests-card',
+                        title: 'Assignment Requests',
+                        intro: 'List of companies requesting your CA services. View their specific service needs (GST, ROC, Audit) and click Accept (check icon) or Reject (cross icon).'
+                    },
+                    {
+                        element: '#assigned-companies-card',
+                        title: 'Active Mapped Clients',
+                        intro: 'Registry of all currently active company assignments showing their profile parameters, extra business nature, status, and communication links.'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            }).start();
+        }
 
-        introJs().setOptions({
-            steps: [
-                {
-                    title: 'Company Assignment',
-                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-link" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage incoming customer service requests, accept assignments, and view assignment metrics.</p></div>'
-                },
-                {
-                    element: '#assign_chart',
-                    title: 'Assignment Metrics Chart',
-                    intro: 'Provides a daily, monthly, or yearly breakdown of your assignments and requests.'
-                },
-                {
-                    element: '#pending-requests-card',
-                    title: 'Assignment Requests',
-                    intro: 'List of companies requesting your CA services. View their specific service needs (GST, ROC, Audit) and click Accept (check icon) or Reject (cross icon).'
-                },
-                {
-                    element: '#assigned-companies-card',
-                    title: 'Active Mapped Clients',
-                    intro: 'Registry of all currently active company assignments showing their profile parameters, extra business nature, status, and communication links.'
-                }
-            ],
-            showBullets: true,
-            showProgress: true,
-            helperElementPadding: 5,
-            exitOnOverlayClick: false,
-            doneLabel: 'Done',
-            nextLabel: 'Next',
-            prevLabel: 'Prev',
-            skipLabel: 'Skip'
-        }).start();
+        if (typeof introJs === 'function') {
+            launch();
+        } else {
+            if (!document.getElementById('introjs-cdn-css')) {
+                let css = document.createElement('link');
+                css.id = 'introjs-cdn-css';
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+                document.head.appendChild(css);
+            }
+            let js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+            js.onload = function() {
+                launch();
+            };
+            document.body.appendChild(js);
+        }
     }
 
     $(document).ready(function() {

@@ -20,7 +20,7 @@
                     </div>
                 </div>          
                 <div class="col-md-8 text-end">
-                    <a href="javascript:void(0);" id="start-ca-compliances-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-3" style="font-size: 0.95rem; vertical-align: middle;">
+                    <a href="javascript:void(0);" onclick="startCACompliancesTour();" id="start-ca-compliances-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-3" style="font-size: 0.95rem; vertical-align: middle;">
                         <u>How does this Page works?</u>
                     </a>
                 </div>

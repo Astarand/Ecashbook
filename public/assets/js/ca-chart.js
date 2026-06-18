@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		}],
 		chart: {
 			type: "bar",
-			height: 320,
+			height: 425,
 			toolbar: { show: false },
 			fontFamily: 'Inter, sans-serif'
 		},
@@ -138,10 +138,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         total: {
                             show: true,
                             label: "Total Earning",
-                            color: "#373d3f",
-                            fontSize: "16px",
-                            fontFamily: "Public Sans, sans-serif",
-                            fontWeight: 400,
+                            color: "#422f90",
+                            fontSize: "14px",
+                            fontFamily: "Inter, sans-serif",
+                            fontWeight: 600,
                             formatter: function (w) {
                                 return (
                                     "₹" +
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
         legend: {
             show: false,
         },
-        colors: ["#00b894", "#e74c3c", "#2c3e50"],
+        colors: ["#10b981", "#f59e0b", "#f43f5e"],
         responsive: [
             {
                 breakpoint: 480,
@@ -299,7 +299,16 @@ document.addEventListener("DOMContentLoaded", function () {
             bar: {
                 horizontal: false,
                 columnWidth: "55%",
+                borderRadius: 4,
             },
+        },
+        grid: {
+            borderColor: "#f1f5f9",
+            strokeDashArray: 4,
+            padding: {
+                left: 10,
+                right: 10
+            }
         },
         xaxis: {
             categories: [],
@@ -316,7 +325,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fill: {
             opacity: 1,
         },
-        colors: ["#2196f3", "#00e396", "#ff4560"],
+        colors: ["#4f46e5", "#0d9488", "#f97316"],
         dataLabels: {
             enabled: false,
         },
@@ -457,14 +466,10 @@ document.addEventListener("DOMContentLoaded", function () {
 				.then(res => res.json())
 				.then(data => {
 
-					const taskCounts = document.querySelectorAll(
-						".col-md-12 .card-body .row.g-3 h3"
-					);
-
-					taskCounts[0].textContent = data.total;
-					taskCounts[1].textContent = data.completed;
-					taskCounts[2].textContent = data.pending;
-					taskCounts[3].textContent = data.overdue;
+					document.getElementById("task-total-count").textContent = data.total;
+					document.getElementById("task-completed-count").textContent = data.completed;
+					document.getElementById("task-pending-count").textContent = data.pending;
+					document.getElementById("task-overdue-count").textContent = data.overdue;
 					
 					// ---- Update table ----
 					let html = '';
@@ -472,11 +477,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 						let statusBadge = '';
 						if (task.project_status == 1) {
-							statusBadge = '<span class="badge bg-danger">Pending</span>';
+							statusBadge = '<span class="badge" style="background-color: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.15); font-weight: 500; font-size: 11px; padding: 6px 12px; border-radius: 6px;">Pending</span>';
 						} else if (task.project_status == 2) {
-							statusBadge = '<span class="badge bg-warning">Ongoing</span>';
+							statusBadge = '<span class="badge" style="background-color: rgba(245, 158, 11, 0.1); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.15); font-weight: 500; font-size: 11px; padding: 6px 12px; border-radius: 6px;">Ongoing</span>';
 						} else {
-							statusBadge = '<span class="badge bg-success">Completed</span>';
+							statusBadge = '<span class="badge" style="background-color: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.15); font-weight: 500; font-size: 11px; padding: 6px 12px; border-radius: 6px;">Completed</span>';
 						}
 
 						html += `

@@ -7,15 +7,21 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-4">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url('/ca-dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Task List</li>
+                    </ul>
+                    <a href="javascript:void(0);" onclick="startCATasksTour();" id="start-ca-tasks-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
+                </div>
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Task List</h2>
                     </div>
                 </div>
-                <div class="col-md-8 text-end">
-                    <a href="javascript:void(0);" id="start-ca-tasks-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-3" style="font-size: 0.95rem; vertical-align: middle;">
-                        <u>How does this Page works?</u>
-                    </a>
+                <div class="col-md-8 text-end mt-2">
                     <a href="#" class="btn btn-success me-2" data-bs-toggle="tooltip" title="Whatsapp"><i class="ti ti-brand-whatsapp"></i></a>
                     <a href="#" class="btn btn-secondary me-2" data-bs-toggle="tooltip" title="Download Now"><i class="ti ti-download"></i></a>
                     @if (Auth::user()->u_type == 1)
@@ -193,40 +199,58 @@ $('#confirmDeleteTask').on('click', function () {
 
 <script>
     function startCATasksTour() {
-        if (typeof introJs !== 'function') return;
+        function launch() {
+            const steps = [
+                {
+                    title: 'Task Management Portal',
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-list-check" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Oversee and manage client tasks, update progress status, and monitor deadlines.</p></div>'
+                },
+                {
+                    element: '#tasks-table-card',
+                    title: 'Tasks Database Table',
+                    intro: 'View a detailed list of tasks including Task ID, Date/Time, Client Name, Category, Assigned Employee, Due Date, and Project Status.'
+                }
+            ];
 
-        const steps = [
-            {
-                title: 'Task Management Portal',
-                intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-list-check" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Oversee and manage client tasks, update progress status, and monitor deadlines.</p></div>'
-            },
-            {
-                element: '#tasks-table-card',
-                title: 'Tasks Database Table',
-                intro: 'View a detailed list of tasks including Task ID, Date/Time, Client Name, Category, Assigned Employee, Due Date, and Project Status.'
+            // If add task button exists (for CA admin u_type 1)
+            if (document.getElementById('add-task-btn')) {
+                steps.splice(1, 0, {
+                    element: '#add-task-btn',
+                    title: 'Create New Task',
+                    intro: 'Click here to initialize and delegate a new task for a client and assign it to an employee.'
+                });
             }
-        ];
 
-        // If add task button exists (for CA admin u_type 1)
-        if (document.getElementById('add-task-btn')) {
-            steps.splice(1, 0, {
-                element: '#add-task-btn',
-                title: 'Create New Task',
-                intro: 'Click here to initialize and delegate a new task for a client and assign it to an employee.'
-            });
+            introJs().setOptions({
+                steps: steps,
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            }).start();
         }
 
-        introJs().setOptions({
-            steps: steps,
-            showBullets: true,
-            showProgress: true,
-            helperElementPadding: 5,
-            exitOnOverlayClick: false,
-            doneLabel: 'Done',
-            nextLabel: 'Next',
-            prevLabel: 'Prev',
-            skipLabel: 'Skip'
-        }).start();
+        if (typeof introJs === 'function') {
+            launch();
+        } else {
+            if (!document.getElementById('introjs-cdn-css')) {
+                let css = document.createElement('link');
+                css.id = 'introjs-cdn-css';
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+                document.head.appendChild(css);
+            }
+            let js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+            js.onload = function() {
+                launch();
+            };
+            document.body.appendChild(js);
+        }
     }
 
     $(document).ready(function() {

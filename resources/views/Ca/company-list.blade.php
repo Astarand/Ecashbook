@@ -7,22 +7,22 @@
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
-                <div class="col-md-12">
-                    <ul class="breadcrumb">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ url('/ca-dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="{{ url('/company-list') }}">Companies</a></li>
                         <li class="breadcrumb-item" aria-current="page">Company List</li>
                     </ul>
+                    <a href="javascript:void(0);" onclick="startCACompaniesTour();" id="start-ca-companies-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
+                        <u>How does this Page works?</u>
+                    </a>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Company List</h2>
                     </div>
                 </div>
-                <div class="col-md-8 text-end">
-                    <a href="javascript:void(0);" id="start-ca-companies-tour" class="text-primary d-inline-flex align-items-center gap-1 fw-semibold me-3" style="font-size: 0.95rem; vertical-align: middle;">
-                        <u>How does this Page works?</u>
-                    </a>
+                <div class="col-md-8 text-end mt-2">
                     <a href="#" class="btn btn-success me-2" data-bs-toggle="tooltip" title="Whatsapp"><i class="ti ti-brand-whatsapp"></i></a>
                     <a href="#" class="btn btn-secondary me-2" data-bs-toggle="tooltip" title="Download Now"><i class="ti ti-download"></i></a>
                     <a href="{{ route('CA.CompanyAdd') }}" id="add-company-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Company</a>
@@ -160,40 +160,58 @@
 @section('page-script')
 <script>
     function startCACompaniesTour() {
-        if (typeof introJs !== 'function') return;
+        function launch() {
+            introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Company List',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-building" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage all companies and clients assigned to you or added by your firm.</p></div>'
+                    },
+                    {
+                        element: '#add-company-btn',
+                        title: 'Onboard New Company',
+                        intro: 'Click here to register a new client company profile under your CA firm.'
+                    },
+                    {
+                        element: '#companies-table-card',
+                        title: 'Companies Roster',
+                        intro: 'List of all clients showing company name, contact numbers, email, assignment source (own or requested), status, and actions.'
+                    },
+                    {
+                        element: '.prod-action-links',
+                        title: 'Action Panel',
+                        intro: 'Quick actions to view client profile details, start a real-time chat, or activate/deactivate the company account.'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip',
+                skipIfNoElement: true
+            }).start();
+        }
 
-        introJs().setOptions({
-            steps: [
-                {
-                    title: 'Company List',
-                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-building" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Manage all companies and clients assigned to you or added by your firm.</p></div>'
-                },
-                {
-                    element: '#add-company-btn',
-                    title: 'Onboard New Company',
-                    intro: 'Click here to register a new client company profile under your CA firm.'
-                },
-                {
-                    element: '#companies-table-card',
-                    title: 'Companies Roster',
-                    intro: 'List of all clients showing company name, contact numbers, email, assignment source (own or requested), status, and actions.'
-                },
-                {
-                    element: '.prod-action-links',
-                    title: 'Action Panel',
-                    intro: 'Quick actions to view client profile details, start a real-time chat, or activate/deactivate the company account.',
-                    skipIfNoElement: true
-                }
-            ],
-            showBullets: true,
-            showProgress: true,
-            helperElementPadding: 5,
-            exitOnOverlayClick: false,
-            doneLabel: 'Done',
-            nextLabel: 'Next',
-            prevLabel: 'Prev',
-            skipLabel: 'Skip'
-        }).start();
+        if (typeof introJs === 'function') {
+            launch();
+        } else {
+            if (!document.getElementById('introjs-cdn-css')) {
+                let css = document.createElement('link');
+                css.id = 'introjs-cdn-css';
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+                document.head.appendChild(css);
+            }
+            let js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+            js.onload = function() {
+                launch();
+            };
+            document.body.appendChild(js);
+        }
     }
 
     $(document).ready(function() {
