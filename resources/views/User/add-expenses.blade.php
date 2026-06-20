@@ -80,6 +80,7 @@
                             <option value="Job Work / Outsourcing">Job Work / Outsourcing</option>
                             <option value="Packing Material">Packing Material</option>
                             <option value="Other">Other Direct Expenses</option>
+                            <option value="freight_transport">Freight & Transport</option>
                         </select>
                     </div>
 
@@ -106,8 +107,32 @@
                             <option value="depreciation">Depreciation</option>
                             <option value="insurance_expense">Insurance Expense</option>
                             <option value="marketing_advertisement">Marketing & Advertisement</option>
-                            <option value="freight_transport">Freight & Transport</option>
+                            {{-- <option value="freight_transport">Freight & Transport</option> --}}
                             <option value="miscellaneous_expenses">Miscellaneous Expenses</option>
+
+                            {{-- New Option --}}
+                            <option value="income_tax_paid">Income Tax Paid</option>
+                            <option value="gst_interest_penalty">GST Interest & Penalty</option>
+                            <option value="late_filing_penalty">Late Filing Penalty</option>
+                            <option value="personal_expenses">Personal Expenses</option>
+                            <option value="cash_payment_above_income_tax_limit">Cash Payment above Income Tax limit</option>
+                            <option value="donation_non_approved">Donation (Non-approved)</option>
+                            <option value="provision_for_expenses">Provision for Expenses</option>
+                            <option value="provision_for_doubtful_debts">Provision for Doubtful Debts</option>
+                            <option value="penalty_for_law_violation">Penalty for Law Violation</option>
+                            <option value="wealth_tax_personal_tax">Wealth Tax / Personal Tax</option>
+                            <option value="capital_loss">Capital Loss</option>
+                            <option value="drawings_owner_withdrawals">Drawings / Owner Withdrawals</option>
+                            <option value="csr_expense(certain_cases)">CSR Expense (certain cases)</option>
+                            <option value="unpaid_pf_esi_beyond_due_date">Unpaid PF/ESI beyond due date</option>
+                            <option value="tds_not_deducted_deposited">TDS not deducted / deposited</option>
+                            <option value="expenses_without_proper_bills">Expenses without proper bills</option>
+                            <option value="interest_on_business_loan">Interest on Business Loan</option>
+                            <option value="software_subscription">Software Subscription</option>
+                            <option value="hosting_cloud_expense">Hosting / Cloud Expense</option>
+                            <option value="motor_car_expense">Motor Car Expense</option>
+                            <option value="entertainment_expense">Entertainment Expense</option>
+                            <option value="director_expense">Director Expense</option>
                         </select>
                     </div>
 
@@ -149,6 +174,7 @@
                                 <option value="">Select Payment Status</option>
                                 <option value="full">Full</option>
                                 <option value="advance">Advance</option>
+                                <option value="due">Due</option>
                             </select>
                         </div>
 
@@ -803,7 +829,7 @@
             let approved_date = $("form#addExpenseFrm #approved_date").val();
             let spec_note = $("form#addExpenseFrm #spec_note").val();
 			let employee_id = $("#employee_id option:selected").val();
-			if (expense_cat === "indirect" && expense_type === "employee_benefits" && !employee_id) {
+			if ((expense_cat === "indirect" || expense_cat === "direct") && expense_type === "employee_benefits" && !employee_id) {
 				showToast("Please select employee", "error");
 				return false;
 			}
@@ -1010,17 +1036,12 @@
 
 		function handleEmployeeDropdown() {
 			let category = $("#expense_cat").val();
-			let type = $("#indirectExpensesType").val();
-
-			// ✅ Direct → always hide
-			if (category === "direct") {
-				$("#employeeDropdownDiv").hide();
-				$("#employee_id").val('');
-				return;
-			}
+			let type = (category === "direct") 
+                    ? $("#directExpensesType").val() 
+                    : $("#indirectExpensesType").val();
 
 			// ✅ Indirect + employee_benefits → show
-			if (category === "indirect" && type === "employee_benefits") {
+			if ((category === "indirect" || category === "direct") && type === "employee_benefits") {
 				$("#employeeDropdownDiv").show();
 				loadEmployees();
 			} else {
@@ -1035,7 +1056,7 @@
 		});
 
 		// 🔥 Trigger on indirect type change
-		$("#indirectExpensesType").change(function () {
+		$("#indirectExpensesType, #directExpensesType").change(function () {
 			handleEmployeeDropdown();
 		});
 
@@ -1043,11 +1064,12 @@
 		handleEmployeeDropdown();
 	});
 
-    // Employee Expense UI Logic
     function handleEmployeeExpenseUI() {
 
         let category = $("#expense_cat").val();
-        let type = $("#indirectExpensesType").val();
+        let type = (category === "direct") 
+                    ? $("#directExpensesType").val() 
+                    : $("#indirectExpensesType").val();
 
         let tdsSection = $("#tds_section").closest(".row");
         let gstSection = $(".gst-container");
@@ -1057,7 +1079,7 @@
 
         let amountLabel = $("#amountLabel");
 
-        if (category === "indirect" && type === "employee_benefits") {
+        if ((category === "indirect" || category === "direct") && type === "employee_benefits") {
 
             // ✅ Change label
             amountLabel.text("Advance Amount *");
@@ -1111,7 +1133,7 @@
     handleEmployeeExpenseUI();
     });
 
-    $("#indirectExpensesType").change(function () {
+    $("#indirectExpensesType, #directExpensesType").change(function () {
         handleEmployeeExpenseUI();
     });
 
@@ -1181,9 +1203,11 @@
     function handleEmployeeInvoiceToggle() {
 
         let category = $("#expense_cat").val();
-        let type = $("#indirectExpensesType").val();
+        let type = (category === "direct") 
+                ? $("#directExpensesType").val() 
+                : $("#indirectExpensesType").val();
 
-        if (category === "indirect" && type === "employee_benefits") {
+        if ((category === "indirect" || category === "direct") && type === "employee_benefits") {
 
             $("#invoiceDiv").hide();          // ❌ hide invoice
             $("#employeeIdDiv").show();       // ✅ show employee id
@@ -1202,7 +1226,7 @@
         $("#employee_code").val(code);
 
     });
-        $("#expense_cat, #indirectExpensesType").change(function () {
+        $("#expense_cat, #indirectExpensesType, #directExpensesType").change(function () {
         handleEmployeeInvoiceToggle();
     });
 
@@ -1214,7 +1238,9 @@
     function handleDepreciationUI() {
 
         let category = $("#expense_cat").val();
-        let type = $("#indirectExpensesType").val();
+        let type = (category === "direct") 
+                    ? $("#directExpensesType").val()    
+                    : $("#indirectExpensesType").val();
 
         if (category === "indirect" && type === "depreciation") {
 
@@ -1243,7 +1269,7 @@
         }
     }
 
-    $("#expense_cat, #indirectExpensesType").on("change", function () {
+    $("#expense_cat, #indirectExpensesType, #directExpensesType").on("change", function () {
 
         // Run after other UI updates (important fix)
         setTimeout(function () {
@@ -1261,6 +1287,7 @@
 
         const expenseCat = document.getElementById("expense_cat");
         const indirectType = document.getElementById("indirectExpensesType");
+        const directType = document.getElementById("directExpensesType");
         const otherBox = document.getElementById("other_text_box");
 
         function toggleOtherField() {

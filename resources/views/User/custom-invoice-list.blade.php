@@ -22,9 +22,11 @@
                         <h2 class="mb-0">Custom Invoice List</h2>
                     </div>
                 </div>
+				@if (Auth::user()->u_type != 3 || Auth::user()->u_type != 6)
                 <div class="col-md-8 text-end">
                     <a href="{{ route('user.GenerateCustomInvoice') }}" id="generate-custom-invoice-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Generate New Invoice</a>
                 </div>
+				@endif
             </div>
         </div>
     </div>

@@ -421,7 +421,7 @@ class JournalService
 			
 			$amount        = (float) ($data['amount'] ?? 0);
 			$tot_amt       = (float) ($data['amount'] ?? 0);
-			$payStatus     = $data['payment_status'] ?? '';	
+			$payStatus     = ucfirst(strtolower($data['payment_status'] ?? ''));
 
 			$tdsApplicable = $data['tds_applicable'] ?? 'no';
 			$tdsPercent    = (float) ($data['tds_percent'] ?? 0);
@@ -535,7 +535,7 @@ class JournalService
 			$party        = $data['party_name'] ?? '';
 			$amount       = $data['amount'] ?? 0;
 			$tot_amt      = $data['amount'] ?? 0;
-			$payStatus     = $data['payment_status'] ?? '';
+			$payStatus     = $data['pay_status'] ?? '';
 
 			$tdsApplicable = $data['tds_applicable'] ?? 'no';
 			$tdsPercent    = $data['tds_percent'] ?? 0;
@@ -643,6 +643,7 @@ class JournalService
 
 			$assetName = $data['asset_name'];
 			$party     = $data['party_name'];
+			$payStatus = $data['pay_status'] ?? '';
 			$amount    = $data['amount'];
 			$dcType = strtolower($data['debit_credit'] ?? 'debit');
 
@@ -687,7 +688,7 @@ class JournalService
 				'reference_no'   => null,
 				'entry_type'     => $entryType,
 				'source'         => $source,
-				'payment_status' => '',
+				'payment_status' => $payStatus,
 				'party_name'     => null,
 				'ledger'         => null,
 				'debit_credit'   => null,
@@ -1002,6 +1003,199 @@ class JournalService
 		} catch (\Exception $e) {
 			DB::rollback();
 			\Log::error('Liability Journal Error: ' . $e->getMessage());
+			return false;
+		}
+	}
+	
+	//Payroll Journal
+	public function storePayrollJournalEntries(array $data)
+	{
+		DB::beginTransaction();
+
+		try {
+
+			$userId  = $data['added_by'];
+			$autoId  = $data['autoId'];
+			$propId  = $data['propId'] ?? null;
+
+			$source    = $data['source'] ?? 'Payroll';
+			$entryType = $data['entry_type'] ?? $source;
+			$payrollMonth = $data['payroll_month'] ?? '';
+
+			$existing  = $this->checkExisting($autoId, $userId, $source);
+			$journalNo = $this->getJournalNo($autoId, $userId, $source);
+
+			// Delete existing payroll journals if regenerated
+			if ($existing->count() > 0) {
+				Journals::where('autoId', $autoId)
+					->where('source', $source)
+					->delete();
+			}
+
+			$common = [
+				'journal_no'     => $journalNo,
+				'added_by'       => $userId,
+				'autoId'         => $autoId,
+				'propId'         => $propId,
+				'journal_date'   => $data['date'],
+				'reference_type' => 'New Ref',
+				'reference_no'   => $data['reference_no'],
+				'entry_type'     => $entryType,
+				'source'         => $source,
+				'payment_status' => 'Payroll',
+				'status'         => 'Posted',
+				'tds_applicable' => 'no',
+				'tds_percent'    => 0,
+				'tds_amt'        => 0,
+				'gst_applicable' => 'no',
+				'gst_rate'       => 0,
+				'gst_trans'      => null,
+				'other_note'     => null,
+				'hsn_sac_code'   => null,
+			];
+
+			$grossSalary = (float) ($data['gross_salary'] ?? 0);
+			$pf          = (float) ($data['pf'] ?? 0);
+			$esi         = (float) ($data['esi'] ?? 0);
+			$ptax        = (float) ($data['ptax'] ?? 0);
+			$tds         = (float) ($data['tds'] ?? 0);
+			$loan        = (float) ($data['loan'] ?? 0);
+
+			$employeeName = $data['employee_name'] ?? '';
+
+			$netSalary = (float) ($data['net_salary'] ?? 0);
+
+			$entries = [];
+
+			/*
+			|--------------------------------------------------------------------------
+			| Salary Expense (Debit)
+			|--------------------------------------------------------------------------
+			*/
+			$entries[] = array_merge($common, [
+				'ledger'        => 'Salary Expense',
+				'party_name'    => $employeeName,
+				'debit_credit'  => 'Debit',
+				'amount'        => $grossSalary,
+				'tot_amt'       => $grossSalary,
+				'notes'         => 'Salary Expense - '.$payrollMonth,
+			]);
+
+			/*
+			|--------------------------------------------------------------------------
+			| PF Payable (Credit)
+			|--------------------------------------------------------------------------
+			*/
+			if ($pf > 0) {
+				$entries[] = array_merge($common, [
+					'ledger'        => 'PF Payable',
+					'party_name'    => $employeeName,
+					'debit_credit'  => 'Credit',
+					'amount'        => $pf,
+					'tot_amt'       => $pf,
+					'notes'         => 'PF Deduction - '.$payrollMonth,
+				]);
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| ESI Payable (Credit)
+			|--------------------------------------------------------------------------
+			*/
+			if ($esi > 0) {
+				$entries[] = array_merge($common, [
+					'ledger'        => 'ESI Payable',
+					'party_name'    => $employeeName,
+					'debit_credit'  => 'Credit',
+					'amount'        => $esi,
+					'tot_amt'       => $esi,
+					'notes'         => 'ESI Deduction - '.$payrollMonth,
+				]);
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| PTAX Payable (Credit)
+			|--------------------------------------------------------------------------
+			*/
+			if ($ptax > 0) {
+				$entries[] = array_merge($common, [
+					'ledger'        => 'PTAX Payable',
+					'party_name'    => $employeeName,
+					'debit_credit'  => 'Credit',
+					'amount'        => $ptax,
+					'tot_amt'       => $ptax,
+					'notes'         => 'Professional Tax Deduction - '.$payrollMonth,
+				]);
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| TDS Payable (Credit)
+			|--------------------------------------------------------------------------
+			*/
+			if ($tds > 0) {
+				$entries[] = array_merge($common, [
+					'ledger'        => 'TDS Payable',
+					'party_name'    => $employeeName,
+					'debit_credit'  => 'Credit',
+					'amount'        => $tds,
+					'tot_amt'       => $tds,
+					'notes'         => 'TDS Deduction - '.$payrollMonth,
+				]);
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Employee Loan Recovery (Credit)
+			|--------------------------------------------------------------------------
+			| If loan was previously given to employee
+			| this entry reduces outstanding employee loan.
+			|--------------------------------------------------------------------------
+			*/
+			if ($loan > 0) {
+				$entries[] = array_merge($common, [
+					'ledger'        => 'Employee Loan Recovery',
+					'party_name'    => $employeeName,
+					'debit_credit'  => 'Credit',
+					'amount'        => $loan,
+					'tot_amt'       => $loan,
+					'notes'         => 'Loan Recovery  - '.$payrollMonth,
+				]);
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Salary Payable (Credit)
+			|--------------------------------------------------------------------------
+			*/
+			if ($netSalary > 0) {
+				$entries[] = array_merge($common, [
+					'ledger'        => 'Salary Payable',
+					'party_name'    => $employeeName,
+					'debit_credit'  => 'Credit',
+					'amount'        => $netSalary,
+					'tot_amt'       => $netSalary,
+					'notes'         => 'Net Salary Payable - '.$payrollMonth,
+				]);
+			}
+
+			Journals::insert($entries);
+
+			DB::commit();
+
+			return true;
+
+		} catch (\Exception $e) {
+
+			DB::rollback();
+
+			\Log::error('Payroll Journal Error', [
+				'message' => $e->getMessage(),
+				'line'    => $e->getLine(),
+				'file'    => $e->getFile(),
+			]);
+
 			return false;
 		}
 	}

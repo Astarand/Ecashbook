@@ -123,8 +123,8 @@
                                             <input type="text" class="form-control" required name="vendor_name" id="vendor_name" value="{{ $vendor->vendor_name }}" placeholder="Enter Company Name">
                                         </div>
                                         <div class="mb-3 col-md-3">
-                                            <label class="form-label" for="inputEmail4">PAN Number<span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" required  name="vendor_pan" id="vendor_pan" value="{{ $vendor->vendor_pan}}" placeholder="Enter PAN Number" style="text-transform: uppercase;">
+                                            <label class="form-label" for="inputEmail4">PAN Number</label>
+                                            <input type="text" class="form-control"  name="vendor_pan" id="vendor_pan" value="{{ $vendor->vendor_pan}}" placeholder="Enter PAN Number" style="text-transform: uppercase;">
                                         </div>
 
                                         <div class="mb-3 col-md-3">
@@ -751,7 +751,7 @@
             const requiredFields = [
                 { id: 'gst_reg', name: 'GST Registration' },
                 { id: 'vendor_name', name: 'Company Name' },
-                { id: 'vendor_pan', name: 'PAN Number' },
+                // { id: 'vendor_pan', name: 'PAN Number' },
                 //{ id: 'vendor_email', name: 'Email' },
                // { id: 'vendor_phone', name: 'Phone Number' },
                 { id: 'comp_type', name: 'Company Type' },
@@ -794,13 +794,13 @@
             }
 
             // PAN Number validation
-            const panNo = $("#vendor_pan").val().trim();
-            const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-            if (!panRegex.test(panNo)) {
-                showToast("Invalid PAN Number. Format should be: AAAAA9999A", "error");
-                $("#vendor_pan").focus();
-                return false;
-            }
+            // const panNo = $("#vendor_pan").val().trim();
+            // const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            // if (!panRegex.test(panNo)) {
+            //     showToast("Invalid PAN Number. Format should be: AAAAA9999A", "error");
+            //     $("#vendor_pan").focus();
+            //     return false;
+            // }
 
             // Additional GST validation
             const gstReg = $("#gst_reg").val();

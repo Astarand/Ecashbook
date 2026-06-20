@@ -769,6 +769,16 @@ $("form#addSalesFrmFour #prevBtnOther").on("click", function () {
     $("#product").addClass("active");
 });
 
+$("form#addProformaFrmFour #prevBtnOther").on("click", function () {
+    $("#tab-D").removeClass("active");
+    $("#tab-C").addClass("active");
+
+    $("#other").hide();
+    $("#product").show();
+    $("#product").addClass("show");
+    $("#product").addClass("active");
+});
+
 var addSalesFrmTwo = $("#addSalesFrmTwo").validate({
     rules: {
         inv_name: {
@@ -3759,12 +3769,29 @@ function changeRatePo(el) {
     $(document).on('click','.upload-pdf-btn',function () {
          $("#pdf_id").val($(this).data('id'));
          $("#pdf_type").val($(this).data('type'));
+		 $("#invoice_number").text($(this).data('inv'));
+		 $("#pdf_file").val('');
+		 $("#uploadError").html('');
     });
+	
+	$(document).on('click', '.view-pdf-btn', function () {
+		let pdfUrl = $(this).data('pdf');
+		$('#pdfFrame').attr('src', pdfUrl);
+		const modal = new bootstrap.Modal(
+			document.getElementById('pdfPreviewModal')
+		);
+		modal.show();
+	});
+	
+	document.getElementById('pdfPreviewModal').addEventListener('hidden.bs.modal', function () {
+		$('#pdfFrame').attr('src', '');
+	});
 
 	$('#uploadPdfModal').on('hidden.bs.modal', function () {
 		$("#uploadPdfForm")[0].reset();
 		$("#pdf_id").val('');
 		$("#pdf_type").val('');
+		$("#invoice_number").text('');
 		$("#uploadError").html('');
 	});
 
@@ -3782,8 +3809,8 @@ function changeRatePo(el) {
          return;
       }
 
-      if (file.size > 5 * 1024 * 1024) {
-		 showToast("Maximum 5MB allowed", "error");
+      if (file.size > 2 * 1024 * 1024) {
+		 showToast("Maximum 2MB allowed", "error");
          return;
       }
 

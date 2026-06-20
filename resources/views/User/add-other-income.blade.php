@@ -80,6 +80,14 @@
 						<div class="col-md-3 mb-3">
 							<label class="form-label">Party / Source Name<span class="text-danger"></span></label>
 							<input type="text" name="customer_name" id="customer_name" class="form-control">
+							<!--<select name="customer_id" id="customer_id" required class="form-control">
+								<option value="">Select</option>
+								@foreach($customers as $customer)
+									<option value="{{ $customer->id }}">
+										{{ $customer->cust_name }}
+									</option>
+								@endforeach
+							</select>-->
 						</div>
 						<div class="col-md-3 mb-3">
 							<label class="form-label">Invoice / Reference Number</label>
@@ -95,6 +103,7 @@
 								<option value="">Select</option>
 								<option value="Full">Full</option>
 								<option value="Advance">Advance</option>														
+								<option value="Due">Due</option>														
 							</select>
 						</div>
 						<div class="col-md-3 mb-3">

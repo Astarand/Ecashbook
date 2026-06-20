@@ -1004,7 +1004,7 @@ class EmployeeManagemnet extends Controller
 			'epfapplicable' => $request->boolean('epf_applicable'),
 			'esicapplicable' => $request->boolean('esic_applicable'),
 			'ptaxapplicable' => $request->boolean('ptax_applicable'),
-			'tdsapplicable' => $request->boolean('tdsapplicable'),
+			'tdsapplicable' => $request->boolean('tds_applicable'),
 			'epfno' => $request->input('epf_no'),
 			'esicno' => $request->input('esic_no'),
 
@@ -1676,6 +1676,9 @@ class EmployeeManagemnet extends Controller
 
 	public function update_user_employee(Request $request)
 	{
+		// echo '<pre>';
+		// print_r($request->all());
+		// die();
 		$empId = $request->input('id'); // Get employee ID from hidden input
 
 		if (!$empId) {
@@ -1792,7 +1795,7 @@ class EmployeeManagemnet extends Controller
 		$employee->epf_applicable = $request->has('epf_applicable') ? 1 : 0;
 		$employee->esic_applicable = $request->has('esic_applicable') ? 1 : 0;
 		$employee->ptax_applicable = $request->has('ptax_applicable') ? 1 : 0;
-		$employee->tds_applicable = $request->has('tdsapplicable') ? 1 : 0;
+		$employee->tds_applicable = $request->has('tds_applicable') ? 1 : 0;
 		$employee->epf_no = $request->epf_no ?? null;
 		$employee->esic_no = $request->esic_no ?? null;
 

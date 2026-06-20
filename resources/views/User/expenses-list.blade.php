@@ -80,6 +80,8 @@
                                     <span class="badge bg-success text-dark">{{ $expen->payment_status }}</span>
                                     @elseif ($expen->payment_status == 'advance')
                                     <span class="badge bg-warning text-dark">{{ $expen->payment_status }}</span>   
+                                    @elseif ($expen->payment_status == 'due')
+                                    <span class="badge bg-danger text-dark">{{ $expen->payment_status }}</span> 
                                     @endif
                                 </td>
 								<td>

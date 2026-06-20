@@ -107,6 +107,7 @@
 								<option value="">Select</option>
 								<option value="Full" <?=($income->pay_status == "Full") ? 'selected' : '' ?>>Full</option>
 								<option value="Advance" <?=($income->pay_status == "Advance") ? 'selected' : '' ?>>Advance</option>														
+								<option value="Due" <?=($income->pay_status == "Due") ? 'selected' : '' ?>>Due</option>														
 							</select>
 						</div>
 						<div class="col-md-3 mb-3">

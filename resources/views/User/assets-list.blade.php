@@ -24,7 +24,11 @@
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
-                    <a href="{{ route('user.AddAsset') }}" class="btn btn-primary"><i class="ti ti-square-plus f-20"></i> Add New Asset</a>
+                    @if($req_tag != 1)
+                        <a href="{{ route('user.AddAsset') }}" class="btn btn-primary">
+                            <i class="ti ti-square-plus f-20"></i> Add New Asset
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -145,7 +149,7 @@
 											<span class="badge bg-warning text-dark">{{ $status }}</span>
 
 										@else
-											<span class="badge bg-secondary text-dark">{{ $status }}</span>
+											<span class="badge bg-danger text-dark">{{ $status }}</span>
 										@endif
 
 									@else

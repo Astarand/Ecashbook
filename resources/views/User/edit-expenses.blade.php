@@ -1,4 +1,4 @@
-﻿@extends('App.Layout')
+@extends('App.Layout')
 
 @section('container')
 
@@ -113,6 +113,11 @@
                                 Packing Material
                             </option>
 
+                            <option value="freight_transport" 
+                                {{ ($expenses->expense_type == 'freight_transport') ? 'selected' : '' }}>
+                                Freight & Transport
+                            </option>
+
                             <option value="Other" 
                                 {{ ($expenses->expense_type == 'Other') ? 'selected' : '' }}>
                                 Other Direct Expenses
@@ -141,8 +146,31 @@
                             <option value="depreciation" {{ ($expenses->expense_type == 'depreciation') ? 'selected' : '' }}>Depreciation</option>
                             <option value="insurance_expense" {{ ($expenses->expense_type == 'insurance_expense') ? 'selected' : '' }}>Insurance Expense</option>
                             <option value="marketing_advertisement" {{ ($expenses->expense_type == 'marketing_advertisement') ? 'selected' : '' }}>Marketing &amp; Advertisement</option>
-                            <option value="freight_transport" {{ ($expenses->expense_type == 'freight_transport') ? 'selected' : '' }}>Freight &amp; Transport</option>
+                            {{-- <option value="freight_transport" {{ ($expenses->expense_type == 'freight_transport') ? 'selected' : '' }}>Freight &amp; Transport</option> --}}
                             <option value="miscellaneous_expenses" {{ ($expenses->expense_type == 'miscellaneous_expenses') ? 'selected' : '' }}>Miscellaneous Expenses</option>
+                            
+                            <option value="income_tax_paid" {{ ($expenses->expense_type == 'income_tax_paid') ? 'selected' : '' }}>Income Tax Paid</option>
+                            <option value="gst_interest_penalty" {{ ($expenses->expense_type == 'gst_interest_penalty') ? 'selected' : '' }}>GST Interest &amp; Penalty</option>
+                            <option value="late_filing_penalty" {{ ($expenses->expense_type == 'late_filing_penalty') ? 'selected' : '' }}>Late Filing Penalty</option>
+                            <option value="personal_expenses" {{ ($expenses->expense_type == 'personal_expenses') ? 'selected' : '' }}>Personal Expenses</option>
+                            <option value="cash_payment_above_income_tax_limit" {{ ($expenses->expense_type == 'cash_payment_above_income_tax_limit') ? 'selected' : '' }}>Cash Payment above Income Tax limit</option>
+                            <option value="donation_non_approved" {{ ($expenses->expense_type == 'donation_non_approved') ? 'selected' : '' }}>Donation (Non-approved)</option>
+                            <option value="provision_for_expenses" {{ ($expenses->expense_type == 'provision_for_expenses') ? 'selected' : '' }}>Provision for Expenses</option>
+                            <option value="provision_for_doubtful_debts" {{ ($expenses->expense_type == 'provision_for_doubtful_debts') ? 'selected' : '' }}>Provision for Doubtful Debts</option>
+                            <option value="penalty_for_law_violation" {{ ($expenses->expense_type == 'penalty_for_law_violation') ? 'selected' : '' }}>Penalty for Law Violation</option>
+                            <option value="wealth_tax_personal_tax" {{ ($expenses->expense_type == 'wealth_tax_personal_tax') ? 'selected' : '' }}>Wealth Tax / Personal Tax</option>
+                            <option value="capital_loss" {{ ($expenses->expense_type == 'capital_loss') ? 'selected' : '' }}>Capital Loss</option>
+                            <option value="drawings_owner_withdrawals" {{ ($expenses->expense_type == 'drawings_owner_withdrawals') ? 'selected' : '' }}>Drawings / Owner Withdrawals</option>
+                            <option value="csr_expense(certain_cases)" {{ ($expenses->expense_type == 'csr_expense(certain_cases)') ? 'selected' : '' }}>CSR Expense (certain cases)</option>
+                            <option value="unpaid_pf_esi_beyond_due_date" {{ ($expenses->expense_type == 'unpaid_pf_esi_beyond_due_date') ? 'selected' : '' }}>Unpaid PF/ESI beyond due date</option>
+                            <option value="tds_not_deducted_deposited" {{ ($expenses->expense_type == 'tds_not_deducted_deposited') ? 'selected' : '' }}>TDS not deducted / deposited</option>
+                            <option value="expenses_without_proper_bills" {{ ($expenses->expense_type == 'expenses_without_proper_bills') ? 'selected' : '' }}>Expenses without proper bills</option>
+                            <option value="interest_on_business_loan" {{ ($expenses->expense_type == 'interest_on_business_loan') ? 'selected' : '' }}>Interest on Business Loan</option>
+                            <option value="software_subscription" {{ ($expenses->expense_type == 'software_subscription') ? 'selected' : '' }}>Software Subscription</option>
+                            <option value="hosting_cloud_expense" {{ ($expenses->expense_type == 'hosting_cloud_expense') ? 'selected' : '' }}>Hosting / Cloud Expense</option>
+                            <option value="motor_car_expense" {{ ($expenses->expense_type == 'motor_car_expense') ? 'selected' : '' }}>Motor Car Expense</option>
+                            <option value="entertainment_expense" {{ ($expenses->expense_type == 'entertainment_expense') ? 'selected' : '' }}>Entertainment Expense</option>
+                            <option value="director_expense" {{ ($expenses->expense_type == 'director_expense') ? 'selected' : '' }}>Director Expense</option>
                         </select>
                     </div>
 
@@ -185,6 +213,7 @@
                                 <option value="">Select Payment Status</option>
                                 <option value="full" {{ $expenses->payment_status == 'full' ? 'selected' : '' }}>Full</option>
                                 <option value="advance" {{ $expenses->payment_status == 'advance' ? 'selected' : '' }}>Advance</option>
+                                <option value="due" {{ $expenses->payment_status == 'due' ? 'selected' : '' }}>Due</option>
                             </select>
                         </div>
 
@@ -665,7 +694,7 @@
             }
 
             let employee_id = $("#employee_id option:selected").val();
-            if (expense_cat === "indirect" && expense_type === "employee_benefits" && !employee_id) {
+            if ((expense_cat === "indirect" || expense_cat === "direct") && expense_type === "employee_benefits" && !employee_id) {
                 showToast("Please select employee", "error");
                 return false;
             }
@@ -812,14 +841,11 @@
 
         function handleEmployeeDropdown() {
             let category = $("#expense_cat").val();
-            let type     = $("#indirectExpensesType").val();
+            let type     = (category === "direct") 
+                    ? $("#directExpensesType").val() 
+                    : $("#indirectExpensesType").val();
 
-            if (category === "direct") {
-                $("#employeeDropdownDiv").hide();
-                $("#employee_id").val('');
-                return;
-            }
-            if (category === "indirect" && type === "employee_benefits") {
+            if ((category === "indirect" || category === "direct") && type === "employee_benefits") {
                 $("#employeeDropdownDiv").show();
                 loadEmployees(selectedEmployeeId);
             } else {
@@ -829,7 +855,7 @@
         }
 
         $("#expense_cat").change(function () { handleEmployeeDropdown(); });
-        $("#indirectExpensesType").change(function () {
+        $("#indirectExpensesType, #directExpensesType").change(function () {
             selectedEmployeeId = ""; // reset on type change
             handleEmployeeDropdown();
         });
@@ -845,9 +871,11 @@
         //------ Employee Expense UI (hide TDS/GST/Vendor for employee_benefits) ------
         function handleEmployeeExpenseUI() {
             let category = $("#expense_cat").val();
-            let type     = $("#indirectExpensesType").val();
+            let type     = (category === "direct") 
+                    ? $("#directExpensesType").val() 
+                    : $("#indirectExpensesType").val();
 
-            if (category === "indirect" && type === "employee_benefits") {
+            if ((category === "indirect" || category === "direct") && type === "employee_benefits") {
                 $("#amountLabel").text("Advance Amount *");
                 $("#tds_section").closest(".row").hide();
                 $(".gst-container").hide();
@@ -871,7 +899,7 @@
         }
 
         $("#expense_cat").change(function () { handleEmployeeExpenseUI(); });
-        $("#indirectExpensesType").change(function () { handleEmployeeExpenseUI(); });
+        $("#indirectExpensesType, #directExpensesType").change(function () { handleEmployeeExpenseUI(); });
         handleEmployeeExpenseUI(); // run on page load
 
     }); // end document.ready
@@ -879,9 +907,11 @@
     //------ Invoice / Employee ID toggle ------
     function handleEmployeeInvoiceToggle() {
         let category = $("#expense_cat").val();
-        let type     = $("#indirectExpensesType").val();
+        let type     = (category === "direct") 
+                ? $("#directExpensesType").val() 
+                : $("#indirectExpensesType").val();
 
-        if (category === "indirect" && type === "employee_benefits") {
+        if ((category === "indirect" || category === "direct") && type === "employee_benefits") {
             $("#invoiceDiv").hide();
             $("#employeeIdDiv").show();
         } else {
@@ -891,7 +921,7 @@
         }
     }
 
-    $("#expense_cat, #indirectExpensesType").change(function () { handleEmployeeInvoiceToggle(); });
+    $("#expense_cat, #indirectExpensesType, #directExpensesType").change(function () { handleEmployeeInvoiceToggle(); });
     handleEmployeeInvoiceToggle();
 
     //------ Payment calculation logic ------
@@ -941,7 +971,9 @@
     //------ Depreciation UI logic ------
     function handleDepreciationUI() {
         let category = $("#expense_cat").val();
-        let type     = $("#indirectExpensesType").val();
+        let type     = (category === "direct") 
+                ? $("#directExpensesType").val() 
+                : $("#indirectExpensesType").val();
 
         if (category === "indirect" && type === "depreciation") {
             $("#normalExpenseFields").css("display", "none");
@@ -954,7 +986,7 @@
         }
     }
 
-    $("#expense_cat, #indirectExpensesType").on("change", function () {
+    $("#expense_cat, #indirectExpensesType, #directExpensesType").on("change", function () {
         setTimeout(function () { handleDepreciationUI(); }, 50);
     });
 

@@ -44,10 +44,10 @@
         // Fallback
     }
 
-    $profileImg = ($employeeDetails && $employeeDetails->profile_img) 
-        ? asset('storage/user_employee/' . $employeeDetails->profile_img) 
-        : (($employeeDetails && $employeeDetails->user_avatar) 
-            ? asset('storage/' . $employeeDetails->user_avatar) 
+    $profileImg = ($employeeDetails && $employeeDetails->profile_img)
+        ? asset('storage/user_employee/' . $employeeDetails->profile_img)
+        : (($employeeDetails && $employeeDetails->user_avatar)
+            ? asset('storage/' . $employeeDetails->user_avatar)
             : asset('assets/images/user/avatar-2.jpg'));
 
     function getStatusBadgeClass($status) {
@@ -369,7 +369,7 @@
                 <u>How does this Page works?</u>
             </a>
         </div>
-        
+
         <!-- 1. Employee Welcome Panel (Top Banner) -->
         <div class="card border-0 shadow-sm profile-banner mb-4" id="employee-welcome-banner">
             <div class="card-body p-4">
@@ -380,7 +380,7 @@
                             <i class="ph-fill ph-circle text-white me-1" style="font-size: 7px;"></i>Online
                         </span>
                     </div>
-                    
+
                     <div class="flex-grow-1 text-center text-md-start">
                         <div class="d-flex flex-column flex-md-row align-items-center gap-2 mb-2 justify-content-center justify-content-md-start">
                             <h3 class="mb-0 fw-bold text-white fs-4">{{ $employeeDetails ? $employeeDetails->user_name : Auth::user()->name }}</h3>
@@ -391,13 +391,13 @@
                                 {{ ucfirst($employeeDetails ? $employeeDetails->emp_status : 'Active') }}
                             </span>
                         </div>
-                        
+
                         <p class="text-white-80 mb-3 fs-14 fw-medium">
                             <i class="ph-duotone ph-briefcase me-1 text-warning"></i> {{ $employeeDetails ? $employeeDetails->designation_name : 'Associate Accountant' }}
                             <span class="mx-2 opacity-50">|</span>
                             <i class="ph-duotone ph-buildings me-1 text-warning"></i> {{ $employeeDetails ? $employeeDetails->dept_name : 'Finance & Accounts' }}
                         </p>
-                        
+
                         <div class="row g-2 text-white-70 fs-13">
                             <div class="col-sm-6 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
                                 <i class="ph-duotone ph-user me-2 text-warning fs-16"></i>
@@ -495,7 +495,7 @@
         <div class="row">
             <!-- Left Side Column: Tasks & Upcoming Tasks -->
             <div class="col-lg-8 col-md-12">
-                
+
                 <!-- 3. My Tasks & Projects -->
                 <div class="card dashboard-card" id="tasks-projects-card">
                     <div class="card-header card-header-gradient">
@@ -602,7 +602,7 @@
 
             <!-- Right Side Column: Performance, Calendar & Events -->
             <div class="col-lg-4 col-md-12">
-                
+
                 <!-- 5. Performance & Review (Month wise) -->
                 <div class="card dashboard-card" id="performance-review-card">
                     <div class="card-header card-header-gradient">
@@ -703,7 +703,7 @@
                     </div>
                     <div class="card-body p-3">
                         <div class="timeline-container">
-                            
+
                             <!-- Today's Meetings -->
                             <div class="timeline-item">
                                 <div class="timeline-dot" style="border-color: #667eea;"></div>

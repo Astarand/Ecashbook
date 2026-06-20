@@ -124,36 +124,40 @@
                             <tr>
                                 <td class="text-end">{{ $i }}</td>
 
-                                <td>{{ $emp->employee_id ?? 'NULL' }}</td>
+                                <td>{{ $emp->employee_id ?? 'N/A' }}</td>
 
                                 <td>
-                                    <h6 class="mb-1">{{ $emp->name ?? 'NULL' }}</h6>
-                                    <small class="text-muted">{{ $emp->email ?? 'NULL' }}</small>
+                                    <h6 class="mb-1">{{ $emp->name ?? 'N/A' }}</h6>
+                                    <small class="text-muted">{{ $emp->email ?? 'N/A' }}</small>
                                 </td>
 
-                                <td>{{ $emp->pan_number ?? 'NULL' }}</td>
+                                <td>{{ $emp->pan_number ?? 'N/A' }}</td>
 
-                                <td>{{ $emp->tds_slab_section ?? 'NULL' }}</td>
+                                <td>{{ $emp->tds_slab_section ?? 'N/A' }}</td>
 
-                                <td>Contract / Salary</td>
+                                <td>
+                                    {{ $emp->payment_type ?? 'N/A' }}
+                                </td>
 
                                 <td>₹ {{ number_format($emp->total_addition ?? 0, 2) }}</td>
 
-                                <td>{{ $emp->tds_slab_rate ? $emp->tds_slab_rate.'%' : 'NULL' }}</td>
-
                                 <td>
-                                    ₹ {{ number_format(($emp->total_addition * $emp->tds / 100) ?? 0, 2) }}
+                                    {{ isset($emp->tds_slab_rate) ? $emp->tds_slab_rate . '%' : 'N/A' }}
                                 </td>
 
-                                <td>{{ $emp->payslip_no ?? 'NULL' }}</td>
+                                <td>
+                                    ₹ {{ number_format($emp->tds_amount ?? 0, 2) }}
+                                </td>
+
+                                <td>{{ $emp->payslip_no ?? 'N/A' }}</td>
 
                                 <td>
                                     {{ $emp->payment_date
                                         ? \Carbon\Carbon::parse($emp->payment_date)->format('d-m-Y')
-                                        : 'NULL' }}
+                                        : 'N/A' }}
                                 </td>
 
-                                <td>{{ $emp->quarter ?? 'NULL' }}</td>
+                                <td>{{ $emp->quarter ?? 'N/A' }}</td>
 
                                 <td>Paid</td>
 
@@ -177,30 +181,45 @@
                                         </div>
 
                                         <div class="modal-body">
-                                            <p><b>Invoice Date:</b>
+
+                                            <p>
+                                                <b>Invoice Date:</b>
                                                 {{ $emp->payment_date
                                                     ? \Carbon\Carbon::parse($emp->payment_date)->format('d-m-Y')
                                                     : 'NULL' }}
                                             </p>
 
-                                            <p><b>Gross Amount:</b>
+                                            <p>
+                                                <b>Gross Amount:</b>
                                                 ₹ {{ number_format($emp->total_addition ?? 0, 2) }}
                                             </p>
 
-                                            <p><b>Section:</b> {{ $emp->tds_slab_section ?? 'NULL' }}</p>
-
-                                            <p><b>TDS Rate:</b> {{ $emp->tds_slab_rate ?? 0 }}%</p>
-
-                                            <p><b>TDS Amount:</b>
-                                                ₹ {{ number_format(($emp->total_addition * $emp->tds / 100) ?? 0, 2) }}
+                                            <p>
+                                                <b>Section:</b>
+                                                {{ $emp->tds_slab_section ?? 'NULL' }}
                                             </p>
-                                            <p><b>CHALLAN NO/PAYSLIP NO:</b>
+
+                                            <p>
+                                                <b>TDS Rate:</b>
+                                                {{ $emp->tds_slab_rate ?? 0 }}%
+                                            </p>
+
+                                            <p>
+                                                <b>TDS Amount:</b>
+                                                ₹ {{ number_format($emp->tds_amount ?? 0, 2) }}
+                                            </p>
+
+                                            <p>
+                                                <b>CHALLAN NO/PAYSLIP NO:</b>
                                                 {{ $emp->payslip_no ?? 'NULL' }}
                                             </p>
+
                                         </div>
 
                                         <div class="modal-footer">
-                                            <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -211,7 +230,7 @@
                             @empty
                             <tr>
                                 <td colspan="14" class="text-center text-muted">
-                                    No TDS applicable employees found
+                                    No TDS applicable records found
                                 </td>
                             </tr>
                             @endforelse

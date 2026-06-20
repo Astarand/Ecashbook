@@ -23,10 +23,12 @@
                         <h2 class="mb-0">View Bank Details</h2>
                     </div>
                 </div>
+                @if ($req_type != 1)
                 <div class="col-md-8 text-end mt-2">
                     <a href="#" class="btn btn-primary" id="add-transaction-btn" data-bs-toggle="modal" data-bs-target="#add-transaction-modal"><i class="ti ti-square-plus f-20"></i> Add New Transaction</a>
-                    <a href="#" class="btn btn-primary" id="upload-statement-btn" data-bs-toggle="modal" data-bs-target="#upload-statement-modal"><i class="ti ti-file-upload f-20"></i> Upload Statement</a>
+                    <a href="#" class="btn btn-primary" id="upload-statement-btn" data-bs-toggle="modal" data-bs-target="#upload-statement-modal"><i class="ti ti-file-upload f-20"></i> Upload Bank Statement</a>
                 </div>
+                @endif
             </div>
         </div>
     </div>

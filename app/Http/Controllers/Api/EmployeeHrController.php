@@ -72,15 +72,15 @@ class EmployeeHrController extends Controller
                 ->select('id', 'added_by', 'employee_id', 'subject', 'content', 'sent_at')
                 ->where('employee_id', $employeeId)
                 ->orderBy('sent_at', 'desc')
-                ->get()
-                ->map(function ($letter) {
-                    // Convert HTML content to plain text
-                    $letter->content = strip_tags($letter->content);
-                    // Remove extra whitespace and &nbsp; entities
-                    $letter->content = html_entity_decode($letter->content, ENT_QUOTES, 'UTF-8');
-                    $letter->content = preg_replace('/\s+/', ' ', trim($letter->content));
-                    return $letter;
-                });
+                ->get();
+                // ->map(function ($letter) {
+                //     // Convert HTML content to plain text
+                //     $letter->content = strip_tags($letter->content);
+                //     // Remove extra whitespace and &nbsp; entities
+                //     $letter->content = html_entity_decode($letter->content, ENT_QUOTES, 'UTF-8');
+                //     $letter->content = preg_replace('/\s+/', ' ', trim($letter->content));
+                //     return $letter;
+                // });
 
             return response()->json([
                 'status' => 'success',

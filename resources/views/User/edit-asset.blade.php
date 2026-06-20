@@ -216,6 +216,7 @@
 														<option value="">Select</option>
 														<option value="Full" {{ $asset->pay_status == 'Full' ? 'selected' : '' }}>Full</option>
 														<option value="Advance" {{ $asset->pay_status == 'Advance' ? 'selected' : '' }}>Advance</option>														
+														<option value="Due" {{ $asset->pay_status == 'Due' ? 'selected' : '' }}>Due</option>														
 													</select>
 												</div>
 												
@@ -279,7 +280,7 @@
 													<select name="depreciation_frequency" id="depreciation_frequency" class="form-select">
 														<option value="">Select</option>
 														<option value="Yearly" {{ $asset->depreciation_frequency == 'Yearly' ? 'selected' : '' }}>Yearly</option>
-														<option value="Half Year" {{ $asset->depreciation_frequency == 'Half Year' ? 'selected' : '' }}>180 days & Below</option>
+														<option value="Half Year" {{ $asset->depreciation_frequency == 'Half Year' ? 'selected' : '' }}>Half Year</option>
 													</select>
 												</div>
 
@@ -301,11 +302,6 @@
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Depreciation Value</label>
 													<input type="number" name="depreciation_value" id="depreciation_value" value="{{ $asset->depreciation_value ?? '' }}" class="form-control">
-												</div>
-
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Net Book Asset Value </label>
-													<input type="number" name="net_book_value" id="net_book_value" value="{{ $asset->net_book_value ?? '' }}" class="form-control">
 												</div>
                                                 
                                             </div>
@@ -390,6 +386,7 @@
 														<option value="">Select</option>
 														<option value="Full" {{ $asset->cwip_pay_status == 'Full' ? 'selected' : '' }}>Full</option>
 														<option value="Advance" {{ $asset->cwip_pay_status == 'Advance' ? 'selected' : '' }}>Advance</option>
+														<option value="Due" {{ $asset->cwip_pay_status == 'Due' ? 'selected' : '' }}>Due</option>
 													</select>
 												</div>
 
@@ -1739,188 +1736,164 @@
 
 	$(document).ready(function () {
 
-		// =========================
-		// SLM CALCULATION
-		// =========================
-		function calculateDepreciation() {
+    // =========================
+    // SLM CALCULATION
+    // =========================
+    function calculateDepreciation() {
 
-			let cost = parseFloat($('#invoice_value').val()) || 0;
-			let residual = parseFloat($('#residual_value').val()) || 0;
-			let life = parseFloat($('#useful_life_years').val()) || 0;
+        let cost = parseFloat($('#invoice_value').val()) || 0;
+        let residual = parseFloat($('#residual_value').val()) || 0;
+        let life = parseFloat($('#useful_life_years').val()) || 0;
 
-			if (cost > 0 && life > 0) {
+        if (cost > 0 && life > 0) {
 
-				if (residual > cost) {
-					alert('Residual value cannot be greater than Asset Amount Value');
-					$('#residual_value').val(cost);
-					residual = cost;
-				}
+            if (residual > cost) {
+                alert('Residual value cannot be greater than Asset Amount Value');
+                $('#residual_value').val(cost);
+                residual = cost;
+            }
 
-				let depreciation = (cost - residual) / life;
+            let depreciation = (cost - residual) / life;
 
-				$('#depreciation_value').val(depreciation.toFixed(2));
+            $('#depreciation_value').val(depreciation.toFixed(2));
 
-			} else {
-				$('#depreciation_value').val('');
-			}
-		}
+        } else {
+            $('#depreciation_value').val('');
+        }
+    }
 
-		// =========================
-		// WDV CALCULATION
-		// =========================
-		function calculateWDV() {
+    // =========================
+    // WDV CALCULATION
+    // =========================
+    function calculateWDV() {
 
-			let cost = parseFloat($('#invoice_value').val()) || 0;
-			let rate = parseFloat($('#depreciation_rate').val()) || 0;
-			let frequency = $('#depreciation_frequency').val();
+        let cost = parseFloat($('#invoice_value').val()) || 0;
+        let rate = parseFloat($('#depreciation_rate').val()) || 0;
+        let frequency = $('#depreciation_frequency').val();
 
-			if (cost <= 0 || rate <= 0) {
-				$('#depreciation_value').val('');
-				return;
-			}
+        if (cost <= 0 || rate <= 0) {
+            $('#depreciation_value').val('');
+            return;
+        }
 
-			// Half Year
-			if (frequency === 'Half Year') {
+        // Half Year
+        if (frequency === 'Half Year') {
 
-				let invoiceDate = $('#invoice_date').val();
-				let depDate = $('#depreciation_start_date').val();
-				rate = 50; // Set rate to 50% for half-yearly
-				$('#depreciation_rate').val(50).prop('readonly', true);
+            let invoiceDate = $('#invoice_date').val();
+            let depDate = $('#depreciation_start_date').val();
 
-				if (invoiceDate && depDate) {
+            if (invoiceDate && depDate) {
 
-					let invDate = new Date(invoiceDate);
-					let startDate = new Date(depDate);
+                let invDate = new Date(invoiceDate);
+                let startDate = new Date(depDate);
 
-					let diffDays = Math.abs(startDate - invDate) / (1000 * 60 * 60 * 24);
+                let diffDays = Math.abs(startDate - invDate) / (1000 * 60 * 60 * 24);
 
-					// if (diffDays <= 180) {
-					// 	rate = rate / 2;
-					// }
-				}
-			}
+                if (diffDays <= 180) {
+                    rate = rate / 2;
+                }
+            }
+        }
 
-			let depreciation = (cost * rate) / 100;
-			// let closingWDV = cost - depreciation;
+        let depreciation = (cost * rate) / 100;
+        let closingWDV = cost - depreciation;
 
-			// $('#depreciation_value').val(closingWDV.toFixed(2));
+        $('#depreciation_value').val(closingWDV.toFixed(2));
+    }
 
+    // =========================
+    // TOGGLE FIELDS
+    // =========================
+    function toggleDepreciationFields() {
 
-			let netBookValue = cost - depreciation;
-			$('#depreciation_value').val(depreciation.toFixed(2));
-			$('#net_book_value').val(netBookValue.toFixed(2));
-		}
+        let method = $('#depreciation_method').val();
 
-		// =========================
-		// TOGGLE FIELDS
-		// =========================
-		function toggleDepreciationFields() {
+        if (method === 'WDV') {
 
-			let method = $('#depreciation_method').val();
+            $('#depreciationRateDiv').show();
+            $('#residualValueDiv').hide();
+            $('#usefulLifeDiv').hide();
 
-			if (method === 'WDV') {
+            $('#residual_value').val('');
+            $('#useful_life_years').val('');
 
-				$('#depreciationRateDiv').show();
-				$('#residualValueDiv').hide();
-				$('#usefulLifeDiv').hide();
-				$('#depreciation_rate').prop('readonly', false);
-				$('#residual_value').val('');
-				$('#useful_life_years').val('');
+            if ($('#depreciation_frequency option[value="Half Year"]').length === 0) {
+                $('#depreciation_frequency').append(
+                    '<option value="Half Year">Half Year</option>'
+                );
+            }
 
-				if ($('#depreciation_frequency option[value="Half Year"]').length === 0) {
-					$('#depreciation_frequency').append(
-						'<option value="Half Year">180 days & Below</option>'
-					);
-				}
+            calculateWDV();
+        }
 
-				calculateWDV();
-			}
+        else if (method === 'SLM') {
 
-			else if (method === 'SLM') {
+            $('#depreciationRateDiv').hide();
+            $('#residualValueDiv').show();
+            $('#usefulLifeDiv').show();
 
-				$('#depreciationRateDiv').hide();
-				$('#residualValueDiv').show();
-				$('#usefulLifeDiv').show();
+            $('#depreciation_frequency option[value="Half Year"]').remove();
 
-				$('#depreciation_frequency option[value="Half Year"]').remove();
+            if ($('#depreciation_frequency').val() === 'Half Year') {
+                $('#depreciation_frequency').val('');
+            }
 
-				if ($('#depreciation_frequency').val() === 'Half Year') {
-					$('#depreciation_frequency').val('');
-				}
+            calculateDepreciation();
+        }
 
-				calculateDepreciation();
-			}
+        else {
 
-			else {
+            $('#depreciationRateDiv').hide();
+            $('#residualValueDiv').show();
+            $('#usefulLifeDiv').show();
 
-				$('#depreciationRateDiv').hide();
-				$('#residualValueDiv').show();
-				$('#usefulLifeDiv').show();
+            $('#depreciation_value').val('');
+        }
+    }
 
-				$('#depreciation_value').val('');
-			}
-		}
+    // =========================
+    // METHOD CHANGE
+    // =========================
+    $('#depreciation_method').on('change', function () {
+        toggleDepreciationFields();
+    });
 
-		// =========================
-		// METHOD CHANGE
-		// =========================
-		$('#depreciation_method').on('change', function () {
-			toggleDepreciationFields();
-		});
+    // =========================
+    // SLM EVENTS
+    // =========================
+    $('#invoice_value, #residual_value, #useful_life_years')
+        .on('input', function () {
 
-		// =========================
-		// SLM EVENTS
-		// =========================
-		$('#invoice_value, #residual_value, #useful_life_years')
-			.on('input', function () {
+            if ($('#depreciation_method').val() === 'SLM') {
+                calculateDepreciation();
+            }
+        });
 
-				if ($('#depreciation_method').val() === 'SLM') {
-					calculateDepreciation();
-				}
-			});
+    // =========================
+    // WDV EVENTS
+    // =========================
+    $('#invoice_value, #depreciation_rate')
+        .on('input', function () {
 
-		// =========================
-		// WDV EVENTS
-		// =========================
-		$('#invoice_value, #depreciation_rate')
-			.on('input', function () {
+            if ($('#depreciation_method').val() === 'WDV') {
+                calculateWDV();
+            }
+        });
 
-				if ($('#depreciation_method').val() === 'WDV') {
-					calculateWDV();
-				}
-			});
+    $('#depreciation_frequency, #invoice_date, #depreciation_start_date')
+        .on('change', function () {
 
-		$('#depreciation_frequency, #invoice_date, #depreciation_start_date')
-			.on('change', function () {
+            if ($('#depreciation_method').val() === 'WDV') {
+                calculateWDV();
+            }
+        });
 
-				if ($('#depreciation_method').val() === 'WDV') {
-					calculateWDV();
-				}
-			});
+    // =========================
+    // PAGE LOAD
+    // =========================
+    toggleDepreciationFields();
 
-		// =========================
-		// PAGE LOAD
-		// =========================
-		toggleDepreciationFields();
-
-		$('#depreciation_frequency').on('change', function () {
-
-			if ($(this).val() === 'Half Year') {
-
-				$('#depreciation_rate')
-					.val(50)
-					.prop('readonly', true);
-
-			} else {
-
-				$('#depreciation_rate')
-					.prop('readonly', false);
-			}
-
-			calculateWDV();
-		});
-
-	});
+});
 	
 	function allowDecimal(el) {
 		let val = el.value.replace(/[^0-9.]/g, '');

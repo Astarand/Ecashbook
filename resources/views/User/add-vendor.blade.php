@@ -125,8 +125,8 @@
                                         <input type="text" class="form-control" required name="vendor_name" id="vendor_name" placeholder="Enter Company Name">
                                     </div>
                                     <div class="mb-3 col-md-3">
-                                        <label class="form-label" for="inputEmail4">PAN Number<span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" required name="vendor_pan" id="vendor_pan" placeholder="Enter PAN Number" style="text-transform: uppercase;">
+                                        <label class="form-label" for="inputEmail4">PAN Number</label>
+                                        <input type="text" class="form-control" name="vendor_pan" id="vendor_pan" placeholder="Enter PAN Number" style="text-transform: uppercase;">
                                     </div>
 
                                     <div class="mb-3 col-md-3">
@@ -715,7 +715,7 @@
         const requiredFields = [
             { id: 'gst_reg', name: 'GST Registration' },
             { id: 'vendor_name', name: 'Company Name' },
-            { id: 'vendor_pan', name: 'PAN Number' },
+            // { id: 'vendor_pan', name: 'PAN Number' },
             //{ id: 'vendor_email', name: 'Email' },
            // { id: 'vendor_phone', name: 'Phone Number' },
             { id: 'comp_type', name: 'Company Type' },

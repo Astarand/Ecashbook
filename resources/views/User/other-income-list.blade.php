@@ -133,6 +133,8 @@
                                     <span class="badge bg-success text-dark">{{ $income->pay_status }}</span>
                                     @elseif ($income->pay_status == 'Advance')
                                     <span class="badge bg-warning text-dark">{{ $income->pay_status }}</span>   
+                                    @elseif ($income->pay_status == 'Due')
+                                    <span class="badge bg-danger text-dark">{{ $income->pay_status }}</span> 
                                     @endif
                                 </td>
 								<td>

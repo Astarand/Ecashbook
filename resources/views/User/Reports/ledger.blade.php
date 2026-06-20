@@ -187,6 +187,7 @@
                                     <th>Sub Group</th>
                                     <th>Debit (₹)</th>
                                     <th>Credit (₹)</th>
+                                    <th>Payment Status</th>
                                     <th>Running Balance (₹)</th>
                                     <th>Dr / Cr</th>
                                 </tr>
@@ -194,7 +195,7 @@
 
                             <tbody id="ledgerData">
                                 <tr>
-                                    <td colspan="15" class="text-center text-muted">
+                                    <td colspan="16" class="text-center text-muted">
                                         No ledger data available
                                     </td>
                                 </tr>
@@ -484,6 +485,27 @@
 		let html = '';
 
 		ledgerRows.slice(start, end).forEach(r => {
+			let statusBadge = '';
+			switch ((r.payment_status || '').toLowerCase()) {
+				case 'Full':
+				case 'full':
+					statusBadge = '<span class="badge bg-success">Paid</span>';
+					break;
+
+				case 'Partial':
+				case 'partial':
+					statusBadge = '<span class="badge bg-warning text-dark">Partial</span>';
+					break;
+
+				case 'Due':
+				case 'due':
+					statusBadge = '<span class="badge bg-danger">Due</span>';
+					break;
+
+				default:
+					statusBadge = `<span class="badge bg-danger">${r.payment_status || 'Due'}</span>`;
+			}
+
 			html += `
 			<tr>
 				<td>${formatDateDMY(r.date)}</td>
@@ -499,13 +521,14 @@
 				<td>${r.sub_group}</td>
 				<td>${formatINR(r.debit)}</td>
 				<td>${formatINR(r.credit)}</td>
+				<td>${statusBadge}</td>
 				<td>${formatINR(r.balance)}</td>
 				<td>${r.dc}</td>
 			</tr>`;
 		});
 
 		$('#ledgerData').html(
-			html || `<tr><td colspan="15" class="text-center">No Data</td></tr>`
+			html || `<tr><td colspan="16" class="text-center">No Data</td></tr>`
 		);
 
 		const totalPages = rowsPerPage === 'all'

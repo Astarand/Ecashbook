@@ -5,13 +5,15 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 //use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use Redirect;
-use DB;
+// use DB;
 use Auth;
-use Validator;
+// use Validator;
 use App\User;
 use App\Models\Country;
 use App\Models\State;
@@ -108,7 +110,7 @@ class VendorManagemet extends Controller
           'gst_reg'      => 'required',
           'vendor_name'  => 'required|string|max:255',
 
-          'vendor_pan'   => ['required','regex:/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/'],
+        //   'vendor_pan'   => ['required','regex:/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/'],
 
           'comp_type' => 'required',
 
@@ -124,8 +126,8 @@ class VendorManagemet extends Controller
           'gst_reg.required'     => 'GST Registration is required.',
           'vendor_name.required' => 'Company Name is required.',
 
-          'vendor_pan.required' => 'PAN Number is required.',
-          'vendor_pan.regex'    => 'Invalid PAN format. Example: AAAAA9999A',
+        //   'vendor_pan.required' => 'PAN Number is required.',
+        //   'vendor_pan.regex'    => 'Invalid PAN format. Example: AAAAA9999A',
 
           'comp_type.required' => 'Company Type is required.',
 
@@ -229,7 +231,7 @@ class VendorManagemet extends Controller
             'vendor_gstin' => $data['vendor_gst_no'],
             'vendor_gst_type' => $data['vendor_gst_type'],
             'vendor_name' => $data['vendor_name'],
-            'vendor_pan' => $data['vendor_pan'],
+            'vendor_pan' => $data['vendor_pan'] ?? '',
             'vendor_email' => $data['vendor_email'],
             'vendor_phone' => $data['vendor_phone'],
             'comp_type' => $data['comp_type'],
@@ -422,7 +424,7 @@ class VendorManagemet extends Controller
                   'vendor_gstin'         => $request->vendor_gst_no,
                   'vendor_gst_type'      => $request->vendor_gst_type,
                   'vendor_name'          => $request->vendor_name,
-                  'vendor_pan'           => $request->vendor_pan,
+                  'vendor_pan'           => $request->vendor_pan ?? '',
                   'vendor_email'         => $request->vendor_email,
                   'vendor_phone'         => $request->vendor_phone,
                   'comp_type'            => $request->comp_type,

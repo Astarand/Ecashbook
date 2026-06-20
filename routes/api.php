@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/task/task-status-update', [EmployeeHolidayController::class, 'taskStatusUpdate']);
         Route::post('/task/task-list', [EmployeeHolidayController::class, 'taskList']);
         Route::post('/task/task-details', [EmployeeHolidayController::class, 'taskDetails']);
+        Route::post('/task/completed-task-list', [EmployeeHolidayController::class, 'completedTaskList']);
 
         //---- Attendence Routes ----//
         Route::post('/attendance/range-summary', [EmployeeAttendanceController::class, 'attendanceRangeSummary']);

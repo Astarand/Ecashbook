@@ -217,6 +217,7 @@
 														<option value="">Select</option>
 														<option value="Full">Full</option>
 														<option value="Advance">Advance</option>														
+														<option value="Due">Due</option>														
 													</select>
 												</div>
 
@@ -304,11 +305,6 @@
 													<label class="form-label">Depreciation Value</label>
 													<input type="number" name="depreciation_value" id="depreciation_value" class="form-control">
 												</div>
-
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Net Book Asset Value </label>
-													<input type="number" name="net_book_value" id="net_book_value" class="form-control">
-												</div>
 												
                                             </div>
                                             
@@ -391,6 +387,7 @@
 														<option value="">Select</option>
 														<option value="Full">Full</option>
 														<option value="Advance">Advance</option>
+														<option value="Due">Due</option>
 													</select>
 												</div>
 
@@ -1724,14 +1721,11 @@
 				// $('#depreciation_value').val(depreciation.toFixed(2));
 
 				let depreciation = (cost - residual) / life;
-				let netBookValue = cost - depreciation;
 
 				$('#depreciation_value').val(depreciation.toFixed(2));
-				$('#net_book_value').val(netBookValue.toFixed(2));
 
 			} else {
 				$('#depreciation_value').val('');
-				$('#net_book_value').val('');
 			}
 		}
 
@@ -1748,7 +1742,6 @@
 
 			if (cost <= 0 || rate <= 0) {
 				$('#depreciation_value').val('');
-				$('#net_book_value').val('');
 				return;
 			}
 
@@ -1762,9 +1755,6 @@
 				let invoiceDate = $('#invoice_date').val();
 				let depDate     = $('#depreciation_start_date').val();
 
-				rate = 50;  // Set to 50% for half-year
-				$('#depreciation_rate').val(50).prop('readonly', true);
-
 				if (invoiceDate && depDate) {
 
 					let invDate = new Date(invoiceDate);
@@ -1773,49 +1763,25 @@
 					let diffDays = Math.abs(startDate - invDate) / (1000 * 60 * 60 * 24);
 
 					// If <= 180 days then use half rate
-					// if (diffDays <= 180) {
-					// 	rate = rate / 2;
-					// }
+					if (diffDays <= 180) {
+						rate = rate / 2;
+					}
 				}
 
-				// let closingWDV = cost - ((cost * rate) / 100);
+				let closingWDV = cost - ((cost * rate) / 100);
 
-				// $('#depreciation_value').val(closingWDV.toFixed(2));
-				let depreciation = (cost * rate) / 100;
-
-				let netBookValue = cost - depreciation;
-				$('#depreciation_value').val(depreciation.toFixed(2));
-				$('#net_book_value').val(netBookValue.toFixed(2));
+				$('#depreciation_value').val(closingWDV.toFixed(2));
 			}
 
 			// YEARLY
 			else {
 
-				$('#depreciation_rate').prop('readonly', false);
 				$('#useful_life_years').prop('disabled', false);
 				$('#usefulLifeDiv').hide();
 
-				// if (life <= 0) {
-				// 	$('#depreciation_value').val('');
-				// 	return;
-				// }
-
-				// let closingWDV = cost;
-
-				// for (let year = 1; year <= life; year++) {
-
-				// 	let depreciation = (closingWDV * rate) / 100;
-
-				// 	closingWDV = closingWDV - depreciation;
-				// }
-
-				// $('#depreciation_value').val(closingWDV.toFixed(2));
-				
 				let depreciation = (cost * rate) / 100;
 				let closingWDV = cost - depreciation;
-				let netBookValue = closingWDV;
-				$('#depreciation_value').val(depreciation.toFixed(2));
-				$('#net_book_value').val(netBookValue.toFixed(2));
+				$('#depreciation_value').val(closingWDV.toFixed(2));
 			}
 		}
 
@@ -1834,11 +1800,11 @@
 				$('#usefulLifeDiv').hide();
 
 				$('#residual_value').val('');
-				$('#net_book_value').val('');
+				
 				if ($('#depreciation_frequency option[value="Half Year"]').length === 0) {
 
 					$('#depreciation_frequency').append(
-						'<option value="Half Year">180 days & Below</option>'
+						'<option value="Half Year">Half Year</option>'
 					);
 				}
 
@@ -1850,7 +1816,6 @@
 				$('#depreciationRateDiv').hide();
 				$('#residualValueDiv').show();
 				$('#usefulLifeDiv').show();
-				$('#net_book_value').val('');
 
 				$('#useful_life_years').prop('disabled', false);
 
@@ -1868,7 +1833,6 @@
 				$('#depreciationRateDiv').hide();
 				$('#residualValueDiv').show();
 				$('#depreciation_value').val('');
-				$('#net_book_value').val('');
 			}
 		}
 
@@ -1917,22 +1881,7 @@
 		// =========================
 		toggleDepreciationFields();
 
-		$('#depreciation_frequency').on('change', function () {
 
-			if ($(this).val() === 'Half Year') {
-
-				$('#depreciation_rate')
-					.val(50)
-					.prop('readonly', true);
-
-			} else {
-
-				$('#depreciation_rate')
-					.prop('readonly', false);
-			}
-
-			calculateWDV();
-		});
 
 	});
 	

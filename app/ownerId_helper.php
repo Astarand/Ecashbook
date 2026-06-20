@@ -64,7 +64,7 @@ function checkCoreAccess($featureName)
 //For CA-Accountant access
 function getAccessCompanyId($request)
 {
-    $userId = null;
+	$userId = null;
     if ($request->filled('compId')) {
         try {
             $compId = decrypt($request->compId);
@@ -93,4 +93,10 @@ function parentCompanyName()
 	return DB::table('company_profiles')
 			->where('userId', $userId)
 			->value('comp_name');
+}
+
+//Round amount
+function getRoundedAmount($amount)
+{
+    return round($amount, 0, PHP_ROUND_HALF_UP);
 }

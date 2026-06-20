@@ -15,11 +15,6 @@
                         <li class="breadcrumb-item" aria-current="page">View Expenses</li>
                     </ul>
                 </div>
-				<div class="col-md-4">
-                    <div class="page-header-title">
-                        <h2 class="mb-0">View Expenses</h2>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -108,6 +103,11 @@
                                 Packing Material
                             </option>
 
+                            <option value="freight_transport" 
+                                {{ ($expenses->expense_type == 'freight_transport') ? 'selected' : '' }}>
+                                Freight & Transport
+                            </option>
+
                             <option value="Other" 
                                 {{ ($expenses->expense_type == 'Other') ? 'selected' : '' }}>
                                 Other Direct Expenses
@@ -138,6 +138,29 @@
                             <option value="marketing_advertisement" {{ ($expenses->expense_type == 'marketing_advertisement') ? 'selected' : '' }}>Marketing &amp; Advertisement</option>
                             <option value="freight_transport" {{ ($expenses->expense_type == 'freight_transport') ? 'selected' : '' }}>Freight &amp; Transport</option>
                             <option value="miscellaneous_expenses" {{ ($expenses->expense_type == 'miscellaneous_expenses') ? 'selected' : '' }}>Miscellaneous Expenses</option>
+
+                            <option value="income_tax_paid" {{ ($expenses->expense_type == 'income_tax_paid') ? 'selected' : '' }}>Income Tax Paid</option>
+                            <option value="gst_interest_penalty" {{ ($expenses->expense_type == 'gst_interest_penalty') ? 'selected' : '' }}>GST Interest &amp; Penalty</option>
+                            <option value="late_filing_penalty" {{ ($expenses->expense_type == 'late_filing_penalty') ? 'selected' : '' }}>Late Filing Penalty</option>
+                            <option value="personal_expenses" {{ ($expenses->expense_type == 'personal_expenses') ? 'selected' : '' }}>Personal Expenses</option>
+                            <option value="cash_payment_above_income_tax_limit" {{ ($expenses->expense_type == 'cash_payment_above_income_tax_limit') ? 'selected' : '' }}>Cash Payment above Income Tax limit</option>
+                            <option value="donation_non_approved" {{ ($expenses->expense_type == 'donation_non_approved') ? 'selected' : '' }}>Donation (Non-approved)</option>
+                            <option value="provision_for_expenses" {{ ($expenses->expense_type == 'provision_for_expenses') ? 'selected' : '' }}>Provision for Expenses</option>
+                            <option value="provision_for_doubtful_debts" {{ ($expenses->expense_type == 'provision_for_doubtful_debts') ? 'selected' : '' }}>Provision for Doubtful Debts</option>
+                            <option value="penalty_for_law_violation" {{ ($expenses->expense_type == 'penalty_for_law_violation') ? 'selected' : '' }}>Penalty for Law Violation</option>
+                            <option value="wealth_tax_personal_tax" {{ ($expenses->expense_type == 'wealth_tax_personal_tax') ? 'selected' : '' }}>Wealth Tax / Personal Tax</option>
+                            <option value="capital_loss" {{ ($expenses->expense_type == 'capital_loss') ? 'selected' : '' }}>Capital Loss</option>
+                            <option value="drawings_owner_withdrawals" {{ ($expenses->expense_type == 'drawings_owner_withdrawals') ? 'selected' : '' }}>Drawings / Owner Withdrawals</option>
+                            <option value="csr_expense(certain_cases)" {{ ($expenses->expense_type == 'csr_expense(certain_cases)') ? 'selected' : '' }}>CSR Expense (certain cases)</option>
+                            <option value="unpaid_pf_esi_beyond_due_date" {{ ($expenses->expense_type == 'unpaid_pf_esi_beyond_due_date') ? 'selected' : '' }}>Unpaid PF/ESI beyond due date</option>
+                            <option value="tds_not_deducted_deposited" {{ ($expenses->expense_type == 'tds_not_deducted_deposited') ? 'selected' : '' }}>TDS not deducted / deposited</option>
+                            <option value="expenses_without_proper_bills" {{ ($expenses->expense_type == 'expenses_without_proper_bills') ? 'selected' : '' }}>Expenses without proper bills</option>
+                            <option value="interest_on_business_loan" {{ ($expenses->expense_type == 'interest_on_business_loan') ? 'selected' : '' }}>Interest on Business Loan</option>
+                            <option value="software_subscription" {{ ($expenses->expense_type == 'software_subscription') ? 'selected' : '' }}>Software Subscription</option>
+                            <option value="hosting_cloud_expense" {{ ($expenses->expense_type == 'hosting_cloud_expense') ? 'selected' : '' }}>Hosting / Cloud Expense</option>
+                            <option value="motor_car_expense" {{ ($expenses->expense_type == 'motor_car_expense') ? 'selected' : '' }}>Motor Car Expense</option>
+                            <option value="entertainment_expense" {{ ($expenses->expense_type == 'entertainment_expense') ? 'selected' : '' }}>Entertainment Expense</option>
+                            <option value="director_expense" {{ ($expenses->expense_type == 'director_expense') ? 'selected' : '' }}>Director Expense</option>
                         </select>
                     </div>
 
@@ -180,6 +203,7 @@
                                 <option value="">Select Payment Status</option>
                                 <option value="full" {{ $expenses->payment_status == 'full' ? 'selected' : '' }}>Full</option>
                                 <option value="advance" {{ $expenses->payment_status == 'advance' ? 'selected' : '' }}>Advance</option>
+                                <option value="due" {{ $expenses->payment_status == 'due' ? 'selected' : '' }}>Due</option>
                             </select>
                         </div>
 

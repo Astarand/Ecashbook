@@ -53,17 +53,9 @@ class ExpensesController extends Controller
 		}
 
         if ($userType == 1 || $userType == 4) { // CA
-            // $expenses = DB::table('expenses')
-            //     ->select('expenses.*', 'company_profiles.comp_name', 'ca_assigns.ca_id')
-            //     ->leftJoin('company_profiles', 'expenses.added_by', '=', 'company_profiles.userId')
-            //     ->leftJoin('ca_assigns', 'expenses.added_by', '=', 'ca_assigns.comp_id')
-            //     ->where('ca_assigns.ca_id', '=', $userId)
-            //     ->where('ca_assigns.ca_assign_status', '=', 1)
-            //     ->orderBy('expenses.id', 'DESC')
-            //     ->paginate(10);
 			$expenses = DB::table('expenses as e')
 						->leftJoin('company_profiles as cp', 'cp.userId', '=', 'e.added_by')
-						->leftJoin('proprietorship_profiles as pp', 'pp.userId', '=', 'e.added_by')
+						->leftJoin('proprietorship_profiles as pp', 'pp.id', '=', 'e.propId')
 						->where('e.added_by', $userId)
 						->orderBy('e.id', 'DESC')
 						->select(
@@ -76,12 +68,12 @@ class ExpensesController extends Controller
 								END as comp_name
 							")
 						)
-						->paginate(10);
+						->get();
 
         } elseif ($userType == 2 || $userType == 5) { // User
 			$expenses = DB::table('expenses as e')
 						->leftJoin('company_profiles as cp', 'cp.userId', '=', 'e.added_by')
-						->leftJoin('proprietorship_profiles as pp', 'pp.userId', '=', 'e.added_by')
+						->leftJoin('proprietorship_profiles as pp', 'pp.id', '=', 'e.propId')
 						->where('e.added_by', $userId)
 						->orderBy('e.id', 'DESC')
 						->select(
@@ -94,7 +86,7 @@ class ExpensesController extends Controller
 								END as comp_name
 							")
 						)
-						->paginate(10);
+						->get();
 
         } elseif ($userType == 3) { // Admin
             $expenses = DB::table('expenses')
@@ -135,7 +127,7 @@ class ExpensesController extends Controller
 
         // Convert array to object
         $expenses = json_decode(json_encode($array));
-
+		//echo "<pre>";print_r($expenses);exit;
         // Return view with data
         return view('User.expenses-list')->with([
             'title' => $title,
@@ -248,7 +240,8 @@ class ExpensesController extends Controller
 		// echo "<pre>";print_r($data);exit;
 		
 		//get TDS data
-		$tdsData = $this->calculateTdsFromRules($data);
+		//$tdsData = $this->calculateTdsFromRules($data);
+		$tdsData = $this->calculateTdsForInvExp($data);
 		$propId = $data['propId'];
         return Expenses::create([
             'added_by' => currentOwnerId(),
@@ -271,13 +264,13 @@ class ExpensesController extends Controller
 			'created_at' => date('Y-m-d H:i:s'),
 
 			// ✅ TDS Fields
-			'tds_applicable' => $data['tds_applicable'] ?? 'no',
-			'tds_percentage' => $data['tds_percentage'] ?? null,
-			'tds_id' => $data['tds_id'] ?? null,
-			'tds_amount' => $data['tds_amount'] ?? 0,
-			'tds_section' => $data['tds_section'] ?? null,
-			'tds_rate' => $data['tds_rate'] ?? null,
-			'tds_threshold_limit' => $data['tds_threshold_limit'] ?? null,
+			'tds_applicable' => $tdsData['tds_applicable'] ?? 'no',
+			'tds_percentage' => $tdsData['tds_percentage'] ?? null,
+			'tds_id' => $tdsData['tds_id'] ?? null,
+			'tds_amount' => $tdsData['tds_amount'] ?? 0,
+			'tds_section' => $tdsData['tds_section'] ?? null,
+			'tds_rate' => $tdsData['tds_rate'] ?? null,
+			'tds_threshold_limit' => $tdsData['tds_threshold_limit'] ?? null,
 
 			// ✅ GST Fields
 			'gst_applicable' => $data['gst_applicable'] ?? 'no',
@@ -710,6 +703,7 @@ class ExpensesController extends Controller
 			| Update Expense
 			|--------------------------------------------------------------------------
 			*/
+			$tdsData = $this->calculateTdsForInvExp($request->toArray());
 
 			$update = DB::table('expenses')
 				->where('id', $eId)
@@ -765,21 +759,21 @@ class ExpensesController extends Controller
 					|--------------------------------------------------------------------------
 					*/
 
-					// 'tds_applicable'      => $tdsData['tds_applicable'],
-					// 'tds_percentage'      => $tdsData['tds_percentage'],
-					// 'tds_id'              => $tdsData['tds_id'],
-					// 'tds_amount'          => $tdsData['tds_amount'],
-					// 'tds_section'         => $tdsData['tds_section'] ?? null,
-					// 'tds_rate'            => $tdsData['tds_rate'] ?? null,
-					// 'tds_threshold_limit' => $tdsData['tds_threshold_limit'] ?? null,
+					'tds_applicable'      => $tdsData['tds_applicable'],
+					'tds_percentage'      => $tdsData['tds_percentage'],
+					'tds_id'              => $tdsData['tds_id'],
+					'tds_amount'          => $tdsData['tds_amount'],
+					'tds_section'         => $tdsData['tds_section'] ?? null,
+					'tds_rate'            => $tdsData['tds_rate'] ?? null,
+					'tds_threshold_limit' => $tdsData['tds_threshold_limit'] ?? null,
 
-					'tds_applicable'      => $request->tds_applicable ?? 'no',
+					/*'tds_applicable'      => $request->tds_applicable ?? 'no',
 					'tds_percentage'      => $request->tds_percentage ?? null,
 					'tds_id'              => $request->tds_id ?? null,
 					'tds_amount'          => $request->tds_amount ?? null,
 					'tds_section'         => $request->tds_section ?? null,
 					'tds_rate'            => $request->tds_rate ?? null,
-					'tds_threshold_limit' => $request->tds_threshold_limit ?? null,
+					'tds_threshold_limit' => $request->tds_threshold_limit ?? null,*/
 
 					/*
 					|--------------------------------------------------------------------------
@@ -901,7 +895,7 @@ class ExpensesController extends Controller
 					$tdsPercentage = (float)$rule->tds_rate;
 					$threshold = (float)($rule->threshold_limit ?? 0);
 					//Threshold check
-					if ($expenseAmt > $threshold) {
+					if ($expenseAmt >= $threshold) {
 						$tdsAmount = ($expenseAmt * $tdsPercentage) / 100;
 					}
 				}
@@ -1237,47 +1231,10 @@ class ExpensesController extends Controller
 	}
 
 	// Fetch TDS rule based on category
-	// public function getTdsRule(Request $request)
-	// {
-	// 	$category = $request->category;
-
-	// 	$rule = DB::table('tds_rules')
-	// 		->where('module', 'Expenses')
-	// 		->where('category', $category)
-	// 		->first();
-
-	// 	return response()->json($rule);
-	// }
-
-	// public function getTdsRule(Request $request)
-	// {
-	// 	$category = $request->category;
-
-
-	// 	$rule = DB::table('tds_rules')
-	// 		->where('module', 'Expenses')
-    //         // Updated line below: maps the dropdown value inline and uses LIKE for partial matching
-	// 		->where('category', 'LIKE', '%' . match($category) {
-    //             'raw_material' => 'Goods Purchase',
-    //             'direct_labor' => 'Salary & Wages',
-    //             'job_outsourcing', 'freight_inwards' => 'Job Work',
-    //             default => $category
-    //         } . '%')
-	// 		->first();
-
-	// 	return response()->json($rule);
-	// }
 
 	public function getTdsRule(Request $request)
 	{
 		$category = $request->category;
-
-		// $searchCategory = match ($category) {
-		// 	'raw_material' => 'Goods Purchase',
-		// 	'direct_labor' => 'Salary & Wages',
-		// 	'job_outsourcing', 'freight_inwards' => 'Job Work',
-		// 	default => $category
-		// };
 
 		$rule = DB::table('tds_rules')
 			->where('module', 'Expenses')
@@ -1303,36 +1260,137 @@ class ExpensesController extends Controller
 	
 	private function calculateTdsForInvExp(array $data): array
 	{
-		$amount = isset($data['expense_amount']) ? (float)$data['expense_amount'] : 0;
-		$tdsApplicable = 'no';		
+		//echo "<pre>";print_r($data);exit;
+		$amount = (float) ($data['expense_amt'] ?? 0);
+
 		$tdsPercentage = 0;
 		$tdsId = null;
 		$tdsAmount = 0;
-		//Get all rules
-		$rules = DB::table('tds_rules')
-					->where('module', 'Expenses')
-					->where('tds_section', '!=', '192')
-					->orderBy('threshold_limit', 'asc')
-					->get();
-		//Apply rule logic
-		foreach ($rules as $index => $rule) {
-			$threshold = (float)($rule->threshold_limit ?? 0);
-			// Apply when amount > threshold 
-			if ($amount > $threshold) {
-				$tdsPercentage = (float)$rule->tds_rate;
-				$tdsId = $rule->id; //get tdsId from rule
-				if ($amount > 0 && $tdsPercentage > 0) {
-					$tdsAmount = ($amount * $tdsPercentage) / 100;
-				}
-				break; //stop loop once matched
-			}
+
+		// Get category name matching tds_rules.category
+		$expenseCategory = $this->getExpenseCategory($data);
+
+		if (empty($expenseCategory)) {
+			return [
+				'tds_applicable' => 'no',
+				'tds_percentage' => 0,
+				'tds_id' => null,
+				'tds_amount' => 0,
+			];
 		}
+
+		// Get TDS rule
+		$rule = DB::table('tds_rules')
+					->where('module', 'Expenses')
+					->where('status', 1)
+					->where('category', $expenseCategory)
+					->first();
+		//echo "<pre>";print_r($rule);exit;
+
+		if (!$rule) {
+			return [
+				'tds_applicable' => 'no',
+				'tds_percentage' => 0,
+				'tds_id' => null,
+				'tds_amount' => 0,
+				'tds_section' => null,
+				'tds_rate' => 0,
+				'tds_threshold_limit' => null
+			];
+		}
+
+		$threshold = (float) ($rule->threshold_limit ?? 0);
+
+		// Check threshold
+		if ($amount < $threshold) {
+			return [
+				'tds_applicable' => 'no',
+				'tds_percentage' => 0,
+				'tds_id' => null,
+				'tds_amount' => 0,
+				'tds_section' => null,
+				'tds_rate' => 0,
+				'tds_threshold_limit' => null
+			];
+		}
+
+		// Calculate TDS
+		$tdsPercentage = (float) $rule->tds_rate;
+		$tdsId = $rule->id;
+		$tdsAmount = ($amount * $tdsPercentage) / 100;
+
 		return [
-			'tds_applicable' => $tdsAmount > 0 ? 'yes' : 'no',
+			'tds_applicable' => 'yes',
 			'tds_percentage' => $tdsPercentage,
 			'tds_id' => $tdsId,
 			'tds_amount' => round($tdsAmount, 2),
+			'tds_section' => $rule->tds_section,
+			'tds_rate' => $rule->tds_rate,
+			'tds_threshold_limit' => $rule->threshold_limit
 		];
 	}
+	
+	private function getExpenseCategory(array $data): ?string
+	{
+		$expenseType = $data['expense_type'] ?? '';
+
+		$map = [
+
+			// Direct Expenses
+			'Raw Material Costs'          => 'Raw Material Costs',
+			'Direct Labour'              => 'Direct Labour',
+			'Manufacturing Expenses'     => 'Manufacturing Expenses',
+			'Factory Utilities'          => 'Factory Utilities',
+			'Freight / Carriage Inward'  => 'Freight / Carriage Inward',
+			'Job Work / Outsourcing'     => 'Job Work / Outsourcing',
+			'Packing Material'           => 'Packing Material',
+			'Other'                      => 'Other Direct Expenses',
+			'freight_transport'          => 'Freight & Transport',
+
+			// Indirect Expenses
+			'employee_benefits'                  => 'Employee Expenses',
+			'rent_expense'                       => 'Rent Expense',
+			'electricity_expense'                => 'Electricity Expense',
+			'internet_communication'             => 'Internet & Communication',
+			'office_expenses'                    => 'Office Expenses',
+			'printing_stationery'               => 'Printing & Stationery',
+			'travel_conveyance'                 => 'Travel & Conveyance',
+			'repair_maintenance'                => 'Repair & Maintenance',
+			'professional_fees'                 => 'Professional Fees',
+			'audit_fees'                        => 'Audit Fees',
+			'legal_charges'                     => 'Legal Charges',
+			'bank_charges'                      => 'Bank Charges',
+			'interest_expense'                  => 'Interest Expense',
+			'depreciation'                      => 'Depreciation',
+			'insurance_expense'                 => 'Insurance Expense',
+			'marketing_advertisement'           => 'Marketing & Advertisement',
+			'miscellaneous_expenses'            => 'Miscellaneous Expenses',
+			'income_tax_paid'                   => 'Income Tax Paid',
+			'gst_interest_penalty'              => 'GST Interest & Penalty',
+			'late_filing_penalty'               => 'Late Filing Penalty',
+			'personal_expenses'                 => 'Personal Expenses',
+			'cash_payment_above_income_tax_limit' => 'Cash Payment above Income Tax limit',
+			'donation_non_approved'             => 'Donation (Non-approved)',
+			'provision_for_expenses'            => 'Provision for Expenses',
+			'provision_for_doubtful_debts'      => 'Provision for Doubtful Debts',
+			'penalty_for_law_violation'         => 'Penalty for Law Violation',
+			'wealth_tax_personal_tax'           => 'Wealth Tax / Personal Tax',
+			'capital_loss'                      => 'Capital Loss',
+			'drawings_owner_withdrawals'        => 'Drawings / Owner Withdrawals',
+			'csr_expense(certain_cases)'        => 'CSR Expense (certain cases)',
+			'unpaid_pf_esi_beyond_due_date'     => 'Unpaid PF/ESI beyond due date',
+			'tds_not_deducted_deposited'        => 'TDS not deducted / deposited',
+			'expenses_without_proper_bills'     => 'Expenses without proper bills',
+			'interest_on_business_loan'         => 'Interest on Business Loan',
+			'software_subscription'             => 'Software Subscription',
+			'hosting_cloud_expense'             => 'Hosting / Cloud Expense',
+			'motor_car_expense'                 => 'Motor Car Expense',
+			'entertainment_expense'             => 'Entertainment Expense',
+			'director_expense'                  => 'Director Expense',
+		];
+
+		return $map[$expenseType] ?? null;
+	}	
+	
 
 }

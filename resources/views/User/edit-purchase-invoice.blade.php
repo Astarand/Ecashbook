@@ -535,7 +535,7 @@
                                                     <p class="f-w-600 mb-1 text-start">Grand Total :</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹<?php echo $totalAmount + $totalTax; ?></p>
+                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹<?php echo getRoundedAmount($totalAmount + $totalTax); ?></p>
                                                 </div>
                                             </div>
                                         </div>

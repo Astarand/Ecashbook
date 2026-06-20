@@ -107,6 +107,7 @@
                                 <th>Cr / Dr</th>
                                 <th>Amount (₹)</th>
                                 <th>GST (%)</th>
+                                <th>Payment Status</th>
                                 <th>TDS Amt (₹)</th>
                                 <th>Party</th>
                                 <th>Note</th>
@@ -133,6 +134,7 @@
 								</td>
 								<td>{{ number_format($journal->total_amount, 2) }}</td>
 								<td>{{ $journal->gst_rate }}</td>
+								<td>{{ $journal->payment_status }}</td>
 								<td>{{ number_format($journal->tds_amt, 2) }}</td>
 								<td>{{ $journal->party_name }}</td>
 								<td>

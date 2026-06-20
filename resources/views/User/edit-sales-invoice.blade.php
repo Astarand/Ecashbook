@@ -563,7 +563,7 @@
                                                     <p class="f-w-600 mb-1 text-start">Grand Total :</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹{{ number_format($totalAmount + $totalTax + $totalGovPay + $totalSerPay, 2) }}</p>
+                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹{{ number_format(getRoundedAmount($totalAmount + $totalTax + $totalGovPay + $totalSerPay), 2) }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -577,7 +577,7 @@
                                         <select class="form-control" name="signature_type" id="signature_type">
                                             <option value="">Select Signature Type</option>
                                             <option value="normal" {{ isset($sales->signature_type) && $sales->signature_type == 'normal' ? 'selected' : '' }}>Normal Signature</option>
-                                            <option value="digital" {{ isset($sales->signature_type) && $sales->signature_type == 'digital' ? 'selected' : '' }}>Digital Signature</option>
+                                            <!--<option value="digital" {{ isset($sales->signature_type) && $sales->signature_type == 'digital' ? 'selected' : '' }}>Digital Signature</option>-->
                                         </select>
                                     </div>
                                 </div>
@@ -1578,7 +1578,7 @@
 
         // alert(grandTotalElement);
         // Store the initial grand total
-        let grandTotal = <?php echo $totalAmount + $totalTax; ?>;
+        let grandTotal = <?php echo getRoundedAmount($totalAmount + $totalTax); ?>;
 
         discountInput.addEventListener("input", function() {
 

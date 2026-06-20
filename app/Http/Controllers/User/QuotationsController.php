@@ -53,6 +53,8 @@ class QuotationsController extends Controller
 							'quotations.inv_name',
 							'quotations.inv_date',
 							'quotations.status',
+							'quotations.signed_pdf',
+							'quotations.signed_pdf_status',
 							'company_profiles.comp_name',
 							'proprietorship_profiles.comp_name as prop_name',
 							DB::raw('SUM(quotations_values.quantity) AS total_qty'),
@@ -69,6 +71,8 @@ class QuotationsController extends Controller
 							'quotations.inv_name',
 							'quotations.inv_date',
 							'quotations.status',
+							'quotations.signed_pdf',
+							'quotations.signed_pdf_status',
 							'company_profiles.comp_name',
 							'proprietorship_profiles.comp_name'
 						)
@@ -117,6 +121,8 @@ class QuotationsController extends Controller
 			$array[$val->id]['total_qty'] = $val->total_qty;
 			$array[$val->id]['total_amount'] = $val->total_amount;
 			$array[$val->id]['status'] = $val->status;
+			$array[$val->id]['signed_pdf'] = $val->signed_pdf;
+			$array[$val->id]['signed_pdf_status'] = $val->signed_pdf_status;
 
 			$customerName =  DB::table('customers')
 				->select(DB::raw('customers.cust_name,customers.cust_phone'))

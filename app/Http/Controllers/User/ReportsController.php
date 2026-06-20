@@ -1085,7 +1085,6 @@ class ReportsController extends Controller
 
 				'debit'  => $debit,
 				'credit' => $credit,
-				'payment_status' => $j->payment_status,
 
 				'balance'    => 0,
 				'dc'         => ($dcType === 'credit') ? 'Cr' : 'Dr',

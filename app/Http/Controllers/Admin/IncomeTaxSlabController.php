@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\IncomeTaxSlab;
-// use illuminate\Support\Facades\Validator;
 use Validator;
 use Redirect;
 use DB;
@@ -33,102 +32,26 @@ class IncomeTaxSlabController extends Controller
     /**
      * Store new Income Tax Slab
      */
-    // public function storeIncomeTaxSlab(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'entity_type' => 'required|string|max:255',
-    //         'company_type' => 'required|string|max:255',
-    //         'applicable_fy' => 'required|string|max:255',
-    //         'assessment_year' => 'required|string|max:255',
-    //         'tax_regime' => 'required|string|max:255',
-    //         'taxpayer_category' => 'required|string|max:255',
-    //         'income_slab_from' => 'required|numeric|min:0',
-    //         'income_slab_to' => 'required|numeric|min:0',
-    //         'tax_rate' => 'required|numeric|min:0|max:100',
-    //         'surcharge_rate' => 'nullable|numeric|min:0|max:100',
-    //         'cess_rate' => 'nullable|numeric|min:0|max:100',
-    //         'marginal_relief_applicable' => 'nullable|in:0,1',
-    //         'mat_applicable' => 'nullable|in:0,1',
-    //         'amt_applicable' => 'nullable|in:0,1',
-    //         'rebate_applicable' => 'nullable|in:0,1',
-    //         'rebate_section' => 'nullable|string|max:255',
-    //         'rebate_limit' => 'nullable|numeric|min:0',
-    //         'status' => 'required|in:0,1',
-    //         'notes' => 'nullable|string',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => $validator->errors()->first(),
-    //             'errors' => $validator->errors()
-    //         ], 422);
-    //     }
-
-    //     try {
-    //         DB::beginTransaction();
-
-    //         IncomeTaxSlab::create([
-    //             'entity_type' => $request->entity_type,
-    //             'company_type' => $request->company_type,
-    //             'applicable_fy' => $request->applicable_fy,
-    //             'assessment_year' => $request->assessment_year,
-    //             'tax_regime' => $request->tax_regime,
-    //             'taxpayer_category' => $request->taxpayer_category,
-    //             'income_slab_from' => $request->income_slab_from,
-    //             'income_slab_to' => $request->income_slab_to,
-    //             'tax_rate' => $request->tax_rate,
-    //             'surcharge_rate' => $request->surcharge_rate ?? 0,
-    //             'cess_rate' => $request->cess_rate ?? 0,
-    //             'marginal_relief_applicable' => $request->marginal_relief_applicable ?? false,
-    //             'mat_applicable' => $request->mat_applicable ?? false,
-    //             'amt_applicable' => $request->amt_applicable ?? false,
-    //             'rebate_applicable' => $request->rebate_applicable ?? false,
-    //             'rebate_section' => $request->rebate_section,
-    //             'rebate_limit' => $request->rebate_limit ?? 0,
-    //             'status' => $request->status,
-    //             'notes' => $request->notes,
-    //             'created_by' => Auth::check() ? Auth::id() : NULL,
-    //         ]);
-
-    //         DB::commit();
-            
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Income Tax Slab created successfully!'
-    //         ], 200);
-    //     } catch (\Exception $e) {
-    //         DB::rollback();
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Error creating Income Tax Slab: ' . $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
     public function storeIncomeTaxSlab(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'entity_type' => 'required|string|max:255',
+            'company_type' => 'required|string|max:255',
             'applicable_fy' => 'required|string|max:255',
             'assessment_year' => 'required|string|max:255',
             'tax_regime' => 'required|string|max:255',
-
+            'taxpayer_category' => 'required|string|max:255',
             'income_slab_from' => 'required|numeric|min:0',
             'income_slab_to' => 'required|numeric|min:0',
-
             'tax_rate' => 'required|numeric|min:0|max:100',
             'surcharge_rate' => 'nullable|numeric|min:0|max:100',
             'cess_rate' => 'nullable|numeric|min:0|max:100',
-
             'marginal_relief_applicable' => 'nullable|in:0,1',
             'mat_applicable' => 'nullable|in:0,1',
             'amt_applicable' => 'nullable|in:0,1',
-
             'rebate_applicable' => 'nullable|in:0,1',
             'rebate_section' => 'nullable|string|max:255',
             'rebate_limit' => 'nullable|numeric|min:0',
-
             'status' => 'required|in:0,1',
             'notes' => 'nullable|string',
         ]);
@@ -142,79 +65,42 @@ class IncomeTaxSlabController extends Controller
         }
 
         try {
-
             DB::beginTransaction();
-
-            // Auto Taxpayer Category Mapping
-            $taxpayerCategoryMap = [
-                'Proprietorship Firm' => 'Individual',
-                'Hindu Undivided Family (HUF)' => 'HUF',
-                'Partnership Firm' => 'Partnership Firm',
-                'Limited Liability Partnership (LLP)' => 'LLP',
-                'One Person Company (OPC)' => 'Domestic Company',
-                'Private Limited Company' => 'Domestic Company',
-                'Public Limited Company' => 'Domestic Company',
-                'Section 8 Company' => 'Domestic Company',
-                'NGO / Trust' => 'Trust / AOP',
-                'Foreign Company' => 'Foreign Company',
-            ];
-
-            $taxpayerCategory =
-                $taxpayerCategoryMap[$request->entity_type] ?? null;
 
             IncomeTaxSlab::create([
                 'entity_type' => $request->entity_type,
-                'taxpayer_category' => $taxpayerCategory,
-
+                'company_type' => $request->company_type,
                 'applicable_fy' => $request->applicable_fy,
                 'assessment_year' => $request->assessment_year,
                 'tax_regime' => $request->tax_regime,
-
+                'taxpayer_category' => $request->taxpayer_category,
                 'income_slab_from' => $request->income_slab_from,
                 'income_slab_to' => $request->income_slab_to,
-
                 'tax_rate' => $request->tax_rate,
                 'surcharge_rate' => $request->surcharge_rate ?? 0,
                 'cess_rate' => $request->cess_rate ?? 0,
-
-                'marginal_relief_applicable' =>
-                    $request->marginal_relief_applicable ?? 0,
-
-                'mat_applicable' =>
-                    $request->mat_applicable ?? 0,
-
-                'amt_applicable' =>
-                    $request->amt_applicable ?? 0,
-
-                'rebate_applicable' =>
-                    $request->rebate_applicable ?? 0,
-
-                'rebate_section' =>
-                    $request->rebate_section,
-
-                'rebate_limit' =>
-                    $request->rebate_limit ?? 0,
-
+                'marginal_relief_applicable' => $request->marginal_relief_applicable ?? false,
+                'mat_applicable' => $request->mat_applicable ?? false,
+                'amt_applicable' => $request->amt_applicable ?? false,
+                'rebate_applicable' => $request->rebate_applicable ?? false,
+                'rebate_section' => $request->rebate_section,
+                'rebate_limit' => $request->rebate_limit ?? 0,
                 'status' => $request->status,
                 'notes' => $request->notes,
-
-                'created_by' => Auth::id(),
+                'created_by' => Auth::check() ? Auth::id() : NULL,
             ]);
 
             DB::commit();
-
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Income Tax Slab created successfully!'
-            ]);
-
+            ], 200);
         } catch (\Exception $e) {
-
-            DB::rollBack();
-
+            DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Error creating Income Tax Slab : ' . $e->getMessage()
+                'message' => 'Error creating Income Tax Slab: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -235,11 +121,11 @@ class IncomeTaxSlabController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'entity_type' => 'required|string|max:255',
-            // 'company_type' => 'required|string|max:255',
+            'company_type' => 'required|string|max:255',
             'applicable_fy' => 'required|string|max:255',
             'assessment_year' => 'required|string|max:255',
             'tax_regime' => 'required|string|max:255',
-            'taxpayer_category' => 'nullable|string|max:255',
+            'taxpayer_category' => 'required|string|max:255',
             'income_slab_from' => 'required|numeric|min:0',
             'income_slab_to' => 'required|numeric|min:0',
             'tax_rate' => 'required|numeric|min:0|max:100',
@@ -269,11 +155,11 @@ class IncomeTaxSlabController extends Controller
             $slab = IncomeTaxSlab::findOrFail($id);
             $slab->update([
                 'entity_type' => $request->entity_type,
-                // 'company_type' => $request->company_type,
+                'company_type' => $request->company_type,
                 'applicable_fy' => $request->applicable_fy,
                 'assessment_year' => $request->assessment_year,
                 'tax_regime' => $request->tax_regime,
-                'taxpayer_category' => $request->taxpayer_category ?? null,
+                'taxpayer_category' => $request->taxpayer_category,
                 'income_slab_from' => $request->income_slab_from,
                 'income_slab_to' => $request->income_slab_to,
                 'tax_rate' => $request->tax_rate,

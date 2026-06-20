@@ -414,7 +414,7 @@
                                                 <p class="f-w-600 mb-1 text-start">Grand Total :</p>
                                             </div>
                                             <div class="col-6">
-                                                <p class="f-w-600 mb-1 text-end">₹{{ number_format($totalAmount + $totalTax + $totalGovPay + $totalSerPay, 2) }}</p>
+                                                <p class="f-w-600 mb-1 text-end">₹{{ number_format(getRoundedAmount($totalAmount + $totalTax + $totalGovPay + $totalSerPay), 2) }}</p>
                                             </div>
                                         </div>
                                     </div>

@@ -86,7 +86,7 @@ class PurchaseController extends Controller
 			$array[$val->id]['due_amount'] = $val->due_amount;
 			$array[$val->id]['other_payment'] = $val->other_payment;
 			$array[$val->id]['pay_status'] = $val->pay_status;
-			$array[$val->id]['total_amount'] = $val->total_amount;
+			$array[$val->id]['total_amount'] = getRoundedAmount($val->total_amount);
 			$array[$val->id]['status'] = $val->status;
 
 			$customerName =  DB::table('vendors')
@@ -105,7 +105,7 @@ class PurchaseController extends Controller
 								'))
 								->where('sid', $val->id)
 								->get();
-				$array[$val->id]['grandTotal'] = isset($salesValue[0]->grandTotal)?$salesValue[0]->grandTotal:0;
+				$array[$val->id]['grandTotal'] = isset($salesValue[0]->grandTotal)?getRoundedAmount($salesValue[0]->grandTotal):0;
 			}else{
 				$array[$val->id]['grandTotal'] = 0;
 

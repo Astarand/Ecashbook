@@ -38,10 +38,14 @@ use App\Http\Controllers\Helper;
 use Image;
 use Illuminate\Support\Facades\Cookie;
 use App\Helpers\AuditLogger;
+use App\Services\JournalService;
 
 class EmployeeManagemnet extends Controller
 {
-	
+	public function __construct(JournalService $journalService = null)
+    {
+        $this->journalService = $journalService;
+    }
 	
 	public function EmployeeList()
 	{
@@ -2982,7 +2986,7 @@ class EmployeeManagemnet extends Controller
 			'epf_applicable' => $request->has('epf_applicable') ? 1 : 0,
 			'esic_applicable' => $request->has('esic_applicable') ? 1 : 0,
 			'ptax_applicable' => $request->has('ptax_applicable') ? 1 : 0,
-			'tds_applicable' => $request->has('tdsapplicable') ? 1 : 0,
+			'tds_applicable' => $request->has('tds_applicable') ? 1 : 0,
 			'epf_no' => $request->epf_no ?? null,
 			'esic_no' => $request->esic_no ?? null,
 
@@ -4260,6 +4264,7 @@ class EmployeeManagemnet extends Controller
 
 	public function savePayslip(Request $request)
 	{
+		$uid = currentOwnerId();
 		try {
 			// Decode all data
 			$empResponse = json_decode($request->emp_response, true);
@@ -4293,6 +4298,10 @@ class EmployeeManagemnet extends Controller
 				'created_at' => now(),
 				'updated_at' => now(),
 			]);
+			
+			
+			$this->journalEntry($payslipId,$uid);
+
 
 			return response()->json([
 				'success' => true,
@@ -4307,6 +4316,56 @@ class EmployeeManagemnet extends Controller
 				'error' => $e->getMessage()
 			], 500);
 		}
+	}
+	
+	public function journalEntry($payslipId,$uid)
+	{
+		$payslip = DB::table('user_payslip as up')
+						->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+						->select(
+							'up.*',
+							'e.propId'
+						)
+						->where('up.id', $payslipId)
+						->first();
+
+		if (!$payslip) {
+			return;
+		}
+
+		$json = json_decode($payslip->emp_salary_slip_response, true);
+
+		$visibleData = $json['visible_data'] ?? [];
+		$employeeName = $visibleData['employee_details']['name'] ?? '';
+		$salaryData = $visibleData['final_salary_calculation'] ?? [];
+		$grossSalary = $salaryData['total_earnings'] ?? 0;
+		$netSalary = $salaryData['net_salary'] ?? 0;
+		$monthName = \Carbon\Carbon::create()->month($payslip->month)->format('F'); // June, July, August
+
+		$pf = $salaryData['provident_fund'] ?? 0;
+		$esi = $salaryData['esi']?? 0;
+		$ptax = $salaryData['ptax']?? 0;
+		$tds = $salaryData['tds'] ?? 0;
+		$loan = $salaryData['loan'] ?? 0;
+
+		$this->journalService->storePayrollJournalEntries([
+			'added_by'      => $uid,
+			'autoId'        => $payslipId,
+			'propId'        => $payslip->propId ?? null,
+			'source'        => 'Payroll',
+			'entry_type'    => 'Payroll',
+			'date'          => $payslip->date,
+			'reference_no'  => $payslip->payslip_no,
+			'employee_name' => $employeeName,
+			'gross_salary'  => $grossSalary,
+			'net_salary'  	=> $netSalary,
+			'pf'            => $pf,
+			'esi'           => $esi,
+			'ptax'          => $ptax,
+			'tds'          	=> $tds,
+			'loan'          => $loan,
+			'payroll_month' => $monthName
+		]);
 	}
 
 

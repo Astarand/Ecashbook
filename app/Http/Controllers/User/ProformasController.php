@@ -53,6 +53,9 @@ class ProformasController extends Controller
 							'proformas.inv_date',
 							'proformas.status',
 							'proformas.pay_status',
+							'proformas.due_amount',
+							'proformas.signed_pdf',
+							'proformas.signed_pdf_status',
 							'company_profiles.comp_name',
 							'proprietorship_profiles.comp_name as prop_name',
 							DB::raw('SUM(proformas_values.quantity) AS total_qty'),
@@ -70,6 +73,9 @@ class ProformasController extends Controller
 							'proformas.inv_date',
 							'proformas.status',
 							'proformas.pay_status',
+							'proformas.due_amount',
+							'proformas.signed_pdf',
+							'proformas.signed_pdf_status',
 							'company_profiles.comp_name',
 							'proprietorship_profiles.comp_name'
 						)
@@ -116,9 +122,12 @@ class ProformasController extends Controller
 			$array[$val->id]['inv_num'] = $val->inv_num;
 			$array[$val->id]['inv_date'] = $val->inv_date;
 			$array[$val->id]['total_qty'] = $val->total_qty;
-			$array[$val->id]['total_amount'] = $val->total_amount;
+			$array[$val->id]['total_amount'] = getRoundedAmount($val->total_amount);
+			$array[$val->id]['due_amount'] = $val->due_amount;
 			$array[$val->id]['status'] = $val->status;
 			$array[$val->id]['pay_status'] = $val->pay_status;
+			$array[$val->id]['signed_pdf'] = $val->signed_pdf;
+			$array[$val->id]['signed_pdf_status'] = $val->signed_pdf_status;
 
 			$customerName =  DB::table('customers')
 				->select(DB::raw('customers.cust_name,customers.cust_phone'))
@@ -296,9 +305,7 @@ class ProformasController extends Controller
 
 		$count = DB::table('proformas')
 			->where('added_by', $userId)
-			->where(function($query) {
-				$query->whereNull('pay_status')->orWhere('pay_status', '');
-			})
+			->where('status', '0')
 			->count();
 
 			if($count >2){    //---------- count empty or null payment status -------
@@ -616,6 +623,7 @@ class ProformasController extends Controller
 			'propId' => $propId,
 			'inv_num' => $invoiceNo,
 			'inv_date' => $data['inv_date'],
+			'pay_status' => 'Due',
 
 			'seller_name' => $data['seller_name'],
 			'seller_contact' => $data['seller_contact'],
@@ -1303,20 +1311,23 @@ class ProformasController extends Controller
 		if ($validation->fails()) {
 			return response()->json($validation->errors()->toArray());
 		} else {
-			//Payment full-advance logic
-			$payStatus = $request->pay_status;
+			//start get old records
+			$oldRec = DB::table('proformas')
+				->where('id', $sId)
+				->first();
+			//end get old records
+						
+			$payStatus = $oldRec->pay_status ?? '';
 			$totalAmount   = $request->total_amount ?? 0;
-			$advanceAmount = $request->advance_amount ?? 0;
-			$dueAmount     = $request->due_amount ?? 0;
-			$adjustedAmount = $request->adjusted_amount ?? 0;
-			if ($payStatus === 'Full') {
-				$adjustedAmount = $totalAmount;   // Full → adjusted = total
+			$dueAmount =  (float) ($oldRec->due_amount ?? 0);
+			$advanceAmount  = (float) ($oldRec->advance_amount ?? 0);
+			$adjustedAmount = (float) ($oldRec->adjusted_amount ?? 0);
+			if ($payStatus === 'Due') 
+			{
+				$payStatus = 'Due';
+				$dueAmount =  0;
 				$advanceAmount  = 0;
-				$dueAmount      = 0;
-			}
-			if ($payStatus === 'Partial') {
-				$adjustedAmount = 0;       
-				$dueAmount = $totalAmount - $advanceAmount;
+				$adjustedAmount  = 0;
 			}
 			
 			$update = DB::table('proformas')
@@ -1325,10 +1336,10 @@ class ProformasController extends Controller
 					array(
 						'mode_of_pay' => $request->mode_of_pay,
 						'other_payment' => $request->other_payment,
-						'pay_status' => $request->pay_status,
+						'pay_status' => $payStatus,
 						'total_amount' => isset($request->total_amount) ? $request->total_amount : 0,
-						'advance_amount' => isset($request->advance_amount) ? $request->advance_amount : 0,
-						'due_amount' => isset($request->due_amount) ? $request->due_amount : 0,
+						'advance_amount' => $advanceAmount,
+						'due_amount' => $dueAmount,
 						'adjusted_amount' => $adjustedAmount,
 						'buyer_orderno' => isset($request->buyer_orderno) ? $request->buyer_orderno : "",
 						'order_date' => isset($request->order_date) ? $request->order_date : "",
@@ -1362,6 +1373,9 @@ class ProformasController extends Controller
 				];
 		$delInvoice = DB::table('proformas')->where('id', $request->id)->delete();
 		$delInvoiceItemValue = DB::table('proformas_values')->where('sid', $request->id)->delete();
+		$delPaymentRec = DB::table('payment_vouchers')
+							->where('f_id', $request->id)
+							->where('source', 'Proforma')->delete();
 		if ($delInvoice) {
 			//AUDIT LOG ENTRY
             AuditLogger::logEntry(

@@ -24,7 +24,9 @@
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
+                    @if(Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
                     <a href="{{ route('user.AddSalesCreditDebit') }}" id="add-credit-debit-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Credit / Debit Note</a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -190,7 +192,7 @@
     let deleteId = null; // Store the ID of the customer to be deleted
 
     // Capture the customer ID when the delete button is clicked
-    $('.delete-btn').on('click', function() {
+    $(document).on('click', '.delete-btn', function () {
         deleteId = $(this).data('id');
         //alert(deleteId);
     });

@@ -274,7 +274,10 @@ class AssetController extends Controller
 				$rules['asset_code'] = 'required';
 				$rules['invoice_value'] = 'required';
 				$rules['pay_status'] = 'required';
-				$rules['adjusted_amt'] = 'required';
+				//$rules['adjusted_amt'] = 'required';
+				if (($data['pay_status'] ?? '') !== 'Due') {
+					$rules['adjusted_amt'] = 'required|numeric';
+				}
 			}
 		}
 
@@ -397,10 +400,12 @@ class AssetController extends Controller
 
 		// ======= Start payment voucher entry ========
 		$currentPayment = 0;
+		$amount = 0;
 		if ($data['assetType'] === 'non-current') {
 			$isWip = (($data['nonCurrentAssetType'] ?? '') === 'Capital Work in Progress');
 			if (!$isWip) {
 				$paymentStatus = strtolower(trim($data['pay_status'] ?? ''));
+				$amount = (float)($data['invoice_value'] ?? 0);
 				$advanceAmt = (float)($data['advance_amt'] ?? 0);
 				$adjustedAmt = (float)($data['adjusted_amt'] ?? 0);
 				if ($paymentStatus == 'advance') {
@@ -409,9 +414,13 @@ class AssetController extends Controller
 				else if ($paymentStatus == 'full') {
 					$currentPayment = $adjustedAmt;
 				}
+				else if ($paymentStatus == 'due') {
+					$currentPayment = $amount;
+				}
 			}
 			else {
 				$paymentStatus = strtolower(trim($data['cwip_pay_status'] ?? ''));
+				$amount = (float)($data['cwip_amount'] ?? 0);
 				$advanceAmt = (float)($data['cwip_advance_amt'] ?? 0);
 				$adjustedAmt = (float)($data['cwip_adjusted_amt'] ?? 0);
 				if ($paymentStatus == 'advance') {
@@ -419,6 +428,9 @@ class AssetController extends Controller
 				}
 				else if ($paymentStatus == 'full') {
 					$currentPayment = $adjustedAmt;
+				}
+				else if ($paymentStatus == 'due') {
+					$currentPayment = $amount;
 				}
 			}
 		}
@@ -478,6 +490,7 @@ class AssetController extends Controller
 			->first();
 
 		$isWip = (($asset->assetType === 'non-current') &&($asset->nonCurrentAssetType === 'Capital Work in Progress'));
+		$payStatus = $isWip ? ($asset->cwip_pay_status ?? ''): ($asset->pay_status ?? 0);
 		$amount = $isWip ? ($asset->cwip_amount ?? 0): ($asset->invoice_value ?? 0);
 		$party = $isWip ? ($asset->cwip_vendor_id ?? '') : ($asset->vendor_id ?? '');
 		$vendorName = $party ? DB::table('vendors')->where('id', $party)->value('vendor_name') : '';
@@ -490,8 +503,9 @@ class AssetController extends Controller
 			'propId'        => $asset->propId ?? null,
 			'date'          => $asset->date,
 			'entry_type'    => 'Asset',
-			'asset_name'    => $asset->asset_name,
+			'asset_name'    => $asset->asset_name ?? $asset->project_name,
 			'party_name'    => $vendorName,
+			'pay_status'    => $payStatus,
 			'amount'        => $amount,
 			'debit_credit'  => $debitCredit,
 			'gst_applicable'=> $asset->gst_applicable ?? 'no',
@@ -983,12 +997,14 @@ class AssetController extends Controller
 			
 			// ======= Start payment voucher entry ========
 			$currentPayment = 0;
+			$amount = 0;
 			if ($data['assetType'] === 'non-current') {
 
 				if (!$isWip) {
 					$oldPayStatus = strtolower(trim($oldRec->pay_status ?? ''));
 					if ($oldPayStatus != 'full') {
 						$newPayStatus = strtolower(trim($data['pay_status'] ?? ''));
+						$amount = (float)($data['invoice_value'] ?? 0);
 						$oldAdvance = (float)($oldRec->advance_amt ?? 0);
 						$newAdvance = (float)($data['advance_amt'] ?? 0);
 						$totalAmount = (float)($data['invoice_value'] ?? 0);
@@ -998,12 +1014,16 @@ class AssetController extends Controller
 						else if ($newPayStatus == 'full') {
 							$currentPayment = $totalAmount - $oldAdvance;
 						}
+						else if ($newPayStatus == 'due') {
+							$currentPayment = $amount;
+						}
 					}
 				}
 				else {
 					$oldPayStatus = strtolower(trim($oldRec->cwip_pay_status ?? ''));
 					if ($oldPayStatus != 'full') {
 						$newPayStatus = strtolower(trim($data['cwip_pay_status'] ?? ''));
+						$amount = (float)($data['cwip_amount'] ?? 0);
 						$oldAdvance = (float)($oldRec->cwip_advance_amt ?? 0);
 						$newAdvance = (float)($data['cwip_advance_amt'] ?? 0);
 						$totalAmount = (float)($data['cwip_amount'] ?? 0);
@@ -1012,6 +1032,9 @@ class AssetController extends Controller
 						}
 						else if ($newPayStatus == 'full') {
 							$currentPayment = $totalAmount - $oldAdvance;
+						}
+						else if ($newPayStatus == 'due') {
+							$currentPayment = $amount;
 						}
 					}
 				}

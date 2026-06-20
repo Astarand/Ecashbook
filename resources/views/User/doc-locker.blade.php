@@ -505,6 +505,22 @@
     </div>
 </div>
 
+<style>
+.passcode-input,
+.passcode-input-confirm {
+    font-size: 24px;
+    font-weight: bold;
+    height: 50px;
+    width: 50px;
+    padding: 0;
+}
+
+.passcode-input:focus,
+.passcode-input-confirm:focus {
+    border-color: #4680ff;
+    box-shadow: 0 0 0 0.2rem rgba(70, 128, 255, 0.25);
+}
+</style>
 
 @endsection
 

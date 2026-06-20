@@ -124,9 +124,9 @@ class OtherIncomeController extends Controller
             $income->incomeType = $request->input('incomeType');
             $income->categoryIncome = $request->input('categoryIncome');
             $income->amount = $request->input('amount');
-			$income->receivable_amt = $request->input('receivable_amt');
-            $income->advance_amt = $request->input('advance_amt');
-            $income->adjust_amt = $request->input('adjust_amt');
+			$income->receivable_amt = $request->input('receivable_amt') ?? 0;
+            $income->advance_amt = $request->input('advance_amt') ?? 0;
+            $income->adjust_amt = $request->input('adjust_amt') ?? 0;
 			 $income->invoice_no = $request->input('invoice_no');
             $income->pay_status = $request->input('pay_status');
             $income->due_date = $request->input('due_date');
@@ -315,9 +315,9 @@ class OtherIncomeController extends Controller
 			$income->incomeType = $request->input('incomeType');
             $income->categoryIncome = $request->input('categoryIncome');
             $income->amount = $request->input('amount');
-            $income->receivable_amt = $request->input('receivable_amt');
-            $income->advance_amt = $request->input('advance_amt');
-            $income->adjust_amt = $request->input('adjust_amt');
+            $income->receivable_amt = $request->input('receivable_amt') ?? 0;
+            $income->advance_amt = $request->input('advance_amt') ?? 0;
+            $income->adjust_amt = $request->input('adjust_amt') ?? 0;
             $income->invoice_no = $request->input('invoice_no');
             $income->pay_status = $request->input('pay_status');
             $income->pay_mode = $request->input('pay_mode');
@@ -368,25 +368,28 @@ class OtherIncomeController extends Controller
             $income->save();
 			$this->journalEntry($id); // Call journal entry
 			
-			// START PAYMENT VOUCHER ENTRY
-			$newAdvance = (float)$income->advance_amt;
-			$newAdjust  = (float)$income->adjust_amt;
+			// START PAYMENT VOUCHER ENTRY			
+			$newAdvance = (float) $income->advance_amt;
+			$newAdjust  = (float) $income->adjust_amt;
 
-			$oldAdvance = (float)$oldIncome->advance_amt;
-			$oldAdjust  = (float)$oldIncome->adjust_amt;
+			$oldAdvance = (float) $oldIncome->advance_amt;
+			$oldAdjust  = (float) $oldIncome->adjust_amt;
 
 			$paymentStatus = strtolower(trim($income->pay_status));
+			$oldPaymentStatus = strtolower(trim($oldIncome->pay_status));
+
 			$currentPayment = 0;
 
 			if ($paymentStatus == 'full') {
-				$currentPayment = ($newAdjust - $oldAdjust);
-			}
-			else if ($paymentStatus == 'advance') {
-				$currentPayment = ($newAdvance - $oldAdvance);
-			}
-			
-			// If no increase in payment,then do NOT create voucher
-			if ($currentPayment <= 0) {
+				if ($oldPaymentStatus == 'due') {
+					$currentPayment = (float) $request->input('amount');
+				} else {
+					$currentPayment = $newAdjust - $oldAdjust;
+				}
+
+			} elseif ($paymentStatus == 'advance') {
+				$currentPayment = $newAdvance - $oldAdvance;
+			} else {
 				$currentPayment = 0;
 			}
 
@@ -398,7 +401,7 @@ class OtherIncomeController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Income details updated successfully!',
-                'redirect' => route('user.OtherIncomeList') // Redirect to income list page
+                'redirect' => route('user.OtherIncomeList') 
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -593,7 +596,7 @@ class OtherIncomeController extends Controller
 			'ledger'        => $income->categoryIncome ?? 'Income',
 			'party_name'    => $customerName,
 			'amount'        => (float)$income->amount,
-			'payment_status'=> $income->pay_status ?? '',
+			'pay_status'	=> $income->pay_status ?? '',
 			'tds_applicable'=> $income->tds_applicable ?? 'no',
 			'tds_percent'   => (float)$income->tds_percentage ?? 0,
 			'tds_amt'       => (float)$income->tds_amount ?? 0,

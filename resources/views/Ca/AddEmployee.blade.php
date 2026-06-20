@@ -605,16 +605,19 @@
                                                     name="basic_percentage"
                                                     id="basic_percentage"
                                                     min="30"
-                                                    max="40"
+                                                    max="50"
                                                     step="1"
                                                     oninput="
-                                                        if(this.value > 40) this.value = 40;
+                                                        if(this.value > 50) this.value = 50;
                                                         if(this.value < 30 && this.value !== '') this.value = 30;
                                                     "
-                                                    value="40"
+                                                    value="50"
                                                     required
                                                     
                                                 />
+                                                <small class="text-danger">
+                                                    Percentage must be between 30 and 50
+                                                </small>
 
                                                 
                                             </div>

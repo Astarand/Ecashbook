@@ -422,7 +422,7 @@
                                                     <p class="f-w-600 mb-1 text-start">Grand Total :</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹{{ number_format($totalAmount + $totalTax + $totalGovPay + $totalSerPay, 2) }}</p>
+                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹{{ number_format(getRoundedAmount($totalAmount + $totalTax + $totalGovPay + $totalSerPay), 2) }}</p>
                                                 </div>
                                         </div>
                                     </div>
@@ -520,34 +520,29 @@
                                                                                 "selected" : "" ?>>Full Payment</option>
                                                     <option value="Partial" <?php echo ($sales->pay_status == "Partial") ?
                                                                                 "selected" : "" ?>>Advance Payment</option>
+													<option value="Due" <?php echo ($sales->pay_status == "Due") ?
+                                                                                "selected" : "" ?>>Due</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- Payment Section -->
-									<div class="row" id="paymentSection" style="display:none;">
+									<div class="row align-items-end" id="paymentSection">
 										<div class="col-md-4 mb-3">
 											<label>Total Amount</label>
-											<input type="text" name="total_amount" id="total_amount" value="{{ $sales->total_amount }}" class="form-control">
+											<input type="text" name="total_amount" id="total_amount" value="{{ $sales->total_amount }}" readonly class="form-control">
 										</div>
 
-										<!-- Advance Only -->
-										<div class="col-md-4 mb-3 d-none" id="advanceBox">
-											<label>Advance Amount</label>
-											<input type="text"  name="advance_amount" id="advance_amount" value="{{ $sales->advance_amount }}" class="form-control">
+										<div class="col-md-4 mb-3 d-flex align-items-end">
+											<button
+												type="button"
+												class="btn btn-primary paymentModalBtn"
+												data-id="{{ $sales->id }}"
+												data-type="Proforma">
+												Click to Update Payment
+											</button>
 										</div>
-
-										<!-- Due Only -->
-										<div class="col-md-4 mb-3 d-none" id="dueBox">
-											<label>Balance Receivable</label>
-											<input type="text" name="due_amount" id="due_amount" value="{{ $sales->due_amount }}" class="form-control" readonly>
-										</div>
-
-										<!-- Adjusted Only -->
-										<div class="col-md-4 mb-3 d-none" id="adjustedBox">
-											<label>Adjusted Amount</label>
-											<input type="text" name="adjusted_amount" id="adjusted_amount" value="{{ $sales->adjusted_amount }}" class="form-control">
-										</div>
+										
 									</div>
                                     <div class="col-md-6 mb-3">
                                         <div class="form-group ">
@@ -712,6 +707,68 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="paymentVoucherModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Details</h5>
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="f_id">
+                <input type="hidden" id="voucher_type">
+				<input type="hidden" id="isViewPage" value="1">
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Total Invoice Amount</label>
+                        <input type="text"
+                            id="invoice_total"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Paid Amount</label>
+                        <input type="text"
+                            id="total_paid"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Balance Due</label>
+                        <input type="text"
+                            id="balance_due"
+                            class="form-control"
+                            readonly>
+                    </div>
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+						<th>Mode</th>
+                        <th id="actionHeader" width="80">Action</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="voucherRows">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 	$('#tab-B, #tab-C, #tab-D').addClass('disabled');
 	
@@ -844,111 +901,24 @@
 
     });
 	
-	document.addEventListener("DOMContentLoaded", function() {
-		
-		const payStatus = document.getElementById("pay_status");
+	document.addEventListener("DOMContentLoaded", function () {
+		const paymentStatusDropdown = document.getElementById("pay_status");
+		const paymentBtn = document.querySelector(".paymentModalBtn");
 
-		const paymentSection = document.getElementById("paymentSection");
-		const totalAmount = document.getElementById("total_amount");
-
-		const advanceBox = document.getElementById("advanceBox");
-		const dueBox = document.getElementById("dueBox");
-		const adjustedBox = document.getElementById("adjustedBox");
-
-		const advanceAmount = document.getElementById("advance_amount");
-		const dueAmount = document.getElementById("due_amount");
-		const adjustedAmount = document.getElementById("adjusted_amount");
-
-		const grandTotalElement = document.getElementById("grand_total_amount");
-
-		// ✅ Detect edit mode
-		let isEditMode = advanceAmount.value !== "" || dueAmount.value !== "";
-
-		// Set total amount
-		if (grandTotalElement && totalAmount) {
-			let amt = grandTotalElement.textContent.replace(/[₹,]/g, '').trim();
-			totalAmount.value = parseFloat(amt || 0).toFixed(2);
-		}
-
-		function resetFields() {
-			advanceAmount.value = "";
-			dueAmount.value = "";
-			adjustedAmount.value = "";
-		}
-
-		function togglePaymentUI(reset = false) {
-
-			let status = payStatus.value;
-
-			if (!status) {
-				paymentSection.style.display = "none";
-				return;
-			}
-
-			paymentSection.style.display = "flex";
-
-			// Hide all
-			advanceBox.classList.add("d-none");
-			dueBox.classList.add("d-none");
-			adjustedBox.classList.add("d-none");
-
-			// ✅ Reset ONLY when user changes
-			if (reset) {
-				resetFields();
-			}
-
-			if (status === "Full") {
-
-				adjustedBox.classList.remove("d-none");
-
-				let total = parseFloat(totalAmount.value) || 0;
-
-				// Only overwrite if not edit mode
-				if (reset || !isEditMode) {
-					adjustedAmount.value = total.toFixed(2);
-				}
-
-				adjustedAmount.readOnly = true;
-
-			} else if (status === "Partial") {
-
-				advanceBox.classList.remove("d-none");
-				dueBox.classList.remove("d-none");
-
-				adjustedAmount.readOnly = false;
-
-				// Only calculate if empty
-				if (!dueAmount.value) {
-					calculateDue();
-				}
+		function toggleFields() {
+			const status = paymentStatusDropdown.value;
+			if (status === "Due") {
+				paymentBtn.style.display = "none";
+			} else {
+				paymentBtn.style.display = "inline-block";
 			}
 		}
 
-		function calculateDue() {
-
-			let total = parseFloat(totalAmount.value) || 0;
-			let advance = parseFloat(advanceAmount.value) || 0;
-
-			if (advance > total) {
-				advanceAmount.value = total.toFixed(2);
-				advance = total;
-			}
-
-			let due = total - advance;
-
-			dueAmount.value = due.toFixed(2);
+		if (paymentStatusDropdown) {
+			paymentStatusDropdown.addEventListener("change", toggleFields);
+			toggleFields(); // Initial page load
 		}
-
-		// ✅ When user changes → reset values
-		payStatus.addEventListener("change", function () {
-			isEditMode = false; // now user changed manually
-			togglePaymentUI(true);
-		});
-
-		advanceAmount.addEventListener("input", calculateDue);
-		togglePaymentUI(false);
-		
-    });
+	});
 	
 	changeProformaCustomer();
 	function changeProformaCustomer() {

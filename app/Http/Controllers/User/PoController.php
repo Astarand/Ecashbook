@@ -75,6 +75,8 @@ class PoController extends Controller
 			$array[$val->id]['pay_status'] = $val->pay_status;
 			$array[$val->id]['total_amount'] = $val->total_amount;
 			$array[$val->id]['status'] = $val->status;
+			$array[$val->id]['signed_pdf'] = $val->signed_pdf;
+			$array[$val->id]['signed_pdf_status'] = $val->signed_pdf_status;
 
 			$customerName =  DB::table('vendors')
 							->select(DB::raw('vendors.vendor_name,vendors.vendor_phone'))

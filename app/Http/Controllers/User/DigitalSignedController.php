@@ -37,9 +37,9 @@ class DigitalSignedController extends Controller
 	{
 
 		$request->validate([
-			'type'=>'required|in:sales,purchase,expense',
+			'type'=>'required|in:sales,quotation,proforma,po',
 			'id'=>'required|integer',
-			'pdf'=>'required|file|mimes:pdf|max:5120'
+			'pdf'=>'required|file|mimes:pdf|max:2048'
 
 		]);
 		$type = $request->type;
@@ -56,9 +56,27 @@ class DigitalSignedController extends Controller
 			$invNum = $invoice->inv_num ?? $request->id;
 			$oldPdf = $invoice->signed_pdf ?? null;
 		}
-		elseif($type == 'purchase')
+		elseif($type == 'quotation')
 		{
-			$invoice = DB::table('purchases')
+			$invoice = DB::table('quotations')
+				->select('inv_num')
+				->where('id',$request->id)
+				->first();
+			$invNum = $invoice->inv_num ?? $request->id;
+			$oldPdf = $invoice->signed_pdf ?? null;
+		}
+		elseif($type == 'proforma')
+		{
+			$invoice = DB::table('proformas')
+				->select('inv_num')
+				->where('id',$request->id)
+				->first();
+			$invNum = $invoice->inv_num ?? $request->id;
+			$oldPdf = $invoice->signed_pdf ?? null;
+		}
+		elseif($type == 'po')
+		{
+			$invoice = DB::table('puos')
 				->select('inv_num')
 				->where('id',$request->id)
 				->first();
@@ -95,8 +113,22 @@ class DigitalSignedController extends Controller
 						'signed_pdf_status'=>1
 					]);
 
-		}else if($type=='purchase') {
-			DB::table('purchases')
+		}else if($type=='quotation') {
+			DB::table('quotations')
+					->where('id',$request->id)
+					->update([
+						'signed_pdf'=>$path,
+						'signed_pdf_status'=>1
+					]);
+		}else if($type=='proforma') {
+			DB::table('proformas')
+					->where('id',$request->id)
+					->update([
+						'signed_pdf'=>$path,
+						'signed_pdf_status'=>1
+					]);
+		}else if($type=='po') {
+			DB::table('puos')
 					->where('id',$request->id)
 					->update([
 						'signed_pdf'=>$path,
@@ -128,5 +160,8 @@ class DigitalSignedController extends Controller
 
 		return response()->download(public_path($data->signed_pdf));
 	}
+	
+	//Via API DSC
+    
 	
 }

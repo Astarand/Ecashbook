@@ -1,4 +1,4 @@
-    @extends('App.Layout')
+@extends('App.Layout')
 
 @section('container')
 
@@ -38,77 +38,29 @@
                         <div class="row">
                             <!-- Entity Type -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Entity Type <span class="text-danger">*</span>
-                                </label>
-                                <select class="form-control" name="entity_type" id="entity_type" required>
+                                <label class="form-label">Entity Type <span class="text-danger">*</span></label>
+                                <select class="form-control" name="entity_type" required>
                                     <option value="">-- Select Entity Type --</option>
-
-                                    <option value="Proprietorship Firm" {{ old('entity_type', $slab->entity_type ?? '') == 'Proprietorship Firm' ? 'selected' : '' }}>
-                                        Proprietorship Firm
-                                    </option>
-
-                                    <option value="Hindu Undivided Family (HUF)" {{ old('entity_type', $slab->entity_type ?? '') == 'Hindu Undivided Family (HUF)' ? 'selected' : '' }}>
-                                        Hindu Undivided Family (HUF)
-                                    </option>
-
-                                    <option value="Partnership Firm" {{ old('entity_type', $slab->entity_type ?? '') == 'Partnership Firm' ? 'selected' : '' }}>
-                                        Partnership Firm
-                                    </option>
-
-                                    <option value="Limited Liability Partnership (LLP)" {{ old('entity_type', $slab->entity_type ?? '') == 'Limited Liability Partnership (LLP)' ? 'selected' : '' }}>
-                                        Limited Liability Partnership (LLP)
-                                    </option>
-
-                                    <option value="One Person Company (OPC)" {{ old('entity_type', $slab->entity_type ?? '') == 'One Person Company (OPC)' ? 'selected' : '' }}>
-                                        One Person Company (OPC)
-                                    </option>
-
-                                    <option value="Private Limited Company" {{ old('entity_type', $slab->entity_type ?? '') == 'Private Limited Company' ? 'selected' : '' }}>
-                                        Private Limited Company
-                                    </option>
-
-                                    <option value="Public Limited Company" {{ old('entity_type', $slab->entity_type ?? '') == 'Public Limited Company' ? 'selected' : '' }}>
-                                        Public Limited Company
-                                    </option>
-
-                                    <option value="Section 8 Company" {{ old('entity_type', $slab->entity_type ?? '') == 'Section 8 Company' ? 'selected' : '' }}>
-                                        Section 8 Company
-                                    </option>
-
-                                    <option value="NGO / Trust" {{ old('entity_type', $slab->entity_type ?? '') == 'NGO / Trust' ? 'selected' : '' }}>
-                                        NGO / Trust
-                                    </option>
-
-                                    <option value="Foreign Company" {{ old('entity_type', $slab->entity_type ?? '') == 'Foreign Company' ? 'selected' : '' }}>
-                                        Foreign Company
-                                    </option>
+                                    <option value="Proprietorship" {{ isset($slab) && $slab->entity_type === 'Proprietorship' ? 'selected' : '' }}>Proprietorship</option>
+                                    <option value="LLP" {{ isset($slab) && $slab->entity_type === 'LLP' ? 'selected' : '' }}>LLP</option>
+                                    <option value="Pvt Ltd" {{ isset($slab) && $slab->entity_type === 'Pvt Ltd' ? 'selected' : '' }}>Pvt Ltd</option>
+                                    <option value="Public Ltd" {{ isset($slab) && $slab->entity_type === 'Public Ltd' ? 'selected' : '' }}>Public Ltd</option>
+                                    <option value="HUF" {{ isset($slab) && $slab->entity_type === 'HUF' ? 'selected' : '' }}>HUF</option>
+                                    <option value="Partnership" {{ isset($slab) && $slab->entity_type === 'Partnership' ? 'selected' : '' }}>Partnership</option>
                                 </select>
-
-                                @error('entity_type')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
+                                @error('entity_type') <small class="text-danger">{{ $message }}</small> @enderror
                             </div>
 
-                            <!-- Taxpayer Category -->
+                            <!-- Company Type -->
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">
-                                    Taxpayer Category <span class="text-danger">*</span>
-                                </label>
-
-                                <input type="text"
-                                    class="form-control"
-                                    id="taxpayer_category_display"
-                                    readonly>
-
-                                <input type="hidden"
-                                    name="taxpayer_category"
-                                    id="taxpayer_category"
-                                    value="{{ old('taxpayer_category', $slab->taxpayer_category ?? '') }}">
-
-                                @error('taxpayer_category')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
+                                <label class="form-label">Company Type <span class="text-danger">*</span></label>
+                                <select class="form-control" name="company_type" required>
+                                    <option value="">-- Select Company Type --</option>
+                                    <option value="Domestic" {{ isset($slab) && $slab->company_type === 'Domestic' ? 'selected' : '' }}>Domestic</option>
+                                    <option value="Foreign" {{ isset($slab) && $slab->company_type === 'Foreign' ? 'selected' : '' }}>Foreign</option>
+                                    <option value="OPC" {{ isset($slab) && $slab->company_type === 'OPC' ? 'selected' : '' }}>OPC</option>
+                                </select>
+                                @error('company_type') <small class="text-danger">{{ $message }}</small> @enderror
                             </div>
 
                             <!-- Applicable FY -->
@@ -139,7 +91,7 @@
                             </div>
 
                             <!-- Taxpayer Category -->
-                            {{-- <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Taxpayer Category <span class="text-danger">*</span></label>
                                 <select class="form-control" name="taxpayer_category" required>
                                     <option value="">-- Select Taxpayer Category --</option>
@@ -149,7 +101,7 @@
                                     <option value="Others" {{ isset($slab) && $slab->taxpayer_category === 'Others' ? 'selected' : '' }}>Others</option>
                                 </select>
                                 @error('taxpayer_category') <small class="text-danger">{{ $message }}</small> @enderror
-                            </div> --}}
+                            </div>
 
                             <hr class="my-4">
 
@@ -428,6 +380,7 @@ document.getElementById('submitBtn').addEventListener('click', function() {
 function validateForm() {
     const requiredFields = {
         entity_type: 'Entity Type',
+        company_type: 'Company Type',
         applicable_fy: 'Applicable FY',
         assessment_year: 'Assessment Year',
         tax_regime: 'Tax Regime',
@@ -464,41 +417,6 @@ document.getElementById('incomeTaxSlabForm').addEventListener('keypress', functi
         e.preventDefault();
     }
 });
-
-
-$(document).ready(function () {
-
-    function setTaxpayerCategory() {
-
-        let entityType = $('#entity_type').val();
-
-        let categories = {
-            'Proprietorship Firm'                : 'Individual',
-            'Hindu Undivided Family (HUF)'       : 'HUF',
-            'Partnership Firm'                   : 'Partnership Firm',
-            'Limited Liability Partnership (LLP)': 'LLP',
-            'One Person Company (OPC)'           : 'Domestic Company',
-            'Private Limited Company'            : 'Domestic Company',
-            'Public Limited Company'             : 'Domestic Company',
-            'Section 8 Company'                  : 'Domestic Company',
-            'NGO / Trust'                        : 'Trust / AOP',
-            'Foreign Company'                    : 'Foreign Company'
-        };
-
-        let taxpayerCategory = categories[entityType] || '';
-
-        $('#taxpayer_category').val(taxpayerCategory);
-        $('#taxpayer_category_display').val(taxpayerCategory);
-    }
-
-    $('#entity_type').on('change', function () {
-        setTaxpayerCategory();
-    });
-
-    // Load existing value on edit page
-    setTaxpayerCategory();
-});
-
 </script>
 
 @endsection

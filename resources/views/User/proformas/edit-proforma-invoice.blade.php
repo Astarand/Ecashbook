@@ -722,6 +722,16 @@
 											<label>Adjusted Amount</label>
 											<input type="text" name="adjusted_amount" id="adjusted_amount" value="{{ $sales->adjusted_amount }}" class="form-control">
 										</div>
+
+										<div class="col-md-4 mb-3 d-flex align-items-end">
+											<button
+												type="button"
+												class="btn btn-primary paymentModalBtn"
+												data-id="{{ $sales->id }}"
+												data-type="Proforma">
+												Click to Update Payment
+											</button>
+										</div>
 									</div>
 
                                     <div class="col-md-6 mb-3">
@@ -891,6 +901,90 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="paymentVoucherModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Details</h5>
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="f_id">
+                <input type="hidden" id="voucher_type">
+				<input type="hidden" id="isViewPage" value="0">
+				
+				<div id="paymentNoteArea" class="alert alert-warning mt-2">
+					<strong>Note:</strong>
+					Please click <strong>Save</strong> to update payment vouchers and payment status.
+				</div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Total Invoice Amount</label>
+                        <input type="text"
+                            id="invoice_total"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Paid Amount</label>
+                        <input type="text"
+                            id="total_paid"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Balance Due</label>
+                        <input type="text"
+                            id="balance_due"
+                            class="form-control"
+                            readonly>
+                    </div>
+					
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+                        <th width="80">Action</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="voucherRows">
+
+                    </tbody>
+                </table>
+
+                <button type="button"
+                    class="btn btn-success"
+                    id="addVoucherRow">
+                    Add Payment
+                </button>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                    class="btn btn-primary"
+                    id="saveVoucherPayments">
+                    Save
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <style>
     .digital-signature-upload .upload-area {
         border: 2px dashed #ccc;
@@ -918,6 +1012,25 @@
 </style>
 <script>
 	
+	document.addEventListener("DOMContentLoaded", function () {
+		const paymentStatusDropdown = document.getElementById("pay_status");
+		const paymentBtn = document.querySelector(".paymentModalBtn");
+
+		function toggleFields() {
+			const status = paymentStatusDropdown.value;
+			if (status === "Due") {
+				paymentBtn.style.display = "none";
+			} else {
+				paymentBtn.style.display = "inline-block";
+			}
+		}
+
+		if (paymentStatusDropdown) {
+			paymentStatusDropdown.addEventListener("change", toggleFields);
+			toggleFields(); // Initial page load
+		}
+	});
+
 	$('#tab-B, #tab-C, #tab-D').addClass('disabled');
 	
 	$(document).ready(function () {
@@ -1340,20 +1453,34 @@
                     // console.log(response);  
                     $("#loader").hide(); 
                     
-                    if (response.status == "success") {
-                        
-                        showToast(response.message, "success");
-                        
-                        setTimeout(function() {
-                            window.location.href = response.redirect;
-                        }, 3000); 
-                    } else if (response.status == "error") {
-                    
-                        showToast(response.message, "error");
-                    } else {
-                        
-                        showToast("An unexpected error occurred. Please try again.", "error");
-                    }
+					// Validation errors
+					if (response.mode_of_pay ||
+						response.pay_status ||
+						response.order_date ||
+						response.disp_through) {
+
+						let message = '';
+
+						$.each(response, function (field, msgs) {
+							if ($.isArray(msgs)) {
+								message += msgs[0] + '\n';
+							}
+						});
+
+						showToast(message, "error");
+						return;
+					}
+
+					// Success
+					if (response.status === "success") {
+						showToast(response.message, "success");
+
+						setTimeout(function () {
+							window.location.href = response.redirect;
+						}, 3000);
+					} else {
+						showToast(response.message || "Something went wrong.", "error");
+					}
                 },
                 // error: function(xhr, status, error) {
                 //     // Handle AJAX error
@@ -1373,7 +1500,7 @@
 
         // alert(grandTotalElement);
         // Store the initial grand total
-        let grandTotal = <?php echo $totalAmount + $totalTax; ?>;
+        let grandTotal = <?php echo getRoundedAmount($totalAmount + $totalTax); ?>;
 
         discountInput.addEventListener("input", function() {
 
@@ -1425,7 +1552,7 @@
 		}
 	}
 
-    document.addEventListener("DOMContentLoaded", function() {
+    /*document.addEventListener("DOMContentLoaded", function() {
 		
 		const payStatus = document.getElementById("pay_status");
 
@@ -1529,7 +1656,7 @@
 		advanceAmount.addEventListener("input", calculateDue);
 		togglePaymentUI(false);
 		
-    });
+    });*/
 
     document.addEventListener("DOMContentLoaded", function() {
         // Existing code...

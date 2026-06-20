@@ -34,14 +34,25 @@
                 @csrf
                 <div class="row">
                     <div class="mb-3 col-md-6">
-                        <label class="form-label" for="inputEmail4">Invoice Number <span class="text-danger">*</span></label>
-                        <select class="form-control error" name="inv_num" id="inv_num" required="" aria-describedby="bouncer-error_select" aria-invalid="true">
-                            <option label="Select Invoice"></option>
+						<label class="form-label">
+							Invoice Number <span class="text-danger">*</span>
+						</label>
+
+						<select class="form-control" name="inv_num" id="inv_num">
+							<option value="">Select Invoice</option>
+							<option value="manual">Other (Enter Manually)</option>
 							@foreach($inv_number as $invoice)
-                            <option value="{{ $invoice->inv_num }}">{{ $invoice->inv_num }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+								<option value="{{ $invoice->inv_num }}">
+									{{ $invoice->inv_num }}
+								</option>
+							@endforeach
+						</select>
+
+						<input type="text"
+							   class="form-control mt-2 d-none"
+							   id="manual_inv_num"
+							   placeholder="Enter Invoice Number">
+					</div>
                     <div class="mb-3 col-md-3">
                         <label class="form-label" for="inputEmail4">Date<span class="text-danger">*</span></label>
                         <input type="date" name="inv_date" id="inv_date" class="form-control" placeholder="Invoice Number">
@@ -242,7 +253,7 @@
                                         <input type="Date" name="note_issuance_date" id="note_issuance_date" class="form-control" placeholder="Date of Note Issuance">
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label class="form-label">Voucher No.</label>
+                                        <label class="form-label">Voucher No. <span class="text-danger">*</span></label>
                                         <input type="text" name="v_num" id="v_num" class="form-control" placeholder="Voucher No.">
                                     </div>
                                     <div class="col-md-3 mb-3">
@@ -294,11 +305,11 @@
                                         <input type="text" name="transporter_name" id="transporter_name" class="form-control" placeholder="Transporter / Courier Name">
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label class="form-label">Challan No.</label>
+                                        <label class="form-label">Challan No. <span class="text-danger">*</span></label>
                                         <input type="text" name="challan_no" id="challan_no" class="form-control" placeholder="Challan No.">
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label class="form-label">Challan Date</label>
+                                        <label class="form-label">Challan Date <span class="text-danger">*</span></label>
                                         <input type="Date" name="challan_date" id="challan_date" class="form-control" placeholder="Challan Date">
                                     </div>
                                     <div class="col-md-12 mb-3">
@@ -485,6 +496,22 @@
             const invNum = this.value;
             //alert(invNum);
             var base_url = "{{ url('/') }}";
+			
+			// Manual invoice number
+			if (invNum === 'manual') {
+				$('#manual_inv_num')
+					.removeClass('d-none')
+					.val('')
+					.focus();
+
+				$('#inv_date').val('').prop('readonly', false);
+
+				return; // Stop API call
+			}
+
+			// Hide manual input
+			$('#manual_inv_num').addClass('d-none').val('');
+			$('#inv_date').prop('readonly', true);
 
             if (invNum) {
                 fetch(base_url + '/fetch-purchases-details', {
@@ -590,6 +617,19 @@
                 $("form#add_other_detail").serialize();*/
 				
 			var formData = new FormData();
+			
+			// Replace manual invoice number
+			if ($('#inv_num').val() === 'manual') {
+				const manualInvNo = $('#manual_inv_num').val().trim();
+
+				if (manualInvNo === '') {
+					alert('Please enter Invoice Number.');
+					return;
+				}
+
+				formData.set('inv_num', manualInvNo);
+			}
+
 			$.each($("form#purchaseCreditDebitFrm").serializeArray(), function(i, field) {
 				formData.append(field.name, field.value);
 			});

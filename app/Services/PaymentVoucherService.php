@@ -148,7 +148,75 @@ class PaymentVoucherService
 					$referenceId = $sales->supplier_refno ?? null;
 					$narration = 'Sales Invoice Entry';
 			}
+			// ======================================================
+			// Proforma
+			// ======================================================
+			else if ($source == 'Proforma') 
+			{
 
+				$sales = DB::table('proformas as s')
+					->leftJoin('customers as c', 'c.id', '=', 's.inv_name')
+					->leftJoin('proformas_values as sv', 'sv.sid', '=', 's.id')
+					->where('s.id', $id)
+					->select(
+						's.id',
+						's.propId',
+						's.inv_date',
+						's.mode_of_pay',
+						's.pay_status',
+						's.advance_amount',
+						's.due_amount',
+						's.supplier_refno',
+
+						'c.id as customer_id',
+						'c.cust_name',
+
+						DB::raw('SUM(sv.amount) as total_amount'),
+						DB::raw('SUM(sv.tax_amt) as total_gst'),
+						DB::raw('SUM(sv.gov_pay) as gov_pay'),
+						DB::raw('SUM(sv.ser_pay) as ser_pay')
+					)
+					->groupBy(
+						's.id',
+						's.propId',
+						's.inv_date',
+						's.mode_of_pay',
+						's.pay_status',
+						's.advance_amount',
+						's.due_amount',
+						's.supplier_refno',
+						'c.id',
+						'c.cust_name'
+					)
+					->first();
+
+					if (!$sales) {
+						return false;
+					}
+
+					$voucherType = 'Receipt Voucher';
+					$propId = $sales->propId;
+					$date = $data['date'] ?? $sales->inv_date;
+					$invoiceNo = $id; //$sales->inv_num;
+					$partyType = 'Customer';
+					$partyId = $sales->customer_id ?? null;
+					$partyName = $sales->cust_name ?? '';	
+					
+					$amount = $currentPayment;
+					$transactionDetails = '';
+					if (($sales->due_amount ?? 0) <= 0)
+					{
+						$transactionDetails = 'Adjustment';
+					}
+					else
+					{
+						$transactionDetails = 'Advance';
+					}
+					$creditDebit = 'Credit';
+					$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $sales->mode_of_pay ?? null);
+					$referenceId = $sales->supplier_refno ?? null;
+					$narration = 'Proforma Invoice Entry';
+			}
 			// ======================================================
 			// PURCHASE
 			// ======================================================
@@ -290,7 +358,11 @@ class PaymentVoucherService
 				} else if (strtolower($expense->payment_status) == 'advance') {
 					$transactionDetails = 'Advance';
 				}else{	
-					$transactionDetails = 'Advance';
+					$transactionDetails = 'Due';
+				}
+				
+				if ($expense->payment_status == 'due') {
+					return true; // don't create voucher
 				}
 				$creditDebit = 'Debit';
 				$paymentMode = $this->getPaymentMode($expense->mode_of_expense ?? '');
@@ -306,7 +378,6 @@ class PaymentVoucherService
 			elseif ($source == 'Income') 
 			{
 				$income = DB::table('income as i')
-					->leftJoin('customers as c', 'c.id', '=', 'i.customer_id')
 					->where('i.id', $id)
 					->select(
 						'i.id',
@@ -322,18 +393,16 @@ class PaymentVoucherService
 						'i.invoice_no',
 						'i.pay_status',
 						'i.pay_mode',
-						'i.customer_id',
+						'i.customer_name',
 						'i.specification',
-						'i.gst_amt',
-
-						'c.id as cust_id',
-						'c.cust_name'
+						'i.gst_amt'
 					)
 					->first();
 
 				if (!$income) {
 					return false;
 				}
+				
 
 				$voucherType = 'Receipt Voucher';
 				$propId = $income->propId;
@@ -342,10 +411,10 @@ class PaymentVoucherService
 				// ==========================================
 				// PARTY DETAILS
 				// ==========================================
-				if (!empty($income->customer_id)) {
+				if (!empty($income->customer_name)) {
 					$partyType = 'Customer';
-					$partyId = $income->customer_id;
-					$partyName = $income->cust_name ?? '';
+					$partyId = null;
+					$partyName = $income->customer_name ?? '';
 				} else {
 					$partyType = 'Other';
 					$partyId = null;
@@ -363,7 +432,11 @@ class PaymentVoucherService
 				} else if (strtolower($income->pay_status) == 'advance') {
 					$transactionDetails = 'Advance';
 				} else {
-					$transactionDetails = 'Advance';
+					$transactionDetails = 'Due';
+				}
+				
+				if ($income->pay_status == 'Due') {
+					return true; // don't create voucher
 				}
 				// ==========================================
 				// TRANSACTION DETAILS
@@ -462,6 +535,10 @@ class PaymentVoucherService
 				} else {
 					$paymentStatus = strtolower(trim($asset->pay_status ?? ''));
 				}
+				
+				if ($paymentStatus == 'due') {
+					return true; // don't create voucher
+				}
 
 				$transactionDetails = '';
 				if ($paymentStatus == 'full') {
@@ -469,7 +546,7 @@ class PaymentVoucherService
 				} else if ($paymentStatus == 'advance') {
 					$transactionDetails = 'Advance';
 				} else {
-					$transactionDetails = 'Advance';
+					$transactionDetails = 'Due';
 				}
 
 				$creditDebit = 'Debit';

@@ -336,7 +336,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="mb-3">
-                                                        <label class="form-label">Emergency Contact Mobile No<<span class="text-danger">*</span>/label>
+                                                        <label class="form-label">Emergency Contact Mobile No<span class="text-danger">*</span></label>
                                                         <input type="text" required name="emergency_mobile" id="emergency_mobile" class="form-control"
                                                                 value="{{ $employee->emergency_mobile ?? '' }}" placeholder="Enter mobile number" maxlength="10"
                                                                 oninput="this.value = this.value.replace(/\D/g, '');">
@@ -524,9 +524,17 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="form-label" for="basic_percentage">Basic Salary Percentage<span class="text-danger">*</span></label>
-                                                <input type="number" class="form-control" name="basic_percentage" value="{{ $employee->basic_percentage ?? '40' }}"
-                                                    id="basic_percentage" placeholder="Enter percentage"/>
-                                                
+                                                <input type="number" class="form-control" name="basic_percentage" value="{{ $employee->basic_percentage ?? '50' }}"
+                                                    id="basic_percentage" placeholder="Enter percentage" min="30"
+                                                    max="50"
+                                                    step="1"
+                                                    oninput="
+                                                        if(this.value > 50) this.value = 50;
+                                                        if(this.value < 30 && this.value !== '') this.value = 30;
+                                                    "/>
+                                                <small class="text-danger">
+                                                    Percentage must be between 30 and 50
+                                                </small>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -1730,6 +1738,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 let accNumber = $('#account_number').val().trim();
                 let confirmAccNumber = $('#confirm_account_no').val().trim();
 
+                let epfApplicable = $('#epf_check').is(':checked');
+                let epfNo = $('#epf_no').val().trim();
+
                 let pan_number = $('#pan_number').val().trim();
                 let aadhaar_number = $('#aadhaar_number').val().trim();
 
@@ -1777,6 +1788,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (joiningDate === "") {
                     showToast("Employee Joining Date is required", "error");
                     $('#emp_joining_date').focus();
+                    return;
+                }
+
+                if (epfApplicable && epfNo === "") {
+                    showToast("Employee EPF No is required", "error");
+                    $('#epf_no').focus();
                     return;
                 }
 

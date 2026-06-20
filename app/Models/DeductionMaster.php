@@ -12,12 +12,19 @@ class DeductionMaster extends Model
         'income_tax_section',
         'deduction_category',
         'deduction_type',
-        'amount',
-        'maximum_limit',
+
+        'limit_type',
+        'base_amount_source',
+        'automation_mode',
+
+        'limit_value',
+        'limit_formula',
         'applicable_fy',
-        'deduction_mode',
+
         'linked_module',
+        'remarks',
+
         'active_status',
-        'deduction_amount_logic'
+        'allow_disallow_status',
     ];
 }

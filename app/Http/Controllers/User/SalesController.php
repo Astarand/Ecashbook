@@ -72,6 +72,7 @@ class SalesController extends Controller
 					'sales.other_payment',
 					'sales.pay_status',
 					'sales.status',
+					'sales.signed_pdf',
 					'sales.signed_pdf_status',
 
 					'company_profiles.comp_name',
@@ -112,6 +113,7 @@ class SalesController extends Controller
 					'sales.other_payment',
 					'sales.pay_status',
 					'sales.status',
+					'sales.signed_pdf',
 					'sales.signed_pdf_status',
 					'company_profiles.comp_name',
 					'proprietorship_profiles.comp_name',
@@ -143,9 +145,10 @@ class SalesController extends Controller
 			$array[$val->id]['mode_of_pay'] = $val->mode_of_pay;
 			$array[$val->id]['other_payment'] = $val->other_payment;
 			$array[$val->id]['pay_status'] = $val->pay_status;
-			$array[$val->id]['total_amount'] = $val->total_amount;
+			$array[$val->id]['total_amount'] = getRoundedAmount($val->total_amount);
 			$array[$val->id]['status'] = $val->status;
-			$array[$val->id]['signed_pdf_status'] = $val->signed_pdf_status ?? 0;
+			$array[$val->id]['signed_pdf'] = $val->signed_pdf;
+			$array[$val->id]['signed_pdf_status'] = $val->signed_pdf_status;
 			$array[$val->id]['cust_name'] = $val->cust_name ?? '';
 			$array[$val->id]['cust_phone'] = $val->cust_phone ?? '';
 
@@ -1307,7 +1310,7 @@ class SalesController extends Controller
 			->sum(DB::raw('amount + tax_amt + gov_pay + ser_pay'));
 
 		return response()->json([
-			'total' => $total_amount
+			'total' => getRoundedAmount($total_amount)
 		]);
 	}
 

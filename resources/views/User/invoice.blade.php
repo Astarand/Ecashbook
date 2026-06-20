@@ -96,7 +96,7 @@
                                                 $totalAmount += $value->amount;
 												$gst_trans = $value->gst_trans; 
                                             }
-                                            $totalAmount = ceil(($totalAmount + $totalTax + $totalGovPay + $totalSerPay));
+                                            $totalAmount = getRoundedAmount(($totalAmount + $totalTax + $totalGovPay + $totalSerPay));
                                         } ?>
                                     </tbody>
                                 </table>
@@ -236,7 +236,14 @@
                                 <p class="mb-0">{{ $sales->terms_delivery ?? '' }}</p>
                             </div>
                         </div>
+                        @php
+                            $sid = base64_encode($sales->id);
+                        @endphp
                         <div class="col-12 text-end d-print-none">
+                            <a href="{{ url('edit-sales-invoice/'.$sid) }}" class="btn btn-primary">
+                                Back
+                            </a>
+
                             <a href="{{ url('sale-invoices') }}" class="btn btn-danger">
                                 Cancel
                             </a>

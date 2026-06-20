@@ -63,7 +63,24 @@
         <div class="col-sm-12">
             <div class="card card-body table-card">
 				
-				<div class="table-responsive">
+				<div class="alert alert-info mb-3" style="font-size:13px;">
+					<h6 class="mb-2">
+						<i class="ti ti-info-circle me-1"></i>
+						Signature Instructions
+					</h6>
+
+					<p class="mb-1">
+						🔐 <strong>Digital Signature (DSC):</strong>
+						Download the invoice PDF, sign it using your DSC/USB Token, and upload the signed PDF for <strong>GST compliance, audits, and official records</strong>.
+					</p>
+
+					<p class="mb-0">
+						✍️ <strong>Normal Signature:</strong>
+						Upload a signature image in <strong>PNG</strong> format during Edit Invoice.
+					</p>
+				</div>
+ 				
+ 				<div class="table-responsive">
 					<table class="table tbl-product"  id="pc-dt-simple">
 						<thead>
 							<tr>
@@ -164,6 +181,7 @@
 												   class="avtar avtar-xs btn-link-primary btn-pc-default upload-pdf-btn"
 												   data-id="{{$sale->id}}"
 												   data-type="sales"
+												   data-inv="{{$sale->inv_num}}"
 												   data-bs-toggle="modal"
 												   data-bs-target="#uploadPdfModal">
 													<i class="ti ti-cloud-upload f-18"></i>
@@ -173,12 +191,10 @@
 											@if($sale->signed_pdf_status==1)
 											<li class="list-inline-item align-bottom"
 												data-bs-toggle="tooltip"
-												data-bs-placement="top"
-												title="Download Digitally Signed PDF">
-
-												<a href="{{route('download.signed.pdf',
-													['type'=>'sales','id'=>$sale->id])}}"
-												   class="avtar avtar-xs btn-link-danger">
+												title="View Signed PDF">
+												<a href="javascript:void(0)"
+												   class="avtar avtar-xs btn-link-primary view-pdf-btn"
+												   data-pdf="{{ url($sale->signed_pdf) }}">
 													<i class="ti ti-file-invoice f-18"></i>
 												</a>
 											</li>
@@ -260,15 +276,23 @@
 <div class="modal fade" id="uploadPdfModal">
    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-         <div class="modal-header">
-            <h5 class="modal-title">
-               Upload Digitally Signed PDF
-            </h5>
-            <button
-               class="btn-close"
-               data-bs-dismiss="modal">
-            </button>
-         </div>
+        <div class="modal-header flex-column align-items-center position-relative">
+			<button
+				type="button"
+				class="btn-close position-absolute end-0 top-0 m-3"
+				data-bs-dismiss="modal">
+			</button>
+
+			<h5 class="modal-title mb-2">
+				<i class="ti ti-file-certificate me-1"></i>
+				Upload Digitally Signed PDF
+			</h5>
+
+			<span class="badge bg-light-primary text-dark px-3 py-2">
+				Invoice No: <span id="invoice_number" class="fw-bold"></span>
+			</span>
+		</div>
+		
          <div class="modal-body">
             <form id="uploadPdfForm" enctype="multipart/form-data">
                @csrf
@@ -277,7 +301,7 @@
                <div class="alert alert-info">
                   <i class="ti ti-info-circle"></i>
                   Only PDF allowed.
-                  Maximum size 5 MB.
+                  Maximum size 2 MB.
                </div>
                <div class="mb-3">
                   <label>
@@ -301,6 +325,31 @@
          </div>
       </div>
    </div>
+</div>
+
+<div class="modal fade" id="pdfPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Signed PDF Preview</h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body p-0">
+                <embed
+					id="pdfFrame"
+					src=""
+					type="application/pdf"
+					width="100%"
+					height="700">
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection
@@ -354,8 +403,10 @@
         $(document).on('click', '.upload-pdf-btn', function () {
             let id = $(this).data('id');
             let type = $(this).data('type');
+            let inv = $(this).data('inv');
             $('#pdf_id').val(id);
             $('#pdf_type').val(type);
+            $('#invoice_number').text(inv);
             $('#uploadError').text('');
             $('#pdf_file').val('');
         });

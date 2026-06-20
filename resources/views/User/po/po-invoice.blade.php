@@ -23,9 +23,11 @@
                         <h2 class="mb-0">Purchase Order (PO)</h2>
                     </div>
                 </div>
+				@if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
                 <div class="col-md-8 text-end">
                     <a href="{{ route('user.CreatePurchaseOrder') }}" id="add-po-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Purchase Order</a>
                 </div>
+				@endif
             </div>
         </div>
     </div>
@@ -36,6 +38,22 @@
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
             <div class="card card-body table-card">
+				<div class="alert alert-info mb-3" style="font-size:13px;">
+					<h6 class="mb-2">
+						<i class="ti ti-info-circle me-1"></i>
+						Signature Instructions
+					</h6>
+
+					<p class="mb-1">
+						🔐 <strong>Digital Signature (DSC):</strong>
+						Download the invoice PDF, sign it using your DSC/USB Token, and upload the signed PDF for <strong>GST compliance, audits, and official records</strong>.
+					</p>
+
+					<p class="mb-0">
+						✍️ <strong>Normal Signature:</strong>
+						Upload a signature image in <strong>PNG</strong> format during Edit Invoice.
+					</p>
+				</div>
                 <div class="table-responsive">
                     <table class="table tbl-product" id="pc-dt-simple">
                         <thead>
@@ -49,6 +67,7 @@
                                 <th>Invoice Date</th>
                                 <th>Transation Type</th>
                                 <th>Grand Total</th>
+								<th>Digital Signature</th>
                                 <th>Pay Status</th>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -79,6 +98,19 @@
                                     </span>
                                 </td>
                                 <td><span class="text-muted text-hover-primary">₹{{ $sale->grandTotal }}</span></td>
+								<td>
+									@if ($sale->signed_pdf_status == 1)
+										<span class="badge bg-success text-dark">
+											<i class="ti ti-circle-check f-14"></i>
+											Signed
+										</span>
+									@else
+										<span class="badge bg-warning text-dark">
+											<i class="ti ti-circle-x f-14"></i>
+											Not Signed
+										</span>
+									@endif
+								</td>
 								<td>
                                     @if ($sale->pay_status == 'Full')
                                     <span class="badge bg-success">Full</span>
@@ -111,6 +143,33 @@
                                                     <i class="ti ti-file f-18"></i>
                                                 </a>
                                             </li>
+											@if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
+											<li class="list-inline-item align-bottom"
+												data-bs-toggle="tooltip"
+												data-bs-placement="top"
+												title="Upload Digitally Signed PDF">
+												<a href="#"
+												   class="avtar avtar-xs btn-link-primary btn-pc-default upload-pdf-btn"
+												   data-id="{{$sale->id}}"
+												   data-type="po"
+												   data-inv="{{$sale->inv_num}}"
+												   data-bs-toggle="modal"
+												   data-bs-target="#uploadPdfModal">
+													<i class="ti ti-cloud-upload f-18"></i>
+												</a>
+											</li>
+											@endif
+											@if($sale->signed_pdf_status==1)
+											<li class="list-inline-item align-bottom"
+												data-bs-toggle="tooltip"
+												title="View Signed PDF">
+												<a href="javascript:void(0)"
+												   class="avtar avtar-xs btn-link-primary view-pdf-btn"
+												   data-pdf="{{ url($sale->signed_pdf) }}">
+													<i class="ti ti-file-invoice f-18"></i>
+												</a>
+											</li>
+											@endif
 											<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Change Status">
 												<a href="javascript:void(0)"
 												   data-id="{{ $sale->id }}"
@@ -201,6 +260,85 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="uploadPdfModal">
+   <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header flex-column align-items-center position-relative">
+			<button
+				type="button"
+				class="btn-close position-absolute end-0 top-0 m-3"
+				data-bs-dismiss="modal">
+			</button>
+
+			<h5 class="modal-title mb-2">
+				<i class="ti ti-file-certificate me-1"></i>
+				Upload Digitally Signed PDF
+			</h5>
+
+			<span class="badge bg-light-primary text-dark px-3 py-2">
+				Invoice No: <span id="invoice_number" class="fw-bold"></span>
+			</span>
+		</div>
+		
+         <div class="modal-body">
+            <form id="uploadPdfForm" enctype="multipart/form-data">
+               @csrf
+               <input type="hidden" name="id" id="pdf_id">
+               <input type="hidden" name="type" id="pdf_type">
+               <div class="alert alert-info">
+                  <i class="ti ti-info-circle"></i>
+                  Only PDF allowed.
+                  Maximum size 2 MB.
+               </div>
+               <div class="mb-3">
+                  <label>
+                  Select Signed PDF
+                  </label>
+                  <input
+                     type="file"
+                     name="pdf"
+                     id="pdf_file"
+                     class="form-control"
+                     accept="application/pdf">
+               </div>
+               <div
+                  id="uploadError"
+                  class="text-danger"></div>
+               <button
+                  class="btn btn-primary w-100">
+               Upload PDF
+               </button>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+<div class="modal fade" id="pdfPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Signed PDF Preview</h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body p-0">
+                <embed
+					id="pdfFrame"
+					src=""
+					type="application/pdf"
+					width="100%"
+					height="700">
             </div>
         </div>
     </div>

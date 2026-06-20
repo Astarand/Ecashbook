@@ -515,6 +515,9 @@ $("#getOtpBtn").on("click", function() {
 			if (path.includes('edit-sales-invoice')) {
 				return '/save-product-and-add-sales';
 			} 
+			if (path.includes('edit-purchase-invoice')) {
+				return '/save-product-and-add-purchase';
+			}
 			if (path.includes('edit-quotation-invoice')) {
 				return '/save-product-and-add-quotation';
 			} 

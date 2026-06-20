@@ -96,7 +96,7 @@
                                                 $totalAmount += $value->amount;
 												$gst_trans = $value->gst_trans;
                                             }
-                                            $totalAmount = ceil(($totalAmount + $totalTax + $totalGovPay + $totalSerPay));
+                                            $totalAmount = getRoundedAmount(($totalAmount + $totalTax + $totalGovPay + $totalSerPay));
                                         } ?>
                                     </tbody>
                                 </table>

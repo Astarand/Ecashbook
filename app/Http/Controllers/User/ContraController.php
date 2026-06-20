@@ -199,7 +199,7 @@ class ContraController extends Controller
 				'bank_ac_no' => 'required',
 				'ifsc_code' => 'required',
 				'curr_bal' => 'required',
-				'bank_qr_code' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+				// 'bank_qr_code' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
 			],
 			[
 				'bank_name.required' => 'Bank Name is required.',
@@ -208,10 +208,10 @@ class ContraController extends Controller
 				'bank_ac_no.required' => 'Account Number is required.',
 				'ifsc_code.required' => 'IFSC Code is required.',
 				'curr_bal.required' => 'Current Bank Balance is required.',
-				'bank_qr_code.required' => 'Please upload Bank QR Code.',
-				'bank_qr_code.image' => 'QR Code must be an image.',
-				'bank_qr_code.mimes' => 'Only JPG, JPEG, PNG and WEBP files are allowed.',
-				'bank_qr_code.max' => 'QR Code size must not exceed 2 MB.',
+				// 'bank_qr_code.required' => 'Please upload Bank QR Code.',
+				// 'bank_qr_code.image' => 'QR Code must be an image.',
+				// 'bank_qr_code.mimes' => 'Only JPG, JPEG, PNG and WEBP files are allowed.',
+				// 'bank_qr_code.max' => 'QR Code size must not exceed 2 MB.',
 			]
 		);
 
@@ -1865,93 +1865,6 @@ class ContraController extends Controller
         ]);
     }
 
-	public function uploadBank_statement_old(Request $request)
-	{
-		//echo "<pre>";print_r($_POST);exit;
-		$added_by = currentOwnerId();
-		$bankId = $request->bank_id;
-		$validation = $this->validator_attachment($request->all());
-		if ($validation->fails())  {
-            return response()->json($validation->errors()->toArray());
-        }
-        else{
-			//die("sdzfgsdfg");
-			$the_file = $request->file('bankstatement');
-
-		   $spreadsheet = IOFactory::load($the_file->getRealPath());
-           $sheet        = $spreadsheet->getActiveSheet();
-           $row_limit    = $sheet->getHighestDataRow();
-           $column_limit = $sheet->getHighestDataColumn();
-           $row_range    = range( 2, $row_limit );
-           $column_range = range( 'F', $column_limit );
-           $startcount = 2;
-           $data = array();
-		   if(count($row_range) ==0){
-			   $msg = array(
-					'status' => 'error',
-					'class' => 'err',
-					'redirect' => url('/bank-details/'.base64_encode($bankId)),
-					'message' => 'Bank statement uploaded failed!'
-				);
-				return response()->json($msg);
-		   }else{
-				$insertData = $this->createBankStatement($request->all());
-				$statement_id = DB::getPdo()->lastInsertId();
-				
-				foreach ( $row_range as $row ) {
-				   /*$data[] = [
-					   'slno' =>$sheet->getCell( 'A' . $row )->getValue(),
-					   'cd_date' => $sheet->getCell( 'B' . $row )->getValue(),
-					   'debit' => $sheet->getCell( 'C' . $row )->getValue(),
-					   'credit' => $sheet->getCell( 'D' . $row )->getValue(),
-				   ];*/
-				   $tran_date = $sheet->getCell( 'B' . $row )->getValue();
-				   $tran_date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($tran_date)->format('Y-m-d');
-				   $purpose =   $sheet->getCell( 'C' . $row )->getValue();
-				   $debit  = str_replace(',', '', $sheet->getCell('D' . $row)->getValue());
-				   $credit = str_replace(',', '', $sheet->getCell('E' . $row)->getValue());
-				   $payment_mode =  strtoupper($sheet->getCell( 'F' . $row )->getValue());
-				   $tran_type = "";
-				   $tran_amt = 0;
-				   $curr_amt = 0;
-				   if($debit =="")
-				   {
-					   $tran_type = "Credit";
-					   $tran_amt = $credit;
-				   }
-				   if($credit =="")
-				   {
-					   $tran_type = "Debit";
-					   $tran_amt = $debit;
-				   }
-
-				   $data[] = [
-					   'added_by' => $added_by,
-					   'bankId' => $bankId,
-					   'tran_date' => $tran_date,
-					   'payment_mode' => $payment_mode,
-					   'tran_amt' => $tran_amt,
-					   'tran_type' => $tran_type,
-					   'purpose' => $purpose,
-					   'curr_amt' => $curr_amt,
-				   ];
-
-				   $startcount++;
-				}
-			   //echo "<pre>";print_r($data); exit;
-			   DB::table('bank_trans')->insert($data);
-				$msg = array(
-					'status' => 'success',
-					'class' => 'succ',
-					'redirect' => url('/bank-details/'.base64_encode($bankId)),
-					'message' => 'Bank statement uploaded successfully'
-				);
-				return response()->json($msg);
-		   }
-		}
-
-	}
-
 	
 	public function uploadBank_statement(Request $request)
 	{
@@ -2133,7 +2046,8 @@ class ContraController extends Controller
 				'tran_date' => $tran_date,
 				'tran_amt'  => round($tran_amt, 2),
 				'tran_type' => $tran_type,
-				'ref_no'    => trim($rowData[$headerMap['ref_no']] ?? ''),
+				//'ref_no'    => trim($rowData[$headerMap['ref_no']] ?? ''),
+				'ref_no'    => isset($headerMap['ref_no'])? trim($rowData[$headerMap['ref_no']] ?? ''): '',
 				'purpose'   => trim($rowData[$headerMap['purpose']] ?? ''),
 				'curr_amt'  => 0,
 			];
@@ -2399,7 +2313,8 @@ class ContraController extends Controller
 
 		$data = $query
 			->orderBy('payment_vouchers.id', 'DESC')
-			->get();
+			->paginate(10)
+			->appends($request->all());
 
 		return view('User.payment-voucher-list', compact('data','proprietorships','banks', 'req_type'));
 	}

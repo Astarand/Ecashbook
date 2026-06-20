@@ -52,21 +52,19 @@ class PayController extends Controller
 				->where('sid',$id)
 				->first();
 
-			$invoiceTotal =
-				$invoice->amount +
-				$invoice->tax_amt +
-				$invoice->ser_pay +
-				$invoice->gov_pay;
-		}
-		else
-		{
+			$invoiceTotal = getRoundedAmount($invoice->amount + $invoice->tax_amt + $invoice->ser_pay + $invoice->gov_pay);
+		}else if($type == 'Proforma'){
+			$invoice = DB::table('proformas_values')
+				->where('sid',$id)
+				->first();
+
+			$invoiceTotal = getRoundedAmount($invoice->amount + $invoice->tax_amt + $invoice->ser_pay + $invoice->gov_pay);
+		}else{
 			$invoice = DB::table('purchase_values')
 				->where('sid',$id)
 				->first();
 
-			$invoiceTotal =
-				$invoice->amount +
-				$invoice->tax_amt;
+			$invoiceTotal = getRoundedAmount($invoice->amount + $invoice->tax_amt);
 		}
 
 		$payments = DB::table('payment_vouchers')
@@ -105,7 +103,9 @@ class PayController extends Controller
 
 				if ($request->voucher_type == 'Sales') {
 					$this->deleteSalesPaymentJournalEntries($sid);
-				} else {
+				} else if ($request->voucher_type == 'Proforma') {
+					
+				} else if ($request->voucher_type == 'Purchase') {
 					$this->deletePurchasePaymentJournalEntries($sid);
 				}
 			}
@@ -153,7 +153,9 @@ class PayController extends Controller
 					$invoiceAmount =($invoice->amount ?? 0) + ($invoice->tax_amt ?? 0) + ($invoice->gov_pay ?? 0) + ($invoice->ser_pay ?? 0);
 					$this->salesJournalEntry($sid,$uid,$invoiceAmount,'Due');
 
-				} else {
+				} else if ($request->voucher_type == 'Proforma') {
+					//No journal entry
+				} else if ($request->voucher_type == 'Purchase') {
 					$invoice = DB::table('purchase_values')
 						->where('sid', $sid)
 						->selectRaw('
@@ -177,7 +179,9 @@ class PayController extends Controller
 					$payment_mode = $val['payment_mode'];
 					if ($request->voucher_type == 'Sales') {
 						$this->salesJournalEntry($sid,$uid,$val['amount'],$payment_mode);
-					} else {
+					}else if ($request->voucher_type == 'Proforma') {
+						//No journal entry
+					} else if ($request->voucher_type == 'Purchase') {
 						$this->purchaseJournalEntry($sid,$uid,$val['amount'],$payment_mode);
 					}
 				}
@@ -209,11 +213,7 @@ class PayController extends Controller
 				->where('sid',$id)
 				->first();
 
-			$total =
-				$invoice->amount +
-				$invoice->tax_amt +
-				$invoice->ser_pay +
-				$invoice->gov_pay;
+			$total = getRoundedAmount($invoice->amount + $invoice->tax_amt + $invoice->ser_pay + $invoice->gov_pay);
 
 			$paid = DB::table('payment_vouchers')
 				->where('f_id',$id)
@@ -243,14 +243,51 @@ class PayController extends Controller
 					'adjusted_amount'=>$paid,
 					'due_amount'=>max(0,$total-$paid)
 				]);
+		} 
+		else if($type=='Proforma') 
+		{
+			$invoice = DB::table('proformas_values')
+				->where('sid',$id)
+				->first();
+
+			$total = getRoundedAmount($invoice->amount + $invoice->tax_amt + $invoice->ser_pay + $invoice->gov_pay);
+
+			$paid = DB::table('payment_vouchers')
+				->where('f_id',$id)
+				->where('source','Proforma')
+				->sum('amount');
+
+			$status = 'Due';
+
+			if($paid == 0)
+			{
+				$status = 'Due';
+			}
+			elseif($paid >= $total)
+			{
+				$status = 'Full';
+			}
+			else
+			{
+				$status = 'Partial';
+			}
+
+			DB::table('proformas')
+				->where('id',$id)
+				->update([
+					'pay_status'=>$status,
+					'advance_amount'=>$paid,
+					'adjusted_amount'=>$paid,
+					'due_amount'=>max(0,$total-$paid)
+				]);
 		}
-		else
+		else if($type=='Purchase') 
 		{
 			$invoice = DB::table('purchase_values')
 				->where('sid',$id)
 				->first();
 
-			$total = $invoice->amount + $invoice->tax_amt;
+			$total = getRoundedAmount($invoice->amount + $invoice->tax_amt);
 
 			$paid = DB::table('payment_vouchers')
 				->where('f_id',$id)

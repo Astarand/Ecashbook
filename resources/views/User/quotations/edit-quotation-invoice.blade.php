@@ -569,7 +569,7 @@
                                         <select class="form-control" name="signature_type" id="signature_type">
                                             <option value="">Select Signature Type</option>
                                             <option value="normal" {{ isset($sales->signature_type) && $sales->signature_type == 'normal' ? 'selected' : '' }}>Normal Signature</option>
-                                            <option value="digital" {{ isset($sales->signature_type) && $sales->signature_type == 'digital' ? 'selected' : '' }}>Digital Signature</option>
+                                            <!--<option value="digital" {{ isset($sales->signature_type) && $sales->signature_type == 'digital' ? 'selected' : '' }}>Digital Signature</option>-->
                                         </select>
                                     </div>
                                 </div>
