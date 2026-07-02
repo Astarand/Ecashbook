@@ -750,7 +750,7 @@ class TaxFilingController extends Controller
 	public function startupFilingListing()
 	{
 		$userId = currentOwnerId();
-		checkCoreAccess('Startup Incubator Services');
+		checkCoreAccess('Professional Services');
 		$applications = StartupIncubatorApplications::when(
 			auth()->user()->u_type != 3,
 			fn($q) => $q->where('uid', $userId)

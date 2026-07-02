@@ -38,6 +38,22 @@
         </div>
         <!-- [Mobile Media Block end] -->
         <div class="ms-auto">
+            {{-- Search Options --}}
+            <div class="form-search tour-search position-relative" style="width:250px;">
+                <i class="ph-duotone ph-magnifying-glass icon-search" style="color:#422f90;"></i>
+                <input type="search"
+                    class="form-control"
+                    placeholder="Search..."
+                    id="compo-menu-search"
+                    autocomplete="off">
+
+                <div id="sidebarSearchResults"
+                    class="dropdown-menu w-100 mt-1 shadow"
+                    style="display:none; max-height:240px; overflow-y:auto;">
+                </div>
+            </div>
+
+
             <ul class="list-unstyled">
                 <!-- Theme Color Change -->
                 <li class="dropdown pc-h-item">
@@ -300,4 +316,69 @@
             </ul>
         </div>
     </div>
+
 </header>
+
+<script>
+    //-------- Searchable Sidebar Menu Script --------//
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('compo-menu-search');
+        const results = document.getElementById('sidebarSearchResults');
+        if (!input || !results) return;
+
+        // Collect all sidebar menu links (text + href)
+        const links = Array.from(document.querySelectorAll('.pc-navbar a.pc-link'))
+        .map(a => ({
+            text: a.textContent.trim().replace(/\s+/g, ' '),
+            href: a.href
+        }))
+        .filter(l => l.text);
+
+        const normalize = (str) => (str || '').replace(/\s+/g, ' ').trim().toLowerCase();
+
+        const renderResults = (items) => {
+        if (!items.length) {
+            results.style.display = 'none';
+            results.innerHTML = '';
+            return;
+        }
+
+        results.innerHTML = items.map(item => `
+                <button type="button" class="dropdown-item py-2">${item.text}</button>
+            `).join('');
+
+        results.style.display = 'block';
+
+        // Attach click handlers
+        Array.from(results.querySelectorAll('.dropdown-item')).forEach((btn, idx) => {
+            btn.addEventListener('click', () => {
+            window.location.href = items[idx].href;
+            });
+        });
+        };
+
+        input.addEventListener('input', function() {
+        const q = normalize(this.value);
+        if (!q) {
+            renderResults([]);
+            return;
+        }
+
+        const filtered = links.filter(link => normalize(link.text).includes(q));
+        renderResults(filtered);
+        });
+
+        // Hide results if user clicks outside
+        document.addEventListener('click', function(evt) {
+        if (!results.contains(evt.target) && evt.target !== input) {
+            results.style.display = 'none';
+        }
+        });
+
+        input.addEventListener('focus', function() {
+        if (results.innerHTML.trim()) {
+            results.style.display = 'block';
+        }
+        });
+    });
+</script>

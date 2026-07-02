@@ -1023,7 +1023,7 @@
                                                             </div>
 
                                                             <div class="col-auto">
-                                                                <p class="text-white text-sm text-opacity-50 mb-0">Account Balance</p>
+                                                                <p class="text-white text-sm text-opacity-50 mb-0">Opening Balance</p>
                                                                 <h6 class="text-white mb-0">₹{{ number_format($val->curr_bal, 2) }}</h6>
                                                             </div>
 

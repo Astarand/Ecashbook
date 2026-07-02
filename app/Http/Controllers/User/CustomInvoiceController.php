@@ -40,7 +40,7 @@ class CustomInvoiceController extends Controller
         if(Auth::user()->u_type == "1" || Auth::user()->u_type == "4"){
             return view('User.custom-invoice-list', compact('custom_invoices'));
         }elseif(Auth::user()->u_type == "2" || Auth::user()->u_type == "5"){
-			checkCoreAccess('Accounting');
+			checkCoreAccess('Sales & Invoicing');
             return view('User.custom-invoice-list', compact('custom_invoices'));
         }
 

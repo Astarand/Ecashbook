@@ -34,7 +34,7 @@ class AuditController extends Controller
 
 	public function auditIndex(Request $request)
 	{
-		checkCoreAccess('Audit & Log Management');
+		checkCoreAccess('Audit Trail');
 		$userId = Auth::user()->id;
 		$userType = Auth::user()->u_type;
 		$search   = $request->search;

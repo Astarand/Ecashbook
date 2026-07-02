@@ -88,7 +88,8 @@
                                                 $taxableAmt += $value->amount;
                                                 $totalAmount += $value->amount;
                                             }
-                                            $totalAmount = ceil(($totalAmount + $cgst + $igst));
+											$shippingCost = $sales->shipping_cost ?? 0;
+                                            $totalAmount = ceil(($totalAmount + $cgst + $igst + $shippingCost));
                                         } ?>
                                     </tbody>
                                 </table>
@@ -117,6 +118,12 @@
                                     </div>
                                     <div class="col-6">
                                         <p class="mb-1 text-end">₹{{ $igst }}</p>
+                                    </div>
+									<div class="col-6">
+                                        <p class="text-muted mb-1 text-start">Shipping Cost:</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="mb-1 text-end">₹{{ $shippingCost ?? 0 }}</p>
                                     </div>
                                     <div class="col-6">
                                         <p class="f-w-600 mb-1 text-start">Total Amount:</p>

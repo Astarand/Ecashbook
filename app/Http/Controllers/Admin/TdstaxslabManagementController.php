@@ -27,6 +27,16 @@ class TdstaxslabManagementController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $dropdowns = DB::table('dropdown_values')
+            ->where('status', 1)
+            ->pluck('option_text', 'option_value');
+
+        foreach ($tdslist as $tds) {
+            $tds->category_name = ($tds->module == 'Expense')
+                ? ($dropdowns[$tds->category] ?? $tds->category)
+                : $tds->category;
+        }
+
         return view('Admin.tdstaxslab-list', compact('tdslist'));
     }
 
@@ -146,11 +156,11 @@ class TdstaxslabManagementController extends Controller
     public function save_tds_tax_slab(Request $request)
     {
         $request->validate([
-            'module'      => 'required|in:Expenses,Purchase,Assets',
+            'module'      => 'required|in:Expense,Purchase,Assets',
             'category'    => 'required|string|max:255',
-            'tds_section' => 'required|string|max:10',
+            'tds_section' => 'required|string|max:220',
             'tds_rate'    => 'required|string|max:20',
-            'entity'      => 'required|string|max:50',
+            'entity'      => 'required|string|max:200',
             'threshold'   => 'nullable|string|max:100',
             'notes'       => 'nullable|string|max:255',
             'salary_slabs'=> 'nullable|string'
@@ -178,7 +188,7 @@ class TdstaxslabManagementController extends Controller
             }
 
             // ✅ SALARY SLABS
-            if ($request->category === 'Salary & Wages' && $request->filled('salary_slabs')) {
+            if ($request->category === 'employee_benefits' && $request->filled('salary_slabs')) {
 
                 $slabs = json_decode($request->salary_slabs, true);
 
@@ -231,16 +241,6 @@ class TdstaxslabManagementController extends Controller
         }
     }
 
-
-    public function EditTdsTaxSlab_bpk($id)
-    {
-        // Fetch the TDS tax slab details by ID
-        $tdsTaxSlab = TdsTaxSlab::find($id);
-        if (!$tdsTaxSlab) {
-            return redirect()->route('tds-tax-slab-list')->with('error', 'TDS Tax Slab not found.');
-        }
-        return view('Admin.tdstaxslab-edit', compact('tdsTaxSlab'));
-    }
 
     public function EditTdsTaxSlab($id)
     {
@@ -317,7 +317,7 @@ class TdstaxslabManagementController extends Controller
                 ]);
 
             // 3️⃣ Salary Slab Handling (ONLY Salary & Wages)
-            if ($request->category === 'Salary & Wages' && $request->filled('salary_slabs')) {
+            if ($request->category === 'employee_benefits' && $request->filled('salary_slabs')) {
 
                 $salarySlabs = json_decode($request->salary_slabs, true);
 
@@ -432,5 +432,17 @@ class TdstaxslabManagementController extends Controller
 			return response()->json($msg);
 		}
     }
+
+    public function getCategories(Request $request)
+    {
+        $categories = DB::table('dropdown_values')
+            ->where('status', 1)
+            ->where('module', $request->module)
+            ->select('option_value', 'option_text')
+            ->get();
+
+        return response()->json($categories);
+    }
+
 
 }

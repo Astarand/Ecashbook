@@ -43,7 +43,7 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form method="POST" name="frmLedger" id="frmLedger" action="javascript:void(0);">
+                    {{-- <form method="POST" name="frmLedger" id="frmLedger" action="javascript:void(0);">
                         <div class="row g-3">
 
                             <div class="col-md-3">
@@ -157,7 +157,194 @@
                                 </button>
                             </div>
                         </div>
-                    </form>
+                    </form>--}}
+					
+					<form method="POST" id="frmLedger" action="javascript:void(0);">
+						<div class="row g-3">
+							<!-- Company -->
+							<div class="col-md-3">
+								<label class="form-label fw-semibold text-muted">Company</label>
+								<select name="propId" id="propId" class="form-select">
+									<option value="">{{ parentCompanyName() }}</option>
+									@foreach($proprietorships as $company)
+										<option value="{{ $company->id }}">
+											{{ $company->comp_name }}
+										</option>
+									@endforeach
+								</select>
+							</div>
+
+							<!-- From Date -->
+							<div class="col-md-3">
+								<label class="form-label fw-semibold text-muted">
+									From Date <span class="text-danger">*</span>
+								</label>
+								<input type="date"
+									   class="form-control"
+									   name="from_date"
+									   id="from_date"
+									   required>
+							</div>
+
+							<!-- To Date -->
+							<div class="col-md-3">
+								<label class="form-label fw-semibold text-muted">
+									To Date <span class="text-danger">*</span>
+								</label>
+								<input type="date"
+									   class="form-control"
+									   name="to_date"
+									   id="to_date"
+									   required>
+							</div>
+
+							<!-- Ledger -->
+							<div class="col-md-3">
+								<label class="form-label fw-semibold text-muted">
+									Ledger Name <span class="text-danger">*</span>
+								</label>
+
+								<select class="form-select"
+										name="ledger_name"
+										id="ledger_name"
+										required>
+
+									<option value="">Select Ledger</option>
+									<option value="all">General Entries</option>
+									<option value="sales">Sales Ledger</option>
+									<option value="purchase">Purchase Ledger</option>
+									<option value="customer">Customer Ledger</option>
+									<option value="supplier">Supplier Ledger</option>
+									<option value="bank">Bank Ledger</option>
+									<option value="gst_output">GST Output Ledger</option>
+									<option value="gst_input">GST Input Ledger</option>
+
+								</select>
+							</div>
+							
+							<!-- Opening Balance -->
+							<div class="col-md-3">
+								<label class="form-label">Opening Balance (₹)</label>
+
+								<input type="number"
+									   step="0.01"
+									   class="form-control"
+									   name="opening_balance"
+									   id="opening_balance"
+									   value="{{ $openingBalance }}">
+							</div>
+						</div>
+
+						<!-- ================= Advanced Filters ================= -->
+
+						<div class="collapse mt-4" id="advancedLedgerFilters">
+							<hr>
+							<h5 class="mb-3 fw-bold">
+								<i class="ti ti-filter"></i>
+								Advanced Filters
+							</h5>
+							<div class="row g-3">
+								<!-- Customer -->
+								<div class="col-md-3">
+									<label class="form-label">Customers</label>
+									<select class="form-select"
+											name="custId"
+											id="custId">
+										<option value="">All</option>
+										@foreach($customers as $c)
+											<option value="{{ $c->id }}">
+												{{ $c->cust_name }}
+											</option>
+										@endforeach
+									</select>
+								</div>
+
+								<!-- Vendor -->
+								<div class="col-md-3">
+									<label class="form-label">Vendors</label>
+									<select class="form-select"
+											name="vendId"
+											id="vendId">
+										<option value="">All</option>
+										@foreach($vendors as $v)
+											<option value="{{ $v->id }}">
+												{{ $v->vendor_name }}
+											</option>
+										@endforeach
+									</select>
+								</div>
+
+								<!-- Party -->
+								<div class="col-md-3">
+									<label class="form-label">Party Name</label>
+									<select class="form-select"
+											name="party_name"
+											id="party_name">
+										<option value="">All</option>
+										@foreach($parties as $party)
+											<option value="{{ $party }}">
+												{{ $party }}
+											</option>
+										@endforeach
+									</select>
+								</div>
+
+								<!-- Ledger Group -->
+								<div class="col-md-3">
+									<label class="form-label">Ledger Group</label>
+									<select class="form-select"
+											name="ledger_group"
+											id="ledgerGroup"
+											onchange="handleLedgerGroup()">
+
+										<option value="">Select Group</option>
+										<option value="assets">Assets</option>
+										<option value="liabilities">Liabilities</option>
+										<option value="income">Income</option>
+										<option value="expenses">Expenses</option>
+									</select>
+								</div>
+
+								<!-- Ledger Sub Group -->
+								<div class="col-md-3">
+									<label class="form-label">Ledger Sub Group</label>
+									<select class="form-select"
+											name="ledger_sub_group"
+											id="ledgerSubGroup"
+											disabled>
+										<option value="">Select Sub Group</option>
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<!-- Buttons -->
+						<div class="row mt-4">
+							<div class="col-md-6 d-flex gap-2">
+								<button type="submit"
+										class="btn btn-primary flex-fill">
+									<i class="ti ti-settings"></i>
+									Generate Ledger Report
+								</button>
+
+								<button type="reset"
+										class="btn btn-outline-secondary flex-fill">
+									<i class="ti ti-refresh"></i>
+									Clear Filters
+								</button>
+							</div>
+							<div class="col-md-6">
+								<button type="button"
+										class="btn btn-outline-primary"
+										data-bs-toggle="collapse"
+										data-bs-target="#advancedLedgerFilters"
+										aria-expanded="true">
+									<i class="ti ti-adjustments"></i>
+									Advanced Filters
+								</button>
+							</div>
+						</div>
+					</form>
                 </div>
             </div>
 
@@ -176,20 +363,20 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Voucher / Invoice No</th>
+                                    <th>Source</th>
                                     <th>Voucher Type</th>
+									<th>Narration / Description</th>
                                     <th>Counter Ledger</th>
-                                    <th>Narration / Description</th>
-                                    <th>CGST (₹)</th>
+                                    <!--<th>CGST (₹)</th>
                                     <th>SGST (₹)</th>
                                     <th>IGST (₹)</th>
                                     <th>Bank Ledger</th>
                                     <th>Ledger Group</th>
-                                    <th>Sub Group</th>
+                                    <th>Sub Group</th>-->
                                     <th>Debit (₹)</th>
-                                    <th>Credit (₹)</th>
-                                    <th>Payment Status</th>
+                                    <th>Credit (₹)</th>                                    
                                     <th>Running Balance (₹)</th>
-                                    <th>Dr / Cr</th>
+									<th>Payment Status</th>
                                 </tr>
                             </thead>
 
@@ -223,24 +410,30 @@
 						</div>
 					</div>
                     <!-- SUMMARY -->
-                    <div class="row mt-4">
-                        <div class="col-md-4 offset-md-8">
-                            <table id="ledgerSummary" class="table table-bordered">
-                                <tr>
-                                    <th>Closing Balance</th>
-                                    <td class="summary-closing">₹ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <th>Total Debit Amount</th>
-                                    <td class="summary-dr">₹ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <th>Total Credit Amount</th>
-                                    <td class="summary-cr">₹ 0.00</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
+					<div class="row mt-4">
+						<div class="col-md-4 offset-md-8">
+							<table id="ledgerSummary" class="table table-bordered">
+								<tbody>
+									<tr>
+										<th width="55%">Opening Balance</th>
+										<td class="summary-opening">₹ 0.00</td>
+									</tr>
+									<tr>
+										<th>Total Debit</th>
+										<td class="summary-dr">₹ 0.00</td>
+									</tr>
+									<tr>
+										<th>Total Credit</th>
+										<td class="summary-cr">₹ 0.00</td>
+									</tr>
+									<tr class="table-primary fw-bold">
+										<th>Closing Balance</th>
+										<td class="summary-closing">₹ 0.00</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
 
                     <!-- ACTION BUTTONS -->
                     <div class="text-end mt-3">
@@ -510,20 +703,20 @@
 			<tr>
 				<td>${formatDateDMY(r.date)}</td>
 				<td>${r.voucher}</td>
+				<td>${r.source}</td>
 				<td>${r.type}</td>
-				<td>${r.counter}</td>
 				<td>${r.narration}</td>
-				<td>${formatINR(r.cgst)}</td>
+				<td>${r.counter}</td>
+				<!--<td>${formatINR(r.cgst)}</td>
 				<td>${formatINR(r.sgst)}</td>
 				<td>${formatINR(r.igst)}</td>
 				<td>${r.bank}</td>
 				<td>${r.group}</td>
-				<td>${r.sub_group}</td>
+				<td>${r.sub_group}</td>-->
 				<td>${formatINR(r.debit)}</td>
-				<td>${formatINR(r.credit)}</td>
-				<td>${statusBadge}</td>
+				<td>${formatINR(r.credit)}</td>				
 				<td>${formatINR(r.balance)}</td>
-				<td>${r.dc}</td>
+				<td>${statusBadge}</td>
 			</tr>`;
 		});
 
@@ -581,10 +774,11 @@
 				ledgerRows = res.rows || [];
 				currentPage = 1;
 				renderTablePage();
-
-				$('.summary-closing').text(`₹ ${formatINR(res.closing)}`);
+				
+				$('.summary-opening').text(`₹ ${formatINR(Math.abs(res.opening_balance))}`);
 				$('.summary-dr').text(`₹ ${formatINR(res.total_debit)}`);
 				$('.summary-cr').text(`₹ ${formatINR(res.total_credit)}`);
+				$('.summary-closing').text(`₹ ${formatINR(res.closing)}`);
 			}
 		});
 	});

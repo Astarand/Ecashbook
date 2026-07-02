@@ -38,7 +38,44 @@ class CommonController extends Controller
         $this->journalService = $journalService;
     }
 	
-    
+    public function getDropdownTypes(Request $request)
+	{
+		$dropdown_name = $request->dropdown_name;
+		$module = $request->module;
+
+		$expenseTypes = DB::table('dropdown_values')
+			->where('module', $module)
+			->where('dropdown_name', $dropdown_name)
+			->where('status', 1)
+			->orderBy('sort_order')
+			->get(['option_value', 'option_text','type']);
+
+		return response()->json($expenseTypes);
+	}
+	
+	public function getTaxRule(Request $request)
+	{
+		$rule = DB::table('tax_deduction_masters')
+			->where('accounting_module', 'Expense')
+			->where('expense_type', $request->expense_type)
+			->where('expense_head', $request->expense_head)
+			->where('is_active', 1)
+			->first();
+
+		if (!$rule) {
+			return response()->json([
+				'status' => false
+			]);
+		}
+
+		return response()->json([
+			'status'          => true,
+			'tax_treatment'   => $rule->tax_treatment,
+			'allowed_ratio'   => $rule->allowed_ratio,
+			'allow_start'     => $rule->allow_start,
+			'allow_end'       => $rule->allow_end
+		]);
+	}
 	
 	//start new
 	public function getCashInHand(Request $request)

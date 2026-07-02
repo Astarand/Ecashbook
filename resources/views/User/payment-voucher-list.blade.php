@@ -39,149 +39,222 @@
     <!-- [ Main Content ] start -->
     <div class="row">
         <div class="col-sm-12">
-            <!-- Filter Options Card -->
-            <div class="card mb-4" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                <div class="card-header py-3" style="background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; border-top-left-radius: 12px; border-top-right-radius: 12px;">
-                    <h5 class="mb-0 text-primary d-flex align-items-center gap-2 fw-bold" style="font-size: 1.05rem;">
-                        <i class="ti ti-filter f-20"></i> Filter Options
-                    </h5>
-                </div>
-                <div class="card-body p-4">
-                    <form method="GET" action="{{ route('user.PaymentVoucherList') }}">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Proprietorship Company</label>
-                                <select name="prop_Id" class="form-control">
-                                    <option value="">{{ parentCompanyName() }}</option>
-                                    @foreach($proprietorships as $company)
-                                        <option value="{{ $company->id }}"
-                                            {{ request('prop_Id') == $company->id ? 'selected' : '' }}>									
-                                            {{ $company->comp_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+            <!-- Filter Options Card -->			
+			<div class="card mb-4 shadow-sm border-0">
+				<div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+					<h5 class="mb-0 fw-bold text-primary">
+						<i class="ti ti-search me-2"></i>
+						Search Filters
+					</h5>
 
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">From Date</label>
-                                <input type="date"
-                                       name="from_date"
-                                       class="form-control"
-                                       value="{{ request('from_date') }}">
-                            </div>
+					<button class="btn btn-outline-primary btn-sm"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#advancedFilters">
 
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">To Date</label>
-                                <input type="date"
-                                       name="to_date"
-                                       class="form-control"
-                                       value="{{ request('to_date') }}">
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Voucher No</label>
-                                <input type="text"
-                                       name="voucher_no"
-                                       class="form-control"
-                                       placeholder="Search voucher no"
-                                       value="{{ request('voucher_no') }}">
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Bank Name</label>
-                                <select name="bank_id" class="form-select">
-                                    <option value="">All</option>
-                                    @foreach($banks as $bank)
-                                        <option value="{{ $bank->id }}"
-                                            {{ request('bank_id') == $bank->id ? 'selected' : '' }}>
-                                            {{ $bank->bank_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+						<i class="ti ti-adjustments"></i>
+						Advanced Filters
+					</button>
+				</div>
 
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Party Name</label>
-                                <input type="text"
-                                       name="party_name"
-                                       class="form-control"
-                                       placeholder="Search party"
-                                       value="{{ request('party_name') }}">
-                            </div>
+				<div class="card-body">
+					<form method="GET" action="{{ route('user.PaymentVoucherList') }}">
+						<div class="row g-3">
+							<!-- Company -->
+							<div class="col-lg-3 col-md-6">
+								<label class="form-label">Company</label>
+								<select name="prop_Id" class="form-select">
+									<option value="">{{ parentCompanyName() }}</option>
 
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Payment Mode</label>
-                                <select name="payment_mode" class="form-select">
-                                    <option value="">All</option>
-                                    <option value="Cash" {{ request('payment_mode') == 'Cash' ? 'selected' : '' }}>Cash</option>
-                                    <option value="Bank" {{ request('payment_mode') == 'Bank' ? 'selected' : '' }}>Bank</option>
-                                    <option value="UPI" {{ request('payment_mode') == 'UPI' ? 'selected' : '' }}>UPI</option>
-                                </select>
-                            </div>
+									@foreach($proprietorships as $company)
+									<option value="{{ $company->id }}"
+										{{ request('prop_Id')==$company->id?'selected':'' }}>
+										{{ $company->comp_name }}
+									</option>
+									@endforeach
 
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Payment Status</label>
-                                <select name="is_paid" class="form-select">
-                                    <option value="">All</option>
-                                    <option value="1" {{ request('is_paid') == '1' ? 'selected' : '' }}>
-                                        Paid
-                                    </option>
-                                    <option value="0" {{ request('is_paid') === '0' ? 'selected' : '' }}>
-                                        Outstanding
-                                    </option>
-                                </select>
-                            </div>
+								</select>
+							</div>
 
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Voucher Type</label>
-                                <select name="voucher_type" class="form-select">
-                                    <option value="">All</option>
-                                    <option value="Payment Voucher"
-                                        {{ request('voucher_type') == 'Payment Voucher' ? 'selected' : '' }}>
-                                        Payment
-                                    </option>
-                                    <option value="Receipt Voucher"
-                                        {{ request('voucher_type') == 'Receipt Voucher' ? 'selected' : '' }}>
-                                        Receipt
-                                    </option>
-                                </select>
-                            </div>
+							<!-- From -->
+							<div class="col-lg-3 col-md-6">
+								<label class="form-label">From Date</label>
+								<input type="date"
+									   name="from_date"
+									   class="form-control"
+									   value="{{ request('from_date') }}">
+							</div>
 
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Party Type</label>
-                                <select name="party_type" class="form-select">
-                                    <option value="">All</option>
-                                    <option value="Customer"
-                                        {{ request('party_type') == 'Customer' ? 'selected' : '' }}>
-                                        Customer
-                                    </option>
-                                    <option value="Vendor"
-                                        {{ request('party_type') == 'Vendor' ? 'selected' : '' }}>
-                                        Vendor
-                                    </option>
-                                    <option value="Employee"
-                                        {{ request('party_type') == 'Employee' ? 'selected' : '' }}>
-                                        Employee
-                                    </option>
-                                    <option value="Other"
-                                        {{ request('party_type') == 'Other' ? 'selected' : '' }}>
-                                        Other
-                                    </option>
-                                </select>
-                            </div>
+							<!-- To -->
+							<div class="col-lg-3 col-md-6">
+								<label class="form-label">To Date</label>
+								<input type="date"
+									   name="to_date"
+									   class="form-control"
+									   value="{{ request('to_date') }}">
+							</div>
 
-                            <div class="col-md-6 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center gap-2 fw-semibold flex-grow-1" style="height: 42px; border-radius: 8px; font-size: 0.95rem;">
-                                    <i class="ti ti-search f-18"></i> Search Records
-                                </button>
-                                <a href="{{ route('user.PaymentVoucherList') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 fw-semibold flex-grow-1" style="height: 42px; border-radius: 8px; font-size: 0.95rem;">
-                                    <i class="ti ti-refresh f-18"></i> Clear Filters
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+							<!-- Voucher -->
+							<div class="col-lg-3 col-md-6">
+								<label class="form-label">Voucher No</label>
+								<input type="text"
+									   name="voucher_no"
+									   class="form-control"
+									   placeholder="Voucher No"
+									   value="{{ request('voucher_no') }}">
+							</div>
+
+							<!-- Party -->
+							<div class="col-lg-3 col-md-6">
+								<label class="form-label">Party Name</label>
+								<input type="text"
+									   name="party_name"
+									   class="form-control"
+									   placeholder="Party Name"
+									   value="{{ request('party_name') }}">
+							</div>
+
+							<!-- Voucher Type -->
+							<div class="col-lg-3 col-md-6">
+								<label class="form-label">Voucher Type</label>
+
+								<select name="voucher_type" class="form-select">
+
+									<option value="">All</option>
+
+									<option value="Payment Voucher"
+										{{ request('voucher_type')=='Payment Voucher'?'selected':'' }}>
+										Payment
+									</option>
+
+									<option value="Receipt Voucher"
+										{{ request('voucher_type')=='Receipt Voucher'?'selected':'' }}>
+										Receipt
+									</option>
+
+								</select>
+
+							</div>
+
+							<!-- Payment Mode -->
+							<div class="col-lg-3 col-md-6">
+
+								<label class="form-label">Payment Mode</label>
+
+								<select name="payment_mode" class="form-select">
+
+									<option value="">All</option>
+
+									<option value="Cash"
+										{{ request('payment_mode')=='Cash'?'selected':'' }}>
+										Cash
+									</option>
+
+									<option value="Bank"
+										{{ request('payment_mode')=='Bank'?'selected':'' }}>
+										Bank
+									</option>
+
+									<option value="UPI"
+										{{ request('payment_mode')=='UPI'?'selected':'' }}>
+										UPI
+									</option>
+
+								</select>
+
+							</div>
+
+						</div>
+
+						<!-- Advanced Filters -->
+
+						<div class="collapse mt-4 {{ request()->hasAny(['bank_id','is_paid','party_type','record_type']) ? 'show' : '' }}" id="advancedFilters">
+							<hr>
+							<h6 class="fw-bold text-secondary mb-3">
+								<i class="ti ti-filter me-2"></i>
+								Advanced Filters
+							</h6>
+
+							<div class="row g-3">
+								<!-- Bank -->
+								<div class="col-lg-3 col-md-6">
+									<label class="form-label">Bank Name</label>
+									<select name="bank_id" class="form-select">
+										<option value="">All</option>
+										@foreach($banks as $bank)
+										<option value="{{ $bank->id }}"
+											{{ request('bank_id')==$bank->id?'selected':'' }}>
+											{{ $bank->bank_name }}
+										</option>
+										@endforeach
+									</select>
+								</div>
+
+								<!-- Payment Status -->
+
+								<div class="col-lg-3 col-md-6">
+									<label class="form-label">Payment Status</label>
+									<select name="is_paid" class="form-select">
+										<option value="">All</option>
+										<option value="1" {{ request('is_paid')=='1'?'selected':'' }}>Paid</option>
+										<option value="0" {{ request('is_paid')=='0'?'selected':'' }}>Outstanding</option>
+									</select>
+								</div>
+
+								<!-- Party Type -->
+
+								<div class="col-lg-3 col-md-6">
+									<label class="form-label">Party Type</label>
+									<select name="party_type" class="form-select">
+										<option value="">All</option>
+										<option value="Customer"
+											{{ request('party_type')=='Customer'?'selected':'' }}>
+											Customer
+										</option>
+										<option value="Vendor"
+											{{ request('party_type')=='Vendor'?'selected':'' }}>
+											Vendor
+										</option>
+										<option value="Employee"
+											{{ request('party_type')=='Employee'?'selected':'' }}>
+											Employee
+										</option>
+										<option value="Other"
+											{{ request('party_type')=='Other'?'selected':'' }}>
+											Other
+										</option>
+									</select>
+								</div>
+
+								<!-- Entry Mode -->
+
+								<div class="col-lg-3 col-md-6">
+									<label class="form-label">Entry Mode</label>
+									<select name="record_type" class="form-select">
+										<option value="">All</option>
+										<option value="Posted" {{ request('record_type')=='Posted'?'selected':'' }}>Posted</option>
+										<option value="Manual" {{ request('record_type')=='Manual'?'selected':'' }}>Manual</option>
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<!-- Buttons -->
+						<div class="mt-4 d-flex justify-content-end gap-2">
+							<button type="submit" class="btn btn-primary px-4">
+								<i class="ti ti-search"></i>
+								Search
+							</button>
+
+							<a href="{{ route('user.PaymentVoucherList') }}"
+							   class="btn btn-outline-secondary px-4">
+								<i class="ti ti-refresh"></i>
+								Reset
+							</a>
+						</div>
+					</form>
+				</div>
+			</div>
 
             <!-- Table Card -->
             <div class="card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
@@ -270,9 +343,7 @@
 
                         </tbody>
                     </table>
-					<div class="mt-3 d-flex justify-content-end">
-						{{ $data->links('pagination::bootstrap-4') }}
-					</div>
+					
                 </div>
             </div>
         </div>
@@ -337,9 +408,12 @@
                             <label class="form-label">Party Type <span class="text-danger">*</span></label>
                             <select name="party_type" id="party_type" class="form-select">
                                 <option value="">Please Select</option>
-                                <option value="Customer">Customer</option>
-                                <option value="Vendor">Vendor</option>
-                                <option value="Employee">Employee</option>
+                                <option value="Customer">Customer ( Sales / Receipt )</option>
+                                <option value="Vendor">Vendor ( Purchase / Payment ) </option>
+                                <option value="Employee">Employee ( Salary / Advance )</option>
+                                <option value="Bank">Bank Transaction</option>
+                                <option value="Cash">Cash Transaction</option>
+                                <option value="Government Payments">Government Payments</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
@@ -357,13 +431,18 @@
 						</div>
 
                         <div class="col-md-6 mb-2">
-                            <label class="form-label">Transaction Details <span class="text-danger">*</span></label>
+                            <label class="form-label">Purpose of Transaction <span class="text-danger">*</span></label>
                             <select name="transaction_details" id="transaction_details" class="form-select">
                                 <option value="" selected>Please Select</option>
                                 <option value="Against Invoice">Against Invoice</option>
                                 <option value="Advance">Advance</option>
-                                <option value="Adjustment">Adjustment</option>
+                                <option value="Adjustment">Payment Adjustment</option>
                                 <option value="Direct Expense">Direct Expense</option>
+                                <option value="Salary Payment">Salary Payment</option>
+                                <option value="Loan Payment">Loan Payment</option>
+                                <option value="Tax Payment">Tax Payment</option>
+                                <option value="Contra Transfer">Contra Transfer</option>
+                                <option value="Opening Balance">Opening Balance</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
@@ -417,10 +496,10 @@
 
                         
 
-                        <div class="col-md-12 mb-2">
+                        <!--<div class="col-md-12 mb-2">
                             <label class="form-label">Purpose <span class="text-danger">*</span></label>
                             <textarea name="narration" id="narration" class="form-control" rows="2" placeholder="Enter purpose"></textarea>
-                        </div>
+                        </div>-->
 
                         <div class="col-md-6 mb-2">
                             <label class="form-label">Attachment</label>
@@ -625,7 +704,7 @@ $(document).ready(function () {
 		$('#bank_id').html(`<option value="">Please Select</option>`);
 		$('#bankWrap').hide();
 		$('#reference_id').val('');
-		$('#narration').val('');
+		//$('#narration').val('');
 		$('#approved_by').val('');
 		$('#attachment').val('');
 		$('#attachmentPreview').html('');
@@ -633,6 +712,7 @@ $(document).ready(function () {
 
 	function resetFullFormKeepVoucher()
 	{
+		$('#party_type').val('');
 		resetPartyFields();
 		resetTransactionFields();
 		resetPaymentFields();
@@ -1001,7 +1081,7 @@ $(document).ready(function () {
 			toggleBankField(res.bank_id);
 			$('#is_paid').val(res.is_paid);
 			$('#reference_id').val(res.reference_id);
-			$('#narration').val(res.narration);
+			//$('#narration').val(res.narration);
 			$('#approved_by').val(res.approved_by);
 
 			// party

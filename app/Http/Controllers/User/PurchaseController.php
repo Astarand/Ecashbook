@@ -41,7 +41,7 @@ class PurchaseController extends Controller
     {
         $title = 'Purchase Invoice';
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Purchase');
 		
 		//start ca-accountant access
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
@@ -95,19 +95,21 @@ class PurchaseController extends Controller
 							->get();
 			$array[$val->id]['cust_name'] = isset($customerName[0]->vendor_name)?$customerName[0]->vendor_name:"";
 			$array[$val->id]['cust_phone'] = isset($customerName[0]->vendor_phone)?$customerName[0]->vendor_phone:"";
-			if($val->id >0){
-				$salesValue = DB::table('purchase_values')
-								->select(DB::raw('
-									SUM(
-										COALESCE(purchase_values.amount, 0) +
-										COALESCE(purchase_values.tax_amt, 0)
-									) as grandTotal
-								'))
-								->where('sid', $val->id)
-								->get();
-				$array[$val->id]['grandTotal'] = isset($salesValue[0]->grandTotal)?getRoundedAmount($salesValue[0]->grandTotal):0;
+			if($val->id >0){				
+				$data = DB::table('purchase_values as pv')
+							->leftJoin('purchases as p', 'p.id', '=', 'pv.sid')
+							->selectRaw('
+								SUM(COALESCE(pv.amount,0) + COALESCE(pv.tax_amt,0)) as grandTotal,
+								COALESCE(MAX(p.shipping_cost),0) as shipping_cost
+							')
+							->where('pv.sid', $val->id)
+							->first();
+
+				$array[$val->id]['shipping_cost'] = $data->shipping_cost;
+				$array[$val->id]['grandTotal'] = getRoundedAmount(($data->grandTotal ?? 0) + ($data->shipping_cost ?? 0));
 			}else{
 				$array[$val->id]['grandTotal'] = 0;
+				$array[$val->id]['shipping_cost'] = 0;
 
 			}
 		}
@@ -240,12 +242,28 @@ class PurchaseController extends Controller
 
 		return $newInvoiceNumber;
 	}
+	
+	public function purchaseShippingCost(Request $request)
+	{
+		DB::table('purchases')
+			->where('id',$request->sId)
+			->update([
+				'shipping_cost'=>$request->shipping_cost
+			]);
+
+		//return $this->purchase_items_display($request);
+		$sales_values = $this->items_purchase_list($request->sId);
+		//echo "<pre>"; print_r($sales_values);exit;
+		return view('User.ajax-purchase-invoice-display')->with([
+			'sales_values'=>$sales_values,
+		]);
+	}
 
 
     public function CreatePurchaseInvoices()
     {
         $userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$invoiceNo = $this->create_purchase_invoice_number($userId);
 		$compData = DB::table('company_profiles')
 								->select(DB::raw('comp_name,comp_phone,comp_email,comp_pan_no,gst_no,comp_bill_pin,comp_bill_addone,comp_bill_addtwo,comp_bill_name,comp_bill_mobile_no,comp_bill_state,comp_bill_city'))
@@ -815,7 +833,12 @@ class PurchaseController extends Controller
 
     public function items_purchase_list($sid)
 	{
-
+		$purchase = DB::table('purchases')
+            ->select('shipping_cost')
+            ->where('id', $sid)
+            ->first();
+		$shipping_cost = $purchase->shipping_cost ?? 0;
+		
 		$sales_values = DB::table('purchase_values')
 								->select(DB::raw('purchase_values.*'))
 								->where('sid', '=', $sid)
@@ -836,6 +859,7 @@ class PurchaseController extends Controller
 			$array[$val->id]['amount'] = $val->amount;
 			$array[$val->id]['tax_type'] = $val->tax_type;
 			$array[$val->id]['gst_trans'] = $val->gst_trans;
+			$array[$val->id]['shipping_cost'] = $shipping_cost;
 
 			if($val->prod_id >0){
 				$item = Product::where('id', '=', $val->prod_id)->get();
@@ -863,7 +887,7 @@ class PurchaseController extends Controller
 			return redirect('/purchase-invoice');
 		}
 		$uid = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$sId = base64_decode($sId);
 		$sales = DB::table('purchases')
 								->where('id', '=', $sId)
@@ -973,7 +997,7 @@ class PurchaseController extends Controller
 		} else {
 			$uid = session('compId'); //ca-accountant access
 		}
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$sales = DB::table('purchases')
 								->where('id', '=', $sId)
 								->get();
@@ -1613,7 +1637,7 @@ class PurchaseController extends Controller
     {
 		$title = 'Purchase Credit Dabit Notessss';
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Purchase');
 
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 			
@@ -1681,7 +1705,7 @@ class PurchaseController extends Controller
 
     public function AddPurchaseCreditDebit()
     {
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$inv_voucher = DB::table('purchases')
 								->where('added_by','=',currentOwnerId())
 								->select('id', 'inv_num')
@@ -2014,7 +2038,7 @@ class PurchaseController extends Controller
 
 	public function edit_purchase_invoice_credit_debit($sId)  {
 
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$sId = base64_decode($sId);
 		$sales = DB::table('voucher_purchases')
 								->where('id', '=', $sId)

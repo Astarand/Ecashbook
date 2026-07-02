@@ -46,7 +46,7 @@ class ProfitLossController extends Controller
 			$userId = getAccessCompanyId($request);
 		}
 		//end ca-accountant access
-		checkCoreAccess('Financial Reports');
+		checkCoreAccess('Profit & Loss');
         return view('User.Reports.profit-loss-report');
     }
 	
@@ -221,15 +221,21 @@ class ProfitLossController extends Controller
 		| Purchases
 		|--------------------------------------------------------------------------
 		*/
-		$purchases = DB::table('purchases as p')
-						->leftJoin('purchase_values as pv', 'pv.sid', '=', 'p.id')
+		$itemTotal = DB::table('purchase_values as pv')
+						->join('purchases as p', 'p.id', '=', 'pv.sid')
 						->where('p.added_by', $userId)
 						->where('p.status', 1)
 						->whereBetween('p.inv_date', [$startDate, $endDate])
-						->selectRaw('SUM(COALESCE(pv.amount,0) + COALESCE(pv.tax_amt,0)) as total_purchase')
-						->value('total_purchase');
+						->selectRaw('SUM(COALESCE(pv.amount,0) + COALESCE(pv.tax_amt,0)) as total')
+						->value('total');
 
-		$purchases = $purchases ?? 0;
+		$shippingTotal = DB::table('purchases')
+						->where('added_by', $userId)
+						->where('status', 1)
+						->whereBetween('inv_date', [$startDate, $endDate])
+						->sum('shipping_cost');
+
+		$purchases = ($itemTotal ?? 0) + ($shippingTotal ?? 0);
 		/*
 		|--------------------------------------------------------------------------
 		| Trade Payable
@@ -254,27 +260,48 @@ class ProfitLossController extends Controller
 		| Direct Expenses
 		|--------------------------------------------------------------------------
 		*/
+		$directExpenseHeads = DB::table('dropdown_values')
+								->where('module', 'Expense')
+								->where('dropdown_name', 'direct')
+								->where('status', 1)
+								->orderBy('sort_order')
+								->get();
+
+		$directExpenseLabels = $directExpenseHeads->pluck('option_text', 'option_value')->toArray();
+		$allowedDirectExpenseTypes = $directExpenseHeads->pluck('option_value')->toArray();
+
 		$directExpenseDetails = DB::table('expenses')
-									->where('added_by', $userId)
-									->where('status', 1)
-									->where('expense_cat', 'direct')
-									->whereBetween('expense_date', [$startDate, $endDate])
-									->select(
-										'expense_type',
-										DB::raw("
-											SUM(
-												CASE
-													WHEN payment_status = 'full'
-														THEN COALESCE(expense_amt,0)
-													ELSE
-														COALESCE(advance_amount,0)
-												END
-											) as total
-										")
-									)
-									->groupBy('expense_type')
-									->orderBy('expense_type')
-									->get();
+								->where('added_by', $userId)
+								->where('status', 1)
+								->where('expense_cat', 'direct')
+								->whereBetween('expense_date', [$startDate, $endDate])
+								->whereIn('expense_type', $allowedDirectExpenseTypes)
+								->select(
+									'expense_type',
+									DB::raw("
+										SUM(
+											CASE
+												WHEN payment_status = 'full'
+												THEN COALESCE(expense_amt,0)
+												ELSE COALESCE(advance_amount,0)
+											END
+										) as total
+									")
+								)
+								->groupBy('expense_type')
+								->get();
+								
+		$directExpenseArray = [];
+		// Initialize all heads
+		foreach ($directExpenseHeads as $head) {
+			$directExpenseArray[$head->option_text] = 0;
+		}
+		// Fill actual values
+		foreach ($directExpenseDetails as $expense) {
+			$label = $directExpenseLabels[$expense->expense_type]?? $expense->expense_type;
+			$directExpenseArray[$label] += $expense->total;
+		}
+		$directExpenseArray = array_filter($directExpenseArray,fn($value) => $value > 0);
 
 		/*
 		|--------------------------------------------------------------------------
@@ -330,171 +357,39 @@ class ProfitLossController extends Controller
 							->value('stock_value') ?? 0;
 
 		$closingStock = $closingStock ?? 0;
-		$directExpenseTotal = $directExpenseDetails->sum('total');
-		$cogsTotal = ($openingStock + ($purchases - $tradePayable) + $directExpenseTotal - $closingStock);
+		$directExpenseTotal = array_sum($directExpenseArray);
+		//$cogsTotal = ($openingStock + ($purchases - $tradePayable) + $directExpenseTotal - $closingStock);
+		$cogsTotal = ($openingStock + $purchases + $directExpenseTotal - $closingStock);
 		$cogs = [
 			'opening_stock'  => $openingStock,
 			'purchases'      => $purchases,
 			'trade_payable'  => $tradePayable,
-			'direct_expense' => $directExpenseDetails,
+			'direct_expense' => $directExpenseArray,
 			'directExpenseTotal'=> $directExpenseTotal,
 			'closing_stock'  => $closingStock,
 			'total_cogs'     => $cogsTotal,
 		];
 
 		/* ================================
-		 | EXPENSES
+		 | INDIRECT EXPENSES
 		 ================================*/			
-		//Indirect Expense Category
-		$allowedExpenseTypes = [
-				'employee_benefits',
-				'rent_expense',
-				'electricity_expense',
-				'internet_communication',
-				'office_expenses',
-				'printing_stationery',
-				'travel_conveyance',
-				'repair_maintenance',
-				'professional_fees',
-				'audit_fees',
-				'legal_charges',
-				'bank_charges',
-				'interest_expense',
-				'depreciation',
-				'insurance_expense',
-				'marketing_advertisement',
-				'miscellaneous_expenses',
+		//Indirect Expense Category		
+		$expenseHeads = DB::table('dropdown_values')
+			->where('module', 'Expense')
+			->where('dropdown_name', 'indirect')
+			->where('status', 1)
+			->orderBy('sort_order')
+			->get();
 
-				'income_tax_paid',
-				'gst_interest_penalty',
-				'late_filing_penalty',
-				'personal_expenses',
-				'cash_payment_above_income_tax_limit',
-				'donation_non_approved',
-				'provision_for_expenses',
-				'provision_for_doubtful_debts',
-				'penalty_for_law_violation',
-				'wealth_tax_personal_tax',
-				'capital_loss',
-				'drawings_owner_withdrawals',
-				'csr_expense(certain_cases)',
-				'unpaid_pf_esi_beyond_due_date',
-				'tds_not_deducted_deposited',
-				'expenses_without_proper_bills',
-
-				'interest_on_business_loan',
-				'software_subscription',
-				'hosting_cloud_expense',
-				'motor_car_expense',
-				'entertainment_expense',
-				'director_expense',
-			];
-			
-		//Indirect Expense Labels
-		$expenseLabels = [
-
-			// Employee
-			'employee_benefits'   => 'Employee Expenses (Salary, Benefits)',
-			'Employee Expenses'   => 'Employee Expenses (Salary, Benefits)',
-
-			// Rent
-			'rent_expense'        => 'Rent Expense',
-			'Rent Expense'        => 'Rent Expense',
-
-			// Electricity
-			'electricity_expense' => 'Electricity Expense',
-			'Electricity Expense' => 'Electricity Expense',
-
-			// Internet
-			'internet_communication'      => 'Internet & Communication',
-			'Internet & Communication'    => 'Internet & Communication',
-
-			// Office
-			'office_expenses'    => 'Office Expenses',
-			'Office Expenses'    => 'Office Expenses',
-
-			// Printing
-			'printing_stationery'      => 'Printing & Stationery',
-			'Printing & Stationery'    => 'Printing & Stationery',
-
-			// Travel
-			'travel_conveyance'      => 'Travel & Conveyance',
-			'Travel & Conveyance'    => 'Travel & Conveyance',
-
-			// Repair
-			'repair_maintenance'      => 'Repair & Maintenance',
-			'Repair & Maintenance'    => 'Repair & Maintenance',
-
-			// Professional
-			'professional_fees'   => 'Professional Fees',
-			'Professional Fees'   => 'Professional Fees',
-
-			// Audit
-			'audit_fees'          => 'Audit Fees',
-			'Audit Fees'          => 'Audit Fees',
-
-			// Legal
-			'legal_charges'       => 'Legal Charges',
-			'Legal Charges'       => 'Legal Charges',
-
-			// Bank
-			'bank_charges'        => 'Bank Charges',
-			'Bank Charges'        => 'Bank Charges',
-
-			// Interest
-			'interest_expense'    => 'Interest Expense',
-			'Interest Expense'    => 'Interest Expense',
-
-			// Depreciation
-			'depreciation'        => 'Depreciation',
-			'Depreciation'        => 'Depreciation',
-
-			// Insurance
-			'insurance_expense'   => 'Insurance Expense',
-			'Insurance Expense'   => 'Insurance Expense',
-
-			// Marketing
-			'marketing_advertisement' => 'Marketing & Advertisement',
-			'Marketing & Advertisement' => 'Marketing & Advertisement',
-
-			// Freight
-			'Freight & Transport' => 'Freight & Transport',
-
-			// Misc
-			'miscellaneous_expenses' => 'Miscellaneous Expenses',
-			'Miscellaneous Expenses' => 'Miscellaneous Expenses',
-
-			'income_tax_paid'                  => 'Income Tax Paid',
-			'gst_interest_penalty'             => 'GST Interest & Penalty',
-			'late_filing_penalty'              => 'Late Filing Penalty',
-			'personal_expenses'                => 'Personal Expenses',
-			'cash_payment_above_income_tax_limit' => 'Cash Payment above Income Tax limit',
-			'donation_non_approved'            => 'Donation (Non-approved)',
-			'provision_for_expenses'           => 'Provision for Expenses',
-			'provision_for_doubtful_debts'     => 'Provision for Doubtful Debts',
-			'penalty_for_law_violation'        => 'Penalty for Law Violation',
-			'wealth_tax_personal_tax'          => 'Wealth Tax / Personal Tax',
-			'capital_loss'                     => 'Capital Loss',
-			'drawings_owner_withdrawals'       => 'Drawings / Owner Withdrawals',
-			'csr_expense(certain_cases)'       => 'CSR Expense (certain cases)',
-			'unpaid_pf_esi_beyond_due_date'    => 'Unpaid PF/ESI beyond due date',
-			'tds_not_deducted_deposited'       => 'TDS not deducted / deposited',
-			'expenses_without_proper_bills'    => 'Expenses without proper bills',
-			'interest_on_business_loan'        => 'Interest on Business Loan',
-			'software_subscription'            => 'Software Subscription',
-			'hosting_cloud_expense'            => 'Hosting / Cloud Expense',
-			'motor_car_expense'                => 'Motor Car Expense',
-			'entertainment_expense'            => 'Entertainment Expense',
-			'director_expense'                 => 'Director Expense',
-		];
+		$allowedExpenseTypes = $expenseHeads->pluck('option_value')->toArray();
+		$expenseLabels = $expenseHeads->pluck('option_text', 'option_value')->toArray();
 
 		$indirectExpenses = DB::table('expenses')
 			->whereBetween('expense_date', [$startDate, $endDate])
 			->where('added_by', $userId)
 			->where('status', 1)
 			->where('expense_cat', 'indirect')
-			//->whereIn('expense_type', $allowedExpenseTypes)
-			->whereIn('expense_type', array_keys($expenseLabels))
+			->whereIn('expense_type', $allowedExpenseTypes)
 			->select(
 				'expense_type',
 				DB::raw("
@@ -508,7 +403,6 @@ class ProfitLossController extends Controller
 				")
 			)
 			->groupBy('expense_type')
-			->orderBy('expense_type')
 			->get();
 
 		$depreciationExpense = DB::table('assets')
@@ -525,9 +419,9 @@ class ProfitLossController extends Controller
 							->where('status', 1)
 							->where('expense_cat', 'indirect')
 							->whereIn('expense_type', [
-								'Interest Expense',
-								'Bank Charges',
-								'OD / CC Interest',
+								'interest_expense',
+								'bank_charges',
+								'interest_on_business_loan',
 								'Processing Charges'
 							])
 							->select(
@@ -548,26 +442,17 @@ class ProfitLossController extends Controller
 							->pluck('total', 'expense_type')
 							->toArray();
 							
-		//$expenseArray = $indirectExpenses->pluck('total', 'expense_type')->toArray();
-		//$totalIndirectExpenses = array_sum($expenseArray);
-		/*$expenseArray = [];
-		foreach($indirectExpenses as $expense)
-		{
-			$label = $expenseLabels[$expense->expense_type] ?? $expense->expense_type;
-
-			$expenseArray[$label] = $expense->total;
-		}*/
-		$expenseArray = [];
-
-		foreach ($indirectExpenses as $expense) {
-
-			$head = $expenseLabels[$expense->expense_type] ?? $expense->expense_type;
-
-			$expenseArray[$head] = ($expenseArray[$head] ?? 0) + $expense->total;
+		$indirectExpenseArray = [];
+		// Create all heads with zero amount first
+		foreach ($expenseHeads as $head) {
+			$indirectExpenseArray[$head->option_text] = 0;
 		}
-
-		ksort($expenseArray);
-		$totalIndirectExpenses = array_sum($expenseArray);
+		foreach ($indirectExpenses as $expense) {
+			$label = $expenseLabels[$expense->expense_type] ?? $expense->expense_type;
+			$indirectExpenseArray[$label] += $expense->total;
+		}
+		$indirectExpenseArray = array_filter($indirectExpenseArray,fn($value) => $value > 0);
+		$totalIndirectExpenses = array_sum($indirectExpenseArray);
 		
 		$operatingIncomeTotal = collect($operatingIncomeDetails)->sum('total');
 		$nonOperatingIncomeTotal = collect($nonOperatingIncomeDetails)->sum('total');
@@ -585,7 +470,7 @@ class ProfitLossController extends Controller
 		//Profit Before Tax
 		$pbt = ($ebit - $totalFinanceCost);
 		//Tax Expense
-		$current_tax = $this->profitLossService->getCurrentTax($userId, $startDate, $endDate);
+		$current_tax = $this->profitLossService->getCurrentTax($userId, $startDate, $endDate, $pbt);
 		$start = \Carbon\Carbon::parse($startDate)->subYear();
 		$end   = \Carbon\Carbon::parse($endDate)->subYear();
 		$current_tax_expenses_prior_years = $this->profitLossService->getCurrentTaxPriorYear($userId, $startDate, $endDate);
@@ -616,7 +501,7 @@ class ProfitLossController extends Controller
 				'total_sales_income' => $totalRevenue,
 			],
 			'cogs' => $cogs,
-			'expenses' => $expenseArray,
+			'expenses' => $indirectExpenseArray,
 			'ebitda' => $ebitda,
 			'depreciationExp' => $depreciationExp,
 			'ebit' => $ebit,

@@ -8,56 +8,6 @@
 <!-- Flatpickr CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-@php
-    $userId = Auth::user()->id;
-    $employeeDetails = null;
-    $companyName = 'E-Cashbook Corp';
-    $managerName = 'Aditya Sen';
-
-    try {
-        $employeeDetails = DB::table('users')
-            ->leftJoin('employees', 'users.id', '=', 'employees.empId')
-            ->leftJoin('depertments', 'employees.dept_id', '=', 'depertments.id')
-            ->leftJoin('designations', 'employees.desig_id', '=', 'designations.id')
-            ->where('users.id', $userId)
-            ->select(
-                'users.name as user_name',
-                'users.email as user_email',
-                'users.avatar as user_avatar',
-                'employees.employee_id',
-                'employees.profile_img',
-                'employees.work_location',
-                'employees.emp_status',
-                'depertments.dept_name',
-                'designations.designation_name'
-            )
-            ->first();
-
-        $companyName = DB::table('users')
-            ->where('id', Auth::user()->user_add_by)
-            ->value('company_name') ?? 'E-Cashbook Corp';
-
-        $managerName = DB::table('users')
-            ->where('id', Auth::user()->user_add_by)
-            ->value('name') ?? 'Aditya Sen';
-    } catch (\Exception $e) {
-        // Fallback
-    }
-
-    $profileImg = ($employeeDetails && $employeeDetails->profile_img)
-        ? asset('storage/user_employee/' . $employeeDetails->profile_img)
-        : (($employeeDetails && $employeeDetails->user_avatar)
-            ? asset('storage/' . $employeeDetails->user_avatar)
-            : asset('assets/images/user/avatar-2.jpg'));
-
-    function getStatusBadgeClass($status) {
-        $s = strtolower($status ?? '');
-        if (str_contains($s, 'probation')) return 'bg-warning text-dark';
-        if (str_contains($s, 'notice')) return 'bg-danger text-white';
-        return 'bg-success text-white';
-    }
-@endphp
-
 <!-- Custom Premium Dashboard Styling -->
 <style>
     /* Card design system */
@@ -359,6 +309,19 @@
         font-size: 1.15rem;
         flex-shrink: 0;
     }
+
+    .bar-stars .ph-star {
+        font-size: 14px;
+        margin-right: 2px;
+    }
+
+    .bar-stars .text-warning {
+        color: #f59e0b !important;
+    }
+
+    .bar-stars .opacity-20 {
+        opacity: .2;
+    }
 </style>
 
 <div class="pc-content py-3">
@@ -374,42 +337,76 @@
         <div class="card border-0 shadow-sm profile-banner mb-4" id="employee-welcome-banner">
             <div class="card-body p-4">
                 <div class="d-flex flex-column flex-md-row align-items-center gap-4">
+
+                    <!-- Profile Image -->
                     <div class="position-relative">
-                        <img src="{{ $profileImg }}" alt="Employee Photo" class="rounded-circle profile-photo shadow">
-                        <span class="position-absolute bottom-0 end-0 badge rounded-pill bg-success border border-2 border-dark px-2 py-1 fs-12">
-                            <i class="ph-fill ph-circle text-white me-1" style="font-size: 7px;"></i>Online
+                        <img src="{{ asset('assets/images/user/avatar-2.jpg') }}"
+                            alt="Employee Photo"
+                            id="employeePhoto"
+                            class="rounded-circle profile-photo shadow">
+
+                        <span id="employeeOnlineStatus"
+                            class="position-absolute bottom-0 end-0 badge rounded-pill bg-success border border-2 border-dark px-2 py-1 fs-12">
+                            <i class="ph-fill ph-circle text-white me-1" style="font-size:7px;"></i>
+                            Online
                         </span>
                     </div>
 
+                    <!-- Employee Info -->
                     <div class="flex-grow-1 text-center text-md-start">
+
                         <div class="d-flex flex-column flex-md-row align-items-center gap-2 mb-2 justify-content-center justify-content-md-start">
-                            <h3 class="mb-0 fw-bold text-white fs-4">{{ $employeeDetails ? $employeeDetails->user_name : Auth::user()->name }}</h3>
-                            <span class="badge bg-white-20 text-white rounded-pill px-3 py-1 fs-11 fw-semibold">
-                                ID: {{ $employeeDetails ? $employeeDetails->employee_id : 'EMP-001' }}
+
+                            <h3 class="mb-0 fw-bold text-white fs-4" id="employeeName">
+                                Loading...
+                            </h3>
+
+                            <span class="badge bg-white-20 text-white rounded-pill px-3 py-1 fs-11 fw-semibold"
+                                id="employeeId">
+                                ID: --
                             </span>
-                            <span class="badge rounded-pill px-3 py-1 fs-11 fw-bold {{ getStatusBadgeClass($employeeDetails ? $employeeDetails->emp_status : 'Active') }}">
-                                {{ ucfirst($employeeDetails ? $employeeDetails->emp_status : 'Active') }}
+
+                            <span class="badge rounded-pill px-3 py-1 fs-11 fw-bold bg-success text-white"
+                                id="employeeStatus">
+                                Active
                             </span>
+
                         </div>
 
                         <p class="text-white-80 mb-3 fs-14 fw-medium">
-                            <i class="ph-duotone ph-briefcase me-1 text-warning"></i> {{ $employeeDetails ? $employeeDetails->designation_name : 'Associate Accountant' }}
+                            <i class="ph-duotone ph-briefcase me-1 text-warning"></i>
+                            <span id="employeeDesignation">Loading...</span>
+
                             <span class="mx-2 opacity-50">|</span>
-                            <i class="ph-duotone ph-buildings me-1 text-warning"></i> {{ $employeeDetails ? $employeeDetails->dept_name : 'Finance & Accounts' }}
+
+                            <i class="ph-duotone ph-buildings me-1 text-warning"></i>
+                            <span id="employeeDepartment">Loading...</span>
                         </p>
 
                         <div class="row g-2 text-white-70 fs-13">
+
                             <div class="col-sm-6 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
                                 <i class="ph-duotone ph-user me-2 text-warning fs-16"></i>
-                                <span><strong>Manager:</strong> {{ $managerName }}</span>
+                                <span>
+                                    <strong>Manager:</strong>
+                                    <span id="managerName">Loading...</span>
+                                </span>
                             </div>
+
                             <div class="col-sm-6 col-md-4 d-flex align-items-center justify-content-center justify-content-md-start">
                                 <i class="ph-duotone ph-storefront me-2 text-warning fs-16"></i>
-                                <span><strong>Company:</strong> {{ $companyName }}</span>
+                                <span>
+                                    <strong>Company:</strong>
+                                    <span id="companyName">Loading...</span>
+                                </span>
                             </div>
+
                             <div class="col-sm-6 col-md-3 d-flex align-items-center justify-content-center justify-content-md-start">
                                 <i class="ph-duotone ph-map-pin-line me-2 text-warning fs-16"></i>
-                                <span><strong>Location:</strong> {{ $employeeDetails ? $employeeDetails->work_location : 'Head Office' }}</span>
+                                <span>
+                                    <strong>Location:</strong>
+                                    <span id="employeeLocation">Loading...</span>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -465,7 +462,7 @@
                                     <div class="stat-box-container">
                                         <div class="stat-box-item">
                                             <div class="stat-box-title">Present Days</div>
-                                            <div class="stat-box-value text-success" id="atten-present">5</div>
+                                            <div class="stat-box-value text-success" id="atten-present">0</div>
                                         </div>
                                         <div class="stat-box-item">
                                             <div class="stat-box-title">Late Marks</div>
@@ -481,7 +478,7 @@
                                         </div>
                                         <div class="stat-box-item">
                                             <div class="stat-box-title">Work from Home</div>
-                                            <div class="stat-box-value text-primary" id="atten-wfh">1</div>
+                                            <div class="stat-box-value text-primary" id="atten-wfh">0</div>
                                         </div>
                                     </div>
                                 </div>
@@ -517,7 +514,7 @@
                                         <i class="ph-bold ph-hourglass-high"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mb-0 fw-extrabold text-dark" id="kpi-pending">6</h5>
+                                        <h5 class="mb-0 fw-extrabold text-dark" id="kpi-pending">0</h5>
                                         <small class="text-muted fw-bold">Pending</small>
                                     </div>
                                 </div>
@@ -528,7 +525,7 @@
                                         <i class="ph-bold ph-activity"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mb-0 fw-extrabold text-dark" id="kpi-in-progress">8</h5>
+                                        <h5 class="mb-0 fw-extrabold text-dark" id="kpi-in-progress">0</h5>
                                         <small class="text-muted fw-bold">In Progress</small>
                                     </div>
                                 </div>
@@ -539,7 +536,7 @@
                                         <i class="ph-bold ph-checks"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mb-0 fw-extrabold text-dark" id="kpi-completed">10</h5>
+                                        <h5 class="mb-0 fw-extrabold text-dark" id="kpi-completed">0</h5>
                                         <small class="text-muted fw-bold">Completed</small>
                                     </div>
                                 </div>
@@ -550,7 +547,7 @@
                                         <i class="ph-bold ph-warning-octagon"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mb-0 fw-extrabold text-dark" id="kpi-overdue">9</h5>
+                                        <h5 class="mb-0 fw-extrabold text-dark" id="kpi-overdue">0</h5>
                                         <small class="text-muted fw-bold">>7d Overdue</small>
                                     </div>
                                 </div>
@@ -569,7 +566,7 @@
                         <div class="d-flex align-items-center gap-2">
                             <input type="text" id="task-datepicker" class="form-control form-control-sm bg-light border text-dark rounded-pill px-3" style="width: 120px; font-size: 0.72rem; cursor: pointer; height: 28px;" placeholder="Pick Date Filter">
                             <select class="form-select form-select-sm rounded-pill text-dark border bg-light" id="task-table-filter" onchange="filterUpcomingTasks(this.value)" style="width: 120px; font-size: 0.72rem; cursor: pointer; height: 28px;">
-                                <option value="all">All Tasks</option>
+                                <option value="today" selected>Today Tasks</option>
                                 <option value="weekly">Weekly Tasks</option>
                                 <option value="monthly">Monthly Tasks</option>
                             </select>
@@ -582,8 +579,6 @@
                                     <tr>
                                         <th>Task ID</th>
                                         <th>Task Title</th>
-                                        <th>Company Name</th>
-                                        <th>Task Category</th>
                                         <th>Due Date</th>
                                         <th>Priority</th>
                                         <th>Status</th>
@@ -611,6 +606,7 @@
                             Performance & Review
                         </h5>
                     </div>
+
                     <div class="card-body p-3">
                         <div class="d-flex align-items-center gap-4 border-bottom pb-3 mb-3">
                             <div class="radial-chart-box">
@@ -621,80 +617,160 @@
                                             <stop offset="100%" stop-color="#764ba2" />
                                         </linearGradient>
                                     </defs>
+
                                     <circle class="radial-svg-circle radial-bg" cx="45" cy="45" r="40" />
-                                    <circle class="radial-svg-circle radial-progress" cx="45" cy="45" r="40" />
+
+                                    <circle class="radial-svg-circle radial-progress"
+                                        cx="45"
+                                        cy="45"
+                                        r="40"
+                                        style="
+                                            stroke: url(#gradientPerformance);
+                                            stroke-width: 8;
+                                            fill: none;
+                                            stroke-linecap: round;
+                                            transform: rotate(-90deg);
+                                            transform-origin: center;
+                                        ">
+                                    </circle>
                                 </svg>
+
                                 <div class="radial-label-text">
-                                    <span>76%</span>
+                                    <span id="performancePercentage" style="font-size: medium;">0%</span>
                                 </div>
                             </div>
+
                             <div>
-                                <h6 class="fw-bold text-dark mb-1 fs-15">Performance Score</h6>
-                                <span class="badge text-white px-2.5 py-1 fs-11" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 2px 8px rgba(16,185,129,0.2);">Excellent</span>
+                                <h6 class="fw-bold text-dark mb-1 fs-15">
+                                    Performance Score
+                                </h6>
+
+                                <span
+                                    id="performanceStatus"
+                                    class="badge text-white px-2.5 py-1 fs-11"
+                                    style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 2px 8px rgba(16,185,129,0.2);">
+                                    Loading...
+                                </span>
+
+                                <div class="mt-1">
+                                    <small class="text-muted" id="reviewMonthText">
+                                        Loading review...
+                                    </small>
+                                </div>
                             </div>
+
                         </div>
 
-                        <!-- Rating Categories with custom progress bars -->
+                        <!-- Rating Categories -->
                         <div class="d-flex flex-column gap-1 mb-3">
+
+                            <!-- Work Performance -->
                             <div class="bar-row">
                                 <div class="bar-label-group">
                                     <span>Work Performance</span>
-                                    <div class="bar-stars">
-                                        <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+
+                                    <div class="bar-stars" id="workStars">
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
                                     </div>
                                 </div>
+
                                 <div class="bar-container">
-                                    <div class="bar-fill" style="width: 95%;"></div>
+                                    <div class="bar-fill" id="workRatingBar" style="width:0%;"></div>
                                 </div>
                             </div>
+
+                            <!-- Skill -->
                             <div class="bar-row">
                                 <div class="bar-label-group">
                                     <span>Skill & Knowledge</span>
-                                    <div class="bar-stars">
-                                        <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star opacity-20"></i><i class="ph-fill ph-star opacity-20"></i>
+
+                                    <div class="bar-stars" id="skillStars">
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
                                     </div>
                                 </div>
+
                                 <div class="bar-container">
-                                    <div class="bar-fill" style="width: 60%;"></div>
+                                    <div class="bar-fill" id="skillRatingBar" style="width:0%;"></div>
                                 </div>
                             </div>
+
+                            <!-- Attendance -->
                             <div class="bar-row">
                                 <div class="bar-label-group">
                                     <span>Attendance & Punctuality</span>
-                                    <div class="bar-stars">
-                                        <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star opacity-20"></i><i class="ph-fill ph-star opacity-20"></i>
+
+                                    <div class="bar-stars" id="attendanceStars">
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
                                     </div>
                                 </div>
+
                                 <div class="bar-container">
-                                    <div class="bar-fill" style="width: 65%;"></div>
+                                    <div class="bar-fill" id="attendanceRatingBar" style="width:0%;"></div>
                                 </div>
                             </div>
+
+                            <!-- Teamwork -->
                             <div class="bar-row">
                                 <div class="bar-label-group">
                                     <span>Teamwork / Behaviour</span>
-                                    <div class="bar-stars">
-                                        <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+
+                                    <div class="bar-stars" id="teamworkStars">
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
+                                        <i class="ph-fill ph-star opacity-20"></i>
                                     </div>
                                 </div>
+
                                 <div class="bar-container">
-                                    <div class="bar-fill" style="width: 90%;"></div>
+                                    <div class="bar-fill" id="teamworkRatingBar" style="width:0%;"></div>
                                 </div>
                             </div>
+
                         </div>
 
                         <!-- Review Comment -->
-                        <div class="border rounded p-3 bg-light position-relative" style="border-left: 4px solid #764ba2 !important;">
-                            <span class="position-absolute end-0 top-0 p-2 text-muted-50" style="font-size: 1.5rem; opacity: 0.15; line-height: 1;"><i class="ph-fill ph-quotes"></i></span>
-                            <small class="text-muted fw-bold d-block mb-1 text-uppercase letter-spacing-05 fs-10">Manager Review Remarks</small>
-                            <p class="mb-0 text-dark fs-12 italic fw-normal leading-relaxed" style="line-height: 1.45;">
-                                "Demonstrates excellent ownership of assigned projects and collaborates effectively with the team. Needs to focus on clock-in punctuality and continuous skill upskilling on advanced GST reconciliation tools."
+                        <div class="border rounded p-3 bg-light position-relative"
+                            style="border-left:4px solid #764ba2 !important;">
+
+                            <span
+                                class="position-absolute end-0 top-0 p-2 text-muted-50"
+                                style="font-size:1.5rem; opacity:.15; line-height:1;">
+                                <i class="ph-fill ph-quotes"></i>
+                            </span>
+
+                            <small
+                                class="text-muted fw-bold d-block mb-1 text-uppercase letter-spacing-05 fs-10">
+                                Manager Review Remarks
+                            </small>
+
+                            <p
+                                id="managerReview"
+                                class="mb-0 text-dark fs-12 italic fw-normal leading-relaxed"
+                                style="line-height:1.45;">
+                                Loading review...
                             </p>
+
                         </div>
+
                     </div>
                 </div>
 
                 <!-- 6. Calendar & Events -->
-                <div class="card dashboard-card" id="calendar-events-card">
+                {{-- <div class="card dashboard-card" id="calendar-events-card">
                     <div class="card-header card-header-gradient">
                         <h5>
                             <i class="ph-duotone ph-calendar"></i>
@@ -762,7 +838,7 @@
 
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
             </div>
         </div>
@@ -789,6 +865,15 @@
             <label class="form-label fw-bold">Task Title</label>
             <input type="text" id="task_title" class="form-control" readonly>
           </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Description</label>
+            <textarea
+                id="task_description"
+                class="form-control"
+                rows="4"
+                readonly></textarea>
+        </div>
 
           <div class="mb-3">
             <label class="form-label fw-bold">Current Status</label>
@@ -825,76 +910,80 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
-    // Constants & Static Datasets (Make all statistics static as requested)
-    const COMPANY_NAME = "{{ $companyName }}";
-
-    // Static Attendance Datasets
-    const ATTENDANCE_STATS = {
-        weekly: {
-            present: 5,
-            late: 0,
-            absent: 0,
-            leave: 0,
-            wfh: 1
-        },
-        monthly: {
-            present: 20,
-            late: 2,
-            absent: 1,
-            leave: 1,
-            wfh: 3
-        }
-    };
-
-    // Static KPI Tasks Datasets
-    const TASK_COUNTERS = {
-        today: { pending: 1, progress: 2, completed: 3, overdue: 0 },
-        week: { pending: 3, progress: 4, completed: 5, overdue: 2 },
-        month: { pending: 6, progress: 8, completed: 10, overdue: 9 }
-    };
 
     // Static Upcoming Tasks Dataset
-    const UPCOMING_TASKS = [
-        { id: 1024, title: "Submit GSTR-1 Monthly Return summary to CA", company: COMPANY_NAME, category: "Taxation", due_date: "2026-06-05", priority: "High", status: "Pending" },
-        { id: 1025, title: "Perform weekly Bank Statement Reconciliation", company: COMPANY_NAME, category: "Banking", due_date: "2026-06-07", priority: "Medium", status: "In Progress" },
-        { id: 1026, title: "Verify vendor TDS deductions and file logs", company: COMPANY_NAME, category: "Taxation", due_date: "2026-06-10", priority: "High", status: "Pending" },
-        { id: 1027, title: "Reconcile Cashbook transactions with supervisor", company: COMPANY_NAME, category: "Accounting", due_date: "2026-06-12", priority: "Low", status: "Completed" },
-        { id: 1028, title: "Submit travel expenditure reimbursement claim docs", company: COMPANY_NAME, category: "Payroll", due_date: "2026-06-15", priority: "Medium", status: "Pending" }
-    ];
+    const UPCOMING_TASKS = [];
 
-    $(document).ready(function() {
-        // Initialize dynamic clock details
+    let ATTENDANCE_STATS = {};
+
+    $(document).ready(function () {
+
         fetchAttendanceData();
-
-        // Load initial toggles
-        toggleAttendance('weekly');
+        fetchAttendanceSummary();
         toggleTasksFilter('month');
-        renderUpcomingTasks(UPCOMING_TASKS);
+        loadUpcomingTasks('today');
+        loadPerformanceReview();
 
-        // Initialize task date filter datepicker
         flatpickr("#task-datepicker", {
             dateFormat: "Y-m-d",
-            onChange: function(selectedDates, dateStr, instance) {
-                filterUpcomingTasksByDate(dateStr);
+            clickOpens: true,
+            allowInput: false,
+            onChange: function(selectedDates, dateStr) {
+
+                // clear dropdown selection
+                $('#task-table-filter').val('');
+
+                loadUpcomingTasks('', dateStr);
             }
         });
     });
 
     // 1. Attendance Toggle (Weekly/Monthly)
-    function toggleAttendance(type) {
-        // Toggle active button style
+    function fetchAttendanceSummary()
+    {
+        $.ajax({
+            url: "{{ route('attendance.summary') }}",
+            type: "GET",
+            dataType: "json",
+
+            success: function(response)
+            {
+                if(response.status)
+                {
+                    ATTENDANCE_STATS = {
+                        weekly: response.weekly,
+                        monthly: response.monthly
+                    };
+
+                    toggleAttendance('weekly');
+                }
+            }
+        });
+    }
+
+    function toggleAttendance(type)
+    {
+        if (!ATTENDANCE_STATS[type]) {
+            return;
+        }
+
         if (type === 'weekly') {
+
             $('#btn-atten-week').addClass('active');
             $('#btn-atten-month').removeClass('active');
+
             $('#atten-summary-title').text('Weekly Summary Details');
+
         } else {
+
             $('#btn-atten-month').addClass('active');
             $('#btn-atten-week').removeClass('active');
+
             $('#atten-summary-title').text('Monthly Summary Details');
         }
 
-        // Load values
         const data = ATTENDANCE_STATS[type];
+
         $('#atten-present').text(data.present);
         $('#atten-late').text(data.late);
         $('#atten-absent').text(data.absent);
@@ -933,14 +1022,72 @@
 
     // 3. KPI Tasks Range Toggle
     function toggleTasksFilter(range) {
-        const counters = TASK_COUNTERS[range];
-        $('#kpi-pending').text(counters.pending);
-        $('#kpi-in-progress').text(counters.progress);
-        $('#kpi-completed').text(counters.completed);
-        $('#kpi-overdue').text(counters.overdue);
+        // Show loading state or 0 while fetching
+        $('#kpi-pending, #kpi-in-progress, #kpi-completed, #kpi-overdue').text('...');
+
+        // Fetch dynamic stats from backend
+        $.ajax({
+            url: '/tasks_counters',
+            type: 'GET',
+            data: { range: range },
+            dataType: 'json',
+            success: function (counters) {
+                // console.log(counters);
+
+                // Update UI elements dynamically with response data
+                $('#kpi-pending').text(counters.pending);
+                $('#kpi-in-progress').text(counters.progress);
+                $('#kpi-completed').text(counters.completed);
+                $('#kpi-overdue').text(counters.overdue);
+            },
+            error: function (xhr, status, error) {
+                // console.error("Failed to fetch task counters:", error);
+                // Fallback to 0 on error
+                $('#kpi-pending, #kpi-in-progress, #kpi-completed, #kpi-overdue').text('0');
+            }
+        });
     }
 
     // 4. Render and Filter Upcoming Tasks table
+    function loadUpcomingTasks(filter = 'today', date = '')
+    {
+        const tbody = $("#pc-dt-simple tbody");
+
+        // Show loading
+        tbody.html(`
+            <tr>
+                <td colspan="6" class="text-center py-4">
+                    <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                    Loading tasks...
+                </td>
+            </tr>
+        `);
+
+        $.ajax({
+            url: "{{ url('/employee/upcoming-tasks') }}",
+            type: "GET",
+            data: {
+                filter: filter,
+                date: date
+            },
+            success: function(response) {
+                renderUpcomingTasks(response);
+            },
+            error: function(xhr) {
+
+                tbody.html(`
+                    <tr>
+                        <td colspan="6" class="text-center text-danger py-4">
+                            Failed to load tasks
+                        </td>
+                    </tr>
+                `);
+
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
     function renderUpcomingTasks(taskList) {
         const tbody = $("#pc-dt-simple tbody");
         tbody.empty();
@@ -948,30 +1095,32 @@
         if (taskList.length === 0) {
             tbody.append(`
                 <tr>
-                    <td colspan="8" class="text-center text-muted py-4">No matching tasks found</td>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        No matching tasks found
+                    </td>
                 </tr>
             `);
             return;
         }
 
         taskList.forEach(task => {
+
             let priorityBadge = getPriorityBadge(task.priority);
             let statusBadge = getStatusBadge(task.status);
+
             tbody.append(`
                 <tr>
                     <td class="fw-semibold text-primary">#TSK-${task.id}</td>
-                    <td>
-                        <div class="fw-semibold text-dark mb-0">${task.title}</div>
-                    </td>
-                    <td><span class="badge bg-light-secondary text-secondary rounded-pill px-2.5 py-1 fs-12 fw-medium">${task.company}</span></td>
-                    <td><span class="badge bg-light-primary text-primary rounded-pill px-2.5 py-1 fs-12 fw-medium">${task.category}</span></td>
+                    <td>${task.title}</td>
                     <td>${task.due_date}</td>
                     <td>${priorityBadge}</td>
                     <td>${statusBadge}</td>
                     <td>
-                        <a href="#!" class="btn btn-sm btn-link-primary p-1" onclick="viewTaskDetails(${task.id})">
+                        <button
+                            class="btn btn-sm btn-link-primary p-1"
+                            onclick='viewTaskDetails(${JSON.stringify(task)})'>
                             <i class="ti ti-edit-circle fs-5"></i>
-                        </a>
+                        </button>
                     </td>
                 </tr>
             `);
@@ -1004,63 +1153,37 @@
     }
 
     // Filter by dropdown select
-    function filterUpcomingTasks(filterType) {
-        // Reset datepicker value
-        document.getElementById('task-datepicker').value = "";
-
-        if (filterType === 'all') {
-            renderUpcomingTasks(UPCOMING_TASKS);
-            return;
-        }
-
-        const today = new Date();
-        let targetDate = new Date();
-
-        if (filterType === 'weekly') {
-            targetDate.setDate(today.getDate() + 7);
-        } else if (filterType === 'monthly') {
-            targetDate.setDate(today.getDate() + 30);
-        }
-
-        const filtered = UPCOMING_TASKS.filter(task => {
-            const taskDate = new Date(task.due_date);
-            return taskDate >= today && taskDate <= targetDate;
-        });
-
-        renderUpcomingTasks(filtered);
-    }
-
-    // Filter by date picker
-    function filterUpcomingTasksByDate(dateStr) {
-        // Reset select filter dropdown to all
-        $('#task-table-filter').val('all');
-
-        if (!dateStr) {
-            renderUpcomingTasks(UPCOMING_TASKS);
-            return;
-        }
-
-        const filtered = UPCOMING_TASKS.filter(task => task.due_date === dateStr);
-        renderUpcomingTasks(filtered);
+    function filterUpcomingTasks(filterType)
+    {
+        $('#task-datepicker').val('');
+        loadUpcomingTasks(filterType);
     }
 
     // Modal display for static upcoming tasks
-    function viewTaskDetails(id) {
-        const task = UPCOMING_TASKS.find(t => t.id === id);
-        if (!task) return;
-
+    function viewTaskDetails(task)
+    {
         $('#task_id').val(task.id);
         $('#task_title').val(task.title);
+        $('#task_description').val(task.description ?? '');
         $('#task_priority').val(task.priority);
         $('#task_deadline').val(task.due_date);
         $('#task_status').val(task.status);
 
         if (task.status.toLowerCase() === 'completed') {
+
             $('#task_status').prop('disabled', true);
-            $('#updateBtn').prop('disabled', true).text('Already Completed');
+
+            $('#updateBtn')
+                .prop('disabled', true)
+                .html('<i class="ti ti-check me-1"></i> Already Completed');
+
         } else {
+
             $('#task_status').prop('disabled', false);
-            $('#updateBtn').prop('disabled', false).text('Update Status');
+
+            $('#updateBtn')
+                .prop('disabled', false)
+                .html('<i class="ti ti-refresh me-1"></i> Update Status');
         }
 
         $('#editTaskModal').modal('show');
@@ -1142,7 +1265,275 @@
             e.preventDefault();
             startEmployeeDashboardTour();
         });
+
+        //-- Fetch Employee Details via AJAX and populate the dashboard
+        loadEmployeeDetails();
     });
+
+    // AJAX function to load employee details
+    function loadEmployeeDetails()
+    {
+        $.ajax({
+            url: "{{ route('employee.dashboard.data') }}",
+            type: "GET",
+            dataType: "json",
+
+            success: function(response)
+            {
+                if(response.status)
+                {
+                    let emp = response.data;
+
+                    $('#employeePhoto').attr('src', emp.profile_image);
+
+                    $('#employeeName').text(emp.name);
+
+                    $('#employeeId').text('ID: ' + (emp.employee_id ?? '--'));
+
+                    $('#employeeDesignation').text(emp.designation ?? '--');
+
+                    $('#employeeDepartment').text(emp.department ?? '--');
+
+                    $('#managerName').text(emp.manager ?? '--');
+
+                    $('#companyName').text(emp.company ?? '--');
+
+                    $('#employeeLocation').text(emp.location ?? '--');
+
+                    let statusClass = 'bg-success text-white';
+
+                    if(emp.emp_status)
+                    {
+                        let status = emp.emp_status.toLowerCase();
+
+                        if(status.includes('probation'))
+                        {
+                            statusClass = 'bg-warning text-dark';
+                        }
+                        else if(status.includes('notice'))
+                        {
+                            statusClass = 'bg-danger text-white';
+                        }
+                    }
+
+                    $('#employeeStatus')
+                        .removeClass()
+                        .addClass('badge rounded-pill px-3 py-1 fs-11 fw-bold ' + statusClass)
+                        .text(emp.emp_status ?? 'Active');
+
+
+                    //---- Employee Online/Offline Status based on emp_status
+                    let empStatus = (emp.emp_status || '').toLowerCase();
+
+                    if (empStatus === 'resigned' || empStatus === 'terminated') {
+
+                        $('#employeeOnlineStatus')
+                            .removeClass('bg-success')
+                            .addClass('bg-danger')
+                            .html('<i class="ph-fill ph-circle text-white me-1" style="font-size:7px;"></i>Offline');
+
+                    } else {
+
+                        $('#employeeOnlineStatus')
+                            .removeClass('bg-danger')
+                            .addClass('bg-success')
+                            .html('<i class="ph-fill ph-circle text-white me-1" style="font-size:7px;"></i>Online');
+                    }
+                }
+            },
+
+            error: function(xhr)
+            {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
+    //-- Update Task -----
+    $('#updateTaskForm').on('submit', function(e) {
+
+        e.preventDefault();
+
+        $.ajax({
+            url: '/employee/update-task-status',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                task_id: $('#task_id').val(),
+                status: $('#task_status').val()
+            },
+
+            success: function(response) {
+
+                $('#editTaskModal').modal('hide');
+
+                loadUpcomingTasks(
+                    $('#task-table-filter').val(),
+                    $('#task-datepicker').val()
+                );
+
+                toggleTasksFilter(document.getElementById('task-range-filter').value);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Task status updated successfully'
+                });
+            },
+
+            error: function() {
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to update task status'
+                });
+            }
+        });
+    });
+
+    //--------- Review data-------
+
+    function loadPerformanceReview() {
+
+        $.ajax({
+            url: "{{ url('/employee/performance-review') }}",
+            type: "GET",
+
+            beforeSend: function () {
+
+                $('#performancePercentage').text('...');
+                $('#performanceStatus').text('Loading...');
+                $('#reviewMonthText').text('Loading review...');
+                $('#managerReview').text('Loading review...');
+
+                $('#workStars, #skillStars, #attendanceStars, #teamworkStars').html(
+                    '<i class="ph-fill ph-star opacity-20"></i>'.repeat(5)
+                );
+            },
+
+            success: function (response) {
+
+                if (!response.status) {
+
+                    $('#performancePercentage').text('0%');
+                    $('#performanceStatus').text('No Review');
+                    $('#reviewMonthText').text('');
+                    $('#managerReview').text('No review available.');
+
+                    return;
+                }
+
+                let data = response.data;
+
+                // Performance %
+                $('#performancePercentage').text(data.total_percentage + '%');
+
+                // Status
+                let status = 'Needs Improvement';
+
+                if (data.total_percentage >= 80) {
+                    status = 'Excellent';
+                } else if (data.total_percentage >= 60) {
+                    status = 'Good';
+                } else if (data.total_percentage >= 40) {
+                    status = 'Average';
+                }
+
+                $('#performanceStatus').text(status);
+
+                // Review Month
+                const months = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+
+                $('#reviewMonthText').text(
+                    months[parseInt(data.review_month) - 1] +
+                    ' ' +
+                    data.review_year +
+                    ' Review'
+                );
+
+                // Progress Bars
+                $('#workRatingBar').css('width', (parseInt(data.work_rating) * 20) + '%');
+                $('#skillRatingBar').css('width', (parseInt(data.skill_rating) * 20) + '%');
+                $('#attendanceRatingBar').css('width', (parseInt(data.attendance_rating) * 20) + '%');
+                $('#teamworkRatingBar').css('width', (parseInt(data.teamwork_rating) * 20) + '%');
+
+                // Stars
+                renderStars('#workStars', data.work_rating);
+                renderStars('#skillStars', data.skill_rating);
+                renderStars('#attendanceStars', data.attendance_rating);
+                renderStars('#teamworkStars', data.teamwork_rating);
+
+                // Review
+                $('#managerReview').text(
+                    data.review ? data.review : 'No remarks provided.'
+                );
+
+                // Circle Progress
+                updateRadialChart(parseFloat(data.total_percentage));
+            },
+
+            error: function () {
+
+                $('#performancePercentage').text('0%');
+                $('#performanceStatus').text('Error');
+                $('#reviewMonthText').text('');
+                $('#managerReview').text('Unable to load review.');
+            }
+        });
+    }
+
+    /**
+     * Dynamic Stars
+     * Example:
+     * 4 => ★★★★☆
+     * 5 => ★★★★★
+     */
+    function renderStars(selector, rating) {
+
+        rating = parseInt(rating) || 0;
+
+        let html = '';
+
+        for (let i = 1; i <= 5; i++) {
+
+            if (i <= rating) {
+                html += '<i class="ph-fill ph-star text-warning"></i>';
+            } else {
+                html += '<i class="ph-fill ph-star opacity-20"></i>';
+            }
+        }
+
+        $(selector).html(html);
+    }
+
+    /**
+     * Radial Progress Circle
+     */
+    function updateRadialChart(percentage)
+    {
+        const circle = document.querySelector('.radial-progress');
+
+        if (!circle) return;
+
+        const radius = 40;
+        const circumference = 2 * Math.PI * radius;
+
+        circle.style.strokeDasharray = circumference;
+
+        if (percentage <= 0) {
+            circle.style.strokeDashoffset = circumference;
+            return;
+        }
+
+        const offset = circumference - (percentage / 100) * circumference;
+
+        circle.style.strokeDashoffset = offset;
+    }
+
 </script>
 
 @endsection

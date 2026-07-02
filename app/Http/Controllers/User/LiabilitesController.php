@@ -45,7 +45,7 @@ class LiabilitesController extends Controller
 		$title = 'Liabilities';
 		$user = Auth::user();
 		$userId = currentOwnerId();
-		checkCoreAccess('Assets & Liabilities');
+		checkCoreAccess('Liabilities & Borrowings');
 
 		//start ca-accountant access
 		$req_type = 0;
@@ -1029,7 +1029,7 @@ class LiabilitesController extends Controller
 	public function AddLiabilites()
 	{
 		$userId = currentOwnerId();
-		checkCoreAccess('Assets & Liabilities');
+		checkCoreAccess('Liabilities & Borrowings');
 		// $purposes_of_tds = DB::table('purposes_of_tds')->get();
 		$purposes_of_tds = DB::table('tds_rules')
 							->where('module', '=', 'Liabilities')

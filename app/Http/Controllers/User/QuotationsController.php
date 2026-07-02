@@ -36,7 +36,7 @@ class QuotationsController extends Controller
 	{
 		$title = 'Quotation Invoice';
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Sales & Invoicing');
 		//start ca-accountant access
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 			$userId = getAccessCompanyId($request);
@@ -309,7 +309,7 @@ class QuotationsController extends Controller
 	{
 
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$invoiceNo = DB::table('quotations')
 			->select(DB::raw('MAX(id) as id'))
 			->get();
@@ -729,7 +729,7 @@ class QuotationsController extends Controller
 		if (Auth::user()->u_type == 1) {
 			return redirect('/sales-quotation');
 		}
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$sId = base64_decode($sId);
 		$sales = DB::table('quotations')
 			->where('id', '=', $sId)
@@ -836,7 +836,7 @@ class QuotationsController extends Controller
 		} else {
 			$uid = session('compId'); //ca-accountant access
 		}
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		
 		$sales = DB::table('quotations')
 			->where('id', '=', $sId)

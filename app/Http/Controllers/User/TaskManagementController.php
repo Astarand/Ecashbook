@@ -13,7 +13,7 @@ class TaskManagementController extends Controller
     public function index()
     {
         $userId = currentOwnerId();
-		checkCoreAccess('HR & Payroll Management');
+		checkCoreAccess('Payroll Management');
         // Fetch employees added by this user, join with users table to get employee name
         $employees = DB::table('employees')
             ->join('users', 'employees.empId', '=', 'users.id')

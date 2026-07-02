@@ -22,7 +22,7 @@ class SupportTicketController extends Controller
     {
 		
 		$userType = Auth::user()->u_type;
-		checkCoreAccess('Tax Filing & Returns');
+		checkCoreAccess('GST Returns & Reports');
 		$query = SupportTickets::orderBy('created_at', 'desc');
 		$userId = null;
 		if (!in_array($userType, [3, 6])) {

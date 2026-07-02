@@ -100,7 +100,7 @@
                                         <h6 class="text-white mb-3">{{ $bank->accholder_name }}</h6>
                                     </div>
                                     <div class="col-auto">
-                                        <p class="text-white text-sm text-opacity-50 mb-0">Account Balance</p>
+                                        <p class="text-white text-sm text-opacity-50 mb-0">Opening Balance</p>
                                         <h6 class="text-white mb-0">₹{{ $bank->curr_bal }}</h6>
                                     </div>
                                     @if(!empty($bank->bank_qr_code))

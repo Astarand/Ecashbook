@@ -89,7 +89,7 @@ class ProprietorshipProfileController extends Controller
 	public function proprietorship_lists()
 	{
 		$userId = currentOwnerId();
-		checkCoreAccess('Multi Proprietorships');
+		checkCoreAccess('Proprietorship Profile');
 
 		// Parent Company
 		$parentCompany = DB::table('company_profiles')
@@ -127,7 +127,7 @@ class ProprietorshipProfileController extends Controller
 
     public function proprietorship_edit($id)
 	{
-		checkCoreAccess('Multi Proprietorships');
+		checkCoreAccess('Proprietorship Profile');
 		$id = Crypt::decrypt($id);
 		
 		$compDetails = DB::table('proprietorship_profiles')

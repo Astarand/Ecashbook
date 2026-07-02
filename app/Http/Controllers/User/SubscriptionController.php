@@ -26,7 +26,7 @@ class SubscriptionController extends Controller
 		$userId = currentOwnerId();
 		$uType = Auth::user()->u_type;
 		if($uType == 5){
-			checkCoreAccess('Plans');
+			checkCoreAccess('Subscription & Billing');
 		}
         $plans = DB::table('subscription_plans')
             ->whereIn('userId', [1, 3])

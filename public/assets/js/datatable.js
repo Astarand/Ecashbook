@@ -10,11 +10,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const table = document.getElementById("pc-dt-simple");
     if (!table) return;
 
+	const totalRows = table.querySelectorAll('tbody tr').length; //binay
     // Initialize the DataTable with custom options
     const dataTable = new simpleDatatables.DataTable(table, {
         sortable: true,
         perPage: 10,
-        perPageSelect: [5, 10, 15, 20, 25, 50],
+        perPageSelect: [5, 10, 15, 20, 25, 50, totalRows],
         searchable: true,
         fixedHeight: false,
         labels: {
@@ -401,6 +402,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Ensure entries selector always updates table page size.
             bindPerPageSelector(wrapper);
+			
+			//Start Rename last option to All, binay
+			const selector = wrapper.querySelector('.datatable-dropdown select');
+			if (selector) {
+				const lastOption = selector.lastElementChild;
+				if (lastOption) {
+					lastOption.textContent = 'All';
+				}
+			}
+			//End Rename last option to All, binay
 
             // Ensure label text does not show raw {select} token.
             normalizePerPageLabel(wrapper);

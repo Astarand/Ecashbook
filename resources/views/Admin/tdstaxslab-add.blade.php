@@ -30,48 +30,56 @@
 
                 <div class="row">
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Module *</label>
+                        <label class="form-label">Accounting Module <span class="text-danger">*</span></label>
                         <select name="module" id="module" class="form-control" required>
                             <option value="">Select</option>
-                            <option value="Expenses">Expenses</option>
+                            <option value="Expense">Expense</option>
                             <option value="Purchase">Purchase</option>
                             <option value="Assets">Assets</option>
                         </select>
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Category of Transaction *</label>
+                        <label class="form-label">Category / Head <span class="text-danger">*</span></label>
                         <select name="category" id="category" class="form-control" required>
                             <option value="">Select</option>
                         </select>
                     </div>
 
                     <div class="col-md-2 mb-3">
-                        <label class="form-label">TDS Section *</label>
+                        <label class="form-label">TDS Section <span class="text-danger">*</span></label>
                         <input type="text" name="tds_section" class="form-control" placeholder="192 / 194J" required>
                     </div>
 
                     <div class="col-md-2 mb-3">
-                        <label class="form-label">TDS Rate(%) *</label>
+                        <label class="form-label">TDS Rate(%) <span class="text-danger">*</span></label>
                         <input type="text" name="tds_rate" id="tds_rate" class="form-control" placeholder="10% / As per slab" required>
                     </div>
 
                     <div class="col-md-2 mb-3">
-                        <label class="form-label">Entity *</label>
+                        <label class="form-label">Entity <span class="text-danger">*</span></label>
                         <select name="entity" class="form-control">
-                            <option value="All">All Entities</option>
+                            <option value="Any">Any</option>
+                            <option value="Individual/HUF">Individual/HUF</option>
                             <option value="Proprietorship">Proprietorship</option>
-                            <option value="Firm">Firm / LLP</option>
+                            <option value="Partnership Firm">Partnership Firm</option>
+                            <option value="LLP">LLP</option>
+                            <option value="Company">Company</option>
+                            <option value="Foreign Vendor">Foreign Vendor</option>
+                            <option value="Government">Government</option>
+                            <option value="Employee">Employee</option>
+                            <option value="Transporter">Transporter</option>
+                            
                         </select>
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Threshold Limit</label>
+                        <label class="form-label">Threshold Limit <span class="text-danger">*</span></label>
                         <input type="text" name="threshold" id="threshold" class="form-control" placeholder="₹50,000 per FY">
                     </div>
 
                     <div class="col-md-9 mb-3">
-                        <label class="form-label">Special Notes (ERP)</label>
+                        <label class="form-label">Applicability Condition</label>
                         <input type="text" name="notes" class="form-control">
                     </div>
                 </div>
@@ -196,7 +204,7 @@
 });
 
     $('#category').on('change', function () {
-        if ($(this).val() === 'Salary & Wages') {
+        if ($(this).val() === 'employee_benefits') {
             $('#salarySlabBox').removeClass('d-none');
             $('#tds_rate').val('As per slab').prop('readonly', true);
         } else {
@@ -204,46 +212,6 @@
             $('#tds_rate').val('').prop('readonly', false);
         }
     });
-
-    const expenseCategories = [
-        // "Professional Fees (CA, Lawyer, Consultant, Marketing, HR, Training, Director Sitting Fees, Royalty/License)",
-        // "Technical Fees (IT, Software, AMC, Call Centre)",
-        // "Contracts – Manpower (Security, Maintenance, Repairs, Event Mgmt)",
-        // "Job Work / Advertising / Transport / Freight",
-        // "Rent – Building / Office / Shop",
-        // "Rent – Machinery / Plant / Equipment",
-        // "Salary & Wages",
-        // "Commission / Brokerage (Sales, Referral)",
-        // "Business Promotion / Benefits / Perquisites (In-kind)",
-
-        // Added from directExpensesType select options
-        "Raw Material Costs",
-        "Direct Labour",
-        "Manufacturing Expenses",
-        "Factory Utilities",
-        "Freight / Carriage Inward",
-        "Job Work / Outsourcing",
-        "Packing Material",
-        "Other Direct Expenses",
-        "Employee Expenses (Salary, Benefits)",
-        "Rent Expense",
-        "Electricity Expense",
-        "Internet & Communication",
-        "Office Expenses",
-        "Printing & Stationery",
-        "Travel & Conveyance",
-        "Repair & Maintenance",
-        "Professional Fees",
-        "Audit Fees",
-        "Legal Charges",
-        "Bank Charges",
-        "Interest Expense",
-        "Depreciation",
-        "Insurance Expense",
-        "Marketing & Advertisement",
-        "Freight & Transport",
-        "Miscellaneous Expenses"
-    ];
 
     const purchaseCategories = [
         "Goods Purchase (Raw material, Trading goods, Machinery as goods)"
@@ -262,25 +230,56 @@
 
         $category.empty().append('<option value="">Select</option>');
 
+        // Reset salary slab on module change
+        $('#salarySlabBox').addClass('d-none');
+        $('#tds_rate').val('').prop('readonly', false);
+
+        // Expenses -> Load from DB
+        if (module === 'Expense') {
+
+            $category.html('<option value="">Loading...</option>');
+
+            $.ajax({
+                url: "{{ url('/get-categories') }}",
+                type: "GET",
+                data: {
+                    module: module
+                },
+                success: function(response) {
+
+                    let options = '<option value="">Select</option>';
+
+                    $.each(response, function(index, item) {
+                        options += `<option value="${item.option_value}">
+                                        ${item.option_text}
+                                    </option>`;
+                    });
+
+                    $category.html(options);
+                },
+                error: function() {
+                    $category.html('<option value="">No Data Found</option>');
+                }
+            });
+
+            return;
+        }
+
+        // Existing logic for Purchase & Assets
         let categories = [];
-        if (module === 'Expenses') categories = expenseCategories;
         if (module === 'Purchase') categories = purchaseCategories;
         if (module === 'Assets') categories = assetCategories;
 
         categories.forEach(cat => {
             $category.append(`<option value="${cat}">${cat}</option>`);
         });
-
-        // Reset salary slab on module change
-        $('#salarySlabBox').addClass('d-none');
-        $('#tds_rate').val('').prop('readonly', false);
     });
 
     // Salary logic
     $('#category').on('change', function () {
         let val = $(this).val();
 
-        if (val === 'Salary & Wages') {
+        if (val === 'employee_benefits') {
             $('#salarySlabBox').removeClass('d-none');
             $('#tds_rate').val('As per slab').prop('readonly', true);
         } else {

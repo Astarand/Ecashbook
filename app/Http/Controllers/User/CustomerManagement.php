@@ -47,7 +47,7 @@ class CustomerManagement extends Controller
 		//$this->middleware('auth'); 
 		$title = 'Customers';
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		//start search filter
 		$data_arry = array();
 		if($request->custName !="" ){
@@ -671,7 +671,7 @@ class CustomerManagement extends Controller
     public function expenditureClaims()
     {	
         $userId = currentOwnerId();
-		checkCoreAccess('HR & Payroll Management');
+		checkCoreAccess('Expense Claims');
 		$claims = \DB::table('expenditure_claims')
 				->join('employees', 'employees.employee_id', '=', 'expenditure_claims.employee_id')
 				->join('users', 'users.id', '=', 'employees.empId')
@@ -806,7 +806,7 @@ class CustomerManagement extends Controller
     public function supplyRequisitions()
     {
         $userId = currentOwnerId();
-		checkCoreAccess('HR & Payroll Management');
+		checkCoreAccess('Purchase Requisitions');
 		$requisitions = \DB::table('supply_requisitions')
 				->join('employees', 'employees.employee_id', '=', 'supply_requisitions.employee_id')
 				->join('users', 'users.id', '=', 'employees.empId')

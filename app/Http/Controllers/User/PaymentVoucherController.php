@@ -198,9 +198,9 @@ class PaymentVoucherController extends Controller
             'payment_mode' => 'required',
 			'is_paid'      => 'required|in:0,1',
 			'bank_id'      => 'required_if:payment_mode,Bank',
-			'narration' => 'required',
+			//'narration' => 'required',
         ], [
-			'narration.required' => 'Please enter purpose',
+			//'narration.required' => 'Please enter purpose',
 		]);
 
 		$added_by = currentOwnerId();
@@ -244,7 +244,7 @@ class PaymentVoucherController extends Controller
 		$voucher->bank_id 					= $request->bank_id;
 		$voucher->is_paid 					= $request->is_paid;
 		$voucher->reference_id              = $request->reference_id;
-		$voucher->narration                 = $request->narration;
+		//$voucher->narration                 = $request->narration;
 		$voucher->attachment                = $attachment;
 		$voucher->approved_by               = $request->approved_by;
 		$voucher->added_by                  = $added_by;
@@ -270,9 +270,9 @@ class PaymentVoucherController extends Controller
             'payment_mode' => 'required',
 			'is_paid'      => 'required|in:0,1',
 			'bank_id'      => 'required_if:payment_mode,Bank',
-			'narration'	   => 'required',
+			//'narration'	   => 'required',
         ], [
-			'narration.required' => 'Please enter purpose',
+			//'narration.required' => 'Please enter purpose',
 		]);
 
         $voucher = PaymentVoucher::findOrFail($id);
@@ -319,7 +319,7 @@ class PaymentVoucherController extends Controller
 		$voucher->bank_id 					= $request->bank_id;
 		$voucher->is_paid 					= $request->is_paid;
 		$voucher->reference_id              = $request->reference_id;
-		$voucher->narration                 = $request->narration;
+		//$voucher->narration                 = $request->narration;
 		$voucher->approved_by               = $request->approved_by;
 
 		$voucher->save();
@@ -392,9 +392,10 @@ class PaymentVoucherController extends Controller
             $data = DB::table('sales')
                 ->where('added_by', $added_by)
                 ->where('inv_name', $party_name)
-				->whereMonth('sales.inv_date', $month)
-				->whereYear('sales.inv_date', $year)
+				//->whereMonth('sales.inv_date', $month)
+				//->whereYear('sales.inv_date', $year)
                 ->select('id', 'inv_num')
+				->orderBy('inv_date', 'desc')
                 ->get();
         }
         else if($voucherType == 'Payment Voucher' && $type =='Vendor')
@@ -403,9 +404,10 @@ class PaymentVoucherController extends Controller
             $data = DB::table('purchases')
                 ->where('added_by', $added_by)
 				->where('inv_name', $party_name)
-				->whereMonth('purchases.inv_date', $month)
-				->whereYear('purchases.inv_date', $year)
+				//->whereMonth('purchases.inv_date', $month)
+				//->whereYear('purchases.inv_date', $year)
                 ->select('id', 'inv_num')
+				->orderBy('inv_date', 'desc')
                 ->get();
         }else{
 			$data = collect([]);
@@ -449,7 +451,7 @@ class PaymentVoucherController extends Controller
         }
 
         return response()->json([
-            'amount' => $invoice->total_amount  ?? 0
+            'amount' => getRoundedAmount($invoice->total_amount)  ?? 0
         ]);
     }
 	

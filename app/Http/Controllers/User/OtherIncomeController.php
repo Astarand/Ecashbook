@@ -36,7 +36,7 @@ class OtherIncomeController extends Controller
     public function OtherIncomeList(request $request)
     {
         $userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Other Income');
 
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 			
@@ -71,7 +71,7 @@ class OtherIncomeController extends Controller
     {
         //$this->middleware('auth');
         $userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Other Income');
 		$compType = DB::table('company_profiles')
 						->where('userId', $userId)
 						->value('comp_type'); 
@@ -253,7 +253,7 @@ class OtherIncomeController extends Controller
 
         $decodedId = base64_decode($id);
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Other Income');
         $income = Income::find($decodedId);
 
         if (!$income) {

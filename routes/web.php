@@ -67,6 +67,7 @@ use App\Http\Controllers\UserEmployee\UserEmployerPolicy;
 use App\Http\Controllers\UserEmployee\UserTaskManagement;
 use App\Http\Controllers\UserEmployee\UserLeaveManagement;
 use App\Http\Controllers\UserEmployee\UserHRLetter;
+use App\Http\Controllers\UserEmployee\UserDashboardController;
 
 
 /* CA Controller */
@@ -103,6 +104,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\DeductionMasterController;
 use App\Http\Controllers\Admin\TaxDeductionController;
 use App\Http\Controllers\Admin\HRLetterTemplateController;
+use App\Http\Controllers\Admin\DropdownValueController;
 
 use Illuminate\Support\Facades\File;
 
@@ -649,10 +651,14 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/attendance_history', [UserEmployeeAttendance::class, 'showEmployeeAttendanceDetails'])->name('userEmployee.attendance_history');
 	Route::post('get_user_attendance', [UserEmployeeAttendance::class, 'getMonthlyAttendance'])->name('userEmoloyee.getMonthlyAttendanceUserEmployee');
 	Route::post('/getDailyActivityUserEmployee', [UserEmployeeAttendance::class, 'getDailyActivity'])->name('userEmoloyee.getDailyActivityUserEmployee');
-
-
-
-
+	
+	/* Employee Dashboard Data */ 
+	Route::get('/employee-dashboard-data', [UserDashboardController::class, 'getDashboardData'])->name('employee.dashboard.data');
+	Route::get('/attendance-summary', [UserDashboardController::class, 'attendanceSummary'])->name('attendance.summary');
+	Route::get('/tasks_counters', [UserDashboardController::class, 'getTaskCounts'])->name('tasks_counters');
+	Route::get('/employee/upcoming-tasks', [UserDashboardController::class, 'getUpcomingTasks'])->name('employee.upcoming.tasks');
+	Route::post('/employee/update-task-status',[UserDashboardController::class, 'updateTaskStatus']);
+	Route::get('/employee/performance-review', [UserDashboardController::class, 'getPerformanceReview']);
 
 
 
@@ -835,6 +841,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/add-tds-tax-slab', [TdstaxslabManagementController::class, 'AddTdsTaxSlab'])->name('admin.add-tds-tax-slab');
 	Route::post('/save_tds_tax_slab', [TdstaxslabManagementController::class, 'save_tds_tax_slab'])->name('admin.save-tds-tax-slab');
 	Route::get('/edit-tds-tax-slab/{id}', [TdstaxslabManagementController::class, 'EditTdsTaxSlab'])->name('admin.edit-tds-tax-slab');
+	Route::get('/get-categories', [TdstaxslabManagementController::class, 'getCategories'])->name('get-categories');
 
 	/* Income Tax Slab Management */
 	Route::get('/income-tax-slab-list', [IncomeTaxSlabController::class, 'incomeTaxSlabList'])->name('admin.income-tax-slab-list');
@@ -1219,8 +1226,21 @@ Route::middleware(['ensure.login'])->group(function () {
     Route::get('/tax-deduction-master/edit/{id}', [TaxDeductionController::class, 'edit'])->name('tax.edit');
     Route::post('/tax-deduction-master/update/{id}', [TaxDeductionController::class, 'update'])->name('tax.update');
     Route::delete('/tax-deduction-master/delete/{id}', [TaxDeductionController::class, 'delete'])->name('tax.delete');
+	Route::get('/expense-heads', [TaxDeductionController::class, 'getExpenseHead'])->name('expense.heads');
 	
 	Route::post('/upload-signed-pdf',[DigitalSignedController::class,'uploadSignedPdf'])->name('upload.signed.pdf');
 	Route::get('/download-signed-pdf/{type}/{id}',[DigitalSignedController::class,'downloadSignedPdf'])->name('download.signed.pdf');
 
+	Route::post('/get-dropdown-types', [CommonController::class, 'getDropdownTypes'])->name('getDropdownTypes');
+	Route::post('/get-tax-rule',[CommonController::class,'getTaxRule'])->name('getTaxRule');
+
+	Route::get('/dropdown-values', [DropdownValueController::class, 'index'])->name('dropdown.index');
+	Route::post('/dropdown-values/store', [DropdownValueController::class, 'store'])->name('dropdown.store');
+	Route::post('/dropdown-values/update/{id}', [DropdownValueController::class, 'update'])->name('dropdown.update');
+	Route::get('/dropdown-values/edit/{id}', [DropdownValueController::class, 'edit'])->name('dropdown.edit');
+	Route::get('/dropdown-values/view/{id}', [DropdownValueController::class, 'show'])->name('dropdown.show');
+	Route::delete('/dropdown-values/delete/{id}', [DropdownValueController::class, 'destroy'])->name('dropdown.delete');
+	
+	Route::post('/purchase_shipping_cost',[PurchaseController::class,'purchaseShippingCost']);
+	
 });

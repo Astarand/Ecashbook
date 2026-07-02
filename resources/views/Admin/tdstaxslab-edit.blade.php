@@ -18,10 +18,10 @@
 
                     {{-- MODULE --}}
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Module *</label>
+                        <label class="form-label">Accounting Module <span class="text-danger">*</span></label>
                         <select name="module" id="module" class="form-control" disabled>
                             <option value="">Select</option>
-                            @foreach(['Expenses','Purchase','Assets'] as $m)
+                            @foreach(['Expense','Purchase','Assets'] as $m)
                                 <option value="{{ $m }}" {{ $tdsRule->module==$m?'selected':'' }}>
                                     {{ $m }}
                                 </option>
@@ -33,14 +33,14 @@
 
                     {{-- CATEGORY --}}
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Category *</label>
+                        <label class="form-label">Category / Head <span class="text-danger">*</span></label>
                         <input type="text" name="category" class="form-control"
-                               value="{{ $tdsRule->category }}" required>
+                               value="{{ $tdsRule->category }}" required readonly>
                     </div>
 
                     {{-- SECTION --}}
                     <div class="col-md-2 mb-3">
-                        <label class="form-label">TDS Section *</label>
+                        <label class="form-label">TDS Section <span class="text-danger">*</span></label>
                         <input type="text" name="tds_section"
                                value="{{ $tdsRule->tds_section }}"
                                class="form-control" required>
@@ -48,7 +48,7 @@
 
                     {{-- RATE --}}
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">TDS Rate(%) *</label>
+                        <label class="form-label">TDS Rate(%) <span class="text-danger">*</span></label>
                         <input type="text" name="tds_rate" id="tds_rate"
                                value="{{ $tdsRule->tds_rate }}"
                                class="form-control" required>
@@ -56,9 +56,9 @@
 
                     {{-- ENTITY --}}
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Entity *</label>
+                        <label class="form-label">Entity <span class="text-danger">*</span></label>
                         <select name="entity" class="form-control">
-                            @foreach(['All','Proprietorship','Firm'] as $e)
+                            @foreach(['Any','Individual/HUF','Proprietorship','Partnership Firm','LLP','Company','Foreign Vendor','Government','Employee','Transporter'] as $e)
                                 <option value="{{ $e }}" {{ $tdsRule->entity==$e?'selected':'' }}>
                                     {{ $e }}
                                 </option>
@@ -68,7 +68,7 @@
 
                     {{-- THRESHOLD --}}
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Threshold</label>
+                        <label class="form-label">Threshold <span class="text-danger">*</span></label>
                         <input type="text" name="threshold" id="threshold"
                                value="{{ $tdsRule->threshold_limit }}"
                                class="form-control">
@@ -76,7 +76,7 @@
 
                     {{-- NOTES --}}
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Notes</label>
+                        <label class="form-label">Applicability Condition</label>
                         <input type="text" name="notes"
                                value="{{ $tdsRule->notes }}"
                                class="form-control">
@@ -85,7 +85,7 @@
 
                 {{-- SALARY SLABS --}}
                 <div id="salarySlabBox"
-                     class="mt-4 {{ $tdsRule->category=='Salary & Wages'?'':'d-none' }}">
+                     class="mt-4 {{ $tdsRule->category=='employee_benefits'?'':'d-none' }}">
 
                     <h5>Salary Tax Slabs (Section 192)</h5>
 

@@ -28,9 +28,6 @@
     </div>
     <!-- [ breadcrumb ] end -->
 
-    <div class="row mb-4">
-        <h3>Add New Expenses</h3>
-    </div>
     <div class="card">
         <div class="card-body">
             <form action="javascript:void(0);" method="POST" name="addExpenseFrm" id="addExpenseFrm" enctype="multipart/form-data">
@@ -63,25 +60,9 @@
                         <label class="form-label">Direct Expenses Type<span class="text-danger">*</span></label>
                         <select id="directExpensesType" class="form-control" name="direct_expense_type">
                             <option value="">Select</option>
-                            {{-- <option value="raw_material">Raw Material Costs</option>
-                            <option value="direct_labor">Direct Labour</option>
-                            <option value="manufacturing_supplies">Manufacturing Expenses</option>
-                            <option value="factory_utilities">Factory Utilities</option>
-                            <option value="freight_inwards">Freight / Carriage Inward</option>
-                            <option value="job_outsourcing">Job Work / Outsourcing</option>
-							<option value="packaging_costs">Packing Material</option>
-                            <option value="Other">Other Direct Expenses</option> --}}
-
-                            <option value="Raw Material Costs">Raw Material Costs</option>
-                            <option value="Direct Labour">Direct Labour</option>
-                            <option value="Manufacturing Expenses">Manufacturing Expenses</option>
-                            <option value="Factory Utilities">Factory Utilities</option>
-                            <option value="Freight / Carriage Inward">Freight / Carriage Inward</option>
-                            <option value="Job Work / Outsourcing">Job Work / Outsourcing</option>
-                            <option value="Packing Material">Packing Material</option>
-                            <option value="Other">Other Direct Expenses</option>
-                            <option value="freight_transport">Freight & Transport</option>
-                        </select>
+                            
+                        </select>						
+						<small id="directExpenseTypeInfo" class="text-primary fw-bold mt-1 d-block"></small>
                     </div>
 
                     <!-- Indirect Expenses Section -->
@@ -90,51 +71,11 @@
                         <select id="indirectExpensesType" name="indirect_expense_type" class="form-control">
                             <option value="">Select</option>
 
-                            <option value="employee_benefits">Employee Expenses (Salary, Benefits)</option>
-
-                            <option value="rent_expense">Rent Expense</option>
-                            <option value="electricity_expense">Electricity Expense</option>
-                            <option value="internet_communication">Internet & Communication</option>
-                            <option value="office_expenses">Office Expenses</option>
-                            <option value="printing_stationery">Printing & Stationery</option>
-                            <option value="travel_conveyance">Travel & Conveyance</option>
-                            <option value="repair_maintenance">Repair & Maintenance</option>
-                            <option value="professional_fees">Professional Fees</option>
-                            <option value="audit_fees">Audit Fees</option>
-                            <option value="legal_charges">Legal Charges</option>
-                            <option value="bank_charges">Bank Charges</option>
-                            <option value="interest_expense">Interest Expense</option>
-                            <option value="depreciation">Depreciation</option>
-                            <option value="insurance_expense">Insurance Expense</option>
-                            <option value="marketing_advertisement">Marketing & Advertisement</option>
-                            {{-- <option value="freight_transport">Freight & Transport</option> --}}
-                            <option value="miscellaneous_expenses">Miscellaneous Expenses</option>
-
-                            {{-- New Option --}}
-                            <option value="income_tax_paid">Income Tax Paid</option>
-                            <option value="gst_interest_penalty">GST Interest & Penalty</option>
-                            <option value="late_filing_penalty">Late Filing Penalty</option>
-                            <option value="personal_expenses">Personal Expenses</option>
-                            <option value="cash_payment_above_income_tax_limit">Cash Payment above Income Tax limit</option>
-                            <option value="donation_non_approved">Donation (Non-approved)</option>
-                            <option value="provision_for_expenses">Provision for Expenses</option>
-                            <option value="provision_for_doubtful_debts">Provision for Doubtful Debts</option>
-                            <option value="penalty_for_law_violation">Penalty for Law Violation</option>
-                            <option value="wealth_tax_personal_tax">Wealth Tax / Personal Tax</option>
-                            <option value="capital_loss">Capital Loss</option>
-                            <option value="drawings_owner_withdrawals">Drawings / Owner Withdrawals</option>
-                            <option value="csr_expense(certain_cases)">CSR Expense (certain cases)</option>
-                            <option value="unpaid_pf_esi_beyond_due_date">Unpaid PF/ESI beyond due date</option>
-                            <option value="tds_not_deducted_deposited">TDS not deducted / deposited</option>
-                            <option value="expenses_without_proper_bills">Expenses without proper bills</option>
-                            <option value="interest_on_business_loan">Interest on Business Loan</option>
-                            <option value="software_subscription">Software Subscription</option>
-                            <option value="hosting_cloud_expense">Hosting / Cloud Expense</option>
-                            <option value="motor_car_expense">Motor Car Expense</option>
-                            <option value="entertainment_expense">Entertainment Expense</option>
-                            <option value="director_expense">Director Expense</option>
                         </select>
+						<small id="indirectExpenseTypeInfo" class="text-primary fw-bold mt-1 d-block"></small>
                     </div>
+					
+					
 
                     <div id="normalExpenseFields" class="row">
                         <div class="col-sm-4 mb-3" id="other_text_box">
@@ -146,8 +87,8 @@
                         <div class="col-sm-4 mb-3">
                             <label class="form-label">Date<span class="text-danger">*</span></label>
                             <input type="date" id="expense_date" name="expense_date" class="form-control" placeholder="Enter Share Holder's Capital">
-                        </div>
-                        
+                        </div>						
+										
                         <div class="col-sm-4 mb-3" id="employeeDropdownDiv" style="display:none;">
                             <label class="form-label">Select Employee <span class="text-danger">*</span></label>
                             <select name="employee_id" id="employee_id" class="form-control">
@@ -169,7 +110,7 @@
                             <input type="number" id="expense_amt" name="expense_amt" class="form-control" placeholder="Enter Amount">
                         </div>
                         <div class="col-sm-4 mb-3" id="payment_status_div">
-                            <label class="form-label">Payment Status</label>
+                            <label class="form-label">Payment Status <span class="text-danger">*</span></label>
                             <select id="payment_status" class="form-control">
                                 <option value="">Select Payment Status</option>
                                 <option value="full">Full</option>
@@ -193,7 +134,7 @@
                             <input type="number" id="adjusted_now" class="form-control" readonly>
                         </div>
                         <div class="col-sm-4 mb-3">
-                            <label class="form-label">Payment Method<span class="text-danger">*</span></label>
+                            <label class="form-label">Payment Method</label>
                             <select class="form-select" name="mode_of_expense" id="mode_of_expense">
                                 <option value="">Select</option>
                                 <option value="NEFT">NEFT</option>
@@ -206,6 +147,23 @@
                                 <option value="Cash">Cash</option>
                             </select>
                         </div>
+						
+						<div class="row mt-2 tax-info-section" style="display:none;">
+							<div class="col-md-4">
+								<label>Tax Treatment</label>
+								<input type="text" id="tax_treatment" name="tax_treatment" class="form-control" readonly>
+							</div>
+
+							<div class="col-md-4">
+								<label>Allowed Ratio (%)</label>
+								<input type="number" id="allowed_ratio" name="allowed_ratio" class="form-control">
+							</div>
+
+							<div class="col-md-4">
+								<label>Deduction Amount</label>
+								<input type="text" id="rebate_amt" name="rebate_amt" class="form-control" readonly>
+							</div>
+						</div>
 
                         <div class="col-sm-4 mb-3">
                             <label class="form-label">Party / Vendor Name<span class="text-danger">*</span></label>
@@ -248,18 +206,32 @@
                             <div class="col-md-12 mb-3" id="tds-applicability-container">
                                 <label class="form-label">TDS Applicable</label>
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-md-4">
                                         <div class="form-check">
                                             <input type="radio" name="tds_applicable" value="yes" id="tdsYes" >
                                             <label for="tdsYes">Yes</label>
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-md-4">
                                         <div class="form-check">
                                             <input type="radio" name="tds_applicable" value="no" id="tdsNo" >
                                             <label for="tdsNo">No</label>
                                         </div>
                                     </div>
+									<div class="col-md-4">
+										<label class="form-label fw-bold">
+											Threshold Type <span class="text-danger">*</span>
+										</label>
+										<select id="threshold_type"
+												name="threshold_type"
+												class="form-control"
+												required>
+											<option value="">Select Threshold Type</option>
+											<option value="NA">N/A</option>
+											<option value="Single">Single</option>
+											<option value="Annual">Annual</option>
+										</select>
+									</div>
                                 </div>
                             </div>
 
@@ -585,7 +557,7 @@
             .then(res => res.json())
             .then(data => {
                 
-                // ✅ If rule found
+                // If rule found
                 if (data && data.tds_rate !== null) {
                     currentRule = data;
 
@@ -596,17 +568,17 @@
                     calculateTDS();
 
                 } else {
-                    // ❌ No rule → force reset
+					showToast("No TDS rule found.", "warning");
                     resetTDS();
                 }
             })
             .catch(() => {
-                // ❌ API error → also reset
+				showToast("Unable to fetch TDS Rule.", "error");
                 resetTDS();
             });
         }
 
-        // ✅ Calculate TDS
+        // Calculate TDS
         function calculateTDS() {
             const amount = parseFloat(amountField.value) || 0;
 
@@ -619,8 +591,8 @@
             const threshold = parseFloat(currentRule.threshold_limit) || 0;
             const rate = parseFloat(currentRule.tds_rate) || 0;
 
-            if (amount > threshold) {
-                // ✅ Applicable
+            if (amount >= threshold) {
+                //Applicable
                 tdsYes.checked = true;
                 tdsNo.checked = false;
                 tdsSection.style.display = "flex";
@@ -629,7 +601,7 @@
                 tdsAmountField.value = tdsAmount.toFixed(2);
 
             } else {
-                // ❌ Not applicable
+                //Not applicable
                 tdsNo.checked = true;
                 tdsYes.checked = false;
                 tdsSection.style.display = "none";
@@ -637,27 +609,67 @@
             }
         }
 
-        // ✅ Reset everything
+        // Reset everything
         function resetTDS() {
             currentRule = null;
-
             tdsSectionField.value = "";
             tdsRateField.value = "";
             tdsAmountField.value = "";
             thresholdInput.value = "";
-
             tdsNo.checked = true;
             tdsYes.checked = false;
-
             tdsSection.style.display = "none";
         }
 
-        // ✅ EVENTS
-        expenseCat.addEventListener("change", fetchTdsRule);
-        directType.addEventListener("change", fetchTdsRule);
-        indirectType.addEventListener("change", fetchTdsRule);
+        // ✅ EVENTS		
+		expenseCat.addEventListener("change", function(){
+			if($('#tdsYes').is(':checked')){
+				fetchTdsRule();
+			}
+		});
 
-        amountField.addEventListener("input", calculateTDS);
+		directType.addEventListener("change", function(){
+			if($('#tdsYes').is(':checked')){
+				fetchTdsRule();
+			}
+		});
+
+		indirectType.addEventListener("change", function(){
+			if($('#tdsYes').is(':checked')){
+				fetchTdsRule();
+			}
+		});
+
+		
+		$('#expense_amt').on('input', function(){
+			if($('#tdsYes').is(':checked')){
+				calculateTDS();
+			}
+		});
+		
+		$('#tdsYes').on('change', function () {
+			if (!this.checked) return;
+			$.get('/check-company-policies', function (res) {
+				if (!res.comp_tan || res.comp_tan.trim() === '') {
+					$('#tdsNo').prop('checked', true);
+					$('#tdsYes').prop('checked', false);
+					resetTDS();
+					Swal.fire({
+						icon: 'warning',
+						title: 'Company TAN Required',
+						text: 'Please update Company TAN in Organization Profile.'
+					});
+					return;
+				}
+				fetchTdsRule();
+			});
+		});
+		
+		
+		$('#tdsNo').on('change', function () {
+			resetTDS();
+		});
+		
     });
 
     //------ end TDS auto fetch & calculation logic ------
@@ -754,7 +766,7 @@
                 let amt = parseFloat(expenseAmtInput.value) || 0;
                 let rate = parseFloat(tdsRateField.value) || 0;
                 let threshold = parseFloat(tdsThresholdField.value) || 0;
-                if (amt > 0 && rate > 0 && amt > threshold) {
+                if (amt > 0 && rate > 0 && amt >= threshold) {
                     let tdsAmt = (amt * rate) / 100;
                     tdsAmountField.value = tdsAmt.toFixed(2);
                     tdsSectionDiv.style.display = 'flex';
@@ -820,6 +832,7 @@
 
             let other = $("form#addExpenseFrm #other_exp").val();
             let expense_date = $("form#addExpenseFrm #expense_date").val();
+			let threshold_type = $("#threshold_type option:selected").val();
             let exp_invno = $("form#addExpenseFrm #exp_invno").val();
             let expense_amt = parseFloat($("form#addExpenseFrm #expense_amt").val()) || 0;
             let mode_of_expense = $("form#addExpenseFrm #mode_of_expense").val();
@@ -829,6 +842,10 @@
             let approved_date = $("form#addExpenseFrm #approved_date").val();
             let spec_note = $("form#addExpenseFrm #spec_note").val();
 			let employee_id = $("#employee_id option:selected").val();
+			let tax_treatment = $("form#addExpenseFrm #tax_treatment").val();
+			let allowed_ratio = $("form#addExpenseFrm #allowed_ratio").val();
+			let rebate_amt = $("form#addExpenseFrm #rebate_amt").val();
+			
 			if ((expense_cat === "indirect" || expense_cat === "direct") && expense_type === "employee_benefits" && !employee_id) {
 				showToast("Please select employee", "error");
 				return false;
@@ -841,6 +858,21 @@
             let vendor_id = $("#vendor_id option:selected").val();
             let vendor_pan = $("#vendor_pan").val();
             let payment_status = $("#payment_status").val();
+			
+			if (!expense_date) {
+				showToast("Please select expense date", "error");
+				return false;
+			}
+			
+			if (!payment_status) {
+				showToast("Please select payment status", "error");
+				return false;
+			}
+			
+			if (payment_status !== 'due' && !mode_of_expense) {
+				showToast("Please select mode of expense", "error");
+				return false;
+			}
 
             // TDS Applicable
             let tds_applicable = $("input[name='tds_applicable']:checked").val() || "no";
@@ -883,6 +915,7 @@
             expensesData.append("expense_cat", expense_cat);
             expensesData.append("expense_type", expense_type);
             expensesData.append("expense_date", expense_date);
+            expensesData.append("threshold_type", threshold_type);
             expensesData.append("exp_invno", exp_invno);
 
             expensesData.append("mode_of_expense", mode_of_expense);
@@ -892,6 +925,9 @@
             expensesData.append("approved_date", approved_date);
             expensesData.append("spec_note", spec_note);
 			expensesData.append("employee_id", employee_id);
+			expensesData.append("tax_treatment", tax_treatment);
+			expensesData.append("allowed_ratio", allowed_ratio);
+			expensesData.append("rebate_amt", rebate_amt);
             expensesData.append("exp_inv_doc", exp_inv_doc);
             expensesData.append("other", other);
 
@@ -1044,9 +1080,11 @@
 			if ((category === "indirect" || category === "direct") && type === "employee_benefits") {
 				$("#employeeDropdownDiv").show();
 				loadEmployees();
+				$("#threshold_type").prop("required", false).val("");
 			} else {
 				$("#employeeDropdownDiv").hide();
 				$("#employee_id").val('');
+				$("#threshold_type").prop("required", true);
 			}
 		}
 
@@ -1081,6 +1119,7 @@
 
         if ((category === "indirect" || category === "direct") && type === "employee_benefits") {
 
+			$("#threshold_type").prop("required", false).val("");
             // ✅ Change label
             amountLabel.text("Advance Amount *");
 
@@ -1096,7 +1135,7 @@
             // $("#balance_amount").prop("disabled", true);
             // $("#adjusted_now").prop("disabled", true);
 
-            $("#payment_status_div").hide();
+            //$("#payment_status_div").hide();
             $("#advance_amount_div").hide();
             $("#balance_amount_div").hide();
             $("#adjusted_now_div").hide();
@@ -1211,12 +1250,14 @@
 
             $("#invoiceDiv").hide();          // ❌ hide invoice
             $("#employeeIdDiv").show();       // ✅ show employee id
+			$("#threshold_type").prop("required", false).val("");
 
         } else {
 
             $("#invoiceDiv").show();          // ✅ show invoice
             $("#employeeIdDiv").hide();       // ❌ hide employee id
             $("#employee_code").val('');
+			$("#threshold_type").prop("required", true);
         }
     }
 
@@ -1307,6 +1348,186 @@
         // Run on page load (important for edit mode)
         toggleOtherField();
     });
+	
+	
+	$('#expense_cat').on('change', function () {
+
+		let expenseCat = $(this).val();
+
+		// Hide both sections and reset dropdowns
+		$('#directExpensesSection, #indirectExpensesSection').hide();
+		$('#directExpensesType').html('<option value="">Select</option>');
+		$('#indirectExpensesType').html('<option value="">Select</option>');
+
+		if (!expenseCat) {
+			return;
+		}
+
+		$.ajax({
+			url: "{{ route('getDropdownTypes') }}",
+			type: "POST",
+			data: {
+				module: 'Expense',
+				dropdown_name: expenseCat,
+				_token: "{{ csrf_token() }}"
+			},
+			success: function (res) {
+
+				let html = '<option value="">Select</option>';
+
+				$.each(res, function (i, item) {
+					html += `
+						<option value="${item.option_value}" data-type="${item.type}">
+							${item.option_text}
+						</option>
+					`;
+				});
+
+				if (expenseCat === 'direct') {
+					$('#directExpensesType').html(html);
+					$('#directExpensesSection').show();
+				} else if (expenseCat === 'indirect') {
+					$('#indirectExpensesType').html(html);
+					$('#indirectExpensesSection').show();
+				}
+			},
+			error: function (xhr) {
+				console.log(xhr.responseText);
+			}
+		});
+
+	});
+	
+	//Show the Type
+	$(document).on("change", "#directExpensesType", function () {
+		let type = $(this).find(":selected").data("type") || "";
+		if (type) {
+			$("#directExpenseTypeInfo").html('<i class="ti ti-info-circle"></i> Type : ' + type);
+		} else {
+			$("#directExpenseTypeInfo").html("");
+		}
+	});
+
+	$(document).on("change", "#indirectExpensesType", function () {
+		let type = $(this).find(":selected").data("type") || "";
+		if (type) {
+			$("#indirectExpenseTypeInfo").html('<i class="ti ti-info-circle"></i> Type : ' + type);
+		} else {
+			$("#indirectExpenseTypeInfo").html("");
+		}
+	});
+	
+	//Start calculate Tax deduction
+	function loadTaxRule(expenseType, expenseHead)
+	{
+		if (!expenseType || !expenseHead) {
+			$('.tax-info-section').hide();
+			return;
+		}
+
+		$.ajax({
+			url: "{{ route('getTaxRule') }}",
+			type: "POST",
+			data: {
+				_token: "{{ csrf_token() }}",
+				expense_type: expenseType,
+				expense_head: expenseHead
+			},
+			success: function(res){
+
+				if(!res.status){
+					$('.tax-info-section').hide();
+					return;
+				}
+
+				$('.tax-info-section').show();
+
+				$('#tax_treatment').val(res.tax_treatment);
+
+				let treatment = (res.tax_treatment || '').trim();
+
+				// FULLY ALLOWED
+				if(treatment === 'Fully Allowed')
+				{
+					$('#allowed_ratio')
+						.val(100)
+						.prop('readonly', true)
+						.attr('min', 100)
+						.attr('max', 100);
+
+					calculateRebate();
+				}
+
+				// PARTIAL ALLOWED
+				else if(treatment === 'Partial Allowed')
+				{
+					let start = parseFloat(res.allow_start || 0);
+					let end   = parseFloat(res.allow_end || 100);
+
+					$('#allowed_ratio')
+						.val(start)
+						.prop('readonly', false)
+						.attr('min', start)
+						.attr('max', end);
+
+					calculateRebate();
+				}
+
+				// DISALLOWED
+				else if(treatment === 'Disallowed')
+				{
+					$('#allowed_ratio')
+						.val(0)
+						.prop('readonly', true)
+						.attr('min', 0)
+						.attr('max', 0);
+
+					$('#rebate_amt').val('0.00');
+				}
+			}
+		});
+	}
+	
+	function calculateRebate()
+	{
+		let amount = parseFloat($('#expense_amt').val()) || 0;
+		let ratio  = parseFloat($('#allowed_ratio').val()) || 0;
+		let rebate = (amount * ratio) / 100;
+		$('#rebate_amt').val(rebate.toFixed(2));
+	}
+	
+	$(document).on('input', '#allowed_ratio', function(){
+
+		let min = parseFloat($(this).attr('min')) || 0;
+		let max = parseFloat($(this).attr('max')) || 100;
+		let val = parseFloat($(this).val()) || 0;
+
+		if(val < min){
+			$(this).val(min);
+			showToast('Minimum allowed ratio is ' + min + '%', 'error');
+		}
+
+		if(val > max){
+			$(this).val(max);
+			showToast('Maximum allowed ratio is ' + max + '%', 'error');
+		}
+
+		calculateRebate();
+	});
+	
+	$('#directExpensesType').change(function(){
+		loadTaxRule('direct',$(this).val());
+	});
+	
+	$('#indirectExpensesType').change(function(){
+		loadTaxRule('indirect',$(this).val());
+	});
+	
+	
+	$(document).on('keyup change','#expense_amt',function(){
+		calculateRebate();
+	});
+	//End calculate Tax deduction
 
     function startAddExpensesTour() {
         if (typeof introJs !== 'function') return;

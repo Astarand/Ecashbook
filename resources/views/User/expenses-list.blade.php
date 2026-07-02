@@ -51,8 +51,8 @@
                                 <th>Expense Categories</th>
                                 <th>Expense Details</th>
                                 <th>Total Amount</th>
-                                <th>TDS</th>
-                                <th>Income Tax</th>
+                                <th>Threshold Type</th>
+                                <th>Deduction</th>
                                 <th>Approve By</th>
                                 <th>Pay Status</th>
                                 <th>Status</th>
@@ -72,8 +72,24 @@
                                 <td><span class="text-muted text-hover-primary">{{ $expen->expense_cat }}</span></td>
                                 <td><span class="text-muted text-hover-primary">{{ ucwords(str_replace(['_', '-'], ' ', $expen->expense_type)) }}</span></td>
                                 <td><span class="text-muted text-hover-primary">₹ {{ $expen->expense_amt }}</span></td>
-                                <td><span class="text-muted text-hover-primary">₹ {{ $expen->tds_amount }}</span></td>
-                                <td><span class="text-muted text-hover-primary">₹ {{ $expen->deduction_amount }}</span></td>
+                                <td><span class="text-muted text-hover-primary">{{ $expen->threshold_type }}</span></td>
+                                <td>
+									<div>
+										<span class="badge 
+											{{ $expen->tax_treatment == 'Fully Allowed' ? 'bg-success' : ($expen->tax_treatment == 'Partial Allowed' ? 'bg-warning text-dark' : 'bg-danger') }}">
+											{{ $expen->tax_treatment }}
+										</span>
+										<br>
+										<small class="text-muted">
+											Ratio:
+											<strong>{{ $expen->allowed_ratio }}%</strong>
+										</small>
+										<br>
+										<small class="fw-bold">
+											Deduction: ₹ {{ number_format($expen->rebate_amt, 2) }}
+										</small>
+									</div>
+								</td>
                                 <td><span class="text-muted text-hover-primary">{{ $expen->approved_by }}</span></td>
 								<td>
                                     @if ($expen->payment_status == 'full')

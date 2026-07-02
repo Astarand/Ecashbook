@@ -35,7 +35,7 @@ class ProformasController extends Controller
 	{
 		$title = 'Proforma Invoice';
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Sales & Invoicing');
 		//start ca-accountant access
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 			$userId = getAccessCompanyId($request);
@@ -323,7 +323,7 @@ class ProformasController extends Controller
 	{
 
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$invoiceNo = DB::table('proformas')
 			->select(DB::raw('MAX(id) as id'))
 			->get();
@@ -750,7 +750,7 @@ class ProformasController extends Controller
 		if (Auth::user()->u_type == 1) {
 			return redirect('/proform-invoice');
 		}
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$sId = base64_decode($sId);
 		$sales = DB::table('proformas')
 			->where('id', '=', $sId)
@@ -856,7 +856,7 @@ class ProformasController extends Controller
 		} else {
 			$uid = session('compId'); //ca-accountant access
 		}
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		
 		$sales = DB::table('proformas')
 			->where('id', '=', $sId)

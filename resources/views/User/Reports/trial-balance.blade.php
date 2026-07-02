@@ -57,12 +57,23 @@
 									@endforeach
 								</select>
 							</div>
+							
+							<!-- FROM DATE -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted">From Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="from_date" id="from_date" required>
+                            </div>
+
+                            <!-- TO DATE -->
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold text-muted">To Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="to_date" id="to_date" required>
+                            </div>
 
                             <!-- LEDGER NAME (7 TYPES) -->
                             <div class="col-md-3">
                                 <label class="form-label fw-semibold text-muted">Ledger Name <span class="text-danger">*</span></label>
                                 <select class="form-select" name="ledger_name" id="ledger_name" required>
-                                    <option value="">Select Ledger</option>
                                     <option value="all">All</option>
                                     <option value="customer">Customer Ledger</option>
                                     <option value="supplier">Supplier Ledger</option>
@@ -76,8 +87,8 @@
 							
 							<!-- LEDGER GROUP -->
                             <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Ledger Group <span class="text-danger">*</span></label>
-                                <select class="form-select" name="ledger_group" id="ledgerGroup" onchange="handleLedgerGroup()">
+                                <label class="form-label fw-semibold text-muted">Ledger Group</label>
+                                <select class="form-select" name="ledger_group" id="ledgerGroup">
                                     <option value="">Select Group</option>
                                     <option value="assets">Assets</option>
                                     <option value="liabilities">Liabilities</option>
@@ -87,38 +98,23 @@
                             </div>
 
                             <!-- LEDGER SUB GROUP -->
-                            <div class="col-md-3">
+                            <!--<div class="col-md-3">
                                 <label class="form-label fw-semibold text-muted">Ledger Sub Group</label>
                                 <select class="form-select" name="ledger_sub_group" id="ledgerSubGroup" disabled>
                                     <option value="">Select Sub Group</option>
                                 </select>
-                            </div>
+                            </div>-->
+							
+							<!-- OPENING BALANCE -->
+							<div class="col-md-3">
+								<label class="form-label fw-semibold text-muted">Opening Balance (Dr.)</label>
+								<input type="number" step="0.01" value="{{ $openingDr }}" class="form-control" name="opening_balance_dr" id="opening_balance_dr">
+							</div>
+							<div class="col-md-3">
+								<label class="form-label fw-semibold text-muted">Opening Balance (Cr.)</label>
+								<input type="number" step="0.01" value="{{ $openingCr }}" class="form-control" name="opening_balance_cr" id="opening_balance_cr">
+							</div>
                         </div>
-
-                        <div class="row g-3 mt-1">
-                            <!-- FROM DATE -->
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">From Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="from_date" id="from_date" required>
-                            </div>
-
-                            <!-- TO DATE -->
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">To Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="to_date" id="to_date" required>
-                            </div>                            
-
-                            <!-- OPENING BALANCE -->
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Opening Balance (Dr.)</label>
-                                <input type="number" step="0.01" value="{{ $openingDr }}" class="form-control" name="opening_balance_dr" id="opening_balance_dr">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Opening Balance (Cr.)</label>
-                                <input type="number" step="0.01" value="{{ $openingCr }}" class="form-control" name="opening_balance_cr" id="opening_balance_cr">
-                            </div>
-                        </div>
-
                         <div class="row g-3 mt-1">
                             <!-- GENERATE BUTTON -->
                             <div class="col-md-12 text-end">

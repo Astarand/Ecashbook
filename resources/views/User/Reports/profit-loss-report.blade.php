@@ -204,15 +204,25 @@
 								
 								<tr>
 									<td></td>
+									<td class="text-center" style="width: 50px;">c.</td>
+									<td class="text-start">Direct Expenses </td>
+									<td></td>
+									<td class="text-start"></td>
+									<td class="text-start" id="curr_directExpenseTotal">00.00</td>
+									<td class="text-start" id="prev_directExpenseTotal">00.00</td>
+								</tr>
+								
+								<!--<tr>
+									<td></td>
 									<td class="text-center" style="width: 50px;">i.</td>
 									<td class="text-start">Trade Payable</td>
 									<td></td>
 									<td class="text-start"></td>
 									<td class="text-start" id="curr_trade_payable">00.00</td>
 									<td class="text-start" id="prev_trade_payable"></td>
-								</tr>
+								</tr>-->
 	
-								<tr>
+								<!--<tr>
 									<td class="text-center" style="border: 1px solid #ddd; width: 50px;"><strong></strong></td>
 									<td class="text-center" style="border: 1px solid #ddd; width: 50px;">c.</td>
 									<td colspan="2" style="border: 1px solid #ddd; background-color: #f7e7b8;"><strong>Direct Expenses</strong></td>
@@ -229,7 +239,7 @@
 									<td colspan="3" class="text-start" style="background-color:#ffffe6;color:#664d03;border:1px solid #ddd;"><strong>Total Direct Expenses</strong></td>
 									<td class="text-start" style="border: 1px solid #ddd;"><strong>₹ <span id="curr_directExpenseTotal">00.00</span></strong></td>
 									<td class="text-start" style="border: 1px solid #ddd;"><strong>₹ <span id="prev_directExpenseTotal">00.00</span></strong></td>
-								</tr>
+								</tr>-->
 								<tr>
 									<td></td>
 									<td class="text-center" style="width: 50px;">d.</td>
@@ -651,42 +661,43 @@
 							====================== */
 							setText('curr_openingStock', curr.cogs.opening_stock);
 							setText('curr_purchase', curr.cogs.purchases);
-							setText('curr_trade_payable', curr.cogs.trade_payable);
+							//setText('curr_trade_payable', curr.cogs.trade_payable);
 							//setText('curr_directExpense', curr.cogs.direct_expense);
 							
 							//Start Direct Expense
 							let directRows = '';
-							let currDirect = curr.cogs.direct_expense || [];
-							let prevDirect = prev.cogs.direct_expense || [];
+							let currDirect = curr.cogs.direct_expense || {};
+							let prevDirect = prev.cogs.direct_expense || {};
 
 							let directMap = {};
 
-							currDirect.forEach(r => {
-								directMap[r.expense_type] = {
-									curr: parseFloat(r.total || 0),
+							// Current Year
+							Object.keys(currDirect).forEach(head => {
+								directMap[head] = {
+									curr: parseFloat(currDirect[head] || 0),
 									prev: 0
 								};
 							});
 
-							prevDirect.forEach(r => {
+							// Previous Year
+							Object.keys(prevDirect).forEach(head => {
 
-								if (!directMap[r.expense_type]) {
-									directMap[r.expense_type] = {
+								if (!directMap[head]) {
+									directMap[head] = {
 										curr: 0,
 										prev: 0
 									};
 								}
 
-								directMap[r.expense_type].prev = parseFloat(r.total || 0);
+								directMap[head].prev = parseFloat(prevDirect[head] || 0);
 							});
 
-							let alphaWord = 'abcdefghijklmnopqrstuvwxyz';
 							let d = 0;
-
 							let currDirectTotal = 0;
 							let prevDirectTotal = 0;
 
 							$('.direct-expense-row').remove();
+
 							Object.keys(directMap).forEach(head => {
 
 								currDirectTotal += directMap[head].curr;
@@ -695,7 +706,7 @@
 								directRows += `
 									<tr class="direct-expense-row">
 										<td></td>
-										<td class="text-center">${roman[d] || (d + 1)}.</td>
+										<td class="text-center">${d + 1}.</td>
 										<td class="text-start">${head}</td>
 										<td></td>
 										<td></td>
@@ -746,7 +757,7 @@
 								expenseRows += `
 									<tr class="indirect-expense-row">
 										<td></td>
-										<td class="text-center">${alphabet[index] || ''}.</td>
+										<td class="text-center">${index + 1}.</td>
 										<td class="text-start">${head}</td>
 										<td></td>
 										<td></td>
@@ -862,7 +873,7 @@
 							====================== */
 							setText('prev_openingStock', prev.cogs.opening_stock);
 							setText('prev_purchase', prev.cogs.purchases);
-							setText('prev_trade_payable', prev.cogs.trade_payable);
+							//setText('prev_trade_payable', prev.cogs.trade_payable);
 							setText('prev_directExpense', prev.cogs.direct_expense);
 							setText('prev_closingStock', prev.cogs.closing_stock);
 							setText('prev_totalCogs', prev.cogs.total_cogs);

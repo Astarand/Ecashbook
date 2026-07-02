@@ -27,7 +27,7 @@ class DocLockerController extends Controller
 		
 		$authUser = auth()->user();
 		$userType = $authUser->u_type;
-		checkCoreAccess('Secure Doc Locker');
+		checkCoreAccess('Document Locker');
 		//$userId = (in_array($userType, [1, 2, 3])) ? Auth::user()->id : Auth::user()->user_add_by;
 		$userId = currentOwnerId();
 

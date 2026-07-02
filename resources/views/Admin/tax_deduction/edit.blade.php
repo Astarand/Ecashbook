@@ -29,134 +29,125 @@
 
             <form action="{{ route('tax.update', $deduction->id) }}" method="POST">
                 @csrf
-                @method('POST')
 
                 <div class="row">
 
                     <div class="col-md-4 mb-3">
-                        <label>Deduction Name <span class="text-danger">*</span></label>
-                        <input type="text" name="deduction_name" class="form-control" value="{{ $deduction->deduction_name }}" required>
-                    </div>
-					
-					<div class="col-md-4 mb-3">
-                        <label>TAX Section </label>
-                        <input type="text" name="income_tax_section" class="form-control" value="{{ $deduction->income_tax_section }}">
-                    </div>
+                        <label>Accounting Module</label>
 
-                    {{-- CATEGORY --}}
-                    <div class="col-md-4 mb-3">
-                        <label>Category</label>
-                        <select name="deduction_category" class="form-control">
-                            @foreach($dropdowns['deduction_category'] as $item)
-                                <option value="{{ $item }}" {{ $deduction->deduction_category == $item ? 'selected' : '' }}>
-                                    {{ $item }}
-                                </option>
-                            @endforeach
+                        <input type="hidden"
+                            name="accounting_module"
+                            value="{{ $deduction->accounting_module }}">
+
+                        <select class="form-control" disabled>
+                            <option value="Expense" selected>
+                                {{ $deduction->accounting_module }}
+                            </option>
                         </select>
                     </div>
 
-                    {{-- TYPE --}}
                     <div class="col-md-4 mb-3">
-                        <label>Deduction Type <span class="text-danger">*</span></label>
-                        <select name="deduction_type" class="form-control">
-                            @foreach($dropdowns['deduction_type'] as $item)
-                                <option value="{{ $item }}" {{ $deduction->deduction_type == $item ? 'selected' : '' }}>
-                                    {{ $item }}
-                                </option>
-                            @endforeach
+                        <label>Expense Type</label>
+
+                        <input type="hidden"
+                            name="expense_type"
+                            value="{{ $deduction->expense_type }}">
+
+                        <select class="form-control" disabled>
+                            <option selected>
+                                {{ ucfirst(str_replace('_',' ',$deduction->expense_type)) }}
+                            </option>
                         </select>
                     </div>
 
-                    {{-- TAX --}}
+                    <div class="col-md-4 mb-3">
+                        <label>Expense Head</label>
+
+                        <input type="hidden"
+                            name="expense_head"
+                            value="{{ $deduction->expense_head }}">
+
+                        <input type="text"
+                            class="form-control"
+                            value="{{ $deduction->expense_head }}"
+                            readonly>
+                    </div>
+
                     <div class="col-md-4 mb-3">
                         <label>Tax Treatment <span class="text-danger">*</span></label>
-                        <select name="tax_treatment" class="form-control">
-                            @foreach($dropdowns['tax_treatment'] as $item)
-                                <option value="{{ $item }}" {{ $deduction->tax_treatment == $item ? 'selected' : '' }}>
-                                    {{ $item }}
-                                </option>
-                            @endforeach
+                        <select name="tax_treatment"
+                                id="tax_treatment"
+                                class="form-control"
+                                required>
+
+                            <option value="">Select</option>
+
+                            <option value="Fully Allowed"
+                                {{ $deduction->tax_treatment == 'Fully Allowed' ? 'selected' : '' }}>
+                                Fully Allowed
+                            </option>
+
+                            <option value="Partial Allowed"
+                                {{ $deduction->tax_treatment == 'Partial Allowed' ? 'selected' : '' }}>
+                                Partial Allowed
+                            </option>
+
+                            <option value="Disallowed"
+                                {{ $deduction->tax_treatment == 'Disallowed' ? 'selected' : '' }}>
+                                Disallowed
+                            </option>
+
                         </select>
                     </div>
 
-                    {{-- LIMIT TYPE --}}
-                    <div class="col-md-4 mb-3">
-                        <label>Limit Type</label>
-                        <select name="limit_type" class="form-control">
-                            @foreach($dropdowns['limit_type'] as $item)
-                                <option value="{{ $item }}" {{ $deduction->limit_type == $item ? 'selected' : '' }}>
-                                    {{ $item }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div class="col-md-4 mb-3 {{ in_array($deduction->tax_treatment,['Fully Allowed','Disallowed']) ? '' : 'd-none' }}"
+                        id="allowedRatioDiv">
+
+                        <label>Allowed Deduction Ratio (%)</label>
+
+                        <input type="number"
+                            step="0.01"
+                            name="allowed_ratio"
+                            id="allowed_ratio"
+                            class="form-control"
+                            value="{{ $deduction->allowed_ratio }}"
+                            {{ $deduction->tax_treatment == 'Disallowed' ? 'readonly' : '' }}>
                     </div>
 
-                    {{-- BASE --}}
-                    <div class="col-md-4 mb-3">
-                        <label>Base Amount Source</label>
-                        <select name="base_amount_source" class="form-control">
-                            @foreach($dropdowns['base_amount_source'] as $item)
-                                <option value="{{ $item }}" {{ $deduction->base_amount_source == $item ? 'selected' : '' }}>
-                                    {{ $item }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div class="col-md-4 mb-3 {{ $deduction->tax_treatment == 'Partial Allowed' ? '' : 'd-none' }}"
+                        id="allowStartDiv">
+
+                        <label>Allow Start (%)</label>
+
+                        <input type="number"
+                            step="0.01"
+                            name="allow_start"
+                            class="form-control"
+                            value="{{ $deduction->allow_start }}">
                     </div>
 
-                    {{-- AUTO --}}
-                    <div class="col-md-4 mb-3">
-                        <label>Automation Mode</label>
-                        <select name="automation_mode" class="form-control">
-                            @foreach($dropdowns['automation_mode'] as $item)
-                                <option value="{{ $item }}" {{ $deduction->automation_mode == $item ? 'selected' : '' }}>
-                                    {{ $item }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <div class="col-md-4 mb-3 {{ $deduction->tax_treatment == 'Partial Allowed' ? '' : 'd-none' }}"
+                        id="allowEndDiv">
 
-                    <div class="col-md-4 mb-3">
-                        <label>Limit Value</label>
-                        <input type="number" step="0.01" name="limit_value" class="form-control" value="{{ $deduction->limit_value }}" >
-                    </div>
-					
-					<div class="col-md-4 mb-3">
-                        <label>Limit Rate(%)</label>
-                        <input type="number" step="0.01" name="limit_rate" class="form-control" value="{{ $deduction->limit_rate }}" >
-                    </div>
+                        <label>Allow End (%)</label>
 
-                    <div class="col-md-4 mb-3">
-                        <label>Limit Formula</label>
-                        <input type="text" name="limit_formula" class="form-control" value="{{ $deduction->limit_formula }}">
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label>FY <span class="text-danger">*</span></label>
-                        <input type="text" name="applicable_fy" class="form-control" value="{{ $deduction->applicable_fy }}" required  placeholder="2025-2026">
-                    </div>
-
-                    {{-- MODULE --}}
-                    <div class="col-md-4 mb-3">
-                        <label>Linked Module <span class="text-danger">*</span></label>
-                        <select name="linked_module" class="form-control" required>
-                            @foreach($dropdowns['linked_module'] as $item)
-                                <option value="{{ $item }}" {{ $deduction->linked_module == $item ? 'selected' : '' }}>
-                                    {{ $item }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label>Rule Priority</label>
-                        <input type="number" name="rule_priority" class="form-control" value="{{ $deduction->rule_priority }}">
+                        <input type="number"
+                            step="0.01"
+                            name="allow_end"
+                            class="form-control"
+                            value="{{ $deduction->allow_end }}">
                     </div>
 
                 </div>
 
                 <div class="text-end">
-                    <a href="{{ route('tax.index') }}" class="btn btn-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{{ route('tax.index') }}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Update
+                    </button>
                 </div>
 
             </form>
@@ -165,5 +156,33 @@
     </div>
 
 </div>
+<script>
+    $('#tax_treatment').change(function() {
+
+            let value = $(this).val();
+
+            $('#allowedRatioDiv').addClass('d-none');
+            $('#allowStartDiv').addClass('d-none');
+            $('#allowEndDiv').addClass('d-none');
+
+            if (value == 'Fully Allowed') {
+
+                $('#allowedRatioDiv').removeClass('d-none');
+                $('#allowed_ratio').prop('readonly', false).val('');
+
+            } else if (value == 'Partial Allowed') {
+
+                $('#allowStartDiv').removeClass('d-none');
+                $('#allowEndDiv').removeClass('d-none');
+
+            } else if (value == 'Disallowed') {
+
+                $('#allowedRatioDiv').removeClass('d-none');
+                $('#allowed_ratio')
+                    .val(0)
+                    .prop('readonly', true);
+            }
+        });
+</script>
 
 @endsection

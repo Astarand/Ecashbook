@@ -127,7 +127,7 @@ class HomeController extends Controller
 				'statutory' => $statutory
 
 			]);
-		}else if(Auth::user() && (Auth::user()->u_type == 3 || Auth::user()->u_type == 6)){
+		}else if(Auth::user() && (Auth::user()->u_type == 3)){  //Admin 
 			$statutory =  DB::table('statutorys')
 							->select(DB::raw('statutorys.*'))
 							->orderBy('id', 'DESC')->offset(0)->limit(3)->get();
@@ -233,6 +233,12 @@ class HomeController extends Controller
 				
 				
 
+			]);
+		}else if(Auth::user() && Auth::user()->u_type == 6){
+			$userId = Auth::user()->id;
+			$promoCodeStatus= '1';
+
+			return view('Employee.UserEmployee.Dashboard')->with([
 			]);
 		}
 		else{

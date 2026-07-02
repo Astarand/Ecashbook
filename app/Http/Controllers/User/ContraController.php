@@ -2310,11 +2310,15 @@ class ContraController extends Controller
 		if (!empty($request->party_type)) {
 			$query->where('payment_vouchers.party_type', $request->party_type);
 		}
+		
+		if (!empty($request->record_type)) {
+			$query->where('payment_vouchers.record_type', $request->record_type);
+		}
 
 		$data = $query
-			->orderBy('payment_vouchers.id', 'DESC')
-			->paginate(10)
-			->appends($request->all());
+			->orderBy('payment_vouchers.id', 'DESC')->get();
+			//->paginate(10)
+			//->appends($request->all());
 
 		return view('User.payment-voucher-list', compact('data','proprietorships','banks', 'req_type'));
 	}

@@ -60,8 +60,17 @@ class TaxDeductionController extends Controller
     // =========================
     public function index()
     {
-        $data = DB::table('tax_deduction_masters')
-            ->orderBy('rule_priority', 'desc')
+        $data = DB::table('tax_deduction_masters as tdm')
+            ->leftJoin('dropdown_values as dv', function ($join) {
+                $join->on('dv.option_value', '=', 'tdm.expense_head')
+                    ->where('dv.status', 1);
+            })
+            ->select(
+                'tdm.*',
+                'dv.option_text as expense_head_name',
+                'dv.type as expense_head_type'
+            )
+            ->orderBy('tdm.id', 'desc')
             ->get();
 
         return view('Admin.tax_deduction.index', compact('data'));
@@ -82,32 +91,29 @@ class TaxDeductionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'deduction_name' => 'required|string|max:255',
-            'deduction_category' => 'required',
-            'deduction_type' => 'required',
+            
+            'accounting_module' => 'required',
             'tax_treatment' => 'required',
         ]);
 
         DB::table('tax_deduction_masters')->insert([
-            'deduction_name' => $request->deduction_name,
-            'income_tax_section' => $request->income_tax_section,
-            'deduction_category' => $request->deduction_category,
-            'deduction_type' => $request->deduction_type,
-            'tax_treatment' => $request->tax_treatment,
-            'limit_type' => $request->limit_type,
-            'base_amount_source' => $request->base_amount_source,
-            'automation_mode' => $request->automation_mode,
-            'limit_value' => $request->limit_value,
-            'limit_rate' => $request->limit_rate,
-            'limit_formula' => $request->limit_formula,
-            'applicable_fy' => $request->applicable_fy,
-            'linked_module' => $request->linked_module,
-            'rule_priority' => $request->rule_priority ?? 0,
-            'is_active' => 1,
-            'created_at' => now(),
+
+            'accounting_module'   => $request->accounting_module,
+            'expense_type'        => $request->expense_type,
+            'expense_head'        => $request->expense_head,
+
+            'tax_treatment'       => $request->tax_treatment,
+            'allowed_ratio'       => $request->allowed_ratio,
+            'allow_start'         => $request->allow_start,
+            'allow_end'           => $request->allow_end,
+
+            'is_active'           => 1,
+            'created_at'          => now(),
+            'updated_at'          => now(),
         ]);
 
-        return redirect()->route('tax.index')->with('success', 'Created successfully');
+        return redirect()->route('tax.index')
+            ->with('success', 'Created successfully');
     }
 
     // =========================
@@ -115,10 +121,11 @@ class TaxDeductionController extends Controller
     // =========================
     public function edit($id)
     {
-        $deduction = DB::table('tax_deduction_masters')->where('id', $id)->first();
-        $dropdowns = $this->getDropdowns();
+        $deduction = DB::table('tax_deduction_masters')
+            ->where('id', $id)
+            ->first();
 
-        return view('Admin.tax_deduction.edit', compact('deduction', 'dropdowns'));
+        return view('Admin.tax_deduction.edit', compact('deduction'));
     }
 
     // =========================
@@ -127,34 +134,39 @@ class TaxDeductionController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'deduction_name' => 'required',
-            'deduction_category' => 'required',
-            'deduction_type' => 'required',
-            'tax_treatment' => 'required',
+            
+            'accounting_module' => 'required',
+            'tax_treatment'     => 'required',
         ]);
 
         DB::table('tax_deduction_masters')
             ->where('id', $id)
             ->update([
-                'deduction_name' => $request->deduction_name,
-                'income_tax_section' => $request->income_tax_section,
-                'deduction_category' => $request->deduction_category,
-                'deduction_type' => $request->deduction_type,
-                'tax_treatment' => $request->tax_treatment,
-                'limit_type' => $request->limit_type,
-                'base_amount_source' => $request->base_amount_source,
-                'automation_mode' => $request->automation_mode,
-                'limit_value' => $request->limit_value,
-                'limit_rate' => $request->limit_rate,
-                'limit_formula' => $request->limit_formula,
-                'applicable_fy' => $request->applicable_fy,
-                'linked_module' => $request->linked_module,
-                'rule_priority' => $request->rule_priority ?? 0,
-                //'is_active' => $request->is_active,
-                'updated_at' => now(),
+
+                'accounting_module'  => $request->accounting_module,
+                'expense_type'       => $request->expense_type,
+                'expense_head'       => $request->expense_head,
+
+                'tax_treatment'      => $request->tax_treatment,
+
+                'allowed_ratio'      => $request->tax_treatment == 'Disallowed'
+                                            ? 0
+                                            : $request->allowed_ratio,
+
+                'allow_start'        => $request->tax_treatment == 'Partial Allowed'
+                                            ? $request->allow_start
+                                            : null,
+
+                'allow_end'          => $request->tax_treatment == 'Partial Allowed'
+                                            ? $request->allow_end
+                                            : null,
+
+                'updated_at'         => now(),
             ]);
 
-        return redirect()->route('tax.index')->with('success', 'Updated successfully');
+        return redirect()
+            ->route('tax.index')
+            ->with('success', 'Updated successfully');
     }
 
     // =========================
@@ -162,10 +174,19 @@ class TaxDeductionController extends Controller
     // =========================
     public function show($id)
     {
-        $deduction = DB::table('tax_deduction_masters')->where('id', $id)->first();
-        $dropdowns = $this->getDropdowns();
+        $deduction = DB::table('tax_deduction_masters as tdm')
+            ->leftJoin('dropdown_values as dv', function ($join) {
+                $join->on('dv.option_value', '=', 'tdm.expense_head')
+                    ->where('dv.status', 1);
+            })
+            ->select(
+                'tdm.*',
+                'dv.option_text as expense_head_name'
+            )
+            ->where('tdm.id', $id)
+            ->first();
 
-        return view('Admin.tax_deduction.show', compact('deduction', 'dropdowns'));
+        return view('Admin.tax_deduction.show', compact('deduction'));
     }
 
     // =========================
@@ -176,5 +197,19 @@ class TaxDeductionController extends Controller
         DB::table('tax_deduction_masters')->where('id', $id)->delete();
 
         return redirect()->route('tax.index')->with('success', 'Deleted successfully');
+    }
+
+    // Get the Expense 
+    public function getExpenseHead(Request $request)
+    {
+        $heads = DB::table('dropdown_values')
+            ->where('status', 1)
+            ->where('module', 'Expense')
+            ->where('dropdown_name', $request->expense_type)
+            ->select('option_value', 'option_text')
+            ->orderBy('option_text')
+            ->get();
+
+        return response()->json($heads);
     }
 }

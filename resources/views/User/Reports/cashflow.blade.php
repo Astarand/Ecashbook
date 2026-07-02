@@ -79,7 +79,6 @@
                             <div class="col-md-3">
                                 <label class="form-label">Cashflow Type <span class="text-danger">*</span></label>
                                 <select class="form-select" name="cashflow_type" id="cashflow_type" required>
-                                    <option value="">Select Cashflow Type</option>
                                     <option value="all">All</option>
                                     <option value="operating">Operating Activities</option>
                                     <option value="investing">Investing Activities</option>
@@ -94,7 +93,7 @@
                                     <option value="all">All</option>
                                     <option value="receipt">Receipt</option>
                                     <option value="payment">Payment</option>
-                                    <option value="contra">Contra (Cash + Banking)</option>
+                                    <!--<option value="contra">Contra (Cash + Banking)</option>-->
                                 </select>
                             </div>
 
@@ -103,13 +102,13 @@
                                 <label class="form-label">Mode of Payment</label>
                                 <select class="form-select" name="payment_mode" id="payment_mode">
                                     <option value="all">All</option>
-                                    <option value="bank">Bank Transfer</option>
-                                    <option value="upi">UPI / QR</option>
-                                    <option value="card">Card / POS</option>
-                                    <option value="cheque">Cheque</option>
-                                    <option value="cash">Cash</option>
+                                    <option value="Bank">Bank Transfer</option>
+                                    <option value="UPI">UPI / QR</option>
+									<option value="Cash">Cash</option>
+                                    <!--<option value="card">Card / POS</option>
+                                    <option value="cheque">Cheque</option>                                    
                                     <option value="payment_gateway">Payment Gateway</option>
-                                    <option value="international_transfer">International Transfer</option>
+                                    <option value="international_transfer">International Transfer</option>-->
                                 </select>
                             </div>
 
@@ -150,7 +149,7 @@
                                     <th style="border:1px solid #000;">Cash / Bank Ledger</th>
                                     <th style="border:1px solid #000;">Cash Inflow (₹)</th>
                                     <th style="border:1px solid #000;">Cash Outflow (₹)</th>
-                                    <th style="border:1px solid #000;">Net Cash Flow (₹)</th>
+                                    <th style="border:1px solid #000;">Running Cash Balance (₹)</th>
                                 </tr>
                             </thead>
 
@@ -363,47 +362,60 @@
 	let cashFlowRows = [];
 	let currentPage = 1;
 	let rowsPerPage = 10;
-
+	
 	function renderTablePage() 
 	{
+
 		let start = 0;
-		let end   = cashFlowRows.length;
+		let end = cashFlowRows.length;
 
 		if (rowsPerPage !== 'all') {
 			start = (currentPage - 1) * rowsPerPage;
-			end   = start + rowsPerPage;
+			end = start + rowsPerPage;
 		}
 
 		let html = '';
 
-		cashFlowRows.slice(start, end).forEach(r => {
+		cashFlowRows.slice(start, end).forEach(function(r){
+
 			html += `
 			<tr>
 				<td>${formatDateDMY(r.date)}</td>
-				<td>${formatText(r.particulars)}</td>
-				<td>${r.voucher ?? '-'}</td>
-				<td>${r.voucher_type}</td>
-				<td>${r.cashflow_type}</td>
-				<td>${r.mode}</td>
-				<td>${r.ledger}</td>
-				<td>${formatINR(r.inflow)}</td>
-				<td>${formatINR(r.outflow)}</td>
-				<td>${formatINR(r.balance)}</td>
+				<td>${formatText(r.party || '-')}</td>
+				<td>${r.voucher_no || '-'}</td>
+				<td>${r.voucher_type || '-'}</td>
+				<td>${r.activity || '-'}</td>
+				<td>${r.mode || '-'}</td>
+				<td>${r.ledger || '-'}</td>
+
+				<td class="text-success fw-bold text-end">
+					${formatINR(r.inflow)}
+				</td>
+
+				<td class="text-danger fw-bold text-end">
+					${formatINR(r.outflow)}
+				</td>
+
+				<td class="text-end">
+					${formatINR(r.balance)}
+				</td>
 			</tr>`;
 		});
 
 		$('#cashFlowData').html(
-			html || `<tr><td colspan="15" class="text-center">No Data</td></tr>`
+			html || `<tr><td colspan="10" class="text-center">No Data</td></tr>`
 		);
 
-		const totalPages = rowsPerPage === 'all'
-			? 1
-			: Math.ceil(cashFlowRows.length / rowsPerPage);
+		let totalPages = 1;
+
+		if(rowsPerPage !== 'all'){
+			totalPages = Math.ceil(cashFlowRows.length / rowsPerPage);
+		}
 
 		$('#pageInfo').text(`Page ${currentPage} of ${totalPages}`);
 
-		$('#prevPage').prop('disabled', currentPage === 1 || rowsPerPage === 'all');
-		$('#nextPage').prop('disabled', currentPage >= totalPages || rowsPerPage === 'all');
+		$('#prevPage').prop('disabled', currentPage == 1 || rowsPerPage == 'all');
+		$('#nextPage').prop('disabled', currentPage >= totalPages || rowsPerPage == 'all');
 	}
 
 	
@@ -448,33 +460,31 @@
 				cashFlowRows = res.rows || [];
 				currentPage = 1;
 				renderTablePage();
+				
+				$('.openingBalance').text("₹ " + formatINR(res.opening));
+				$('.closingBalance').text("₹ " + formatINR(res.closing));
 
-				const totalIn  = parseFloat(res.total_in  || 0);
-				const totalOut = parseFloat(res.total_out || 0);
+				$('.cashInFlow').text("₹ " + formatINR(res.total_in));
+				$('.cashOutFlow').text("₹ " + formatINR(res.total_out));
 
-				const netCashFlow = totalIn - totalOut;
+				let net = res.closing;
 
-				$('.cashInFlow').text(`₹ ${formatINR(totalIn)}`);
-				$('.cashOutFlow').text(`₹ ${formatINR(totalOut)}`);
-
-				// Net Cash Flow (with sign handling)
-				if (netCashFlow < 0) {
-					$('.netCashFlow')
-						.text(`₹ ${formatINR(netCashFlow)}`)
-						.addClass('text-danger')
-						.removeClass('text-black');
-				} else {
-					$('.netCashFlow')
-						.text(`₹ ${formatINR(netCashFlow)}`)
-						.addClass('text-black')
-						.removeClass('text-danger');
-				}
+				$('.netCashFlow')
+					.text("₹ " + formatINR(net))
+					.toggleClass('text-danger', net < 0)
+					.toggleClass('text-success', net >= 0);
+				
 			}
 		});
 	});
 	
 	function formatINR(amount) {
-		return Number(amount).toLocaleString('en-IN');
+		 amount = parseFloat(amount || 0);
+
+		return amount.toLocaleString('en-IN',{
+			minimumFractionDigits:2,
+			maximumFractionDigits:2
+		});
 	}
 	
 	function formatText(str) {

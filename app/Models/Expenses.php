@@ -16,6 +16,7 @@ class Expenses extends Model
 
         // Basic Expense Info
         'expense_date',
+        'threshold_type',
         'pur_of_expense',
         'mode_of_expense',
         'expense_cat',
@@ -75,6 +76,11 @@ class Expenses extends Model
         // ✅ Vendor
         'vendor_id',
         'vendor_pan',
+		
+        'deduction_amount',
+        'tax_treatment',
+        'allowed_ratio',
+        'rebate_amt',
 
         // Timestamps
         'created_at',

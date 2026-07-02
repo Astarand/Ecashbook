@@ -418,11 +418,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 mb-3"></div>
-                                    <div class="col-md-6 mb-3 text-end">
+                                    <div class="col-md-1 mb-3"></div>
+                                    <div class="col-md-11 mb-3 text-end">
                                     <a href="javascript:void(0);" onclick="addProductItems_purchase()" class="btn btn-outline-secondary me-3"> Add These Item</a>
                                     <a href="javascript:void(0);" onclick="addAnotherProduct()" class="btn btn-primary"> Add Another Item</a>                                       
                                     <a href="javascript:void(0);" id="addProductService" class="btn btn-outline-secondary me-3">Add Product/Service</a>
+									<a href="javascript:void(0);" id="addShippingCost" class="btn btn-warning">Add Shipping Cost</a>
 									</div>
                                 </div>
                                 <div class="row" id="invoiceData">
@@ -449,6 +450,7 @@
 													$totalDisc = 0;
 													$totalTax = 0;
 													$totalAmount = 0;
+													$shippingCost = 0;
 													$totalGovPay = 0;
 													$totalSerPay = 0;
 													$gst_trans = "";
@@ -531,11 +533,17 @@
 														<p class="f-w-600 mb-1 text-end">₹{{ number_format($totalTax, 2) }}</p>
 													</div>
 												@endif
+												<div class="col-6">
+                                                    <p class="f-w-600 mb-1 text-start">Shipping Cost :</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p class="f-w-600 mb-1 text-end" id="shippingCost">₹<?php echo getRoundedAmount($sales->shipping_cost); ?></p>
+                                                </div>
                                                 <div class="col-6">
                                                     <p class="f-w-600 mb-1 text-start">Grand Total :</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹<?php echo getRoundedAmount($totalAmount + $totalTax); ?></p>
+                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹<?php echo getRoundedAmount($totalAmount + $totalTax + $sales->shipping_cost); ?></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -779,6 +787,42 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="shippingCostModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Shipping Cost</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="shipping_purchase_id" value="{{ $sales->id }}">
+
+                <div class="mb-3">
+                    <label>Shipping Cost</label>
+                    <input type="number"
+                           class="form-control"
+                           id="shipping_cost_input"
+                           value="{{ $sales->shipping_cost ?? 0 }}"
+                           min="0"
+                           step="0.01">
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary"
+                        onclick="saveShippingCostPurchase()">
+                    Save
+                </button>
+            </div>
+
         </div>
     </div>
 </div>

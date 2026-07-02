@@ -21,6 +21,7 @@
 													$totalTax = 0;
 													$totalAmount = 0;
 													$special_discount_amount = 0;
+													$shippingCost = 0;
 													$totalGovPay = 0;
 													$totalSerPay = 0;
 													$gst_trans = ""; 
@@ -50,6 +51,7 @@
 														$totalTax += $value->tax_amt;
 														$totalAmount += $value->amount;
 														$gst_trans = $value->gst_trans;
+														$shippingCost = $value->shipping_cost ?? 0;
 													?>
                                                     @endforeach
                                                 </tbody>
@@ -102,11 +104,17 @@
 														<p class="f-w-600 mb-1 text-end">₹{{ number_format($totalTax, 2) }}</p>
 													</div>
 												@endif
+												<div class="col-6">
+                                                    <p class="f-w-600 mb-1 text-start">Shipping Cost :</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p class="f-w-600 mb-1 text-end" id="shipping_cost">₹<?php echo getRoundedAmount($shippingCost); ?></p>
+                                                </div>
                                                 <div class="col-6">
                                                     <p class="f-w-600 mb-1 text-start">Grand Total :</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹<?php echo getRoundedAmount($totalAmount + $totalTax); ?></p>
+                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹<?php echo getRoundedAmount($totalAmount + $totalTax + $shippingCost); ?></p>
                                                 </div>
                                             </div>
                                         </div>

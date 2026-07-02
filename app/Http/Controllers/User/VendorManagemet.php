@@ -49,7 +49,7 @@ class VendorManagemet extends Controller
       //$this->middleware('auth'); 
       $title = 'vendors';
       $userId = currentOwnerId();
-	  checkCoreAccess('Accounting');
+	  checkCoreAccess('Biz Operations');
       //$vendors = DB::table('vendors')->where('userId', '=', $userId)->orderBy('id', 'DESC')->paginate(10);
       if(Auth::user()->u_type ==1){ //ca
         $vendors =  DB::table('vendors')

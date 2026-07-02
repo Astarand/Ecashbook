@@ -2435,6 +2435,39 @@ function addProductItems() {
     }
 }
 
+$("#addShippingCost").click(function () {
+    $("#shippingCostModal").modal("show");
+});
+
+function saveShippingCostPurchase() {
+
+    var base_url = $("#base_url").val();
+
+    $.ajaxSetup({
+        headers:{
+            "X-CSRF-TOKEN":$('meta[name="csrf-token"]').attr("content")
+        }
+    });
+
+    var sId = $("#shipping_purchase_id").val();
+    var shipping_cost = $("#shipping_cost_input").val();
+
+    $.ajax({
+        type:"POST",
+        url:base_url+"/purchase_shipping_cost",
+        data:{
+            sId:sId,
+            shipping_cost:shipping_cost
+        },
+
+        success:function(result){
+            $("#shippingCostModal").modal("hide");
+            $("#invoiceData").html(result);
+            updateTotalAmount();
+        }
+    });
+}
+
 function addProductItems_purchase() {
     var base_url = $("#base_url").val();
     $.ajaxSetup({

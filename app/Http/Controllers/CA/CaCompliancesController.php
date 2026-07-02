@@ -40,7 +40,7 @@ class CaCompliancesController extends Controller
 				->orderBy('statutorys.id', 'DESC')->paginate(10);
 		}  elseif (Auth::user()->u_type == 2 || Auth::user()->u_type == 5) { //user
 			$userId = currentOwnerId();
-			checkCoreAccess('Statutory Compliance Status');
+			checkCoreAccess('Compliance Overview');
 			$statutory =  DB::table('statutorys')
 				->select(DB::raw('statutorys.*,company_profiles.comp_name'))
 				->leftJoin('company_profiles', 'statutorys.compId', '=', 'company_profiles.userId')

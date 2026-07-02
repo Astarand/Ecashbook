@@ -47,7 +47,7 @@ class AssetController extends Controller
         //$this->middleware('auth');
 		$title = 'Assets';
 		$userId = currentOwnerId();
-		checkCoreAccess('Assets & Liabilities');
+		checkCoreAccess('Asset Management');
 
 		$req_tag = 0;
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
@@ -220,7 +220,7 @@ class AssetController extends Controller
     {
         //$this->middleware('auth');
 		$userId = currentOwnerId();
-		checkCoreAccess('Assets & Liabilities');
+		checkCoreAccess('Asset Management');
 		//$purposes_of_tds = DB::table('purposes_of_tds')->get();
 		$purposes_of_tds = DB::table('tds_rules')
 							->where('module', '=', 'Assets')
@@ -1167,7 +1167,7 @@ class AssetController extends Controller
 
 		$title = 'Asset Vouchers';
 		$userId = currentOwnerId();
-		checkCoreAccess('Assets & Liabilities');
+		checkCoreAccess('Asset Management');
 
 		//start ca-accountant access
 		$req_type = 0;
@@ -1290,7 +1290,7 @@ class AssetController extends Controller
     {
         //$this->middleware('auth');
 		$userId = currentOwnerId();
-		checkCoreAccess('Assets & Liabilities');
+		checkCoreAccess('Asset Management');
 		$vendors = DB::table('vendors')
 							->select(DB::raw('vendors.id,vendors.vendor_name'))
 							->where('userId','=',$userId)

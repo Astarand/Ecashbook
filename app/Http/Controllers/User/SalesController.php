@@ -42,7 +42,7 @@ class SalesController extends Controller
 		$userId = currentOwnerId();
 		$search = $request->search;
 		$searchDate = $request->search_date;
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Sales & Invoicing');
 
 		//start ca-accountant access
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
@@ -354,7 +354,7 @@ class SalesController extends Controller
 	{
 
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$invoiceNo = DB::table('sales')
 			->select(DB::raw('MAX(id) as id'))
 			->get();
@@ -774,7 +774,7 @@ class SalesController extends Controller
 		}
 		$sId = base64_decode($sId);
 		$uid = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$sales = DB::table('sales')
 			->where('id', '=', $sId)
 			->get();
@@ -893,7 +893,7 @@ class SalesController extends Controller
 		} else {
 			$uid = session('compId'); //ca-accountant access
 		}
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$sales = DB::table('sales')
 			->where('id', '=', $sId)
 			->get();
@@ -2173,7 +2173,7 @@ class SalesController extends Controller
 		//$this->middleware('auth');
 		$title = 'Sales Credit Dabit Notes';
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Sales & Invoicing');
 
 		
 
@@ -2269,7 +2269,7 @@ class SalesController extends Controller
 		$vNo = isset($vNo[0]->id) ? $vNo[0]->id : 0;
 		$vNo = Helper::invoice_num($vNo + 1, 7, "VN-");
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$compData = DB::table('company_profiles')
 		->select(DB::raw('comp_name,comp_phone,comp_email,comp_pan_no,comp_bill_addone,comp_bill_addtwo,comp_bill_pin,comp_bill_state,comp_bill_city'))
 		->where('company_profiles.userId', '=', $userId)
@@ -2453,7 +2453,7 @@ class SalesController extends Controller
 		// echo $uid;
 		// exit;
 		
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$sId = base64_decode($sId);
 		$sales = DB::table('vouchers')
 			->where('id', '=', $sId)
@@ -2499,7 +2499,7 @@ class SalesController extends Controller
 
 	public function edit_sales_invoice_credit_debit($sId)
 	{
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$sId = base64_decode($sId);
 		$sales = DB::table('vouchers')
 			->where('id', '=', $sId)

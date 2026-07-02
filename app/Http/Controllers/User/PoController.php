@@ -32,7 +32,7 @@ class PoController extends Controller
     {
         $title = 'Purchase Invoice';
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Purchase');
 		//start ca-accountant access
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 			$userId = getAccessCompanyId($request);
@@ -253,7 +253,7 @@ class PoController extends Controller
     public function CreatePurchaseOrder()
     {
         $userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$invoiceNo = $this->create_po_invoice_number($userId);
 		$compData = DB::table('company_profiles')
 								->select(DB::raw('comp_name,comp_phone,comp_email,comp_pan_no,gst_no,comp_bill_pin,comp_bill_addone,comp_bill_addtwo,comp_bill_name,comp_bill_mobile_no,comp_bill_state,comp_bill_city'))
@@ -729,7 +729,7 @@ class PoController extends Controller
 			return redirect('/purchase-order');
 		}
 		$uid = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		$sId = base64_decode($sId);
 		$sales = DB::table('puos')
 								->where('id', '=', $sId)

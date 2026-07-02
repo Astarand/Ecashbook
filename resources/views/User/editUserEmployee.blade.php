@@ -10,7 +10,7 @@
                 <div class="col-md-12 d-flex justify-content-between align-items-center">
                     <ul class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('user.Employeelist') }}">Employees</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('user.EmployeeList') }}">Employees</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Edit Employee Profile</li>
                     </ul>
                     <a href="javascript:void(0);" id="start-edit-user-employee-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
@@ -844,28 +844,81 @@
                                     </div>
 									@if(Auth::user()->u_type == 2)
                                     <div class="mb-3 row">
-										<div class="col-sm-12">
-											<div class="d-flex flex-wrap justify-content-start">
-												<?php $empPermissions = explode(',', $employee->emp_permission); ?>
-												@foreach($menu_features as $key => $feature)
-													<div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-														<div class="form-check">
-															<input class="form-check-input"
-																   type="checkbox"
-																   name="emp_permission[]"
-																   value="{{ $feature->code }}"
-																   id="customCheckinlh{{ $key }}" {{ in_array($feature->code, $empPermissions) ? 'checked' : '' }}>
+										@php
+                                            $empPermissions = !empty($employee->emp_permission)
+                                                ? explode(',', $employee->emp_permission)
+                                                : [];
+                                        @endphp
 
-															<label class="form-check-label"
-																   for="customCheckinlh{{ $key }}">
-																{{ $feature->code }}
-															</label>
-														</div>
-													</div>
-												@endforeach
+                                        <div class="row">
 
-											</div>
-										</div>
+                                            @foreach($mainMenus as $mainMenu)
+
+                                                @php
+                                                    $subMenus = $menu_features->where('parent_id', $mainMenu->id);
+                                                @endphp
+
+                                                <div class="col-md-4 mb-4">
+
+                                                    <div class="card border shadow-sm h-100">
+
+                                                        <div class="card-header bg-primary text-white fw-bold">
+                                                            {{ $mainMenu->menu_name }}
+                                                        </div>
+
+                                                        <div class="card-body">
+
+                                                            @if($subMenus->count())
+
+                                                                @foreach($subMenus as $submenu)
+
+                                                                    <div class="form-check mb-2">
+
+                                                                        <input
+                                                                            class="form-check-input submenu-checkbox"
+                                                                            type="checkbox"
+                                                                            name="emp_permission[]"
+                                                                            value="{{ $submenu->code }}"
+                                                                            id="menu{{ $submenu->id }}"
+                                                                            {{ in_array($submenu->code, $empPermissions) ? 'checked' : '' }}>
+
+                                                                        <label class="form-check-label" for="menu{{ $submenu->id }}">
+                                                                            {{ $submenu->menu_name }}
+                                                                        </label>
+
+                                                                    </div>
+
+                                                                @endforeach
+
+                                                            @else
+
+                                                                <div class="form-check">
+
+                                                                    <input
+                                                                        class="form-check-input"
+                                                                        type="checkbox"
+                                                                        name="emp_permission[]"
+                                                                        value="{{ $mainMenu->code }}"
+                                                                        id="menu{{ $mainMenu->id }}"
+                                                                        {{ in_array($mainMenu->code, $empPermissions) ? 'checked' : '' }}>
+
+                                                                    <label class="form-check-label" for="menu{{ $mainMenu->id }}">
+                                                                        {{ $mainMenu->menu_name }}
+                                                                    </label>
+
+                                                                </div>
+
+                                                            @endif
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            @endforeach
+
+                                        </div>
 									</div>
 									@else
 									<div class="mb-3 row">
@@ -2060,24 +2113,67 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+
+
+    //--------- Employee Permission --------
+    $(document).ready(function () {
+
+        let all = $('input[name="emp_permission[]"][value="All"]');
+        let noAccess = $('input[name="emp_permission[]"][value="No Access"]');
+        let others = $('input[name="emp_permission[]"]').not(all).not(noAccess);
+
+        if (others.length === others.filter(':checked').length) {
+            all.prop('checked', true);
+        }
+
+    });
 	
 	$('input[name="emp_permission[]"]').on('change', function () {
 
-		let noAccess = $('input[name="emp_permission[]"][value="No Access"]');
+        let all = $('input[name="emp_permission[]"][value="All"]');
+        let noAccess = $('input[name="emp_permission[]"][value="No Access"]');
+        let others = $('input[name="emp_permission[]"]').not(all).not(noAccess);
 
-		if ($(this).val() === "No Access") {
-			if ($(this).is(':checked')) {
-				// Uncheck all others
-				$('input[name="emp_permission[]"]').not(this).prop('checked', false);
-			}
-		} else {
-			// If any other checkbox is checked → uncheck No Access
-			if ($(this).is(':checked')) {
-				noAccess.prop('checked', false);
-			}
-		}
+        // When "All" is clicked
+        if ($(this).val() === "All") {
 
-	});
+            if ($(this).is(':checked')) {
+                others.prop('checked', true);
+                noAccess.prop('checked', false);
+            } else {
+                others.prop('checked', false);
+            }
+
+            return;
+        }
+
+        // When "No Access" is clicked
+        if ($(this).val() === "No Access") {
+
+            if ($(this).is(':checked')) {
+                $('input[name="emp_permission[]"]')
+                    .not(this)
+                    .prop('checked', false);
+            }
+
+            return;
+        }
+
+        // Any normal menu checked
+        if ($(this).is(':checked')) {
+            noAccess.prop('checked', false);
+        }
+
+        // If any normal menu is unchecked, uncheck "All"
+        if (!$(this).is(':checked')) {
+            all.prop('checked', false);
+        }
+
+        // Auto check "All" when every normal menu is checked
+        if (others.length === others.filter(':checked').length) {
+            all.prop('checked', true);
+        }
+    });
 
     function startEditUserEmployeeTour() {
         if (typeof introJs !== 'function') return;

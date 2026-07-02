@@ -43,7 +43,7 @@ class ProductServiceController extends Controller
 		//echo"Hello";exit;
         $title = 'products';
         $userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		if(Auth::user()->u_type ==1){ //ca
 			$items =  DB::table('products')
 							->select(DB::raw('products.*,company_profiles.comp_name,ca_assigns.ca_id'))

@@ -249,10 +249,10 @@ use Illuminate\Support\Str;
                                                 <i class="ph-duotone ph-x"></i>
                                             </button>
                                             @endif
-                                            <button class="btn btn-sm btn-outline-danger"
+                                            {{-- <button class="btn btn-sm btn-outline-danger"
                                                 onclick="deleteWFHRequest({{ $wfh->id }})" title="Delete Request">
                                                 <i class="ph-duotone ph-trash"></i>
-                                            </button>
+                                            </button> --}}
                                         </div>
                                     </td>
                                 </tr>
@@ -601,7 +601,7 @@ function showWFHDateDetails(dateString, wfhInfo) {
                         <button type="button" class="btn btn-success" onclick="acceptWFHRequest(${wfhInfo.id})">Accept</button>
                         <button type="button" class="btn btn-danger" onclick="rejectWFHRequest(${wfhInfo.id})">Reject</button>
                         ` : ''}
-                        <button type="button" class="btn btn-outline-danger" onclick="deleteWFHRequest(${wfhInfo.id})">Delete</button>
+                        
                     </div>
                 </div>
             </div>

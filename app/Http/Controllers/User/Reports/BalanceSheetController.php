@@ -48,7 +48,7 @@ class BalanceSheetController extends Controller
 			$userId = getAccessCompanyId($request);
 		}
 		//end ca-accountant access
-		checkCoreAccess('Financial Reports');
+		checkCoreAccess('Balance Sheet');
 		$previousYearData = DB::table('balance_sheets')
             ->where('added_by', $userId)
             ->first();

@@ -30,9 +30,6 @@
     </div>
     <!-- [ breadcrumb ] end -->
 
-    <div class="row mb-4">
-        <h3>Edit Expenses</h3>
-    </div>
     <div class="card">
         <div class="card-body">
             <form action="javascript:void(0);" method="POST" enctype="multipart/form-data" name="addExpenseFrm" id="addExpenseFrm">
@@ -58,71 +55,18 @@
                             <option value="">Select</option>
                             <option value="direct" {{ ($expenses->expense_cat == 'direct') ? 'selected' : '' }}>Direct Expenses</option>
                             <option value="indirect" {{ ($expenses->expense_cat == 'indirect') ? 'selected' : '' }}>Indirect Expenses</option>
+                            
                         </select>
                     </div>
 
                     <!-- Direct Expenses Section -->
                     <div id="directExpensesSection" class="col-sm-4 mb-3" style="display: none;">
-                        <label class="form-label">Direct Expenses Type<span class="text-danger">*</span></label>
-                        {{-- <select id="directExpensesType" class="form-control" name="direct_expense_type">
-                            <option value="">Select</option>
-                            <option value="raw_material" {{ ($expenses->expense_type == 'raw_material') ? 'selected' : '' }}>Raw Material Costs</option>
-                            <option value="direct_labor" {{ ($expenses->expense_type == 'direct_labor') ? 'selected' : '' }}>Direct Labour</option>
-                            <option value="manufacturing_supplies" {{ ($expenses->expense_type == 'manufacturing_supplies') ? 'selected' : '' }}>Manufacturing Expenses</option>
-                            <option value="factory_utilities" {{ ($expenses->expense_type == 'factory_utilities') ? 'selected' : '' }}>Factory Utilities</option>
-                            <option value="freight_inwards" {{ ($expenses->expense_type == 'freight_inwards') ? 'selected' : '' }}>Freight / Carriage Inward</option>
-                            <option value="job_outsourcing" {{ ($expenses->expense_type == 'job_outsourcing') ? 'selected' : '' }}>Job Work / Outsourcing</option>
-                            <option value="packaging_costs" {{ ($expenses->expense_type == 'packaging_costs') ? 'selected' : '' }}>Packing Material</option>
-                            <option value="Other" {{ ($expenses->expense_type == 'Other') ? 'selected' : '' }}>Other Direct Expenses</option>
-                        </select> --}}
+                        <label class="form-label">Direct Expenses Type<span class="text-danger">*</span></label>                        
                         <select id="directExpensesType" class="form-control" name="direct_expense_type">
                             <option value="">Select</option>
 
-                            <option value="Raw Material Costs" 
-                                {{ ($expenses->expense_type == 'Raw Material Costs') ? 'selected' : '' }}>
-                                Raw Material Costs
-                            </option>
-
-                            <option value="Direct Labour" 
-                                {{ ($expenses->expense_type == 'Direct Labour') ? 'selected' : '' }}>
-                                Direct Labour
-                            </option>
-
-                            <option value="Manufacturing Expenses" 
-                                {{ ($expenses->expense_type == 'Manufacturing Expenses') ? 'selected' : '' }}>
-                                Manufacturing Expenses
-                            </option>
-
-                            <option value="Factory Utilities" 
-                                {{ ($expenses->expense_type == 'Factory Utilities') ? 'selected' : '' }}>
-                                Factory Utilities
-                            </option>
-
-                            <option value="Freight / Carriage Inward" 
-                                {{ ($expenses->expense_type == 'Freight / Carriage Inward') ? 'selected' : '' }}>
-                                Freight / Carriage Inward
-                            </option>
-
-                            <option value="Job Work / Outsourcing" 
-                                {{ ($expenses->expense_type == 'Job Work / Outsourcing') ? 'selected' : '' }}>
-                                Job Work / Outsourcing
-                            </option>
-
-                            <option value="Packing Material" 
-                                {{ ($expenses->expense_type == 'Packing Material') ? 'selected' : '' }}>
-                                Packing Material
-                            </option>
-
-                            <option value="freight_transport" 
-                                {{ ($expenses->expense_type == 'freight_transport') ? 'selected' : '' }}>
-                                Freight & Transport
-                            </option>
-
-                            <option value="Other" 
-                                {{ ($expenses->expense_type == 'Other') ? 'selected' : '' }}>
-                                Other Direct Expenses
-                            </option>
                         </select>
+						<small id="directExpenseTypeInfo" class="text-primary fw-bold mt-1 d-block"></small>
                     </div>
 
                     <!-- Indirect Expenses Section -->
@@ -130,49 +74,15 @@
                         <label class="form-label">Indirect Expenses Type<span class="text-danger">*</span></label>
                         <select id="indirectExpensesType" name="indirect_expense_type" class="form-control">
                             <option value="">Select</option>
-                            <option value="employee_benefits" {{ ($expenses->expense_type == 'employee_benefits') ? 'selected' : '' }}>Employee Expenses (Salary, Benefits)</option>
-                            <option value="rent_expense" {{ ($expenses->expense_type == 'rent_expense') ? 'selected' : '' }}>Rent Expense</option>
-                            <option value="electricity_expense" {{ ($expenses->expense_type == 'electricity_expense') ? 'selected' : '' }}>Electricity Expense</option>
-                            <option value="internet_communication" {{ ($expenses->expense_type == 'internet_communication') ? 'selected' : '' }}>Internet &amp; Communication</option>
-                            <option value="office_expenses" {{ ($expenses->expense_type == 'office_expenses') ? 'selected' : '' }}>Office Expenses</option>
-                            <option value="printing_stationery" {{ ($expenses->expense_type == 'printing_stationery') ? 'selected' : '' }}>Printing &amp; Stationery</option>
-                            <option value="travel_conveyance" {{ ($expenses->expense_type == 'travel_conveyance') ? 'selected' : '' }}>Travel &amp; Conveyance</option>
-                            <option value="repair_maintenance" {{ ($expenses->expense_type == 'repair_maintenance') ? 'selected' : '' }}>Repair &amp; Maintenance</option>
-                            <option value="professional_fees" {{ ($expenses->expense_type == 'professional_fees') ? 'selected' : '' }}>Professional Fees</option>
-                            <option value="audit_fees" {{ ($expenses->expense_type == 'audit_fees') ? 'selected' : '' }}>Audit Fees</option>
-                            <option value="legal_charges" {{ ($expenses->expense_type == 'legal_charges') ? 'selected' : '' }}>Legal Charges</option>
-                            <option value="bank_charges" {{ ($expenses->expense_type == 'bank_charges') ? 'selected' : '' }}>Bank Charges</option>
-                            <option value="interest_expense" {{ ($expenses->expense_type == 'interest_expense') ? 'selected' : '' }}>Interest Expense</option>
-                            <option value="depreciation" {{ ($expenses->expense_type == 'depreciation') ? 'selected' : '' }}>Depreciation</option>
-                            <option value="insurance_expense" {{ ($expenses->expense_type == 'insurance_expense') ? 'selected' : '' }}>Insurance Expense</option>
-                            <option value="marketing_advertisement" {{ ($expenses->expense_type == 'marketing_advertisement') ? 'selected' : '' }}>Marketing &amp; Advertisement</option>
-                            {{-- <option value="freight_transport" {{ ($expenses->expense_type == 'freight_transport') ? 'selected' : '' }}>Freight &amp; Transport</option> --}}
-                            <option value="miscellaneous_expenses" {{ ($expenses->expense_type == 'miscellaneous_expenses') ? 'selected' : '' }}>Miscellaneous Expenses</option>
                             
-                            <option value="income_tax_paid" {{ ($expenses->expense_type == 'income_tax_paid') ? 'selected' : '' }}>Income Tax Paid</option>
-                            <option value="gst_interest_penalty" {{ ($expenses->expense_type == 'gst_interest_penalty') ? 'selected' : '' }}>GST Interest &amp; Penalty</option>
-                            <option value="late_filing_penalty" {{ ($expenses->expense_type == 'late_filing_penalty') ? 'selected' : '' }}>Late Filing Penalty</option>
-                            <option value="personal_expenses" {{ ($expenses->expense_type == 'personal_expenses') ? 'selected' : '' }}>Personal Expenses</option>
-                            <option value="cash_payment_above_income_tax_limit" {{ ($expenses->expense_type == 'cash_payment_above_income_tax_limit') ? 'selected' : '' }}>Cash Payment above Income Tax limit</option>
-                            <option value="donation_non_approved" {{ ($expenses->expense_type == 'donation_non_approved') ? 'selected' : '' }}>Donation (Non-approved)</option>
-                            <option value="provision_for_expenses" {{ ($expenses->expense_type == 'provision_for_expenses') ? 'selected' : '' }}>Provision for Expenses</option>
-                            <option value="provision_for_doubtful_debts" {{ ($expenses->expense_type == 'provision_for_doubtful_debts') ? 'selected' : '' }}>Provision for Doubtful Debts</option>
-                            <option value="penalty_for_law_violation" {{ ($expenses->expense_type == 'penalty_for_law_violation') ? 'selected' : '' }}>Penalty for Law Violation</option>
-                            <option value="wealth_tax_personal_tax" {{ ($expenses->expense_type == 'wealth_tax_personal_tax') ? 'selected' : '' }}>Wealth Tax / Personal Tax</option>
-                            <option value="capital_loss" {{ ($expenses->expense_type == 'capital_loss') ? 'selected' : '' }}>Capital Loss</option>
-                            <option value="drawings_owner_withdrawals" {{ ($expenses->expense_type == 'drawings_owner_withdrawals') ? 'selected' : '' }}>Drawings / Owner Withdrawals</option>
-                            <option value="csr_expense(certain_cases)" {{ ($expenses->expense_type == 'csr_expense(certain_cases)') ? 'selected' : '' }}>CSR Expense (certain cases)</option>
-                            <option value="unpaid_pf_esi_beyond_due_date" {{ ($expenses->expense_type == 'unpaid_pf_esi_beyond_due_date') ? 'selected' : '' }}>Unpaid PF/ESI beyond due date</option>
-                            <option value="tds_not_deducted_deposited" {{ ($expenses->expense_type == 'tds_not_deducted_deposited') ? 'selected' : '' }}>TDS not deducted / deposited</option>
-                            <option value="expenses_without_proper_bills" {{ ($expenses->expense_type == 'expenses_without_proper_bills') ? 'selected' : '' }}>Expenses without proper bills</option>
-                            <option value="interest_on_business_loan" {{ ($expenses->expense_type == 'interest_on_business_loan') ? 'selected' : '' }}>Interest on Business Loan</option>
-                            <option value="software_subscription" {{ ($expenses->expense_type == 'software_subscription') ? 'selected' : '' }}>Software Subscription</option>
-                            <option value="hosting_cloud_expense" {{ ($expenses->expense_type == 'hosting_cloud_expense') ? 'selected' : '' }}>Hosting / Cloud Expense</option>
-                            <option value="motor_car_expense" {{ ($expenses->expense_type == 'motor_car_expense') ? 'selected' : '' }}>Motor Car Expense</option>
-                            <option value="entertainment_expense" {{ ($expenses->expense_type == 'entertainment_expense') ? 'selected' : '' }}>Entertainment Expense</option>
-                            <option value="director_expense" {{ ($expenses->expense_type == 'director_expense') ? 'selected' : '' }}>Director Expense</option>
                         </select>
+						<small id="indirectExpenseTypeInfo" class="text-primary fw-bold mt-1 d-block"></small>
                     </div>
+					
+				
+					
+					<input type="hidden" id="selected_direct_expense" value="{{ $expenses->expense_type }}">
+					<input type="hidden" id="selected_indirect_expense" value="{{ $expenses->expense_type }}">
 
                     <div id="normalExpenseFields" class="row">
 
@@ -208,7 +118,7 @@
                         </div>
 
                         <div class="col-sm-4 mb-3" id="payment_status_div">
-                            <label class="form-label">Payment Status</label>
+                            <label class="form-label">Payment Status <span class="text-danger">*</span></label>
                             <select id="payment_status" name="payment_status" class="form-control">
                                 <option value="">Select Payment Status</option>
                                 <option value="full" {{ $expenses->payment_status == 'full' ? 'selected' : '' }}>Full</option>
@@ -233,7 +143,7 @@
                         </div>
 
                         <div class="col-sm-4 mb-3">
-                            <label class="form-label">Payment Method<span class="text-danger">*</span></label>
+                            <label class="form-label">Payment Method</label>
                             <select class="form-select" name="mode_of_expense" id="mode_of_expense" required>
                                 <option value="">Select</option>
                                 <option value="NEFT" {{ ($expenses->mode_of_expense == 'NEFT') ? 'selected' : '' }}>NEFT</option>
@@ -246,6 +156,44 @@
                                 <option value="Cash" {{ ($expenses->mode_of_expense == 'Cash') ? 'selected' : '' }}>Cash</option>
                             </select>
                         </div>
+						
+						<div class="row mt-2 tax-info-section" style="{{ !empty($expenses->tax_treatment ?? '') ? '' : 'display:none;' }}">
+
+							<div class="col-md-4">
+								<label class="form-label">Tax Treatment</label>
+								<input type="text"
+									   id="tax_treatment"
+									   name="tax_treatment"
+									   class="form-control"
+									   value="{{ $expenses->tax_treatment ?? '' }}"
+									   readonly>
+							</div>
+
+							<div class="col-md-4">
+								<label class="form-label">Allowed Ratio (%)</label>
+								<input type="number"
+									   id="allowed_ratio"
+									   name="allowed_ratio"
+									   class="form-control"
+									   value="{{ $expenses->allowed_ratio ?? '' }}">
+							</div>
+
+							<div class="col-md-4">
+								<label class="form-label">Deduction Amount</label>
+								<input type="text"
+									   id="rebate_amt"
+									   name="rebate_amt"
+									   class="form-control"
+									   value="{{ $expenses->rebate_amt ?? '' }}"
+									   readonly>
+							</div>
+						</div>
+
+						<input type="hidden" id="old_allowed_ratio"
+							   value="{{ $expenses->allowed_ratio ?? '' }}">
+
+						<input type="hidden" id="old_rebate_amt"
+							   value="{{ $expenses->rebate_amt ?? '' }}">
 
                         <div class="col-sm-4 mb-3">
                             <label class="form-label">Party / Vendor Name<span class="text-danger">*</span></label>
@@ -276,18 +224,27 @@
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">TDS Applicable</label>
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-4">
                                         <div class="form-check">
                                             <input type="radio" name="tds_applicable" value="yes" id="tdsYes" {{ ($expenses->tds_applicable == 'yes') ? 'checked' : '' }}>
                                             <label for="tdsYes">Yes</label>
                                         </div>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-4">
                                         <div class="form-check">
                                             <input type="radio" name="tds_applicable" value="no" id="tdsNo" {{ ($expenses->tds_applicable != 'yes') ? 'checked' : '' }}>
                                             <label for="tdsNo">No</label>
                                         </div>
                                     </div>
+									<div class="col-4">
+										<label class="form-label fw-bold">Threshold Type <span class="text-danger">*</span></label>
+										<select id="threshold_type" name="threshold_type"  class="form-control">
+											<option value="">Select Threshold Type</option>
+											<option value="NA" {{ $expenses->threshold_type == 'NA' ? 'selected' : '' }}>N/A</option>
+											<option value="Single" {{ $expenses->threshold_type == 'Single' ? 'selected' : '' }}>Single</option>
+											<option value="Annual"{{ $expenses->threshold_type == 'Annual' ? 'selected' : '' }}>Annual</option>
+										</select>
+									</div>
                                 </div>
                             </div>
 
@@ -520,74 +477,163 @@
     //------ end GST calculation logic ------
 
     //------ start TDS auto fetch & calculation logic ------
-    document.addEventListener("DOMContentLoaded", function () {
+	document.addEventListener("DOMContentLoaded", function () {
 
-        const expenseCat    = document.getElementById("expense_cat");
-        const directType    = document.getElementById("directExpensesType");
-        const indirectType  = document.getElementById("indirectExpensesType");
-        const amountField   = document.getElementById("expense_amt");
+		const expenseCat = document.getElementById("expense_cat");
+		const directType = document.getElementById("directExpensesType");
+		const indirectType = document.getElementById("indirectExpensesType");
 
-        const tdsYes        = document.getElementById("tdsYes");
-        const tdsNo         = document.getElementById("tdsNo");
-        const tdsSection    = document.getElementById("tds_section");
+		const amountField = document.getElementById("expense_amt");
 
-        const tdsSectionField = document.getElementById("tds_section_field");
-        const tdsRateField    = document.getElementById("tds_rate_field");
-        const tdsAmountField  = document.getElementById("tds_amount_field");
-        const thresholdInput  = document.getElementById("tds_threshold_limit");
+		const tdsYes = document.getElementById("tdsYes");
+		const tdsNo = document.getElementById("tdsNo");
 
-        let currentRule = null;
+		const tdsSection = document.getElementById("tds_section");
 
-        // Pre-load existing TDS rule from saved data
-        if (tdsRateField.value && tdsSectionField.value) {
-            currentRule = {
-                tds_section:     tdsSectionField.value,
-                tds_rate:        parseFloat(tdsRateField.value),
-                threshold_limit: parseFloat(thresholdInput.value) || 0
-            };
-        }
+		const tdsSectionField = document.getElementById("tds_section_field");
+		const tdsRateField = document.getElementById("tds_rate_field");
+		const tdsAmountField = document.getElementById("tds_amount_field");
+		const thresholdInput = document.getElementById("tds_threshold_limit");
 
-        function getSelectedCategory() {
-            if (expenseCat.value === "direct")   return directType.value;
-            if (expenseCat.value === "indirect") return indirectType.value;
-            return null;
-        }
+		let currentRule = null;
 
-        function fetchTdsRule() {
-            const category = getSelectedCategory();
-            if (!category) { resetTDS(); return; }
+		//-------------------------------------------------------
+		// Selected Expense Head
+		//-------------------------------------------------------
+		function getSelectedCategory() {
 
-            fetch("/get-tds-rule", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ category: category })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.tds_rate !== null) {
-                    currentRule = data;
-                    tdsSectionField.value = data.tds_section || "";
-                    tdsRateField.value    = data.tds_rate    || "";
-                    thresholdInput.value  = data.threshold_limit || "";
-                    calculateTDS();
-                } else {
-                    resetTDS();
-                }
-            })
-            .catch(() => resetTDS());
-        }
+			if (expenseCat.value === "direct")
+				return directType.value;
 
-        function calculateTDS() {
+			if (expenseCat.value === "indirect")
+				return indirectType.value;
+
+			return "";
+		}
+
+		//-------------------------------------------------------
+		// Edit Page Load
+		//-------------------------------------------------------
+		if (
+			tdsYes.checked &&
+			tdsRateField.value &&
+			tdsSectionField.value
+		) {
+			currentRule = {
+				tds_section: tdsSectionField.value,
+				tds_rate: parseFloat(tdsRateField.value),
+				threshold_limit: parseFloat(thresholdInput.value) || 0
+			};
+
+			tdsSection.style.display = "flex";
+			calculateTDS();
+
+		} else {
+			resetTDS(false);
+		}
+
+		//-------------------------------------------------------
+		// YES Click
+		//-------------------------------------------------------
+		tdsYes.addEventListener("change", function () {
+
+			if (!this.checked)
+				return;
+
+			fetch("/check-company-policies")
+				.then(res => res.json())
+				.then(res => {
+					if (!res.comp_tan || res.comp_tan.trim() === "") {
+						showToast("Please update Company TAN in Organization Profile.", "error");
+						tdsYes.checked = false;
+						tdsNo.checked = true;
+						resetTDS();
+						return;
+					}
+
+					fetchTdsRule();
+
+				})
+				.catch(() => {
+					showToast("Unable to verify Company TAN.", "error");
+					tdsYes.checked = false;
+					tdsNo.checked = true;
+					resetTDS();
+				});
+		});
+
+		//-------------------------------------------------------
+		// NO Click
+		//-------------------------------------------------------
+		tdsNo.addEventListener("change", function () {
+			if (this.checked) {
+				resetTDS();
+			}
+		});
+
+		//-------------------------------------------------------
+		// Fetch TDS Rule
+		//-------------------------------------------------------
+		function fetchTdsRule() {
+
+			const category = getSelectedCategory();
+			if (!category) {
+				resetTDS(false);
+				return;
+			}
+
+			fetch("/get-tds-rule", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-CSRF-TOKEN": document
+						.querySelector('meta[name="csrf-token"]')
+						.content
+
+				},
+
+				body: JSON.stringify({
+					category: category
+				})
+
+			})
+
+			.then(res => res.json())
+			.then(data => {
+				if (!data || data.tds_rate == null) {
+					showToast("No TDS rule found.", "warning");
+					resetTDS(false);
+					return;
+				}
+
+				currentRule = data;
+				tdsSectionField.value = data.tds_section || "";
+				tdsRateField.value = data.tds_rate || "";
+				thresholdInput.value = data.threshold_limit || "";
+				calculateTDS();
+
+			})
+
+			.catch(function () {
+				showToast("Unable to fetch TDS Rule.", "error");
+				resetTDS(false);
+
+			});
+
+		}
+
+		//-------------------------------------------------------
+		// Calculate TDS
+		//-------------------------------------------------------
+		
+		function calculateTDS() {
             const amount = parseFloat(amountField.value) || 0;
             if (!currentRule || !currentRule.tds_rate) { resetTDS(); return; }
 
             const threshold = parseFloat(currentRule.threshold_limit) || 0;
             const rate      = parseFloat(currentRule.tds_rate) || 0;
 
-            if (amount > threshold) {
+            if (amount >= threshold) {
                 tdsYes.checked = true;
                 tdsNo.checked  = false;
                 tdsSection.style.display = "flex";
@@ -600,22 +646,45 @@
             }
         }
 
-        function resetTDS() {
-            currentRule = null;
-            tdsSectionField.value = "";
-            tdsRateField.value    = "";
-            tdsAmountField.value  = "";
-            thresholdInput.value  = "";
-            tdsNo.checked  = true;
-            tdsYes.checked = false;
-            tdsSection.style.display = "none";
-        }
+		//-------------------------------------------------------
+		// Reset
+		//-------------------------------------------------------
+		function resetTDS(resetRadio = true) {
+			currentRule = null;
+			tdsSectionField.value = "";
+			tdsRateField.value = "";
+			tdsAmountField.value = "";
+			thresholdInput.value = "";
+			tdsSection.style.display = "none";
+			if (resetRadio) {
+				tdsYes.checked = false;
+				tdsNo.checked = true;
+			}
+		}
 
-        expenseCat.addEventListener("change", fetchTdsRule);
-        directType.addEventListener("change", fetchTdsRule);
-        indirectType.addEventListener("change", fetchTdsRule);
-        amountField.addEventListener("input", calculateTDS);
-    });
+		//-------------------------------------------------------
+		// Amount Changed
+		//-------------------------------------------------------
+		amountField.addEventListener("input", function () {
+			if (tdsYes.checked) {
+				calculateTDS();
+			}
+		});
+
+		//-------------------------------------------------------
+		// Expense Head Changed
+		//-------------------------------------------------------
+		function expenseChanged() {
+			if (tdsYes.checked) {
+				fetchTdsRule();
+			}
+		}
+
+		expenseCat.addEventListener("change", expenseChanged);
+		directType.addEventListener("change", expenseChanged);
+		indirectType.addEventListener("change", expenseChanged);
+
+	});
     //------ end TDS auto fetch & calculation logic ------
 
     //------ start image upload preview ------
@@ -646,10 +715,12 @@
         const expenseCat             = document.getElementById("expense_cat");
         const directExpensesSection  = document.getElementById("directExpensesSection");
         const indirectExpensesSection = document.getElementById("indirectExpensesSection");
+        
 
         function toggleExpenseSections() {
             directExpensesSection.style.display  = (expenseCat.value === "direct")   ? "block" : "none";
             indirectExpensesSection.style.display = (expenseCat.value === "indirect") ? "block" : "none";
+            
         }
 
         expenseCat.addEventListener("change", toggleExpenseSections);
@@ -701,9 +772,13 @@
 
             let other         = $("#other_exp").val();
             let expense_date  = $("#expense_date").val();
+			let threshold_type = $("#threshold_type option:selected").val();
             let exp_invno     = $("#exp_invno").val();
             let expense_amt   = parseFloat($("#expense_amt").val()) || 0;
             let mode_of_expense = $("#mode_of_expense").val();
+			let tax_treatment = $("#tax_treatment").val();
+			let allowed_ratio = $("#allowed_ratio").val();
+			let rebate_amt 	  = $("#rebate_amt").val();
             let pur_of_expense  = $("#pur_of_expense").val();
             let approved_by   = $("#approved_by").val();
             let designation   = $("#designation").val();
@@ -716,6 +791,21 @@
             let vendor_id     = $("#vendor_id option:selected").val();
             let vendor_pan    = $("#vendor_pan").val();
             let payment_status = $("#payment_status").val();
+			
+			if (!expense_date) {
+				showToast("Please select expense date", "error");
+				return false;
+			}
+			
+			if (!payment_status) {
+				showToast("Please select payment status", "error");
+				return false;
+			}
+			
+			if (payment_status !== 'due' && !mode_of_expense) {
+				showToast("Please select mode of expense", "error");
+				return false;
+			}
 
             // TDS
             let tds_applicable     = $("input[name='tds_applicable']:checked").val() || "no";
@@ -751,9 +841,13 @@
             expensesData.append("expense_cat",   expense_cat);
             expensesData.append("expense_type",  expense_type);
             expensesData.append("expense_date",  expense_date);
+            expensesData.append("threshold_type",  threshold_type);
             expensesData.append("exp_invno",     exp_invno);
             expensesData.append("expense_amt",   expense_amt);
             expensesData.append("mode_of_expense", mode_of_expense);
+			expensesData.append("tax_treatment", tax_treatment);
+			expensesData.append("allowed_ratio", allowed_ratio);
+			expensesData.append("rebate_amt", rebate_amt);
             expensesData.append("pur_of_expense",  pur_of_expense);
             expensesData.append("approved_by",   approved_by);
             expensesData.append("designation",   designation);
@@ -817,42 +911,70 @@
     let selectedEmployeeId = "{{ $expenses->employee_id ?? '' }}";
 
     $(document).ready(function () {
+		
+		function loadEmployees(selectedEmployee = '') {
 
-        function loadEmployees(selectedId) {
-            $.ajax({
-                url: "/get-employees",
-                type: "GET",
-                success: function (res) {
-                    let dropdown = $("#employee_id");
-                    dropdown.empty();
-                    dropdown.append('<option value="">Select Employee</option>');
-                    $.each(res, function (key, emp) {
-                        let sel = (emp.id == selectedId) ? 'selected' : '';
-                        dropdown.append(
-                            `<option value="${emp.id}" data-code="${emp.employee_code}" ${sel}>${emp.name}</option>`
-                        );
-                    });
-                    // Restore employee code on load
-                    let code = dropdown.find(':selected').data('code') || '';
-                    $("#employee_code").val(code);
-                }
-            });
-        }
+			$.ajax({
+				url: "/get-employees",
+				type: "GET",
+				success: function (res) {
 
-        function handleEmployeeDropdown() {
-            let category = $("#expense_cat").val();
-            let type     = (category === "direct") 
-                    ? $("#directExpensesType").val() 
-                    : $("#indirectExpensesType").val();
+					let dropdown = $("#employee_id");
+					dropdown.empty();
+					dropdown.append('<option value="">Select Employee</option>');
 
-            if ((category === "indirect" || category === "direct") && type === "employee_benefits") {
-                $("#employeeDropdownDiv").show();
-                loadEmployees(selectedEmployeeId);
-            } else {
-                $("#employeeDropdownDiv").hide();
-                $("#employee_id").val('');
-            }
-        }
+					$.each(res, function (key, emp) {
+
+						let selected = (emp.id == selectedEmployee) ? 'selected' : '';
+
+						dropdown.append(`
+							<option value="${emp.id}"
+									data-code="${emp.employee_code}"
+									${selected}>
+								${emp.name}
+							</option>
+						`);
+					});
+
+					// Fill Employee Code
+					if(selectedEmployee){
+						let code = dropdown.find(":selected").data("code") || '';
+						$("#employee_code").val(code);
+					}
+				}
+			});
+		}
+		
+		function handleEmployeeDropdown() {
+
+			let category = $("#expense_cat").val();
+
+			let type = (category === "direct")
+				? $("#directExpensesType").val()
+				: $("#indirectExpensesType").val();
+
+			// Saved employee id (Edit page)
+			let selectedEmployee = "{{ $expenses->employee_id ?? '' }}";
+
+			if ((category === "indirect" || category === "direct")
+				&& type === "employee_benefits") {
+
+				$("#employeeDropdownDiv").show();
+				$("#employeeIdDiv").show();
+
+				loadEmployees(selectedEmployee);
+
+			} else {
+
+				$("#employeeDropdownDiv").hide();
+				$("#employeeIdDiv").hide();
+
+				$("#employee_id").empty()
+					.append('<option value="">Select Employee</option>');
+
+				$("#employee_code").val('');
+			}
+		}
 
         $("#expense_cat").change(function () { handleEmployeeDropdown(); });
         $("#indirectExpensesType, #directExpensesType").change(function () {
@@ -881,7 +1003,7 @@
                 $(".gst-container").hide();
                 $("#vendor_id").closest(".col-sm-4").hide();
                 $("#vendor_pan").closest(".col-sm-4").hide();
-                $("#payment_status_div").hide();
+                //$("#payment_status_div").hide();
                 $("#advance_amount_div").hide();
                 $("#balance_amount_div").hide();
                 $("#adjusted_now_div").hide();
@@ -923,6 +1045,7 @@
 
     $("#expense_cat, #indirectExpensesType, #directExpensesType").change(function () { handleEmployeeInvoiceToggle(); });
     handleEmployeeInvoiceToggle();
+
 
     //------ Payment calculation logic ------
     function handlePaymentCalculation() {
@@ -989,8 +1112,223 @@
     $("#expense_cat, #indirectExpensesType, #directExpensesType").on("change", function () {
         setTimeout(function () { handleDepreciationUI(); }, 50);
     });
+	
+	$(document).ready(function () { handleDepreciationUI(); });
+	
+	$('#expense_cat').on('change', function () {
+		let expenseCat = $(this).val();
+		$('#directExpensesSection, #indirectExpensesSection').hide();
+		$('#directExpensesType').html('<option value="">Select</option>');
+		$('#indirectExpensesType').html('<option value="">Select</option>');
 
-    $(document).ready(function () { handleDepreciationUI(); });
+		if (!expenseCat) {
+			return;
+		}
+
+		$.ajax({
+			url: "{{ route('getDropdownTypes') }}",
+			type: "POST",
+			data: {
+				module: 'Expense',
+				dropdown_name: expenseCat,
+				_token: "{{ csrf_token() }}"
+			},
+			success: function (res) {
+
+				let html = '<option value="">Select</option>';
+
+				$.each(res, function (i, item) {
+					html += `
+						<option value="${item.option_value}" data-type="${item.type}">
+							${item.option_text}
+						</option>
+					`;
+				});
+
+				if (expenseCat === 'direct') {
+					$('#directExpensesType').html(html).val($('#selected_direct_expense').val());
+					$('#directExpensesSection').show();
+					showExpenseTypeInfo();
+				} else if (expenseCat === 'indirect') {
+					$('#indirectExpensesType').html(html).val($('#selected_indirect_expense').val()).trigger('change');
+					$('#indirectExpensesSection').show();
+					showExpenseTypeInfo();
+				}
+				
+			}
+		});
+	});
+
+
+	$(document).ready(function () {
+		$('#expense_cat').trigger('change');
+	});
+	
+	//Start calculate Tax deduction
+	function loadTaxRule(expenseType, expenseHead)
+	{
+		if (!expenseType || !expenseHead) {
+			$('.tax-info-section').hide();
+			return;
+		}
+
+		$.ajax({
+			url: "{{ route('getTaxRule') }}",
+			type: "POST",
+			data: {
+				_token: "{{ csrf_token() }}",
+				expense_type: expenseType,
+				expense_head: expenseHead
+			},
+			success: function(res){
+
+				if(!res.status){
+					$('.tax-info-section').hide();
+					return;
+				}
+
+				$('.tax-info-section').show();
+
+				$('#tax_treatment').val(res.tax_treatment);
+
+				let treatment = (res.tax_treatment || '').trim();
+
+				// FULLY ALLOWED
+				if(treatment === 'Fully Allowed')
+				{
+					$('#allowed_ratio')
+						.val(100)
+						.prop('readonly', true)
+						.attr('min', 100)
+						.attr('max', 100);
+
+					calculateRebate();
+				}
+
+				// PARTIAL ALLOWED
+				else if(treatment === 'Partial Allowed')
+				{
+					let start = parseFloat(res.allow_start || 0);
+					let end   = parseFloat(res.allow_end || 100);
+
+					let savedRatio = $('#old_allowed_ratio').val();
+
+					$('#allowed_ratio')
+						.val(savedRatio ? savedRatio : start)
+						.prop('readonly', false)
+						.attr('min', start)
+						.attr('max', end);
+
+					calculateRebate();
+				}
+
+				// DISALLOWED
+				else if(treatment === 'Disallowed')
+				{
+					$('#allowed_ratio')
+						.val(0)
+						.prop('readonly', true)
+						.attr('min', 0)
+						.attr('max', 0);
+
+					$('#rebate_amt').val('0.00');
+				}
+			}
+		});
+	}
+
+	function calculateRebate()
+	{
+		let amount = parseFloat($('#expense_amt').val()) || 0;
+		let ratio  = parseFloat($('#allowed_ratio').val()) || 0;
+		let rebate = (amount * ratio) / 100;
+		$('#rebate_amt').val(rebate.toFixed(2));
+	}
+
+	$(document).on('input', '#allowed_ratio', function(){
+
+		let min = parseFloat($(this).attr('min')) || 0;
+		let max = parseFloat($(this).attr('max')) || 100;
+		let val = parseFloat($(this).val()) || 0;
+
+		if(val < min)
+		{
+			$(this).val(min);
+			showToast('Minimum allowed ratio is ' + min + '%', 'error');
+			val = min;
+		}
+
+		if(val > max)
+		{
+			$(this).val(max);
+			showToast('Maximum allowed ratio is ' + max + '%', 'error');
+			val = max;
+		}
+
+		calculateRebate();
+	});
+
+	$(document).on('keyup change', '#expense_amt', function(){
+		calculateRebate();
+	});
+
+	$('#directExpensesType').on('change', function(){
+		$('#old_allowed_ratio').val('');
+		$('#old_rebate_amt').val('');
+		loadTaxRule('direct', $(this).val());
+	});
+
+	$('#indirectExpensesType').on('change', function(){
+		$('#old_allowed_ratio').val('');
+		$('#old_rebate_amt').val('');
+		loadTaxRule('indirect', $(this).val());
+	});
+
+	// Edit Page Auto Load
+	$(document).ready(function(){
+
+		let expenseType = '';
+		let expenseHead = '';
+
+		if($('#directExpensesType').length &&
+		   $('#directExpensesType').val())
+		{
+			expenseType = 'direct';
+			expenseHead = $('#directExpensesType').val();
+		}
+		else if($('#indirectExpensesType').length &&
+				$('#indirectExpensesType').val())
+		{
+			expenseType = 'indirect';
+			expenseHead = $('#indirectExpensesType').val();
+		}
+
+		if(expenseType && expenseHead)
+		{
+			loadTaxRule(expenseType, expenseHead);
+		}
+
+		calculateRebate();
+	});
+	//End calculate Tax deduction
+	
+	function showExpenseTypeInfo() {
+
+		let directType = $("#directExpensesType").find(":selected").data("type") || "";
+		$("#directExpenseTypeInfo").html(
+			directType ? '<i class="ti ti-info-circle"></i> Type : ' + directType : ""
+		);
+
+		let indirectType = $("#indirectExpensesType").find(":selected").data("type") || "";
+		$("#indirectExpenseTypeInfo").html(
+			indirectType ? '<i class="ti ti-info-circle"></i> Type : ' + indirectType : ""
+		);
+	}
+
+	// On change
+	$(document).on("change", "#directExpensesType, #indirectExpensesType", function () {
+		showExpenseTypeInfo();
+	});
 
 
     function startEditExpensesTour() {

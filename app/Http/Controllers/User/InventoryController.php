@@ -22,7 +22,7 @@ class InventoryController extends Controller
     {
 		$title = 'Inventory';
         $userId = currentOwnerId();
-		checkCoreAccess('Inventory Management');
+		checkCoreAccess('Inventory');
 		//start ca-accountant access
 		$req_type = 0;
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
@@ -503,7 +503,7 @@ class InventoryController extends Controller
 			$req_type = 1;
 		}
 		//end ca-accountant access
-		checkCoreAccess('Inventory Management');
+		checkCoreAccess('Inventory');
 		$expenses = DB::table('inventory_expenses as ie')
 					->leftJoin('company_profiles as cp', 'ie.uid', '=', 'cp.userId')
 					->leftJoin('proprietorship_profiles as pp', 'pp.userId', '=', 'ie.uid')

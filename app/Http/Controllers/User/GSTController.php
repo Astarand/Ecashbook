@@ -57,7 +57,7 @@ class GSTController extends Controller
     public function GSTProfile(Request $request)
     {
 		$userId = currentOwnerId();
-		checkCoreAccess('Tax Filing & Returns');
+		checkCoreAccess('GST Returns & Reports');
 		//start ca-accountant access
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 			$userId = getAccessCompanyId($request);
@@ -142,14 +142,14 @@ class GSTController extends Controller
     }
     public function OtherGSTProfile()
     {
-		checkCoreAccess('Tax Filing & Returns');
+		checkCoreAccess('GST Returns & Reports');
         return view('User.other-gst-profile');
     }
     public function GSTReturns()
     {
 		if(Auth::user() && (Auth::user()->u_type == 2 || Auth::user()->u_type == 5)){
 			$userId = currentOwnerId();
-			checkCoreAccess('Tax Filing & Returns');
+			checkCoreAccess('GST Returns & Reports');
 			$getUserData =  DB::table('users')
 							->select(DB::raw('users.id as uid,company_profiles.comp_tran_type,gst_logins.*'))
 							->leftJoin('company_profiles', 'users.id', '=', 'company_profiles.userId')
@@ -178,7 +178,7 @@ class GSTController extends Controller
     public function GSTReports(Request $request)
     {
 		$userId = currentOwnerId();
-		checkCoreAccess('Tax Filing & Returns');
+		checkCoreAccess('GST Returns & Reports');
 		//start ca-accountant access
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 			$userId = getAccessCompanyId($request);

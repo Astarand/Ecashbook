@@ -422,11 +422,17 @@
 														<p class="f-w-600 mb-1 text-end">₹{{ number_format($totalTax, 2) }}</p>
 													</div>
 												@endif
+												<div class="col-6">
+                                                    <p class="f-w-600 mb-1 text-start">Shipping Cost :</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p class="f-w-600 mb-1 text-end" id="shipping_cost">₹<?php echo getRoundedAmount($sales->shipping_cost); ?></p>
+                                                </div>
                                                 <div class="col-6">
                                                     <p class="f-w-600 mb-1 text-start">Grand Total :</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹<?php echo getRoundedAmount($totalAmount + $totalTax); ?></p>
+                                                    <p class="f-w-600 mb-1 text-end" id="grand_total_amount">₹<?php echo getRoundedAmount($totalAmount + $totalTax + $sales->shipping_cost); ?></p>
                                                 </div>
                                             </div>
                                         </div>

@@ -58,12 +58,12 @@
                                         <span class="badge bg-info">{{ $tds->module }}</span>
                                     </td>
 
-                                    <td>{{ $tds->category }}</td>
+                                    <td>{{ $tds->category_name ?? $tds->category }}</td>
 
                                     <td>{{ $tds->tds_section }}</td>
 
                                     <td>
-                                        @if($tds->category === 'Salary & Wages')
+                                        @if($tds->category === 'employee_benefits')
                                             <span class="badge bg-warning">As per slab</span>
 
                                             <ul class="small mb-0 mt-1">

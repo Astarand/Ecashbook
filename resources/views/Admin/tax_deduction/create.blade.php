@@ -42,116 +42,72 @@
 
                 <div class="row">
 
-                    <div class="col-md-4 mb-3">
+                    {{-- <div class="col-md-4 mb-3">
                         <label>Deduction Name <span class="text-danger">*</span></label>
-                        <input type="text" name="deduction_name" class="form-control" value="{{ old('deduction_name') }}" required>
-                    </div>
-					
-					<div class="col-md-4 mb-3">
-                        <label>TAX Section </label>
-                        <input type="text" name="income_tax_section" class="form-control" value="{{ old('income_tax_section') }}" >
+                        <input type="text" name="deduction_name" class="form-control" required>
                     </div>
 
-                    {{-- CATEGORY --}}
                     <div class="col-md-4 mb-3">
-                        <label>Deduction Category <span class="text-danger">*</span></label>
-                        <select name="deduction_category" class="form-control" required>
+                        <label>TAX Section</label>
+                        <input type="text" name="income_tax_section" class="form-control">
+                    </div> --}}
+
+                    <div class="col-md-4 mb-3">
+                        <label>Accounting Module <span class="text-danger">*</span></label>
+                        <select name="accounting_module" id="accounting_module" class="form-control" required>
                             <option value="">Select</option>
-                            @foreach($dropdowns['deduction_category'] as $item)
-                                <option value="{{ $item }}">{{ $item }}</option>
-                            @endforeach
+                            <option value="Expense">Expense</option>
+                            {{-- <option value="Asset">Asset</option> --}}
                         </select>
                     </div>
 
-                    {{-- TYPE --}}
-                    <div class="col-md-4 mb-3">
-                        <label>Deduction Type <span class="text-danger">*</span></label>
-                        <select name="deduction_type" class="form-control" required>
+                    <div class="col-md-4 mb-3 d-none" id="expenseTypeDiv">
+                        <label>Expense Type</label>
+                        <select name="expense_type" id="expense_type" class="form-control">
                             <option value="">Select</option>
-                            @foreach($dropdowns['deduction_type'] as $item)
-                                <option value="{{ $item }}">{{ $item }}</option>
-                            @endforeach
+                            <option value="direct">Direct</option>
+                            <option value="indirect">Indirect</option>
+                            <option value="non_operating">Non Operating</option>
                         </select>
                     </div>
 
-                    {{-- TAX --}}
+                    <div class="col-md-4 mb-3 d-none" id="expenseHeadDiv">
+                        <label>Expense Head</label>
+                        <select name="expense_head" id="expense_head" class="form-control">
+                            <option value="">Select</option>
+                        </select>
+                    </div>
+
                     <div class="col-md-4 mb-3">
                         <label>Tax Treatment <span class="text-danger">*</span></label>
-                        <select name="tax_treatment" class="form-control" required>
+                        <select name="tax_treatment" id="tax_treatment" class="form-control" required>
                             <option value="">Select</option>
-                            @foreach($dropdowns['tax_treatment'] as $item)
-                                <option value="{{ $item }}">{{ $item }}</option>
-                            @endforeach
+                            <option value="Fully Allowed">Fully Allowed</option>
+                            <option value="Partial Allowed">Partial Allowed</option>
+                            <option value="Disallowed">Disallowed</option>
                         </select>
                     </div>
 
-                    {{-- LIMIT TYPE --}}
-                    <div class="col-md-4 mb-3">
-                        <label>Limit Type  <span class="text-danger">*</span></label>
-                        <select name="limit_type" class="form-control" required>
-                            <option value="">Select</option>
-                            @foreach($dropdowns['limit_type'] as $item)
-                                <option value="{{ $item }}">{{ $item }}</option>
-                            @endforeach
-                        </select>
+                    <div class="col-md-4 mb-3 d-none" id="allowedRatioDiv">
+                        <label>Allowed Deduction Ratio (%)</label>
+                        <input type="number" step="0.01"
+                            name="allowed_ratio"
+                            id="allowed_ratio"
+                            class="form-control">
                     </div>
 
-                    {{-- BASE --}}
-                    <div class="col-md-4 mb-3">
-                        <label>Base Amount Source</label>
-                        <select name="base_amount_source" class="form-control">
-                            <option value="">Select</option>
-                            @foreach($dropdowns['base_amount_source'] as $item)
-                                <option value="{{ $item }}">{{ $item }}</option>
-                            @endforeach
-                        </select>
+                    <div class="col-md-4 mb-3 d-none" id="allowStartDiv">
+                        <label>Allow Start (%)</label>
+                        <input type="number" step="0.01"
+                            name="allow_start"
+                            class="form-control">
                     </div>
 
-                    {{-- AUTO --}}
-                    <div class="col-md-4 mb-3">
-                        <label>Automation Mode  <span class="text-danger">*</span></label>
-                        <select name="automation_mode" class="form-control" required>
-                            <option value="">Select</option>
-                            @foreach($dropdowns['automation_mode'] as $item)
-                                <option value="{{ $item }}">{{ $item }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label>Limit Value <span class="text-danger">*</span></label>
-                        <input type="number" step="0.01" value="0" name="limit_value" class="form-control" required>
-                    </div>
-					
-					<div class="col-md-4 mb-3">
-                        <label>Limit Rate(%) <span class="text-danger">*</span></label>
-                        <input type="number" step="0.01" value="0" name="limit_rate" class="form-control" required>
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label>Limit Formula</label>
-                        <input type="text" name="limit_formula" class="form-control">
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label>Applicable FY <span class="text-danger">*</span></label>
-                        <input type="text" name="applicable_fy" class="form-control" required placeholder="2025-2026">
-                    </div>
-
-                    {{-- MODULE --}}
-                    <div class="col-md-4 mb-3">
-                        <label>Linked Module <span class="text-danger">*</span></label>
-                        <select name="linked_module" class="form-control" required>
-                            <option value="">Select</option>
-                            @foreach($dropdowns['linked_module'] as $item)
-                                <option value="{{ $item }}">{{ $item }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-4 mb-3">
-                        <label>Rule Priority</label>
-                        <input type="number" name="rule_priority" class="form-control" value="0">
+                    <div class="col-md-4 mb-3 d-none" id="allowEndDiv">
+                        <label>Allow End (%)</label>
+                        <input type="number" step="0.01"
+                            name="allow_end"
+                            class="form-control">
                     </div>
 
                 </div>
@@ -160,12 +116,80 @@
                     <a href="{{ route('tax.index') }}" class="btn btn-secondary">Cancel</a>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
-
             </form>
 
         </div>
     </div>
 
 </div>
+<script>
+    $(document).ready(function() {
+
+        $('#accounting_module').change(function() {
+
+            if ($(this).val() == 'Expense') {
+                $('#expenseTypeDiv').removeClass('d-none');
+            } else {
+                $('#expenseTypeDiv').addClass('d-none');
+                $('#expenseHeadDiv').addClass('d-none');
+            }
+        });
+
+        $('#expense_type').change(function() {
+
+            let expenseType = $(this).val();
+
+            if (expenseType != '') {
+
+                $.ajax({
+                    url: "{{ route('expense.heads') }}",
+                    type: "GET",
+                    data: {
+                        expense_type: expenseType
+                    },
+                    success: function(res) {
+
+                        let html = '<option value="">Select</option>';
+
+                        $.each(res, function(i, item) {
+                            html += '<option value="'+item.option_value+'">'+item.option_text+'</option>';
+                        });
+
+                        $('#expense_head').html(html);
+                        $('#expenseHeadDiv').removeClass('d-none');
+                    }
+                });
+            }
+        });
+
+        $('#tax_treatment').change(function() {
+
+            let value = $(this).val();
+
+            $('#allowedRatioDiv').addClass('d-none');
+            $('#allowStartDiv').addClass('d-none');
+            $('#allowEndDiv').addClass('d-none');
+
+            if (value == 'Fully Allowed') {
+
+                $('#allowedRatioDiv').removeClass('d-none');
+                $('#allowed_ratio').prop('readonly', false).val('');
+
+            } else if (value == 'Partial Allowed') {
+
+                $('#allowStartDiv').removeClass('d-none');
+                $('#allowEndDiv').removeClass('d-none');
+
+            } else if (value == 'Disallowed') {
+
+                $('#allowedRatioDiv').removeClass('d-none');
+                $('#allowed_ratio')
+                    .val(0)
+                    .prop('readonly', true);
+            }
+        });
+
+    });
+</script>
 
 @endsection

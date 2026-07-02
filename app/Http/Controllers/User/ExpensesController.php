@@ -44,7 +44,7 @@ class ExpensesController extends Controller
     {
         $title = 'Expenses';
         $userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Expenses');
         $userType = Auth::user()->u_type;
 
 		//start ca-accountant access
@@ -109,6 +109,7 @@ class ExpensesController extends Controller
                 'id' => $val->id,
                 'comp_name' => $val->comp_name,
                 'expense_date' => $val->expense_date,
+                'threshold_type' => $val->threshold_type,
                 'exp_invno' => $val->exp_invno,
 
                 'pur_of_expense' => $val->pur_of_expense,
@@ -119,7 +120,9 @@ class ExpensesController extends Controller
                 'payment_status' => $val->payment_status,
                 'expense_amt' => $val->expense_amt,
                 'tds_amount' => $val->tds_amount,
-                'deduction_amount' => $val->deduction_amount,
+                'tax_treatment' => $val->tax_treatment,
+                'allowed_ratio' => $val->allowed_ratio,
+                'rebate_amt' => $val->rebate_amt,
                 'approved_by' => $val->approved_by,
                 'status' => $val->status,
             ];
@@ -165,7 +168,7 @@ class ExpensesController extends Controller
         //$this->middleware('auth');
 		//$purposes_of_tds = DB::table('purposes_of_tds')->get();
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Expenses');
 		$compType = DB::table('company_profiles')
 						->where('userId', $userId)
 						->value('comp_type');   
@@ -174,7 +177,7 @@ class ExpensesController extends Controller
 						->where('userId',$userId)
 						->get();
 		$purposes_of_tds = DB::table('tds_rules')
-								->where('module', 'Expenses')
+								->where('module', 'Expense')
 								->where('tds_section', '!=', '192')
 								->where(function ($query) use ($compType) {
 									if ($compType === 'Proprietorship') {
@@ -247,6 +250,7 @@ class ExpensesController extends Controller
             'added_by' => currentOwnerId(),
 			'propId' => $propId,
             'expense_date' => $data['expense_date'],
+            'threshold_type' => $data['threshold_type'] ?? '',
 			'pur_of_expense' => $data['pur_of_expense'] ?? null,
 			'mode_of_expense' => $data['mode_of_expense'],
 			'expense_cat' => $data['expense_cat'],
@@ -295,6 +299,9 @@ class ExpensesController extends Controller
 			// 'dep_method'     => $data['dep_method'] ?? null,
 			'dep_value'      => $data['dep_value'] ?? null,
 			// 'residual_value' => $data['residual_value'] ?? null,
+			'tax_treatment' => $data['tax_treatment'] ?? 'Disallowed',
+			'allowed_ratio' => $data['allowed_ratio'] ?? 0,
+			'rebate_amt' => $data['rebate_amt'] ?? 0,
 			
         ]);
     }
@@ -440,7 +447,7 @@ class ExpensesController extends Controller
 		}
 		$eId = base64_decode($eId);
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Expenses');
 		$expenses = DB::table('expenses')
 								->where('id', '=', $eId)
 								->get();
@@ -455,7 +462,7 @@ class ExpensesController extends Controller
 						->where('userId',$userId)
 						->get();
 		$purposes_of_tds = DB::table('tds_rules')
-								->where('module', 'Expenses')
+								->where('module', 'Expense')
 								->where('tds_section', '!=', '192')
 								->where(function ($query) use ($compType) {
 									if ($compType === 'Proprietorship') {
@@ -496,7 +503,7 @@ class ExpensesController extends Controller
 
 		$eId = base64_decode($eId);
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Expenses');
 		$expenses = DB::table('expenses')
 								->where('id', '=', $eId)
 								->get();
@@ -510,7 +517,7 @@ class ExpensesController extends Controller
 								->where('userId',$userId)
 								->get();						
 		$purposes_of_tds = DB::table('tds_rules')
-								->where('module', 'Expenses')
+								->where('module', 'Expense')
 								->where('tds_section', '!=', '192')
 								->where(function ($query) use ($compType) {
 									if ($compType === 'Proprietorship') {
@@ -711,6 +718,7 @@ class ExpensesController extends Controller
 
 					'propId'           => $request->propId,
 					'expense_date'     => $request->expense_date,
+					'threshold_type'     => $request->threshold_type,
 					'pur_of_expense'   => $request->pur_of_expense,
 					'mode_of_expense'  => $request->mode_of_expense,
 					'expense_cat'      => $request->expense_cat,
@@ -818,6 +826,9 @@ class ExpensesController extends Controller
 					*/
 
 					'dep_value' => $request->dep_value ?? null,
+					'tax_treatment' => $request->tax_treatment ?? 'Disallowed',
+					'allowed_ratio' => $request->allowed_ratio ?? 0,
+					'rebate_amt' => $request->rebate_amt ?? 0,
 				]);
 
 			/*
@@ -886,7 +897,7 @@ class ExpensesController extends Controller
 			if ($tdsId) {
 				//Fetch rule from DB
 				$rule = DB::table('tds_rules')
-							->where('module', 'Expenses')
+							->where('module', 'Expense')
 							// ->where('tds_section', '!=', '192')
 							->where('id', $tdsId)
 							->first();
@@ -1110,7 +1121,7 @@ class ExpensesController extends Controller
 						->where('userId',$userId)
 						->get();
 		$purposes_of_tds = DB::table('tds_rules')
-								->where('module', 'Expenses')
+								->where('module', 'Expense')
 								->where('tds_section', '!=', '192')
 								->where(function ($query) use ($compType) {
 									if ($compType === 'Proprietorship') {
@@ -1237,8 +1248,9 @@ class ExpensesController extends Controller
 		$category = $request->category;
 
 		$rule = DB::table('tds_rules')
-			->where('module', 'Expenses')
-			->where('category', 'LIKE', "%{$category}%")
+			->where('module', 'Expense')
+			//->where('category', 'LIKE', "%{$category}%")
+			->where('category', $category)
 			->first();
 
 		return response()->json($rule);
@@ -1246,7 +1258,7 @@ class ExpensesController extends Controller
 
 	
 	
-	public function calculateTdsInvexp(Request $request)
+	/*public function calculateTdsInvexp(Request $request)
 	{
 		$data = [
 			'expense_amount' => $request->expense_amount,
@@ -1256,11 +1268,23 @@ class ExpensesController extends Controller
 		$result = $this->calculateTdsForInvExp($data);
 
 		return response()->json($result);
-	}
+	}*/
 	
 	private function calculateTdsForInvExp(array $data): array
 	{
 		//echo "<pre>";print_r($data);exit;
+		// If user selected TDS = No
+		if (($data['tds_applicable'] ?? 'no') !== 'yes') {
+			return [
+				'tds_applicable'      => 'no',
+				'tds_percentage'      => 0,
+				'tds_id'              => null,
+				'tds_amount'          => 0,
+				'tds_section'         => null,
+				'tds_rate'            => 0,
+				'tds_threshold_limit' => null,
+			];
+		}
 		$amount = (float) ($data['expense_amt'] ?? 0);
 
 		$tdsPercentage = 0;
@@ -1268,7 +1292,7 @@ class ExpensesController extends Controller
 		$tdsAmount = 0;
 
 		// Get category name matching tds_rules.category
-		$expenseCategory = $this->getExpenseCategory($data);
+		$expenseCategory = $data['expense_type'] ?? ''; 
 
 		if (empty($expenseCategory)) {
 			return [
@@ -1281,7 +1305,7 @@ class ExpensesController extends Controller
 
 		// Get TDS rule
 		$rule = DB::table('tds_rules')
-					->where('module', 'Expenses')
+					->where('module', 'Expense')
 					->where('status', 1)
 					->where('category', $expenseCategory)
 					->first();

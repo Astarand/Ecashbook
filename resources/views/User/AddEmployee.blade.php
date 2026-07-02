@@ -944,202 +944,243 @@
                                         <small id="passwordError" class="text-danger"></small>
                                     </div>
 									@if(Auth::user()->u_type == 2)
-                                    <div class="mb-3 row">
-										<div class="col-sm-12">
-											<div class="d-flex flex-wrap justify-content-start">
+                                        <div class="row">
 
-												@foreach($menu_features as $key => $feature)
-													<div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-														<div class="form-check">
-															<input class="form-check-input"
-																   type="checkbox"
-																   name="emp_permission[]"
-																   value="{{ $feature->code }}"
-																   id="customCheckinlh{{ $key }}">
+                                            @foreach($mainMenus as $mainMenu)
+                                                @php
+                                                    $subMenus = $menu_features->where('parent_id', $mainMenu->id);
+                                                @endphp
 
-															<label class="form-check-label"
-																   for="customCheckinlh{{ $key }}">
-																{{ $feature->code }}
-															</label>
-														</div>
-													</div>
-												@endforeach
+                                                <div class="col-md-4 mb-4">
 
-											</div>
-										</div>
-									</div>
+                                                    <div class="card border shadow-sm h-100">
+
+                                                        <div class="card-header bg-primary text-white fw-bold">
+                                                            {{ $mainMenu->menu_name }}
+                                                        </div>
+
+                                                        <div class="card-body">
+
+                                                            @if($subMenus->count())
+
+                                                                @foreach($subMenus as $submenu)
+
+                                                                    <div class="form-check mb-2">
+                                                                        <input
+                                                                            class="form-check-input submenu-checkbox"
+                                                                            type="checkbox"
+                                                                            name="emp_permission[]"
+                                                                            value="{{ $submenu->code }}"
+                                                                            id="menu{{ $submenu->id }}">
+
+                                                                        <label class="form-check-label"
+                                                                            for="menu{{ $submenu->id }}">
+                                                                            {{ $submenu->menu_name }}
+                                                                        </label>
+                                                                    </div>
+                                                                @endforeach
+
+                                                            @else
+
+                                                                <div class="form-check">
+
+                                                                    <input
+                                                                        class="form-check-input"
+                                                                        type="checkbox"
+                                                                        name="emp_permission[]"
+                                                                        value="{{ $mainMenu->code }}"
+                                                                        id="menu{{ $mainMenu->id }}">
+
+                                                                    <label class="form-check-label"
+                                                                        for="menu{{ $mainMenu->id }}">
+                                                                        {{ $mainMenu->menu_name }}
+                                                                    </label>
+
+                                                                </div>
+
+                                                            @endif
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            @endforeach
+
+                                        </div>
 									@else
-									<div class="mb-3 row">
-                                        <div class="col-sm-12">
-                                            <!-- Flexbox container for checkboxes -->
-                                            <div class="d-flex flex-wrap justify-content-start">
-                                                <!-- Checkbox Group 1 -->
-                                                <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminProfile" name="emp_permission[]"
-                                                            id="customCheckinlh0">
-                                                        <label class="form-check-label" for="customCheckinlh0">Admin profile</label>
+                                        <div class="mb-3 row">
+                                            <div class="col-sm-12">
+                                                <!-- Flexbox container for checkboxes -->
+                                                <div class="d-flex flex-wrap justify-content-start">
+                                                    <!-- Checkbox Group 1 -->
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminProfile" name="emp_permission[]"
+                                                                id="customCheckinlh0">
+                                                            <label class="form-check-label" for="customCheckinlh0">Admin profile</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <!-- Checkbox Group 1 -->
-                                                <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminSubscription" name="emp_permission[]"
-                                                            id="customCheckinlh1">
-                                                        <label class="form-check-label"
-                                                            for="customCheckinlh1">Manage Subscription</label>
+                                                    <!-- Checkbox Group 1 -->
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminSubscription" name="emp_permission[]"
+                                                                id="customCheckinlh1">
+                                                            <label class="form-check-label"
+                                                                for="customCheckinlh1">Manage Subscription</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <!-- Checkbox Group 2 -->
-                                                <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="adminCa"
-                                                            name="emp_permission[]" id="customCheckinlh2">
-                                                        <label class="form-check-label" for="customCheckinlh2">CA Manage</label>
+                                                    <!-- Checkbox Group 2 -->
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value="adminCa"
+                                                                name="emp_permission[]" id="customCheckinlh2">
+                                                            <label class="form-check-label" for="customCheckinlh2">CA Manage</label>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <!-- Checkbox Group 3 -->
-                                                <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="adminTds"
-                                                            name="emp_permission[]" id="customCheckinlh3">
-                                                        <label class="form-check-label" for="customCheckinlh3">TDS TAX</label>
+                                                    <!-- Checkbox Group 3 -->
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" value="adminTds"
+                                                                name="emp_permission[]" id="customCheckinlh3">
+                                                            <label class="form-check-label" for="customCheckinlh3">TDS TAX</label>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <!-- Checkbox Group 4 -->
-                                                <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminCustomer" name="emp_permission[]"
-                                                            id="customCheckinlh4">
-                                                        <label class="form-check-label" for="customCheckinlh4">Customer Manage</label>
+                                                    <!-- Checkbox Group 4 -->
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminCustomer" name="emp_permission[]"
+                                                                id="customCheckinlh4">
+                                                            <label class="form-check-label" for="customCheckinlh4">Customer Manage</label>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <!-- Checkbox Group 5 -->
-                                                <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminHrPayroll" name="emp_permission[]"
-                                                            id="customCheckinlh5">
-                                                        <label class="form-check-label" for="customCheckinlh5">HR & Payroll</label>
+                                                    <!-- Checkbox Group 5 -->
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminHrPayroll" name="emp_permission[]"
+                                                                id="customCheckinlh5">
+                                                            <label class="form-check-label" for="customCheckinlh5">HR & Payroll</label>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <!-- Checkbox Group 6 -->
-                                                <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminBusinessEarnings" name="emp_permission[]"
-                                                            id="customCheckinlh6">
-                                                        <label class="form-check-label" for="customCheckinlh6">Business & Earnings</label>
+                                                    <!-- Checkbox Group 6 -->
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminBusinessEarnings" name="emp_permission[]"
+                                                                id="customCheckinlh6">
+                                                            <label class="form-check-label" for="customCheckinlh6">Business & Earnings</label>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <!-- Checkbox Group 7 -->
-                                                <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminPayment" name="emp_permission[]"
-                                                            id="customCheckinlh7">
-                                                        <label class="form-check-label" for="customCheckinlh7">Payment Manage</label>
+                                                    <!-- Checkbox Group 7 -->
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminPayment" name="emp_permission[]"
+                                                                id="customCheckinlh7">
+                                                            <label class="form-check-label" for="customCheckinlh7">Payment Manage</label>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <!-- Checkbox Group 8 -->
-                                                <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminTicket" name="emp_permission[]"
-                                                            id="customCheckinlh8">
-                                                        <label class="form-check-label" for="customCheckinlh8">Ticket Manage</label>
+                                                    <!-- Checkbox Group 8 -->
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminTicket" name="emp_permission[]"
+                                                                id="customCheckinlh8">
+                                                            <label class="form-check-label" for="customCheckinlh8">Ticket Manage</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-												
-												
-												<div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminReminder" name="emp_permission[]"
-                                                            id="customCheckinlh9">
-                                                        <label class="form-check-label" for="customCheckinlh9">Reminder & Communication</label>
+                                                    
+                                                    
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminReminder" name="emp_permission[]"
+                                                                id="customCheckinlh9">
+                                                            <label class="form-check-label" for="customCheckinlh9">Reminder & Communication</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-												
-												
-												<div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminTaxFilling" name="emp_permission[]"
-                                                            id="customCheckinlh10">
-                                                        <label class="form-check-label" for="customCheckinlh10">Tax Filing & Returns</label>
+                                                    
+                                                    
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminTaxFilling" name="emp_permission[]"
+                                                                id="customCheckinlh10">
+                                                            <label class="form-check-label" for="customCheckinlh10">Tax Filing & Returns</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-												
-												<div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminAgent" name="emp_permission[]"
-                                                            id="customCheckinlh11">
-                                                        <label class="form-check-label" for="customCheckinlh11">Agent & Channel Partner</label>
+                                                    
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminAgent" name="emp_permission[]"
+                                                                id="customCheckinlh11">
+                                                            <label class="form-check-label" for="customCheckinlh11">Agent & Channel Partner</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-												
-												<div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminDirectBusiness" name="emp_permission[]"
-                                                            id="customCheckinlh12">
-                                                        <label class="form-check-label" for="customCheckinlh12">Direct Business Desk</label>
+                                                    
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminDirectBusiness" name="emp_permission[]"
+                                                                id="customCheckinlh12">
+                                                            <label class="form-check-label" for="customCheckinlh12">Direct Business Desk</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-												
-												<div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminReport" name="emp_permission[]"
-                                                            id="customCheckinlh13">
-                                                        <label class="form-check-label" for="customCheckinlh13">Report Section</label>
+                                                    
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminReport" name="emp_permission[]"
+                                                                id="customCheckinlh13">
+                                                            <label class="form-check-label" for="customCheckinlh13">Report Section</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-												
-												
-												<div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminAudit" name="emp_permission[]"
-                                                            id="customCheckinlh14">
-                                                        <label class="form-check-label" for="customCheckinlh14">Audit & Log Management</label>
+                                                    
+                                                    
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminAudit" name="emp_permission[]"
+                                                                id="customCheckinlh14">
+                                                            <label class="form-check-label" for="customCheckinlh14">Audit & Log Management</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-												
-												<div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            value="adminSettings" name="emp_permission[]"
-                                                            id="customCheckinlh15">
-                                                        <label class="form-check-label" for="customCheckinlh15">Settings & Administration</label>
+                                                    
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                value="adminSettings" name="emp_permission[]"
+                                                                id="customCheckinlh15">
+                                                            <label class="form-check-label" for="customCheckinlh15">Settings & Administration</label>
+                                                        </div>
                                                     </div>
-                                                </div>
-												
-												<div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
-													<div class="form-check">
-														<input class="form-check-input noAccessCheck" type="checkbox"
-															value="No Access" name="emp_permission[]">
+                                                    
+                                                    <div class="card shadow-sm border-0 p-3 m-2" style="width: 18%;">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input noAccessCheck" type="checkbox"
+                                                                value="No Access" name="emp_permission[]">
 
-														<label class="form-check-label">
-															No Access
-														</label>
-													</div>
-												</div>
-												
+                                                            <label class="form-check-label">
+                                                                No Access
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 									@endif
                                     <!-- end col -->
                                 </div>
@@ -2415,23 +2456,52 @@
         });
     });
 	
-	$('input[name="emp_permission[]"]').on('change', function () {
+	$(document).on('change', 'input[name="emp_permission[]"]', function () {
 
-		let noAccess = $('input[name="emp_permission[]"][value="No Access"]');
+        let all = $('input[name="emp_permission[]"][value="All"]');
+        let noAccess = $('input[name="emp_permission[]"][value="No Access"]');
+        let others = $('input[name="emp_permission[]"]').not(all).not(noAccess);
 
-		if ($(this).val() === "No Access") {
-			if ($(this).is(':checked')) {
-				// Uncheck all others
-				$('input[name="emp_permission[]"]').not(this).prop('checked', false);
-			}
-		} else {
-			// If any other checkbox is checked → uncheck No Access
-			if ($(this).is(':checked')) {
-				noAccess.prop('checked', false);
-			}
-		}
+        // ALL checked
+        if ($(this).val() === "All") {
 
-	});
+            if ($(this).is(':checked')) {
+                others.prop('checked', true);
+                noAccess.prop('checked', false);
+            } else {
+                others.prop('checked', false);
+            }
+
+            return;
+        }
+
+        // NO ACCESS checked
+        if ($(this).val() === "No Access") {
+
+            if ($(this).is(':checked')) {
+                $('input[name="emp_permission[]"]')
+                    .not(this)
+                    .prop('checked', false);
+            }
+
+            return;
+        }
+
+        // Any normal menu checked
+        if ($(this).is(':checked')) {
+            noAccess.prop('checked', false);
+        }
+
+        // If any normal menu is unchecked, uncheck ALL
+        if (!$(this).is(':checked')) {
+            all.prop('checked', false);
+        }
+
+        // If every normal menu is checked, automatically check ALL
+        if (others.length === others.filter(':checked').length) {
+            all.prop('checked', true);
+        }
+    });
 
     function startAddEmployeeTour() {
         if (typeof introJs !== 'function') return;
@@ -2531,5 +2601,6 @@
             startAddEmployeeTour();
         });
     });
+    
 </script>
 @endsection

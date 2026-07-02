@@ -44,7 +44,7 @@ class ProjectManagementController extends Controller
 		//]); 
 		$title = 'Projects';
 		$userId = currentOwnerId();
-		checkCoreAccess('Accounting');
+		checkCoreAccess('Biz Operations');
 		if(Auth::user()->u_type ==1){ //ca
 			$projects =  DB::table('projects')
 							->select(DB::raw('projects.*,company_profiles.comp_name,ca_assigns.ca_id'))

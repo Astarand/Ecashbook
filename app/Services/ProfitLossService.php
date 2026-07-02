@@ -19,30 +19,102 @@ class ProfitLossService
         
     }
 	
-	public function getCurrentTax($userId, $from, $to)
+		
+	public function getCurrentTax_old($userId, $startDate, $endDate, $pbt)
 	{
-		// GST from Sales Items
-		$salesGst = DB::table('sales as s')
-						->join('sales_values as sv', 'sv.sid', '=', 's.id')
-						->where('s.added_by', $userId)
-						->where('s.status', 1)
-						->whereBetween('s.inv_date', [$from, $to])
-						->sum(DB::raw('
-							COALESCE(sv.tax_amt,0) +
-							COALESCE(sv.gov_pay,0) +
-							COALESCE(sv.ser_pay,0)
-						'));
+		
+		//$fy = date('Y', strtotime($startDate)) . '-' . date('Y', strtotime($endDate));
+		$taxpayerCategory = 'HUF';
+		$taxRegime = 'New';
+		// 1. Profit Before Tax
+		$profitBeforeTax = $pbt;
 
-		// GST from Income
-		$incomeGst = DB::table('income')
-			->where('addBy', $userId)
+		// 2. Add disallowed expenses
+		$disallowedAmount = DB::table('expenses as e')
+			->join('tax_deduction_masters as t', function ($join) {
+				$join->on('e.expense_type', '=', 't.expense_head')
+					 ->where('t.tax_treatment', 'Disallowed')
+					 ->where('t.is_active', 1);
+			})
+			->sum('e.expense_amt');
+
+		// 3. Less allowable deductions
+		$allowableAmount = DB::table('expenses as e')
+			->join('tax_deduction_masters as t', function ($join) {
+				$join->on('e.expense_type', '=', 't.expense_head')
+					 ->where('t.tax_treatment', 'Fully Allowed')
+					 ->where('t.is_active', 1);
+			})
+			->sum('e.expense_amt');
+			
+		//echo "<pre>";print_r($allowableAmount); exit;
+
+		// 4. Taxable Income
+		$taxableIncome = ($profitBeforeTax + $disallowedAmount - $allowableAmount);
+
+		// 5. Get applicable slab
+		$slab = DB::table('income_tax_slabs')
 			->where('status', 1)
-			->whereBetween('dateInput', [$from, $to])
-			->sum('gst_amt');
+			//->where('applicable_fy', $fy)
+			->where('taxpayer_category', $taxpayerCategory)
+			->where('tax_regime', $taxRegime)
+			->where('income_slab_from', '<=', $taxableIncome)
+			->where('income_slab_to', '>=', $taxableIncome)
+			->first();
+		//echo "<pre>";print_r($slab); exit;
+		if (!$slab) {
+			return 0;
+		}
 
-		return round($salesGst + $incomeGst, 2);
+		// 6. Income Tax
+		$incomeTax = ($taxableIncome * $slab->tax_rate) / 100;
+		// Surcharge
+		$surcharge = ($incomeTax * $slab->surcharge_rate) / 100;
+		// Cess
+		$cess = (($incomeTax + $surcharge) * $slab->cess_rate) / 100;
+
+		return round($incomeTax + $surcharge + $cess, 2);
 	}
+	
+	public function getCurrentTax($userId, $startDate, $endDate, $pbt = 0)
+	{
+		$result = DB::table('expenses')
+			->where('added_by', $userId)
+			->where('status', 1)
+			->whereBetween('expense_date', [$startDate, $endDate])
+			->whereNotNull('tax_treatment')
+			->selectRaw("
+				SUM(
+					CASE
+						WHEN tax_treatment = 'Disallowed'
+							THEN expense_amt
+						ELSE 0
+					END
+				) as disallowed_total,
 
+				SUM(
+					CASE
+						WHEN tax_treatment = 'Partial Allowed'
+							THEN GREATEST(expense_amt - rebate_amt,0)
+						ELSE 0
+					END
+				) as partial_disallowed_total,
+
+				SUM(
+					CASE
+						WHEN tax_treatment = 'Fully Allowed'
+							THEN expense_amt
+						ELSE 0
+					END
+				) as fully_allowed_total
+			")
+			->first();
+
+		$currentTax =($result->disallowed_total ?? 0) + ($result->partial_disallowed_total ?? 0);
+
+		return round($currentTax, 2);
+	}
+	
 	public function getCurrentTaxPriorYear($userId, $from, $to)
 	{
 		$totalCurrentTax = DB::table('expenses')

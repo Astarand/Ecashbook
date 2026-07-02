@@ -52,7 +52,7 @@ class EmployeeManagemnet extends Controller
 		$userId = Auth::user()->id;
 		$uType  = Auth::user()->u_type;
 		$ownerId = currentOwnerId();
-		checkCoreAccess('HR & Payroll Management');
+		checkCoreAccess('Payroll Management');
 		$query = DB::table('users')
 			->select(
 				'users.id',
@@ -109,7 +109,7 @@ class EmployeeManagemnet extends Controller
 		$uType  = Auth::user()->u_type;
 		$ownerId = currentOwnerId();
 
-		checkCoreAccess('HR & Payroll Management');
+		checkCoreAccess('Payroll Management');
 
 		$query = DB::table('resign_employee')
 			->select(
@@ -166,9 +166,13 @@ class EmployeeManagemnet extends Controller
                         ->get();
         $locations = Location::where('added_by', $userId)->orderBy('created_at', 'desc')->get();
         $states = State::where('country_id', '=', 101)->get();
+
         $menu_features = DB::table('menu_features')
-            ->select('menu_features.*')
-            ->get();
+			->orderBy('parent_id')
+			->orderBy('id')
+			->get();
+
+		$mainMenus = $menu_features->where('type', 'MAIN');
        
         $parentCompany = DB::table('company_profiles')
                         ->select('basic_percentage')
@@ -182,6 +186,7 @@ class EmployeeManagemnet extends Controller
             'states' => $states,
             'locations' => $locations,
             'menu_features' => $menu_features,
+			'mainMenus'       => $mainMenus,
             'basic_percentage' => $basic_percentage
  
         ]);
@@ -2534,9 +2539,13 @@ class EmployeeManagemnet extends Controller
 		$id = base64_decode($encodedId);
 		$uType = Auth::user()->u_type;
 		$userId = currentOwnerId();
+
 		$menu_features = DB::table('menu_features')
-			->select('menu_features.*')
+			->orderBy('parent_id')
+			->orderBy('id')
 			->get();
+
+		$mainMenus = $menu_features->where('type', 'MAIN');
 
 		if($uType == 2 || $uType == 5){
 			// Fetch employee details with all fields from 'users' and 'employees' tables
@@ -2564,11 +2573,12 @@ class EmployeeManagemnet extends Controller
 				'states'   => $states,
 				'locations' => $locations,
 				'employee' => $employee,
-				'menu_features' => $menu_features,
+				'menu_features'   => $menu_features,
+        		'mainMenus'       => $mainMenus,
 				'proprietorships' => $proprietorships,
 			]);
 		}else if($uType == 1 ||  $uType == 4){
-			// Fetch employee details with all fields from 'users' and 'employees' tables
+			// Fetch employee details with all fields from 'ca' and 'ca employees' tables
 			$employee = DB::table('users')
 				->select(
 					'users.*',
@@ -2591,7 +2601,7 @@ class EmployeeManagemnet extends Controller
 				'employee' => $employee,
 			]);
 		}else if($uType == 3 || $uType == 6){
-			// Fetch employee details with all fields from 'users' and 'employees' tables
+			// Fetch employee details with all fields from 'admin' and 'admin employees' tables
 			$employee = DB::table('users')
 				->select(
 					'users.*',
@@ -4910,7 +4920,7 @@ public function downloadPayslip($id)
 		} catch (\Exception $e) {
 			return response()->json([
 				'status' => 'error',
-				'message' => 'Failed to submit request. Please try again.'
+				'message' => 'Please select future date'
 			]);
 		}
 	}
@@ -5115,10 +5125,11 @@ public function downloadPayslip($id)
 	public function checkCompanyPolicies()
 	{
 		$user = Auth::user();
-		$userId = $user->id;
+		//$userId = $user->id;
+		$userId = currentOwnerId();
 
 		// Check user type
-		if ($user->u_type == 2) {
+		if ($user->u_type == 2 || $user->u_type == 5) {
 
 			// Fetch from company_profiles
 			$company = Company_profiles::where('userId', $userId)->first();
@@ -5130,7 +5141,7 @@ public function downloadPayslip($id)
 				'comp_tan'  => $company ? $company->comp_tan : '',
 			]);
 
-		} elseif ($user->u_type == 1) {
+		} elseif ($user->u_type == 1 || $user->u_type == 4) {
 
 			// Fetch from ca_profiles
 			$ca = Ca_profiles::where('userId', $userId)->first();
@@ -5141,7 +5152,7 @@ public function downloadPayslip($id)
 				'comp_ptax' => $ca ? $ca->pt_reg_no : '',
 				'comp_tan'  => $ca ? $ca->tan_no : '', 
 			]);
-		} elseif ($user->u_type == 3) {
+		} elseif ($user->u_type == 3 || $user->u_type == 6) {
 			// Fetch from Admin_profiless
 			$admin = Admin_profiles::where('userId', $userId)->first();
 			return response()->json([

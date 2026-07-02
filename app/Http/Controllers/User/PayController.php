@@ -59,12 +59,18 @@ class PayController extends Controller
 				->first();
 
 			$invoiceTotal = getRoundedAmount($invoice->amount + $invoice->tax_amt + $invoice->ser_pay + $invoice->gov_pay);
-		}else{
-			$invoice = DB::table('purchase_values')
-				->where('sid',$id)
-				->first();
+		}else{			
+			$invoice = DB::table('purchase_values as pv')
+							->leftJoin('purchases as p', 'p.id', '=', 'pv.sid')
+							->select(
+								'pv.amount',
+								'pv.tax_amt',
+								'p.shipping_cost'
+							)
+							->where('pv.sid', $id)
+							->first();
 
-			$invoiceTotal = getRoundedAmount($invoice->amount + $invoice->tax_amt);
+			$invoiceTotal = getRoundedAmount(($invoice->amount ?? 0) +($invoice->tax_amt ?? 0) +($invoice->shipping_cost ?? 0));
 		}
 
 		$payments = DB::table('payment_vouchers')
@@ -163,8 +169,13 @@ class PayController extends Controller
 							SUM(tax_amt) as tax_amt
 						')
 						->first();
+						
+					 $purchase = DB::table('purchases')
+									->where('id', $sid)
+									->select('shipping_cost')
+									->first();
 
-					$invoiceAmount =($invoice->amount ?? 0) + ($invoice->tax_amt ?? 0);
+					$invoiceAmount =($invoice->amount ?? 0) + ($invoice->tax_amt ?? 0) + ($purchase->shipping_cost ?? 0);
 					$this->purchaseJournalEntry($sid,$uid,$invoiceAmount,'Due');
 				}
 			}
@@ -286,8 +297,13 @@ class PayController extends Controller
 			$invoice = DB::table('purchase_values')
 				->where('sid',$id)
 				->first();
+				
+			$purchase = DB::table('purchases')
+									->where('id', $id)
+									->select('shipping_cost')
+									->first();
 
-			$total = getRoundedAmount($invoice->amount + $invoice->tax_amt);
+			$total = getRoundedAmount($invoice->amount + $invoice->tax_amt + ($purchase->shipping_cost ?? 0));
 
 			$paid = DB::table('payment_vouchers')
 				->where('f_id',$id)

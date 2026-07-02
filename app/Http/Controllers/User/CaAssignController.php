@@ -37,7 +37,7 @@ class CaAssignController extends Controller
 		$authUser = auth()->user();
 		$userType = $authUser->u_type;		
 		$userId = currentOwnerId();
-		checkCoreAccess('Assign CA Firm');
+		checkCoreAccess('CA Connect');
 		$ca_details = DB::table('users')
 			->select(DB::raw('users.*, ca_profiles.comp_logo, ca_profiles.comp_name, ca_profiles.total_no_client,
 						ca_profiles.comp_bill_addone, ca_profiles.comp_bill_country, ca_profiles.comp_bill_state,
