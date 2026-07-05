@@ -1,0 +1,299 @@
+@extends('App.Layout')
+
+@section('container')
+
+<div class="pc-content">
+	<!-- [ breadcrumb ] start -->
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Accounting & Finance</a></li>
+                        <li class="breadcrumb-item"><a href="#">Business Operations</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/agent-list') }}">Agent & Channel Partner</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Agent / Channel Partner</li>
+                    </ul>
+                </div>
+                <div class="col-md-12">
+                    <div class="page-header-title">
+                        <h2 class="mb-0">Edit Agent / Channel Partner</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ breadcrumb ] end -->
+    <div id="employeeEnroll" class="form-wizard row justify-content-center">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body p-3">
+                    <ul class="nav nav-pills nav-justified">
+                        <li class="nav-item" data-target-form="#contactDetailForm">
+                            <a href="#personalDetail" data-bs-toggle="tab" data-toggle="tab" class="nav-link active">
+                                <i class="ph-duotone ph-user-circle"></i>
+                                <span class="d-none d-sm-inline">Agent Details</span>
+                            </a>
+                        </li>
+                        <!-- end nav item -->
+                        <li class="nav-item">
+                            <a href="#address" data-bs-toggle="tab" data-toggle="tab" class="nav-link icon-btn">
+                                <i class="ph-duotone ph-map-pin"></i>
+                                <span class="d-none d-sm-inline">Address</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="tab-content">
+                        <!-- START: Define your tab pans here -->
+                        <div class="tab-pane show active" id="personalDetail">
+                        <form action="javascript:void(0);" method="post" name="addAgentFrm" id="addAgentFrm" enctype="multipart/form-data">
+                        <input type="hidden" name="id" id="agentId" value="{{$agent->id}}">
+                         @csrf
+                                <div class="row mt-4">
+                                    <div class="col-sm-auto text-center">
+                                        <div class="position-relative me-3 d-inline-flex">
+                                            <div class="position-absolute top-50 start-100 translate-middle">
+                                                <button type="button" class="btn btn-sm btn-primary btn-icon" onclick="document.getElementById('agentImageInput').click();">
+                                                    <i class="ti ti-pencil"></i>
+                                                </button>
+                                            </div>
+                                            
+                                            <!-- Image element that shows current or selected image -->
+                                            <img id="agentImagePreview"
+                                                 src="{{ $agent->agent_image ? asset('storage/business_agent/' . $agent->agent_image) : asset('storage/profile/e-cashbook.png') }}"
+                                                 alt="agent-image"
+                                                 class="wid-150 rounded img-fluid ms-2">
+                                    
+                                            <!-- Hidden file input -->
+                                            <input type="file" id="agentImageInput" name="agent_image" accept="image/*" style="display: none;" onchange="previewAgentImage(this)">
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="mb-3 col-md-4">
+                                                <label class="form-label" for="inputEmail4">Agent Name <span class="text-danger">*</span></label>
+                                                <input type="text" required name="agent_name" id="agent_name" value="{{ $agent->agent_name}}" class="form-control" placeholder="Enter Agent Name">
+                                            </div>
+                                            <div class="mb-3 col-md-4">
+                                                <label class="form-label" for="inputEmail4">Contact Number <span class="text-danger">*</span></label>
+                                                <input type="text" required name="agent_phone" id="agent_phone" value="{{ $agent->agent_phone}}" class="form-control" placeholder="Enter Contact Number">
+                                            </div>
+                                            <div class="mb-3 col-md-4">
+                                                <label class="form-label" for="inputEmail4">Email Address<span class="text-danger">*</span></label>
+                                                <input type="email" required name="agent_email" id="agent_email" value="{{ $agent->agent_email}}" class="form-control" placeholder="Enter Email Address">
+                                            </div>
+                                            <div class="mb-3 col-md-4">
+                                                <label class="form-label" for="inputEmail4">Agent Whatsapp Number<span class="text-danger">*</span></label>
+                                                <input type="number" required name="agent_whats_no" id="agent_whats_no" value="{{ $agent->agent_whats_no}}" class="form-control" placeholder="Enter Agent Whatsapp Number">
+                                            </div>
+                                            <div class="mb-3 col-md-4">
+                                                <label class="form-label" for="inputEmail4">Company Name</label>
+                                                <input type="text" name="company_name" id="company_name" value="{{ $agent->company_name}}" class="form-control" placeholder="Enter Company Name">
+                                            </div>
+                                            <div class="mb-3 col-md-4">
+                                                <label class="form-label" for="inputEmail4">Company Website</label>
+                                                <input type="text" name="company_website" id="company_website" value="{{ $agent->company_website}}" class="form-control" placeholder="Enter website">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex wizard justify-content-end mt-3">
+                                <div class="last">
+                                    <a href="javascript:void(0);" class="btn btn-primary next-btn d-flex align-items-center justify-content-center">
+                                        Next <i class="ti ti-arrow-up-right-circle ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end contact detail tab pane -->
+                        <div class=" tab-pane" id="address">                            
+                           <!-- <form action="javascript:void(0);" method="post" name="addAgentaddressFrm" id="addAgentaddressFrm" enctype="multipart/form-data">-->
+                                <div class="row">
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+                                            <h5>Permanent Address</h5>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Address Line 1 <span class="text-danger">*</span></label>
+                                                    <input type="text" required name="address_lineone" id="address_lineone" value="{{ $agent->address_lineone}}" class="form-control" placeholder="Enter Address Line 1">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Address Line 2</label>
+                                                    <input type="text" name="address_linetwo" id="address_linetwo" value="{{ $agent->address_linetwo}}" class="form-control" placeholder="Enter Address Line 2">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-0">
+                                                    <label class="form-label">State <span class="text-danger">*</span></label>                                                    
+                                                    <select class="form-control" required name="agent_state" id="agent_state" onChange="changeState(this);">
+                                                    <option value="">Select State</option>
+														@foreach($states as $k => $state)
+															<option value="{{ $state->id }}" <?php echo ($state->id==$agent->agent_state)? "selected":"" ?>>{{ $state->name }}</option>
+														@endforeach
+														
+													</select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-0">
+                                                    <label class="form-label">City <span class="text-danger">*</span></label>                                                    
+                                                    <select class="form-control select-style" required name="agent_city" id="city">
+                                                        <option value="">Select City</option>
+                                                        @foreach($cities as $k=>$city)
+                                                            <option value="{{ $city->id }}" <?php echo ($city->id==$agent->agent_city)? 'selected="selected"':"" ?>>{{ $city->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-0">
+                                                    <label class="form-label">Zip Code <span class="text-danger">*</span></label>
+                                                    <input type="text" required name="agent_pincode" id="agent_pincode" value="{{ $agent->agent_pincode}}" class="form-control" placeholder="Enter Zip Code">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <h5>Current Address</h5>
+                                            <div class="btn btn-primary" onclick="copyParamanentAddress()">Same as Permanent Address</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Address Line 1</label>
+                                                    <input type="text" name="curraddress_lineone" id="curraddress_lineone" value="{{ $agent->curraddress_lineone}}" class="form-control" placeholder="Enter Address Line 1">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Address Line 2</label>
+                                                    <input type="text" name="curraddress_linetwo" id="curraddress_linetwo" value="{{ $agent->curraddress_linetwo}}" class="form-control" placeholder="Enter Address Line 2">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-0">
+                                                    <label class="form-label">State</label>                                                    
+                                                    <select class="form-control" name="curragent_state" id="curr_state" onChange="changeState(this);">
+												    <option value="">Select State</option>
+														@foreach($states as $k => $state)
+															<option value="{{ $state->id }}" <?php echo ($state->id==$agent->curragent_state)? "selected":"" ?>>{{ $state->name }}</option>
+														@endforeach
+														
+													</select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-0">
+                                                    <label class="form-label">City</label>                                                   
+                                                    <select class="form-control" name="curragent_city" id="curr_city">
+													<option value="">Select City</option>
+                                                        @foreach($cities as $k=>$city)
+                                                            <option value="{{ $city->id }}" <?php echo ($city->id==$agent->curragent_city)? 'selected="selected"':"" ?>>{{ $city->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="mb-0">
+                                                    <label class="form-label">Zip Code</label>
+                                                    <input type="text" name="curragent_pincode" id="curragent_pincode" value="{{ $agent->curragent_pincode}}" class="form-control" placeholder="Enter Zip Code">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex wizard justify-content-between mt-3">
+                                <div class="first">
+                                    <a href="javascript:void(0);" class="btn btn-secondary previous-btn d-flex align-items-center justify-content-center">
+                                    <i class="ti ti-arrow-up-circle me-2"></i> Back To Previous
+                                    </a>
+                                </div>
+                                    <div class="last">
+                                        <button type='submit' id="nxtBtnVThree" class="btn btn-primary d-flex align-items-center justify-content-center">
+                                            Update Agent <i class="ti ti-arrow-up-right-circle ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                </div>
+                            </form>
+                        
+                    </div>
+                </div>
+            </div>
+            <!-- end tab content-->
+        </div>
+    </div>
+</div>
+
+<script>
+
+            function previewAgentImage(input) {
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById('agentImagePreview').src = e.target.result;
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+            //Add Employee Copy from Parmanent Address
+            function copyParamanentAddress() {
+                document.getElementById("curraddress_lineone").value =
+                    document.getElementById("address_lineone").value;
+                document.getElementById("curraddress_linetwo").value =
+                    document.getElementById("address_linetwo").value;
+                document.getElementById("curr_state").value =
+                    document.getElementById("agent_state").value;
+                document.getElementById("curr_city").value =
+                    document.getElementById("agent_city").value;
+                document.getElementById("curragent_pincode").value =
+                    document.getElementById("agent_pincode").value;
+            }
+        document.addEventListener('DOMContentLoaded', function () {
+        // Handle Next button click - FIXED
+        document.querySelector('.next-btn').addEventListener('click', function () {
+            // Remove active class from current tab
+            document.querySelector('.nav-pills .nav-link.active').classList.remove('active');
+            document.querySelector('.tab-pane.show.active').classList.remove('show', 'active');
+            
+            // Add active class to address tab
+            document.querySelector('.nav-pills .nav-link[href="#address"]').classList.add('active');
+            document.querySelector('#address').classList.add('show', 'active');
+        });
+
+        // Handle Previous button click
+        document.querySelector('.previous-btn').addEventListener('click', function () {
+            // Remove active class from current tab
+            document.querySelector('.nav-pills .nav-link.active').classList.remove('active');
+            document.querySelector('.tab-pane.show.active').classList.remove('show', 'active');
+            
+            // Add active class to personal details tab
+            document.querySelector('.nav-pills .nav-link[href="#personalDetail"]').classList.add('active');
+            document.querySelector('#personalDetail').classList.add('show', 'active');
+        });
+
+        // Handle "Other" checkbox click
+        document.querySelector('#customCheckinlh15').addEventListener('change', function () {
+            if (this.checked) {
+                document.querySelector('#otherInput').style.display = 'block';
+            } else {
+                document.querySelector('#otherInput').style.display = 'none';
+            }
+        });
+
+    });
+</script>
+@endsection
