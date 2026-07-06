@@ -1,6 +1,84 @@
 @extends('App.Layout')
 
 @section('container')
+<style>
+.custom-action-btn-pdf {
+    background-color: #ffeef0 !important;
+    color: #dc3545 !important;
+}
+.custom-action-btn-pdf:hover {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+}
+.custom-action-btn-excel {
+    background-color: #e8fadf !important;
+    color: #198754 !important;
+}
+.custom-action-btn-excel:hover {
+    background-color: #198754 !important;
+    color: #ffffff !important;
+}
+.custom-action-btn-print {
+    background-color: #e7f3ff !important;
+    color: #0d6efd !important;
+}
+.custom-action-btn-print:hover {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+}
+
+/* Datatable style normalization */
+.datatable-top {
+    padding: 10px 10px 15px 10px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+}
+.datatable-bottom {
+    padding: 15px 10px 10px 10px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+}
+.datatable-search {
+    float: none !important;
+    margin-left: 0 !important;
+    position: relative !important;
+}
+.datatable-search input {
+    border-radius: 8px !important;
+    border: 1px solid #e3e6f6 !important;
+    padding: 8px 16px 8px 38px !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: 14px center !important;
+    background-size: 14px !important;
+    font-size: 13.5px !important;
+    width: 220px !important;
+}
+.datatable-selector {
+    border-radius: 8px !important;
+    border: 1px solid #e3e6f6 !important;
+    padding: 6px 32px 6px 12px !important;
+    font-size: 13.5px !important;
+}
+.datatable-pagination a {
+    border-radius: 6px !important;
+    margin: 0 2px !important;
+    font-size: 13.5px !important;
+}
+.datatable-container {
+    border-top: 1px solid #f1f3f9 !important;
+    border-bottom: 1px solid #f1f3f9 !important;
+}
+.datatable-search .icon-search {
+    display: none !important;
+}
+</style>
 <div class="pc-content">
     {{-- PAGE HEADER --}}
     <div class="page-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
@@ -188,39 +266,30 @@
 
     <div class="row">
         <div class="col-12">
-            <div class="card border shadow-none rounded-3 mb-4">
-                <div class="card-header border-0 bg-transparent pt-3 px-3 pb-0 d-flex justify-content-end">
-                    {{-- Action Buttons --}}
-                    <div class="d-flex gap-3 align-items-center mb-2">
-                        <button onclick="exportToPDF()" class="btn btn-sm btn-outline-secondary px-3 py-1.5 rounded-pill d-flex align-items-center gap-1.5 fw-bold"><i class="ph ph-file-pdf fs-5 text-danger"></i> &nbsp; Export PDF</button>
-                        <button onclick="exportToExcel()" class="btn btn-sm btn-outline-secondary px-3 py-1.5 rounded-pill d-flex align-items-center gap-1.5 fw-bold"><i class="ph ph-file-xls fs-5 text-success"></i> &nbsp; Export Excel</button>
-                        <button onclick="printReport()" class="btn btn-sm btn-outline-secondary px-3 py-1.5 rounded-pill d-flex align-items-center gap-1.5 fw-bold"><i class="ph ph-printer fs-5 text-primary"></i>&nbsp; Print Report</button>
-                    </div>
-                </div>
-
-                <div class="card-body p-3">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-3.5">
                     <div class="tab-content" id="payrollTabContent">
 
                         {{-- TAB 1: PAYROLL REGISTER --}}
                         <div class="tab-pane fade show active" id="register" role="tabpanel" aria-labelledby="register-tab">
                             <h5 class="fw-bold mb-3 text-dark d-flex align-items-center"><i class="ph-duotone ph-table text-primary me-2 fs-5"></i> Payroll Register - <span class="active-month-text text-primary">July 2026</span></h5>
                             <div class="table-responsive border rounded-3">
-                                <table class="table tbl-product my-3" id="registerTable">
-                                    <thead>
-                                        <tr style="background-color: #cbcbcb;">
-                                            <th class="ps-3">Employee ID</th>
-                                            <th>Employee Name</th>
-                                            <th>Designation</th>
-                                            <th>DOJ</th>
-                                            <th>Gross Salary</th>
-                                            <th>Net Salary</th>
-                                            <th>PF Amount</th>
-                                            <th>ESI Amount</th>
-                                            <th>P-Tax</th>
-                                            <th>TDS Amount</th>
-                                            <th>Advance</th>
-                                            <th>Loan Ded.</th>
-                                            <th class="pe-3">Payment Status</th>
+                                <table class="table tbl-product m-0 custom-list-table align-middle" id="pc-dt-simple">
+                                    <thead class="bg-light">
+                                        <tr class="text-secondary small fw-bold">
+                                            <th class="ps-3 py-3">Employee ID</th>
+                                            <th class="py-3">Employee Name</th>
+                                            <th class="py-3">Designation</th>
+                                            <th class="py-3">DOJ</th>
+                                            <th class="py-3">Gross Salary</th>
+                                            <th class="py-3">Net Salary</th>
+                                            <th class="py-3">PF Amount</th>
+                                            <th class="py-3">ESI Amount</th>
+                                            <th class="py-3">P-Tax</th>
+                                            <th class="py-3">TDS Amount</th>
+                                            <th class="py-3">Advance</th>
+                                            <th class="py-3">Loan Ded.</th>
+                                            <th class="pe-3 py-3">Payment Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -312,10 +381,23 @@
                                             <td>₹1,540</td>
                                             <td>₹0</td>
                                             <td>₹3,000</td>
-                                            <td><span class="badge bg-light-warning text-warning rounded-pill px-2.5 py-1 small" id="emp6Status">Pending Approval</span></td>
+                                            <td><span class="badge bg-light-warning text-warning rounded-pill px-2.5 py-1 small">Payment Pending</span></td>
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            
+                            {{-- Action Buttons for Register Tab --}}
+                            <div class="d-flex justify-content-end gap-3 align-items-center mt-3 pt-3 border-top">
+                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                    <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
+                                </button>
+                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                    <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
+                                </button>
+                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
+                                </button>
                             </div>
                         </div>
 
@@ -323,17 +405,17 @@
                         <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
                             <h5 class="fw-bold mb-3 text-dark d-flex align-items-center"><i class="ph-duotone ph-calendar text-primary me-2 fs-5"></i> Attendance & Leave Register - <span class="active-month-text text-primary">July 2026</span></h5>
                             <div class="table-responsive border rounded-3">
-                                <table class="table tbl-product my-3" id="attendanceTable">
-                                    <thead>
-                                        <tr style="background-color: #cbcbcb;">
-                                            <th class="ps-3">Employee ID</th>
-                                            <th>Employee Name</th>
-                                            <th>Attendance (Days)</th>
-                                            <th>Absent (Days)</th>
-                                            <th>Leave (Days)</th>
-                                            <th>Late (Hours)</th>
-                                            <th>Overtime (Hours)</th>
-                                            <th class="pe-3">WFH (Days)</th>
+                                <table class="table tbl-product m-0 custom-list-table align-middle" id="pc-dt-attendance">
+                                    <thead class="bg-light">
+                                        <tr class="text-secondary small fw-bold">
+                                            <th class="ps-3 py-3">Employee ID</th>
+                                            <th class="py-3">Employee Name</th>
+                                            <th class="py-3">Attendance (Days)</th>
+                                            <th class="py-3">Absent (Days)</th>
+                                            <th class="py-3">Leave (Days)</th>
+                                            <th class="py-3">Late (Hours)</th>
+                                            <th class="py-3">Overtime (Hours)</th>
+                                            <th class="pe-3 py-3">WFH (Days)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -400,6 +482,19 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            {{-- Action Buttons for Attendance Tab --}}
+                            <div class="d-flex justify-content-end gap-3 align-items-center mt-3 pt-3 border-top">
+                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                    <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
+                                </button>
+                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                    <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
+                                </button>
+                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
+                                </button>
+                            </div>
                         </div>
 
                         {{-- TAB 3: SUMMARIES & DOWNLOADS --}}
@@ -409,33 +504,54 @@
                                 <div class="col-md-4 mb-3">
                                     <h6 class="fw-bold mb-3 text-dark text-uppercase small-text"><i class="ph-duotone ph-folders text-primary me-2"></i>Available Summaries</h6>
                                     <div class="list-group rounded-3 shadow-none border" id="summarySelectorList">
-                                        <button onclick="selectSummary('salary_sheet')" class="list-group-item list-group-item-action active py-3 d-flex align-items-center gap-2 fw-semibold">
-                                            <i class="ph-duotone ph-file-text fs-4 text-primary"></i> Salary Sheet Audit View
+                                        <button onclick="selectSummary('salary_sheet')" class="list-group-item list-group-item-action active py-3 d-flex align-items-center justify-content-between fw-semibold">
+                                            <span class="d-flex align-items-center gap-2">
+                                                <i class="ph-duotone ph-file-text fs-4 text-primary"></i> Salary Sheet Audit View
+                                            </span>
+                                            <span class="rounded-circle bg-primary" style="width: 8px; height: 8px;"></span>
                                         </button>
-                                        <button onclick="selectSummary('pf_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center gap-2 fw-semibold">
-                                            <i class="ph-duotone ph-coins fs-4 text-warning"></i> PF Liability Summary
+                                        <button onclick="selectSummary('pf_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center justify-content-between fw-semibold">
+                                            <span class="d-flex align-items-center gap-2">
+                                                <i class="ph-duotone ph-coins fs-4 text-warning"></i> PF Liability Summary
+                                            </span>
+                                            <span class="rounded-circle bg-warning" style="width: 8px; height: 8px;"></span>
                                         </button>
-                                        <button onclick="selectSummary('esi_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center gap-2 fw-semibold">
-                                            <i class="ph-duotone ph-first-aid fs-4 text-danger"></i> ESI Contribution Summary
+                                        <button onclick="selectSummary('esi_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center justify-content-between fw-semibold">
+                                            <span class="d-flex align-items-center gap-2">
+                                                <i class="ph-duotone ph-first-aid fs-4 text-danger"></i> ESI Contribution Summary
+                                            </span>
+                                            <span class="rounded-circle bg-danger" style="width: 8px; height: 8px;"></span>
                                         </button>
-                                        <button onclick="selectSummary('pt_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center gap-2 fw-semibold">
-                                            <i class="ph-duotone ph-bank fs-4 text-secondary"></i> Professional Tax (P-Tax) Summary
+                                        <button onclick="selectSummary('pt_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center justify-content-between fw-semibold">
+                                            <span class="d-flex align-items-center gap-2">
+                                                <i class="ph-duotone ph-bank fs-4 text-secondary"></i> Professional Tax (P-Tax) Summary
+                                            </span>
+                                            <span class="rounded-circle bg-secondary" style="width: 8px; height: 8px;"></span>
                                         </button>
-                                        <button onclick="selectSummary('tds_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center gap-2 fw-semibold">
-                                            <i class="ph-duotone ph-receipt fs-4 text-indigo"></i> TDS Compliance Summary
+                                        <button onclick="selectSummary('tds_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center justify-content-between fw-semibold">
+                                            <span class="d-flex align-items-center gap-2">
+                                                <i class="ph-duotone ph-receipt fs-4 text-indigo"></i> TDS Compliance Summary
+                                            </span>
+                                            <span class="rounded-circle bg-indigo" style="width: 8px; height: 8px; background-color: #6610f2 !important;"></span>
                                         </button>
-                                        <button onclick="selectSummary('lwf_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center gap-2 fw-semibold">
-                                            <i class="ph-duotone ph-umbrella fs-4 text-success"></i> Labour Welfare Fund (LWF)
+                                        <button onclick="selectSummary('lwf_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center justify-content-between fw-semibold">
+                                            <span class="d-flex align-items-center gap-2">
+                                                <i class="ph-duotone ph-umbrella fs-4 text-success"></i> Labour Welfare Fund (LWF)
+                                            </span>
+                                            <span class="rounded-circle bg-success" style="width: 8px; height: 8px;"></span>
                                         </button>
-                                        <button onclick="selectSummary('gratuity_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center gap-2 fw-semibold">
-                                            <i class="ph-duotone ph-hand-heart fs-4 text-info"></i> Gratuity Payment
+                                        <button onclick="selectSummary('gratuity_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center justify-content-between fw-semibold">
+                                            <span class="d-flex align-items-center gap-2">
+                                                <i class="ph-duotone ph-hand-heart fs-4 text-info"></i> Gratuity Payment
+                                            </span>
+                                            <span class="rounded-circle bg-info" style="width: 8px; height: 8px;"></span>
                                         </button>
                                     </div>
                                 </div>
 
                                 {{-- Right panel: Active Summary details & visual preview --}}
                                 <div class="col-md-8">
-                                    <div class="card border rounded-3 p-4 bg-white shadow-none" id="printReportContainer">
+                                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white" id="printReportContainer">
                                         {{-- Report Official Header --}}
                                         <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-4">
                                             <div class="d-flex align-items-center gap-3">
@@ -455,21 +571,20 @@
 
                                         {{-- Sub-table 1: Salary Sheet --}}
                                         <div id="summary_salary_sheet" class="summary-table-section">
-                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">Employee Bank Disbursement Register</h6>
-                                            <div class="table-responsive border rounded mb-3">
-                                                <table class="table align-middle mb-0 table-sm" id="salarySheetTable">
+                                            <div class="table-responsive border rounded-3 mb-3">
+                                                <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="salarySheetTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">EMP ID</th>
-                                                            <th>Employee Name</th>
-                                                            <th>Bank Name</th>
-                                                            <th>Account Number</th>
-                                                            <th>IFSC Code</th>
-                                                            <th>Net Salary</th>
-                                                            <th>Month</th>
-                                                            <th>Payment Date</th>
-                                                            <th>UTR / Ref</th>
-                                                            <th class="pe-2">Status</th>
+                                                            <th class="ps-3 py-2.5">EMP ID</th>
+                                                            <th class="py-2.5">Employee Name</th>
+                                                            <th class="py-2.5">Bank Name</th>
+                                                            <th class="py-2.5">Account Number</th>
+                                                            <th class="py-2.5">IFSC Code</th>
+                                                            <th class="py-2.5">Net Salary</th>
+                                                            <th class="py-2.5">Month</th>
+                                                            <th class="py-2.5">Payment Date</th>
+                                                            <th class="py-2.5">UTR / Ref</th>
+                                                            <th class="pe-3 py-2.5">Status</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -579,6 +694,18 @@
                                                     <span class="fw-bold text-dark">Authorized Signatory</span>
                                                 </div>
                                             </div>
+
+                                            <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
+                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
+                                                </button>
+                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
+                                                </button>
+                                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
+                                                </button>
+                                            </div>
                                         </div>
 
                                         {{-- Sub-table 2: PF Summary --}}
@@ -592,104 +719,118 @@
                                             </div>
 
                                             {{-- PF Table View --}}
-                                            <div id="pf_table_view" class="table-responsive border rounded mb-4">
-                                                <table class="table align-middle mb-0 table-sm" id="pfTable">
-                                                    <thead class="bg-light">
-                                                        <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">UAN</th>
-                                                            <th>Member Name</th>
-                                                            <th>Gross Wages</th>
-                                                            <th>EPF Wages</th>
-                                                            <th>EPS Wages</th>
-                                                            <th>EDLI Wages</th>
-                                                            <th>EPF Cont. (Emp 12%)</th>
-                                                            <th>EPF Cont. (Employer 3.67%)</th>
-                                                            <th>EPS Cont. (Employer 8.33%)</th>
-                                                            <th>NCP Days</th>
-                                                            <th class="pe-2">Refund of Advances</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">100984523190</td>
-                                                            <td class="fw-bold text-dark">Rahul Verma</td>
-                                                            <td>₹1,20,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td class="text-primary fw-bold">₹1,800.00</td>
-                                                            <td class="text-success fw-semibold">₹550.50</td>
-                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                            <td>0</td>
-                                                            <td class="pe-2">₹0.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">100984523910</td>
-                                                            <td class="fw-bold text-dark">Sneha Iyer</td>
-                                                            <td>₹95,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td class="text-primary fw-bold">₹1,800.00</td>
-                                                            <td class="text-success fw-semibold">₹550.50</td>
-                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                            <td>1</td>
-                                                            <td class="pe-2">₹0.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">100984523212</td>
-                                                            <td class="fw-bold text-dark">David Miller</td>
-                                                            <td>₹85,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td class="text-primary fw-bold">₹1,800.00</td>
-                                                            <td class="text-success fw-semibold">₹550.50</td>
-                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                            <td>0</td>
-                                                            <td class="pe-2">₹0.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">100984523010</td>
-                                                            <td class="fw-bold text-dark">Ananya Sen</td>
-                                                            <td>₹80,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td class="text-primary fw-bold">₹1,800.00</td>
-                                                            <td class="text-success fw-semibold">₹550.50</td>
-                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                            <td>0</td>
-                                                            <td class="pe-2">₹0.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">100984523182</td>
-                                                            <td class="fw-bold text-dark">Vikram Rathore</td>
-                                                            <td>₹1,50,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td class="text-primary fw-bold">₹1,800.00</td>
-                                                            <td class="text-success fw-semibold">₹550.50</td>
-                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                            <td>2</td>
-                                                            <td class="pe-2">₹0.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">100984523120</td>
-                                                            <td class="fw-bold text-dark">Priya Sharma</td>
-                                                            <td>₹72,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td>₹15,000.00</td>
-                                                            <td class="text-primary fw-bold">₹1,800.00</td>
-                                                            <td class="text-success fw-semibold">₹550.50</td>
-                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                            <td>0</td>
-                                                            <td class="pe-2">₹0.00</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                            <div id="pf_table_view">
+                                                <div class="table-responsive border rounded-3 mb-4">
+                                                    <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="pfTable">
+                                                        <thead class="bg-light">
+                                                            <tr class="text-secondary small fw-bold">
+                                                                <th class="ps-3 py-2.5">UAN</th>
+                                                                <th class="py-2.5">Member Name</th>
+                                                                <th class="py-2.5">Gross Wages</th>
+                                                                <th class="py-2.5">EPF Wages</th>
+                                                                <th class="py-2.5">EPS Wages</th>
+                                                                <th class="py-2.5">EDLI Wages</th>
+                                                                <th class="py-2.5">EPF Contribution (Employee 12%)</th>
+                                                                <th class="py-2.5">EPS Contribution (Employer 8.33%)</th>
+                                                                <th class="py-2.5">EPF Contribution (Employer 3.67%)</th>
+                                                                <th class="py-2.5">NCP Days</th>
+                                                                <th class="pe-3 py-2.5">Refund of Advances</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">100984523190</td>
+                                                                <td class="fw-bold text-dark">Rahul Verma</td>
+                                                                <td>₹1,20,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td class="text-primary fw-bold">₹1,800.00</td>
+                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
+                                                                <td class="text-success fw-semibold">₹550.50</td>
+                                                                <td>0</td>
+                                                                <td class="pe-2">₹0.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">100984523910</td>
+                                                                <td class="fw-bold text-dark">Sneha Iyer</td>
+                                                                <td>₹95,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td class="text-primary fw-bold">₹1,800.00</td>
+                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
+                                                                <td class="text-success fw-semibold">₹550.50</td>
+                                                                <td>1</td>
+                                                                <td class="pe-2">₹0.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">100984523212</td>
+                                                                <td class="fw-bold text-dark">David Miller</td>
+                                                                <td>₹85,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td class="text-primary fw-bold">₹1,800.00</td>
+                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
+                                                                <td class="text-success fw-semibold">₹550.50</td>
+                                                                <td>0</td>
+                                                                <td class="pe-2">₹0.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">100984523010</td>
+                                                                <td class="fw-bold text-dark">Ananya Sen</td>
+                                                                <td>₹80,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td class="text-primary fw-bold">₹1,800.00</td>
+                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
+                                                                <td class="text-success fw-semibold">₹550.50</td>
+                                                                <td>0</td>
+                                                                <td class="pe-2">₹0.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">100984523182</td>
+                                                                <td class="fw-bold text-dark">Vikram Rathore</td>
+                                                                <td>₹1,50,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td class="text-primary fw-bold">₹1,800.00</td>
+                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
+                                                                <td class="text-success fw-semibold">₹550.50</td>
+                                                                <td>2</td>
+                                                                <td class="pe-2">₹0.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">100984523120</td>
+                                                                <td class="fw-bold text-dark">Priya Sharma</td>
+                                                                <td>₹72,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td>₹15,000.00</td>
+                                                                <td class="text-primary fw-bold">₹1,800.00</td>
+                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
+                                                                <td class="text-success fw-semibold">₹550.50</td>
+                                                                <td>0</td>
+                                                                <td class="pe-2">₹0.00</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
+                                                    <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                        <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
+                                                    </button>
+                                                    <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                        <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
+                                                    </button>
+                                                    <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                        <i class="ph-duotone ph-printer fs-4"></i> Print Report
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             {{-- PF ECR Text File Format View --}}
@@ -713,6 +854,11 @@
                                                         <li class="d-flex align-items-center gap-1.5 mb-1"><i class="ti ti-circle-check text-success"></i> Only one text file can be packed inside the ZIP. Do not pack other formats like xls, doc, etc.</li>
                                                     </ul>
                                                 </div>
+                                                <div class="d-flex justify-content-end mt-4 pt-3 border-top no-print">
+                                                    <button onclick="downloadEcrText()" class="btn btn-light-warning px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm custom-action-btn-excel" style="transition: all 0.2s ease;">
+                                                        <i class="ph-duotone ph-download-simple fs-4"></i> Download ECR (.txt)
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -727,96 +873,110 @@
                                             </div>
 
                                             {{-- ESI Contribution Summary Table --}}
-                                            <div id="esi_summary_table_view" class="table-responsive border rounded mb-4">
-                                                <table class="table align-middle mb-0 table-sm" id="esiTable">
-                                                    <thead class="bg-light">
-                                                        <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">Employee ID</th>
-                                                            <th>Employee Name</th>
-                                                            <th>ESI Number</th>
-                                                            <th>ECR Gross Wages</th>
-                                                            <th>ESI Wages</th>
-                                                            <th>Employee ESI (0.75%)</th>
-                                                            <th>Employer ESI (3.25%)</th>
-                                                            <th class="pe-2">Total ESI (4%)</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">EMP001</td>
-                                                            <td class="fw-bold text-dark">Rahul Verma</td>
-                                                            <td>21-00-123456-001-0001</td>
-                                                            <td>₹1,20,000.00</td>
-                                                            <td>₹21,000.00</td>
-                                                            <td class="text-primary fw-semibold">₹157.50</td>
-                                                            <td class="text-success fw-semibold">₹682.50</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">EMP002</td>
-                                                            <td class="fw-bold text-dark">Sneha Iyer</td>
-                                                            <td>21-00-123456-002-0002</td>
-                                                            <td>₹95,000.00</td>
-                                                            <td>₹21,000.00</td>
-                                                            <td class="text-primary fw-semibold">₹157.50</td>
-                                                            <td class="text-success fw-semibold">₹682.50</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">EMP003</td>
-                                                            <td class="fw-bold text-dark">David Miller</td>
-                                                            <td>21-00-123456-003-0003</td>
-                                                            <td>₹85,000.00</td>
-                                                            <td>₹21,000.00</td>
-                                                            <td class="text-primary fw-semibold">₹157.50</td>
-                                                            <td class="text-success fw-semibold">₹682.50</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">EMP004</td>
-                                                            <td class="fw-bold text-dark">Ananya Sen</td>
-                                                            <td>21-00-123456-004-0004</td>
-                                                            <td>₹80,000.00</td>
-                                                            <td>₹21,000.00</td>
-                                                            <td class="text-primary fw-semibold">₹157.50</td>
-                                                            <td class="text-success fw-semibold">₹682.50</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">EMP005</td>
-                                                            <td class="fw-bold text-dark">Vikram Rathore</td>
-                                                            <td>21-00-123456-005-0005</td>
-                                                            <td>₹1,50,000.00</td>
-                                                            <td>₹21,000.00</td>
-                                                            <td class="text-primary fw-semibold">₹157.50</td>
-                                                            <td class="text-success fw-semibold">₹682.50</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">EMP006</td>
-                                                            <td class="fw-bold text-dark">Priya Sharma</td>
-                                                            <td>21-00-123456-006-0006</td>
-                                                            <td>₹72,000.00</td>
-                                                            <td>₹21,000.00</td>
-                                                            <td class="text-primary fw-semibold">₹157.50</td>
-                                                            <td class="text-success fw-semibold">₹682.50</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                            <div id="esi_summary_table_view">
+                                                <div class="table-responsive border rounded-3 mb-4">
+                                                    <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="esiTable">
+                                                        <thead class="bg-light">
+                                                            <tr class="text-secondary small fw-bold">
+                                                                <th class="ps-3 py-2.5">Employee ID</th>
+                                                                <th class="py-2.5">Employee Name</th>
+                                                                <th class="py-2.5">ESI Number</th>
+                                                                <th class="py-2.5">ECR Gross Wages</th>
+                                                                <th class="py-2.5">ESI Wages</th>
+                                                                <th class="py-2.5">Employee ESI (0.75%)</th>
+                                                                <th class="py-2.5">Employer ESI (3.25%)</th>
+                                                                <th class="pe-3 py-2.5">Total ESI (4%)</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">EMP001</td>
+                                                                <td class="fw-bold text-dark">Rahul Verma</td>
+                                                                <td>21-00-123456-001-0001</td>
+                                                                <td>₹1,20,000.00</td>
+                                                                <td>₹21,000.00</td>
+                                                                <td class="text-primary fw-semibold">₹157.50</td>
+                                                                <td class="text-success fw-semibold">₹682.50</td>
+                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">EMP002</td>
+                                                                <td class="fw-bold text-dark">Sneha Iyer</td>
+                                                                <td>21-00-123456-002-0002</td>
+                                                                <td>₹95,000.00</td>
+                                                                <td>₹21,000.00</td>
+                                                                <td class="text-primary fw-semibold">₹157.50</td>
+                                                                <td class="text-success fw-semibold">₹682.50</td>
+                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">EMP003</td>
+                                                                <td class="fw-bold text-dark">David Miller</td>
+                                                                <td>21-00-123456-003-0003</td>
+                                                                <td>₹85,000.00</td>
+                                                                <td>₹21,000.00</td>
+                                                                <td class="text-primary fw-semibold">₹157.50</td>
+                                                                <td class="text-success fw-semibold">₹682.50</td>
+                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">EMP004</td>
+                                                                <td class="fw-bold text-dark">Ananya Sen</td>
+                                                                <td>21-00-123456-004-0004</td>
+                                                                <td>₹80,000.00</td>
+                                                                <td>₹21,000.00</td>
+                                                                <td class="text-primary fw-semibold">₹157.50</td>
+                                                                <td class="text-success fw-semibold">₹682.50</td>
+                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">EMP005</td>
+                                                                <td class="fw-bold text-dark">Vikram Rathore</td>
+                                                                <td>21-00-123456-005-0005</td>
+                                                                <td>₹1,50,000.00</td>
+                                                                <td>₹21,000.00</td>
+                                                                <td class="text-primary fw-semibold">₹157.50</td>
+                                                                <td class="text-success fw-semibold">₹682.50</td>
+                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="ps-2 fw-bold text-dark">EMP006</td>
+                                                                <td class="fw-bold text-dark">Priya Sharma</td>
+                                                                <td>21-00-123456-006-0006</td>
+                                                                <td>₹72,000.00</td>
+                                                                <td>₹21,000.00</td>
+                                                                <td class="text-primary fw-semibold">₹157.50</td>
+                                                                <td class="text-success fw-semibold">₹682.50</td>
+                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
+                                                    <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                        <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
+                                                    </button>
+                                                    <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                        <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
+                                                    </button>
+                                                    <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                        <i class="ph-duotone ph-printer fs-4"></i> Print Report
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             {{-- ESIC Upload Sheet Table --}}
-                                            <div id="esi_upload_table_view" class="table-responsive border rounded mb-4 d-none">
-                                                <table class="table align-middle mb-0 table-sm" id="esiUploadTable">
+                                            <div id="esi_upload_table_view" class="table-responsive border rounded-3 mb-4 d-none">
+                                                <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="esiUploadTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">IP Number (10 Digits)</th>
-                                                            <th>IP Name (Only alphabets and space)</th>
-                                                            <th>No of Days for which wages paid/payable during the month</th>
-                                                            <th>Total Monthly Wages</th>
-                                                            <th>Reason Code for Zero working days</th>
-                                                            <th class="pe-2">Last Working Day</th>
+                                                            <th class="ps-3 py-2.5">IP Number (10 Digits)</th>
+                                                            <th class="py-2.5">IP Name (Only alphabets and space)</th>
+                                                            <th class="py-2.5">No of Days for which wages paid/payable during the month</th>
+                                                            <th class="py-2.5">Total Monthly Wages</th>
+                                                            <th class="py-2.5">Reason Code for Zero working days</th>
+                                                            <th class="pe-3 py-2.5">Last Working Day</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -871,22 +1031,28 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+
+                                            <div class="d-flex justify-content-end mt-4 pt-3 border-top no-print">
+                                                <button onclick="exportToExcel()" class="btn btn-light-success px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm custom-action-btn-excel" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-xls fs-4"></i> Download ESIC Upload Sheet
+                                                </button>
+                                            </div>
                                         </div>
 
                                         {{-- Sub-table 4: PT Summary --}}
                                         <div id="summary_pt_summary" class="summary-table-section d-none">
                                             <h6 class="fw-bold mb-3 text-dark uppercase-label">P-Tax Return Summary</h6>
-                                            <div class="table-responsive border rounded mb-4">
-                                                <table class="table align-middle mb-0 table-sm" id="ptTable">
+                                            <div class="table-responsive border rounded-3 mb-4">
+                                                <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="ptTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">Registration No</th>
-                                                            <th>Employer Name</th>
-                                                            <th>Employee Count</th>
-                                                            <th>Gross Salary</th>
-                                                            <th>PT Deduction</th>
-                                                            <th>Total PT Payable</th>
-                                                            <th class="pe-2">Period</th>
+                                                            <th class="ps-3 py-2.5">Registration No</th>
+                                                            <th class="py-2.5">Employer Name</th>
+                                                            <th class="py-2.5">Employee Count</th>
+                                                            <th class="py-2.5">Gross Salary</th>
+                                                            <th class="py-2.5">PT Deduction</th>
+                                                            <th class="py-2.5">Total PT Payable</th>
+                                                            <th class="pe-3 py-2.5">Period</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -920,24 +1086,36 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+
+                                            <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
+                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
+                                                </button>
+                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
+                                                </button>
+                                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
+                                                </button>
+                                            </div>
                                         </div>
 
                                         {{-- Sub-table 5: TDS Summary --}}
                                         <div id="summary_tds_summary" class="summary-table-section d-none">
                                             <h6 class="fw-bold mb-3 text-dark uppercase-label">TDS FVU (File Validation Utility) - RPU/FVU compatible</h6>
-                                            <div class="table-responsive border rounded mb-4">
-                                                <table class="table align-middle mb-0 table-sm" id="tdsTable">
+                                            <div class="table-responsive border rounded-3 mb-4">
+                                                <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="tdsTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">TAN</th>
-                                                            <th>PAN</th>
-                                                            <th>Employee Name</th>
-                                                            <th>Salary Amount</th>
-                                                            <th>TDS Amount</th>
-                                                            <th>Section Code</th>
-                                                            <th>Challan No</th>
-                                                            <th>BSR Code</th>
-                                                            <th class="pe-2">Deposit Date</th>
+                                                            <th class="ps-3 py-2.5">TAN</th>
+                                                            <th class="py-2.5">PAN</th>
+                                                            <th class="py-2.5">Employee Name</th>
+                                                            <th class="py-2.5">Salary Amount</th>
+                                                            <th class="py-2.5">TDS Amount</th>
+                                                            <th class="py-2.5">Section Code</th>
+                                                            <th class="py-2.5">Challan No</th>
+                                                            <th class="py-2.5">BSR Code</th>
+                                                            <th class="pe-3 py-2.5">Deposit Date</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -1010,23 +1188,35 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+
+                                            <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
+                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
+                                                </button>
+                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
+                                                </button>
+                                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
+                                                </button>
+                                            </div>
                                         </div>
 
                                         {{-- Sub-table 5: Labour Welfare Fund --}}
                                         <div id="summary_lwf_summary" class="summary-table-section d-none">
                                             <h6 class="fw-bold text-dark mb-3">Labour Welfare Fund (LWF) Liability Report</h6>
-                                            <div class="table-responsive border rounded mb-4">
-                                                <table class="table align-middle mb-0 table-sm" id="lwfTable">
+                                            <div class="table-responsive border rounded-3 mb-4">
+                                                <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="lwfTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">EMP ID</th>
-                                                            <th>Employee Name</th>
-                                                            <th>State</th>
-                                                            <th>Gross Wages</th>
-                                                            <th>Employee Share (LWF)</th>
-                                                            <th>Employer Share (LWF)</th>
-                                                            <th>Total LWF Contribution</th>
-                                                            <th class="pe-2">Status</th>
+                                                            <th class="ps-3 py-2.5">EMP ID</th>
+                                                            <th class="py-2.5">Employee Name</th>
+                                                            <th class="py-2.5">State</th>
+                                                            <th class="py-2.5">Gross Wages</th>
+                                                            <th class="py-2.5">Employee Share (LWF)</th>
+                                                            <th class="py-2.5">Employer Share (LWF)</th>
+                                                            <th class="py-2.5">Total LWF Contribution</th>
+                                                            <th class="pe-3 py-2.5">Status</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -1093,23 +1283,35 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+
+                                            <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
+                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
+                                                </button>
+                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
+                                                </button>
+                                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
+                                                </button>
+                                            </div>
                                         </div>
 
                                         {{-- Sub-table 6: Gratuity Payment --}}
                                         <div id="summary_gratuity_summary" class="summary-table-section d-none">
                                             <h6 class="fw-bold text-dark mb-3">Gratuity Liability & Accrual Statement</h6>
-                                            <div class="table-responsive border rounded mb-4">
-                                                <table class="table align-middle mb-0 table-sm" id="gratuityTable">
+                                            <div class="table-responsive border rounded-3 mb-4">
+                                                <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="gratuityTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">EMP ID</th>
-                                                            <th>Employee Name</th>
-                                                            <th>Date of Joining</th>
-                                                            <th>Completed Years</th>
-                                                            <th>Basic Salary</th>
-                                                            <th>Gratuity Accrued (Current FY)</th>
-                                                            <th>Total Gratuity Accrued</th>
-                                                            <th class="pe-2">Status</th>
+                                                            <th class="ps-3 py-2.5">EMP ID</th>
+                                                            <th class="py-2.5">Employee Name</th>
+                                                            <th class="py-2.5">Date of Joining</th>
+                                                            <th class="py-2.5">Completed Years</th>
+                                                            <th class="py-2.5">Basic Salary</th>
+                                                            <th class="py-2.5">Gratuity Accrued (Current FY)</th>
+                                                            <th class="py-2.5">Total Gratuity Accrued</th>
+                                                            <th class="pe-3 py-2.5">Status</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -1175,6 +1377,18 @@
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                            </div>
+
+                                            <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
+                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
+                                                </button>
+                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
+                                                </button>
+                                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -1327,6 +1541,38 @@
     bottom: 0;
     width: 4px;
     background-color: #422f90;
+}
+
+/* Print Report Container Styles */
+#printReportContainer {
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+}
+#printReportContainer table th {
+    background-color: #f8f9fa !important;
+    color: #555555 !important;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+#printReportContainer table td {
+    font-size: 13px;
+    padding: 10px 12px !important;
+}
+.summary-table-section h6 {
+    position: relative;
+    padding-left: 12px;
+}
+.summary-table-section h6::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 3px;
+    bottom: 3px;
+    width: 3px;
+    background-color: #422f90;
+    border-radius: 2px;
 }
 #summarySelectorList .list-group-item i {
     transition: transform 0.25s ease;
@@ -1499,6 +1745,25 @@ function exportToExcel() {
     alert('Exporting report as Excel spreadsheet...');
 }
 
+// Download ECR Text file return
+function downloadEcrText() {
+    const preElement = document.querySelector("#pf_text_view pre");
+    if (preElement) {
+        const text = preElement.innerText;
+        const blob = new Blob([text], { type: "text/plain" });
+        const anchor = document.createElement("a");
+        anchor.download = "PF_ECR_Return.txt";
+        anchor.href = window.URL.createObjectURL(blob);
+        anchor.target = "_blank";
+        anchor.style.display = "none";
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+    } else {
+        alert("ECR text content not found.");
+    }
+}
+
 // Switch ESI tabs
 function switchEsiTab(tab, btn) {
     $('.active-esi-tab-btn').removeClass('active bg-white text-primary').addClass('text-secondary');
@@ -1530,5 +1795,164 @@ function switchPfTab(tab, btn) {
         $('#pf_text_view').removeClass('d-none');
     }
 }
+
+// Initialize custom Datatables for Attendance
+document.addEventListener("DOMContentLoaded", function () {
+    const attendanceTable = document.getElementById("pc-dt-attendance");
+    if (attendanceTable && typeof simpleDatatables !== 'undefined') {
+        const totalRows = attendanceTable.querySelectorAll('tbody tr').length;
+        const dataTable = new simpleDatatables.DataTable(attendanceTable, {
+            sortable: true,
+            perPage: 10,
+            perPageSelect: [5, 10, 15, 20, 25, 50, totalRows],
+            searchable: true,
+            fixedHeight: false,
+            labels: {
+                placeholder: "Search...",
+                perPage: "entries per page",
+                noRows: "No data available",
+                info: "Showing {start} to {end} of {rows} entries",
+            },
+            layout: {
+                top: "{select}{search}",
+                bottom: "{info}{pager}",
+            },
+            classes: {
+                active: "active",
+                disabled: "disabled",
+                selector: "form-select",
+                input: "form-control",
+                paginationList: "pagination",
+            }
+        });
+
+        // Add action buttons and style layout like pc-dt-simple
+        setTimeout(function () {
+            const wrapper = attendanceTable.closest(".datatable-wrapper");
+            if (wrapper) {
+                const topSection = wrapper.querySelector(".datatable-top");
+                if (topSection) {
+                    // Create search and buttons container
+                    const searchAndButtonsContainer = document.createElement("div");
+                    searchAndButtonsContainer.className = "datatable-search-and-buttons";
+
+                    // Get search element
+                    const searchElement = topSection.querySelector(".datatable-search");
+                    if (searchElement) {
+                        topSection.removeChild(searchElement);
+                        searchAndButtonsContainer.appendChild(searchElement);
+                    }
+
+                    // Append container to top section
+                    topSection.appendChild(searchAndButtonsContainer);
+
+                    // Add download and print buttons
+                    const buttonContainer = document.createElement("div");
+                    buttonContainer.className = "datatable-custom-buttons";
+
+                    const downloadBtn = document.createElement("a");
+                    downloadBtn.href = "#";
+                    downloadBtn.className = "btn btn-secondary me-2";
+                    downloadBtn.setAttribute("data-bs-toggle", "tooltip");
+                    downloadBtn.setAttribute("title", "Download Now");
+                    downloadBtn.innerHTML = '<i class="ti ti-download"></i>';
+                    downloadBtn.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        exportToExcel();
+                    });
+
+                    const printBtn = document.createElement("a");
+                    printBtn.href = "#";
+                    printBtn.className = "btn btn-primary";
+                    printBtn.setAttribute("data-bs-toggle", "tooltip");
+                    printBtn.setAttribute("title", "Print");
+                    printBtn.innerHTML = '<i class="ti ti-printer"></i>';
+                    printBtn.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        printReport();
+                    });
+
+                    buttonContainer.appendChild(downloadBtn);
+                    buttonContainer.appendChild(printBtn);
+                    searchAndButtonsContainer.appendChild(buttonContainer);
+                }
+
+                // Move Entries selector to bottom
+                const bottomSection = wrapper.querySelector(".datatable-bottom");
+                if (bottomSection && topSection) {
+                    const topSelector = topSection.querySelector(".datatable-selector-wrapper");
+                    if (topSelector) {
+                        const infoElement = bottomSection.querySelector(".datatable-info");
+                        if (infoElement) {
+                            bottomSection.insertBefore(topSelector, infoElement);
+                        } else {
+                            bottomSection.prepend(topSelector);
+                        }
+                        topSelector.style.float = "left";
+                        topSelector.style.clear = "left";
+                        topSelector.style.marginBottom = "10px";
+                        topSelector.style.width = "auto";
+                        if (infoElement) {
+                            infoElement.style.clear = "left";
+                            infoElement.style.marginTop = "5px";
+                        }
+                    }
+                }
+
+                // Normalize perPage label and All text
+                const selectorLabel = wrapper.querySelector(".datatable-selector-wrapper label, .datatable-dropdown label");
+                if (selectorLabel) {
+                    selectorLabel.innerHTML = selectorLabel.innerHTML.replace(/\{select\}\s*/g, "");
+                }
+                const selector = wrapper.querySelector('.datatable-dropdown select');
+                if (selector && selector.lastElementChild) {
+                    selector.lastElementChild.textContent = 'All';
+                }
+
+                // Make pagination float right
+                if (bottomSection) {
+                    const paginationElement = bottomSection.querySelector(".datatable-pagination");
+                    if (paginationElement) {
+                        paginationElement.style.float = "right";
+                        paginationElement.style.marginTop = "-45px";
+                    }
+                }
+
+                // Bind perPage selector for pc-dt-attendance
+                const bindAttendancePerPageSelector = function (wrapperElement) {
+                    if (!wrapperElement || wrapperElement.dataset.boundPerPageDelegate === "1") return;
+
+                    wrapperElement.addEventListener("change", function (e) {
+                        const target = e.target;
+                        if (!(target instanceof HTMLSelectElement)) return;
+
+                        if (
+                            !target.closest(".datatable-dropdown") &&
+                            !target.classList.contains("datatable-selector") &&
+                            !target.classList.contains("form-select")
+                        ) {
+                            return;
+                        }
+
+                        const nextPerPage = parseInt(target.value, 10);
+                        if (!Number.isFinite(nextPerPage) || nextPerPage <= 0) return;
+
+                        dataTable.options.perPage = nextPerPage;
+                        dataTable._currentPage = 1;
+                        dataTable.update();
+
+                        if (typeof dataTable._fixHeight === "function") {
+                            dataTable._fixHeight();
+                        }
+                    });
+
+                    wrapperElement.dataset.boundPerPageDelegate = "1";
+                };
+
+                bindAttendancePerPageSelector(wrapper);
+            }
+        }, 500);
+    }
+});
 </script>
 @endsection
