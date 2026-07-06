@@ -687,8 +687,16 @@
 
                                         {{-- Sub-table 3: ESI Summary --}}
                                         <div id="summary_esi_summary" class="summary-table-section d-none">
-                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">ESI Summary - MC Excel</h6>
-                                            <div class="table-responsive border rounded mb-4">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="fw-bold text-dark mb-0 uppercase-label" id="esiSummaryTitle">ESI Summary - MC Excel</h6>
+                                                <div class="btn-group btn-group-sm border rounded-pill overflow-hidden p-0.5 bg-light" role="group">
+                                                    <button type="button" class="btn btn-sm rounded-pill px-3 active-esi-tab-btn active bg-white text-primary border-0 fw-bold" onclick="switchEsiTab('summary', this)">ESI Summary</button>
+                                                    <button type="button" class="btn btn-sm rounded-pill px-3 active-esi-tab-btn text-secondary border-0 fw-bold" onclick="switchEsiTab('upload', this)">ESIC Upload Sheet</button>
+                                                </div>
+                                            </div>
+
+                                            {{-- ESI Contribution Summary Table --}}
+                                            <div id="esi_summary_table_view" class="table-responsive border rounded mb-4">
                                                 <table class="table align-middle mb-0 table-sm" id="esiTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
@@ -762,6 +770,72 @@
                                                             <td class="text-primary fw-semibold">₹157.50</td>
                                                             <td class="text-success fw-semibold">₹682.50</td>
                                                             <td class="pe-2 fw-bold text-dark">₹840.00</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            {{-- ESIC Upload Sheet Table --}}
+                                            <div id="esi_upload_table_view" class="table-responsive border rounded mb-4 d-none">
+                                                <table class="table align-middle mb-0 table-sm" id="esiUploadTable">
+                                                    <thead class="bg-light">
+                                                        <tr class="text-secondary small fw-bold">
+                                                            <th class="ps-2">IP Number (10 Digits)</th>
+                                                            <th>IP Name (Only alphabets and space)</th>
+                                                            <th>No of Days for which wages paid/payable during the month</th>
+                                                            <th>Total Monthly Wages</th>
+                                                            <th>Reason Code for Zero working days</th>
+                                                            <th class="pe-2">Last Working Day</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="ps-2 fw-bold text-dark">2100123456</td>
+                                                            <td class="fw-bold text-dark">Rahul Verma</td>
+                                                            <td>26</td>
+                                                            <td class="fw-semibold">₹1,20,000.00</td>
+                                                            <td>0</td>
+                                                            <td class="pe-2 text-muted">N/A</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="ps-2 fw-bold text-dark">2100123457</td>
+                                                            <td class="fw-bold text-dark">Sneha Iyer</td>
+                                                            <td>26</td>
+                                                            <td class="fw-semibold">₹95,000.00</td>
+                                                            <td>0</td>
+                                                            <td class="pe-2 text-muted">N/A</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="ps-2 fw-bold text-dark">2100123458</td>
+                                                            <td class="fw-bold text-dark">David Miller</td>
+                                                            <td>26</td>
+                                                            <td class="fw-semibold">₹85,000.00</td>
+                                                            <td>0</td>
+                                                            <td class="pe-2 text-muted">N/A</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="ps-2 fw-bold text-dark">2100123459</td>
+                                                            <td class="fw-bold text-dark">Ananya Sen</td>
+                                                            <td>26</td>
+                                                            <td class="fw-semibold">₹80,000.00</td>
+                                                            <td>0</td>
+                                                            <td class="pe-2 text-muted">N/A</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="ps-2 fw-bold text-dark">2100123460</td>
+                                                            <td class="fw-bold text-dark">Vikram Rathore</td>
+                                                            <td>26</td>
+                                                            <td class="fw-semibold">₹1,50,000.00</td>
+                                                            <td>0</td>
+                                                            <td class="pe-2 text-muted">N/A</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="ps-2 fw-bold text-dark">2100123461</td>
+                                                            <td class="fw-bold text-dark">Priya Sharma</td>
+                                                            <td>26</td>
+                                                            <td class="fw-semibold">₹72,000.00</td>
+                                                            <td>0</td>
+                                                            <td class="pe-2 text-muted">N/A</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1429,6 +1503,22 @@ function exportToPDF() {
 // Export Excel Handler
 function exportToExcel() {
     alert('Exporting report as Excel spreadsheet...');
+}
+
+// Switch ESI tabs
+function switchEsiTab(tab, btn) {
+    $('.active-esi-tab-btn').removeClass('active bg-white text-primary').addClass('text-secondary');
+    $(btn).addClass('active bg-white text-primary').removeClass('text-secondary');
+    
+    if (tab === 'summary') {
+        $('#esiSummaryTitle').text('ESI Summary - MC Excel');
+        $('#esi_summary_table_view').removeClass('d-none');
+        $('#esi_upload_table_view').addClass('d-none');
+    } else {
+        $('#esiSummaryTitle').text('ESIC ONLINE SHEET FOR UPLOAD');
+        $('#esi_summary_table_view').addClass('d-none');
+        $('#esi_upload_table_view').removeClass('d-none');
+    }
 }
 </script>
 @endsection
