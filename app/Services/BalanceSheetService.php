@@ -384,7 +384,8 @@ class BalanceSheetService
 
 		// Trade Payables
 		if ($type == 'trade_payables') {
-			$amount = DB::table('purchases as p')
+			 // Outstanding Purchase Amount
+			$purchaseAmount = DB::table('purchases as p')
 							->leftJoin('purchase_values as pv', 'pv.sid', '=', 'p.id')
 							->where('p.added_by', $userId)
 							->where('p.status', 1)
@@ -397,6 +398,22 @@ class BalanceSheetService
 							')
 							->get()
 							->sum('payable');
+							
+			// Purchase Credit/Debit Notes
+			$voucherPurchaseTotals = DB::table('voucher_purchases')
+								->selectRaw("
+									SUM(CASE WHEN note_type='Credit' THEN total_amt ELSE 0 END) AS total_credit,
+									SUM(CASE WHEN note_type='Debit' THEN total_amt ELSE 0 END) AS total_debit
+								")
+								->where('added_by', $userId)
+								->where('return_status', 'Received')
+								//->where('status', 1)
+								->whereBetween('inv_date', [$startDate, $endDate])
+								->first();
+
+			$purchaseCredit = $voucherPurchaseTotals->total_credit ?? 0;
+			$purchaseDebit  = $voucherPurchaseTotals->total_debit ?? 0;
+			$amount = ($purchaseAmount - $purchaseCredit + $purchaseDebit);
 		}
 
 		// Advance from Customer
@@ -484,38 +501,8 @@ class BalanceSheetService
 
 		// GST Payable
 		if ($type == 'gst_payable') {
-
-			// Get sales ids
-			$salesIds = DB::table('sales')
-				->where('added_by', $userId)
-				->whereBetween('inv_date', [$startDate, $endDate])
-				->pluck('id');
-
-			// Sum tax amount from sales_values table
-			$salesTaxAmount = DB::table('sales_values')
-				->whereIn('sid', $salesIds)
-				->sum('tax_amt');
-
-			// Income GST Amount
-			$incomeGstAmount = DB::table('income')
-				->where('addBy', $userId)
-				->whereBetween('dateInput', [$startDate, $endDate])
-				->sum('gst_amt');
-
-			// Expenses GST Amount
-			$expenseGstAmount = DB::table('expenses')
-				->where('added_by', $userId)
-				->whereBetween('expense_date', [$startDate, $endDate])
-				->sum('total_gst');
-			
-			 // Assets GST Amount
-			$assetGstAmount = DB::table('assets')
-				->where('added_by', $userId)
-				->whereBetween('date', [$startDate, $endDate])
-				->sum('gst_amt');
-
-			// Final Total
-			$amount = $salesTaxAmount + $incomeGstAmount + $expenseGstAmount + $assetGstAmount;
+			$gst = $this->calculateGST($userId, $startDate, $endDate);
+			$amount = $gst['gst_payable'];
 		}
 
 		// TDS Payable
@@ -700,7 +687,21 @@ class BalanceSheetService
 				->selectRaw('SUM(COALESCE(amount,0) - COALESCE(advance_amt,0)) as receivable')
 				->value('receivable');
 
-			$amount = ($salesReceivable ?? 0) + ($incomeReceivable ?? 0);
+			// Sales Credit/Debit Notes
+			$voucherSalesTotals = DB::table('vouchers')
+									->selectRaw("
+										SUM(CASE WHEN note_type = 'Credit' THEN total_amt ELSE 0 END) AS total_credit,
+										SUM(CASE WHEN note_type = 'Debit' THEN total_amt ELSE 0 END) AS total_debit
+									")
+									->where('added_by', $userId)
+									->where('return_status', 'Received')
+									//->where('status', 1)
+									->whereBetween('inv_date', [$startDate, $endDate])
+									->first();
+
+			$salesCredit = $voucherSalesTotals->total_credit ?? 0;
+			$salesDebit  = $voucherSalesTotals->total_debit ?? 0;
+			$amount = ($salesReceivable - $salesCredit + $salesDebit) + ($incomeReceivable ?? 0);
 		}
 
 		/*
@@ -750,12 +751,8 @@ class BalanceSheetService
 		|--------------------------------------------------------------------------
 		*/
 		if ($type == 'Input GST Credit') {
-
-			$amount = DB::table('purchase_values as pv')
-				->join('purchases as p', 'p.id', '=', 'pv.sid')
-				->where('p.added_by', $userId)
-				->whereBetween('p.inv_date', [$startDate, $endDate])
-				->sum('pv.tax_amt');
+			$gst = $this->calculateGST($userId, $startDate, $endDate);
+			$amount = $gst['gst_receivable'];
 		}
 
 		/*
@@ -811,6 +808,101 @@ class BalanceSheetService
 		}
 
 		return $amount;
+	}
+	
+	private function calculateGST($userId, $startDate, $endDate)
+	{
+		// Sales IDs
+		$salesIds = DB::table('sales')
+			->where('added_by', $userId)
+			->where('status', 1)
+			->whereBetween('inv_date', [$startDate, $endDate])
+			->pluck('id');
+
+		// Purchase IDs
+		$purchaseIds = DB::table('purchases')
+			->where('added_by', $userId)
+			->where('status', 1)
+			->whereBetween('inv_date', [$startDate, $endDate])
+			->pluck('id');
+
+		// Output GST
+		$salesTaxAmount = DB::table('sales_values')
+			->whereIn('sid', $salesIds)
+			->sum('tax_amt');
+
+		$incomeGstAmount = DB::table('income')
+			->where('addBy', $userId)
+			->whereBetween('dateInput', [$startDate, $endDate])
+			->sum('gst_amt');
+
+		// Input GST
+		$purchaseTaxAmount = DB::table('purchase_values')
+			->whereIn('sid', $purchaseIds)
+			->sum('tax_amt');
+
+		$expenseGstAmount = DB::table('expenses')
+			->where('added_by', $userId)
+			->whereBetween('expense_date', [$startDate, $endDate])
+			->sum('total_gst');
+
+		$assetGstAmount = DB::table('assets')
+			->where('added_by', $userId)
+			->whereBetween('date', [$startDate, $endDate])
+			->sum('gst_amt');
+
+		// Sales Credit/Debit Notes
+		$voucherSales = DB::table('vouchers')
+			->selectRaw("
+				SUM(CASE WHEN note_type='Credit'
+					THEN COALESCE(cgst_amount,0)+COALESCE(sgst_amount,0)+COALESCE(igst_amount,0)
+					ELSE 0 END) AS credit_gst,
+
+				SUM(CASE WHEN note_type='Debit'
+					THEN COALESCE(cgst_amount,0)+COALESCE(sgst_amount,0)+COALESCE(igst_amount,0)
+					ELSE 0 END) AS debit_gst
+			")
+			->where('added_by', $userId)
+			->where('return_status', 'Received')
+			->whereBetween('inv_date', [$startDate, $endDate])
+			->first();
+
+		// Purchase Credit/Debit Notes
+		$voucherPurchase = DB::table('voucher_purchases')
+			->selectRaw("
+				SUM(CASE WHEN note_type='Credit'
+					THEN COALESCE(cgst_amount,0)+COALESCE(sgst_amount,0)+COALESCE(igst_amount,0)
+					ELSE 0 END) AS credit_gst,
+
+				SUM(CASE WHEN note_type='Debit'
+					THEN COALESCE(cgst_amount,0)+COALESCE(sgst_amount,0)+COALESCE(igst_amount,0)
+					ELSE 0 END) AS debit_gst
+			")
+			->where('added_by', $userId)
+			->where('return_status', 'Received')
+			->whereBetween('inv_date', [$startDate, $endDate])
+			->first();
+
+		$outputGST = $salesTaxAmount
+			+ $incomeGstAmount
+			- ($voucherSales->credit_gst ?? 0)
+			+ ($voucherSales->debit_gst ?? 0);
+
+		$inputGST = $purchaseTaxAmount
+			+ $expenseGstAmount
+			+ $assetGstAmount
+			- ($voucherPurchase->credit_gst ?? 0)
+			+ ($voucherPurchase->debit_gst ?? 0);
+
+		$netGST = $outputGST - $inputGST;
+
+		return [
+			'output_gst'     => $outputGST,
+			'input_gst'      => $inputGST,
+			'net_gst'        => $netGST,
+			'gst_payable'    => max($netGST, 0),
+			'gst_receivable' => max(-$netGST, 0),
+		];
 	}
 
 }

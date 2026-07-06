@@ -1836,10 +1836,10 @@ class PurchaseController extends Controller
 								->select(DB::raw('comp_name,comp_phone,gst_no,comp_email,comp_pan_no'))
 								->where('company_profiles.userId','=',$userId)
 								->get();
-		$custData = DB::table('customers')
-								->select(DB::raw('customers.*'))
-								->where('customers.userId','=',currentOwnerId())
-								->where('customers.status','=',1)
+		$vendorData = DB::table('vendors')
+								->select(DB::raw('vendors.*'))
+								->where('vendors.userId','=',currentOwnerId())
+								->where('vendors.status','=',1)
 								->get();
 		$purposes_of_tds = DB::table('purposes_of_tds')
 								->get();
@@ -1872,7 +1872,7 @@ class PurchaseController extends Controller
 			'cities_bill'=>$cities_bill,
 			'states_ship'=>$states_ship,
 			'cities_ship'=>$cities_ship,
-			'custData' =>$custData,
+			'vendorData' =>$vendorData,
 			'inv_number' => $inv_voucher,
 			'purposes_of_tds' => $purposes_of_tds
 
@@ -2174,10 +2174,10 @@ class PurchaseController extends Controller
 								->select(DB::raw('comp_name,comp_phone,gst_no,comp_email,comp_pan_no'))
 								->where('company_profiles.userId','=',currentOwnerId())
 								->get();
-		$custData = DB::table('customers')
-								->select(DB::raw('customers.*'))
-								->where('customers.userId','=',currentOwnerId())
-								->where('customers.status','=',1)
+		$vendorData = DB::table('vendors')
+								->select(DB::raw('vendors.*'))
+								->where('vendors.userId','=',currentOwnerId())
+								->where('vendors.status','=',1)
 								->get();
 
 		$purposes_of_tds = DB::table('purposes_of_tds')
@@ -2199,7 +2199,7 @@ class PurchaseController extends Controller
 		return view('User.edit-purchase-credit-debit')->with([
 			'products' => $products,
 			'sales' => $sales,
-			'custData'=>$custData,
+			'vendorData'=>$vendorData,
 			'countries' => $countries,
 			'states_seller' => $states_seller,
 			'cities_seller' => $cities_seller,
@@ -2228,10 +2228,10 @@ class PurchaseController extends Controller
 								->select(DB::raw('comp_name,comp_phone,gst_no,comp_email,comp_pan_no'))
 								->where('company_profiles.userId','=',currentOwnerId())
 								->get();
-		$custData = DB::table('customers')
-								->select(DB::raw('customers.*'))
-								->where('customers.userId','=',currentOwnerId())
-								->where('customers.status','=',1)
+		$vendorData = DB::table('vendors')
+								->select(DB::raw('vendors.*'))
+								->where('vendors.userId','=',currentOwnerId())
+								->where('vendors.status','=',1)
 								->get();
 
 		$purposes_of_tds = DB::table('purposes_of_tds')
@@ -2252,7 +2252,7 @@ class PurchaseController extends Controller
 		return view('User.view-purchase-credit-debit')->with([
 			'products' => $products,
 			'sales' => $sales,
-			'custData'=>$custData,
+			'vendorData'=>$vendorData,
 			'countries' => $countries,
 			'states_seller' => $states_seller,
 			'cities_seller' => $cities_seller,

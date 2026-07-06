@@ -89,10 +89,10 @@
                                             <div class="mb-3 col-md-4">
                                                 <label class="form-label" for="inputEmail4">Company Name <span class="text-danger">*</span></label>
                                                 
-                                                <select class="form-control" name="v_name" id="invNameCustomer" onchange="changeCustomer();">
+                                                <select class="form-control" name="v_name" id="invNameCustomer" onchange="changeCustomer_purchase();">
                                                         <option value="">Select</option>
-														@foreach($custData as $k=>$cust)
-															<option value="{{ $cust->id }}"<?php echo @($cust->id==$sales->v_name)? "selected":"" ?> >{{ $cust->cust_name }}</option>
+														@foreach($vendorData as $k=>$vendor)
+															<option value="{{ $vendor->id }}"<?php echo @($vendor->id==$sales->v_name)? "selected":"" ?> >{{ $vendor->vendor_name }}</option>
 														@endforeach
                                                     </select>
                                             </div>
