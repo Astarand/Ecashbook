@@ -583,8 +583,16 @@
 
                                         {{-- Sub-table 2: PF Summary --}}
                                         <div id="summary_pf_summary" class="summary-table-section d-none">
-                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">PF ECR (Electronic Challan cum Return) - ECR TXT / CSV Compatible</h6>
-                                            <div class="table-responsive border rounded mb-4">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="fw-bold text-dark mb-0 uppercase-label" id="pfSummaryTitle">PF ECR - Table View</h6>
+                                                <div class="btn-group btn-group-sm border rounded-pill overflow-hidden p-0.5 bg-light" role="group">
+                                                    <button type="button" class="btn btn-sm rounded-pill px-3 active-pf-tab-btn active bg-white text-primary border-0 fw-bold" onclick="switchPfTab('table', this)">Table View</button>
+                                                    <button type="button" class="btn btn-sm rounded-pill px-3 active-pf-tab-btn text-secondary border-0 fw-bold" onclick="switchPfTab('text', this)">ECR TXT Format</button>
+                                                </div>
+                                            </div>
+
+                                            {{-- PF Table View --}}
+                                            <div id="pf_table_view" class="table-responsive border rounded mb-4">
                                                 <table class="table align-middle mb-0 table-sm" id="pfTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
@@ -682,6 +690,29 @@
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                            </div>
+
+                                            {{-- PF ECR Text File Format View --}}
+                                            <div id="pf_text_view" class="border rounded mb-4 p-4 bg-light d-none">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="fw-bold text-dark font-14 mb-0"><i class="ti ti-file-text text-primary f-18 me-1"></i> ECR Text Return Output (.txt)</h6>
+                                                    <span class="badge bg-light-warning text-warning border border-warning-subtle">Separator: #~#</span>
+                                                </div>
+                                                <pre class="bg-dark text-success p-3 rounded-3 mb-0 text-start overflow-auto fw-bold" style="font-family: monospace; font-size: 13.5px; line-height: 1.8; letter-spacing: 0.5px;">
+100984523190#~#Rahul Verma#~#120000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
+100984523910#~#Sneha Iyer#~#95000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#1#~#0
+100984523212#~#David Miller#~#85000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
+100984523010#~#Ananya Sen#~#80000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
+100984523182#~#Vikram Rathore#~#150000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#2#~#0
+100984523120#~#Priya Sharma#~#72000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0</pre>
+                                                <div class="mt-3">
+                                                    <h6 class="fw-bold text-dark font-13 mb-1.5">Guidelines for EPFO Portal upload:</h6>
+                                                    <ul class="list-unstyled mb-0 text-secondary font-12">
+                                                        <li class="d-flex align-items-center gap-1.5 mb-1"><i class="ti ti-circle-check text-success"></i> Only use alphabets and numbers in file names. Remove special characters and spaces from the file name.</li>
+                                                        <li class="d-flex align-items-center gap-1.5 mb-1"><i class="ti ti-circle-check text-success"></i> Max Size of File Upload is 8 MB. Text files over 2 MB should be compressed as a ZIP.</li>
+                                                        <li class="d-flex align-items-center gap-1.5 mb-1"><i class="ti ti-circle-check text-success"></i> Only one text file can be packed inside the ZIP. Do not pack other formats like xls, doc, etc.</li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -1518,6 +1549,22 @@ function switchEsiTab(tab, btn) {
         $('#esiSummaryTitle').text('ESIC ONLINE SHEET FOR UPLOAD');
         $('#esi_summary_table_view').addClass('d-none');
         $('#esi_upload_table_view').removeClass('d-none');
+    }
+}
+
+// Switch PF tabs
+function switchPfTab(tab, btn) {
+    $('.active-pf-tab-btn').removeClass('active bg-white text-primary').addClass('text-secondary');
+    $(btn).addClass('active bg-white text-primary').removeClass('text-secondary');
+    
+    if (tab === 'table') {
+        $('#pfSummaryTitle').text('PF ECR - Table View');
+        $('#pf_table_view').removeClass('d-none');
+        $('#pf_text_view').addClass('d-none');
+    } else {
+        $('#pfSummaryTitle').text('EPF ECR Text File Return Format');
+        $('#pf_table_view').addClass('d-none');
+        $('#pf_text_view').removeClass('d-none');
     }
 }
 </script>
