@@ -136,20 +136,20 @@
             </div>
         </div>
 
-        {{-- Card 8: Status & Approvals --}}
+        {{-- Card 8: Payment Status Summary --}}
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="card border shadow-none rounded-3 h-100">
                 <div class="card-body p-3.5 d-flex flex-column justify-content-between">
                     <div>
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="text-secondary small fw-bold uppercase-label">Payment Status</span>
-                            <span class="badge bg-light-warning text-warning px-2.5 py-1 rounded-pill small">Pending Approval</span>
+                            <span class="badge bg-light-success text-success px-2.5 py-1 rounded-pill small">Processed</span>
                         </div>
-                        <h6 class="fw-bold text-dark mb-0">Pending Payroll Approval: 1</h6>
+                        <h4 class="fw-bold text-dark mb-1">Paid: 27 / 28</h4>
                     </div>
                     <div class="pt-2 border-top mt-2 d-flex justify-content-between align-items-center">
-                        <span class="text-muted small">Paid: 27 / 28</span>
-                        <button class="btn btn-xs btn-primary py-0.5 px-2 rounded fw-bold text-white shadow-sm" id="btnApproveAll">Approve</button>
+                        <span class="text-success small fw-semibold"><i class="ph ph-check-circle"></i> 27 Paid</span>
+                        <span class="text-danger small fw-semibold"><i class="ph ph-x-circle"></i> 1 Unpaid</span>
                     </div>
                 </div>
             </div>
@@ -1460,43 +1460,6 @@ $(document).ready(function() {
 
         $('.active-month-text').text(fullStr);
         $('#generationDate').text('05-' + (m === 'July' ? '07' : m === 'June' ? '06' : m === 'May' ? '05' : '04') + '-' + (fy === '2026-27' ? '2026' : '2025'));
-    });
-
-    // Handle single Approve button
-    $('#btnApproveAll').on('click', function() {
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: 'Approve Payroll?',
-                text: 'Are you sure you want to approve the pending payroll record for Priya Sharma?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, Approve!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Update statuses
-                    $('#emp6Status').removeClass('bg-light-warning text-warning').addClass('bg-light-success text-success').text('Salary Done');
-                    $('#emp6SalaryStatus').removeClass('bg-light-warning text-warning').addClass('bg-light-success text-success').text('Paid');
-                    $('#tds6Status').removeClass('bg-light-warning text-warning').addClass('bg-light-success text-success').text('₹1,540');
-                    $('#btnApproveAll').addClass('disabled').prop('disabled', true).text('Approved');
-
-                    Swal.fire(
-                        'Approved!',
-                        'Payroll records have been successfully approved and marked as Paid.',
-                        'success'
-                    );
-                }
-            });
-        } else {
-            if (confirm('Are you sure you want to approve the pending payroll record?')) {
-                $('#emp6Status').removeClass('bg-light-warning text-warning').addClass('bg-light-success text-success').text('Salary Done');
-                $('#emp6SalaryStatus').removeClass('bg-light-warning text-warning').addClass('bg-light-success text-success').text('Paid');
-                $('#tds6Status').removeClass('bg-light-warning text-warning').addClass('bg-light-success text-success').text('₹1,540');
-                $('#btnApproveAll').addClass('disabled').prop('disabled', true).text('Approved');
-                alert('Payroll approved successfully.');
-            }
-        }
     });
 });
 
