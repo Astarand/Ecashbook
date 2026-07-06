@@ -1303,6 +1303,51 @@ class SalesController extends Controller
 		
 	}
 	
+	
+	public function journalEntryVoucher($vid,$uid)
+	{			
+		$voucher = DB::table('vouchers as v')
+			->leftJoin('customers as c', 'c.id', '=', 'v.v_name')
+			->select(
+				'v.*',
+				'c.cust_name'
+			)
+			->where('v.id', $vid)
+			->where('v.added_by', $uid)
+			->first();
+
+		if(!$voucher){
+			return;
+		}
+		
+		$gstRate = (float) $voucher->gst_rate;
+		$totalAmount = (float) $voucher->total_amt;
+		$gstAmount = $gstRate > 0 ? round(($totalAmount * $gstRate) / 100, 2) : 0;
+		$baseAmount = $totalAmount - $gstAmount;
+
+		$this->journalService->storeSalesVoucherJournalEntries([
+			'source'        => 'Sales Voucher',
+			'voucher_type'  => 'Sales '.$voucher->note_type, // sales_credit / sales_debit
+			'autoId'        => $voucher->id,
+			'added_by'      => $uid,
+			'propId'        => $voucher->propId ?? null,
+			'date'          => $voucher->inv_date,
+			'reference_no'  => $voucher->invoice_number,
+			'entry_type'    => 'Sales '.$voucher->note_type,
+			'party_name'    => $voucher->cust_name ?? '',
+			'pay_status'    => 'Full',
+			'notes'   		=> !empty($voucher->otherIssuance) ? $voucher->otherIssuance : ($voucher->reason_issuance ?? ''),
+
+			'amount'        => $totalAmount,
+			'total_amount'  => $totalAmount,
+			'base_amount'   => $baseAmount,
+			'gst_amount'    => $gstAmount,
+			'gst_rate'      => $voucher->gst_rate,
+			'gst_trans'     => 'intrastate',
+			'status'        => 1,
+		]);
+	}
+	
 	public function getInvoiceTotal($id)
 	{
 		$total_amount = DB::table('sales_values')
@@ -2415,6 +2460,9 @@ class SalesController extends Controller
 					->where('id', $sId)
 					->update(['voucher_doc' => $fileName]);
 			}
+			
+			$userId = currentOwnerId();
+			$this->journalEntryVoucher($sId,$userId); //Journal Entry
 
 			if ($insertSales) {
 				$msg = array(
@@ -2612,6 +2660,10 @@ class SalesController extends Controller
 						'term_condition'     => $request->term_condition ?? null,
 					)
 				);
+				
+			$userId = currentOwnerId();
+			$this->journalEntryVoucher($sId,$userId); //Journal Entry
+			
 			$msg = array(
 				'status' => 'success',
 				'class' => 'succ',
@@ -2634,6 +2686,9 @@ class SalesController extends Controller
 					]
 				];
 		$delInvoice = DB::table('vouchers')->where('id', $request->id)->delete();
+		$delJournalRec = DB::table('journals')
+								->where('autoId', $request->id)
+								->where('source', 'Sales Voucher')->delete();
 
 		if ($delInvoice) {
 			//AUDIT LOG ENTRY

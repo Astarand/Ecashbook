@@ -102,6 +102,7 @@ class JournalController extends Controller
 
 		$parties = Journals::where('added_by', $userId)
 			->whereIn('party_name', ['Customer', 'Vendor'])
+			->where('ledger', '!=', '')
 			->select('ledger')
 			->distinct()
 			->pluck('ledger');
@@ -114,6 +115,7 @@ class JournalController extends Controller
 
 		$sources = Journals::where('added_by', $userId)
 			->select('source')
+			->where('source', '!=', '')
 			->distinct()
 			->orderBy('source')
 			->pluck('source');
@@ -128,7 +130,7 @@ class JournalController extends Controller
 
 			$journal->gst_amount = $gstAmount;
 
-			if (in_array($journal->entry_type, ['Sales', 'Purchase'])) {
+			if (in_array($journal->entry_type, ['Sales','Sales Credit','Sales Debit', 'Purchase','Purchase Credit','Purchase Debit'])) {
 				$journal->total_amount = $amount;
 			} else {
 				$journal->total_amount = $totalAmount;

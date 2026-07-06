@@ -113,15 +113,21 @@ class ProfitLossController extends Controller
 							COALESCE(sv.gov_pay,0) +
 							COALESCE(sv.ser_pay,0)
 						"));
-			
-		$profit_sale = DB::table('sales')
-			->join('sales_values', 'sales_values.sid', '=', 'sales.id')
-			->join('products', 'products.id', '=', 'sales_values.prod_id')
-			->where('sales.added_by', $userId)
-			->where('sales.status', 1) //only active records
-			->whereBetween('sales.inv_date', [$startDate, $endDate])
-			->selectRaw('SUM(sales_values.amount) AS total')
-			->value('total') ?? 0;
+		//Get Sales Vouchers
+		$voucherTotals = DB::table('vouchers')
+						->selectRaw("
+							SUM(CASE WHEN note_type = 'Credit' THEN total_amt ELSE 0 END) AS total_credit,
+							SUM(CASE WHEN note_type = 'Debit' THEN total_amt ELSE 0 END) AS total_debit
+						")
+						->where('added_by', $userId)
+						//->where('status', 1)
+						->whereBetween('inv_date', [$startDate, $endDate])
+						->first();
+
+		$totalSalesVoucherCr = $voucherTotals->total_credit ?? 0;
+		$totalSalesVoucherDr = $voucherTotals->total_debit ?? 0;
+		
+		$profit_sale = ($totalReseller + $totalService) - $totalSalesVoucherCr + $totalSalesVoucherDr;
 
 		/* ================================
 		 | OTHER INCOME - TDS amount
@@ -218,27 +224,24 @@ class ProfitLossController extends Controller
 						->where('status', 1)
 						->whereBetween('inv_date', [$startDate, $endDate])
 						->sum('shipping_cost');
+						
+		//Get Purchase Vouchers
+		$voucherPurTotals = DB::table('voucher_purchases')
+						->selectRaw("
+							SUM(CASE WHEN note_type = 'Credit' THEN total_amt ELSE 0 END) AS total_credit,
+							SUM(CASE WHEN note_type = 'Debit' THEN total_amt ELSE 0 END) AS total_debit
+						")
+						->where('added_by', $userId)
+						//->where('status', 1)
+						->whereBetween('inv_date', [$startDate, $endDate])
+						->first();
+
+		$totalPurchaseVoucherCr = $voucherPurTotals->total_credit ?? 0;
+		$totalPurchaseVoucherDr = $voucherPurTotals->total_debit ?? 0;
 
 		//$purchases = ($itemTotal ?? 0) + ($shippingTotal ?? 0);
 		$purchases = ($itemTotal ?? 0);
-		/*
-		|--------------------------------------------------------------------------
-		| Trade Payable
-		|--------------------------------------------------------------------------
-		*/					
-		$tradePayable = DB::table('purchases as p')
-							->leftJoin('purchase_values as pv', 'pv.sid', '=', 'p.id')
-							->where('p.added_by', $userId)
-							->where('p.status', 1)
-							->where('p.pay_status', '!=', 'Full')
-							->whereBetween('p.inv_date', [$startDate, $endDate])
-							->groupBy('p.id', 'p.advance_amount')
-							->selectRaw('
-								SUM(COALESCE(pv.amount,0) + COALESCE(pv.tax_amt,0))
-								- COALESCE(p.advance_amount,0) as payable
-							')
-							->get()
-							->sum('payable');
+		$totalPurchases = ($itemTotal ?? 0) - ($totalPurchaseVoucherCr ?? 0)  + ($totalPurchaseVoucherDr ?? 0);
 
 		/*
 		|--------------------------------------------------------------------------
@@ -335,12 +338,13 @@ class ProfitLossController extends Controller
 
 		$closingStock = $closingStock ?? 0;
 		$directExpenseTotal = array_sum($directExpenseArray);
-		//$cogsTotal = ($openingStock + ($purchases - $tradePayable) + $directExpenseTotal - $closingStock);
-		$cogsTotal = ($openingStock + $purchases + $directExpenseTotal - $closingStock);
+		//$cogsTotal = ($openingStock + $purchases + $directExpenseTotal - $closingStock);
+		$cogsTotal = ($openingStock + $totalPurchases + $directExpenseTotal - $closingStock);
 		$cogs = [
 			'opening_stock'  => $openingStock,
 			'purchases'      => $purchases,
-			'trade_payable'  => $tradePayable,
+			'totalPurchaseVoucherCr'      => $totalPurchaseVoucherCr,
+			'totalPurchaseVoucherDr'      => $totalPurchaseVoucherDr,
 			'direct_expense' => $directExpenseArray,
 			'directExpenseTotal'=> $directExpenseTotal,
 			'closing_stock'  => $closingStock,
@@ -416,7 +420,8 @@ class ProfitLossController extends Controller
 		
 		$operatingIncomeTotal = collect($operatingIncomeDetails)->sum('total');
 		$nonOperatingIncomeTotal = collect($nonOperatingIncomeDetails)->sum('total');
-		$totalRevenue = ($totalReseller + $totalService + $operatingIncomeTotal + $nonOperatingIncomeTotal);
+		//$totalRevenue = ($totalReseller + $totalService + $operatingIncomeTotal + $nonOperatingIncomeTotal);
+		$totalRevenue = ($profit_sale + $operatingIncomeTotal + $nonOperatingIncomeTotal);
 		
 		$ebitda = ($totalRevenue - ($cogsTotal + $totalIndirectExpenses));
 		$depreciationExp = $depreciationExpense;
@@ -454,6 +459,8 @@ class ProfitLossController extends Controller
 			'revenue' => [
 				'totalReseller' => $totalReseller,
 				'totalService' => $totalService,				
+				'totalSalesVoucherCr' => $totalSalesVoucherCr,				
+				'totalSalesVoucherDr' => $totalSalesVoucherDr,				
 				'operatingIncomeDetails' => $operatingIncomeDetails,
 				'operatingIncomeTotal' => $operatingIncomeTotal,
 				'nonOperatingIncomeDetails' => $nonOperatingIncomeDetails,

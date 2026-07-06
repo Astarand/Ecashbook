@@ -224,6 +224,258 @@ class JournalService
 		}
 	}
 	
+	
+	//Sales voucher
+	public function storeSalesVoucherJournalEntries(array $data)
+	{
+		DB::beginTransaction();
+
+		try {
+
+			// ================= BASIC DATA =================
+			$userId    = $data['added_by'];
+			$autoId    = $data['autoId'];
+			$propId    = $data['propId'] ?? null;
+			$date      = $data['date'];
+			$refNo     = $data['reference_no'];
+			$source    = $data['source'] ?? 'Sales Voucher';
+			$entryType = $data['entry_type'] ?? '';
+			$payStatus = $data['pay_status'] ?? 'Full';
+			$notes 	   = $data['notes'] ?? '';
+
+			$party = $data['party_name'] ?? '';
+
+			$invoiceAmount = (float)($data['amount'] ?? 0);          // Total Invoice
+			$baseAmount    = (float)($data['base_amount'] ?? 0);     // Taxable Value
+			$gstAmount     = (float)($data['gst_amount'] ?? 0);      // GST
+			$gstRate       = (float)($data['gst_rate'] ?? 0);
+			$gstTrans      = $data['gst_trans'] ?? 'intrastate';
+
+			// ================= GST SPLIT =================
+			$cgst = 0;
+			$sgst = 0;
+			$igst = 0;
+
+			if (strtolower($gstTrans) == 'intrastate') {
+				$cgst = round($gstAmount / 2, 2);
+				$sgst = round($gstAmount / 2, 2);
+			} else {
+				$igst = $gstAmount;
+			}
+
+			// ================= CHECK EXISTING =================
+			$existing = $this->checkExisting($autoId, $userId, $source);
+			$journalNo = $this->getJournalNo($autoId, $userId, $source);
+
+			if ($existing->count() > 0) {
+				Journals::where('autoId', $autoId)
+					->where('source', $source)
+					->delete();
+			}
+
+			// ================= COMMON DATA =================
+			$common = [
+				'journal_no'       => $journalNo,
+				'added_by'         => $userId,
+				'autoId'           => $autoId,
+				'propId'           => $propId,
+				'journal_date'     => $date,
+				'reference_type'   => 'New Ref',
+				'reference_no'     => $refNo,
+				'entry_type'       => $entryType,
+				'source'           => $source,
+				'payment_status'   => $payStatus,
+
+				'tds_applicable'   => 'no',
+				'tds_percent'      => 0,
+				'tds_amt'          => 0,
+				'tds_id'           => null,
+
+				'hsn_sac_code'     => null,
+				'other_note'       => null,
+
+				'status'           => 'Posted',
+				'rev_amend_status' => null,
+			];
+
+			$entries = [];
+
+			// ===========================================================
+			// SALES CREDIT NOTE
+			// ===========================================================
+
+			if (strtolower($entryType) == 'sales credit') {
+
+				// Sales DR
+				$entries[] = array_merge($common, [
+					'ledger' => 'Sales',
+					'party_name' => null,
+					'debit_credit' => 'Debit',
+					'amount' => $invoiceAmount,
+					'tot_amt' => $baseAmount,
+					'notes' => $notes,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+
+				// CGST DR
+				if ($cgst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Output CGST',
+						'party_name' => null,
+						'debit_credit' => 'Debit',
+						'amount' => $cgst,
+						'tot_amt' => $cgst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+
+				// SGST DR
+				if ($sgst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Output SGST',
+						'party_name' => null,
+						'debit_credit' => 'Debit',
+						'amount' => $sgst,
+						'tot_amt' => $sgst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+
+				// IGST DR
+				if ($igst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Output IGST',
+						'party_name' => null,
+						'debit_credit' => 'Debit',
+						'amount' => $igst,
+						'tot_amt' => $igst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+
+				// Customer CR
+				$entries[] = array_merge($common, [
+					'ledger' => $party,
+					'party_name' => 'Customer',
+					'debit_credit' => 'Credit',
+					'amount' => $invoiceAmount,
+					'tot_amt' => $invoiceAmount,
+					'notes' => $notes,
+					'gst_applicable' => 'yes',
+					'gst_rate' => $gstRate,
+					'gst_trans' => $gstTrans,
+				]);
+			}
+
+			// ===========================================================
+			// SALES DEBIT NOTE
+			// ===========================================================
+
+			elseif (strtolower($entryType) == 'sales debit') {
+
+				// Customer DR
+				$entries[] = array_merge($common, [
+					'ledger' => $party,
+					'party_name' => 'Customer',
+					'debit_credit' => 'Debit',
+					'amount' => $invoiceAmount,
+					'tot_amt' => $invoiceAmount,
+					'notes' => $notes,
+					'gst_applicable' => 'yes',
+					'gst_rate' => $gstRate,
+					'gst_trans' => $gstTrans,
+				]);
+
+				// Sales CR
+				$entries[] = array_merge($common, [
+					'ledger' => 'Sales',
+					'party_name' => null,
+					'debit_credit' => 'Credit',
+					'amount' => $baseAmount,
+					'tot_amt' => $baseAmount,
+					'notes' => $notes,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+
+				// CGST CR
+				if ($cgst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Output CGST',
+						'party_name' => null,
+						'debit_credit' => 'Credit',
+						'amount' => $cgst,
+						'tot_amt' => $cgst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+
+				// SGST CR
+				if ($sgst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Output SGST',
+						'party_name' => null,
+						'debit_credit' => 'Credit',
+						'amount' => $sgst,
+						'tot_amt' => $sgst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+
+				// IGST CR
+				if ($igst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Output IGST',
+						'party_name' => null,
+						'debit_credit' => 'Credit',
+						'amount' => $igst,
+						'tot_amt' => $igst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+			}
+
+			// ================= INSERT =================
+			if (!empty($entries)) {
+				Journals::insert($entries);
+			}
+
+			DB::commit();
+
+			return true;
+
+		} catch (\Exception $e) {
+
+			DB::rollBack();
+
+			\Log::error('Sales Voucher Journal Error : '.$e->getMessage());
+
+			return false;
+		}
+	}
+	
+	
 	//Purchase journal
 	public function storePurchaseJournalEntries(array $data)
 	{
@@ -396,6 +648,257 @@ class JournalService
 
 			DB::rollback();
 			\Log::error('Purchase Journal Error: ' . $e->getMessage());
+			return false;
+		}
+	}
+	
+	
+	//Purchase voucher
+	public function storePurchaseVoucherJournalEntries(array $data)
+	{
+		DB::beginTransaction();
+
+		try {
+
+			// ================= BASIC DATA =================
+			$userId    = $data['added_by'];
+			$autoId    = $data['autoId'];
+			$propId    = $data['propId'] ?? null;
+			$date      = $data['date'];
+			$refNo     = $data['reference_no'];
+			$source    = $data['source'] ?? 'Purchase Voucher';
+			$entryType = $data['entry_type'] ?? '';
+			$payStatus = $data['pay_status'] ?? 'Full';
+			$notes 	   = $data['notes'] ?? '';
+
+			$party = $data['party_name'] ?? '';
+
+			$invoiceAmount = (float)($data['amount'] ?? 0);          // Total Invoice
+			$baseAmount    = (float)($data['base_amount'] ?? 0);     // Taxable Value
+			$gstAmount     = (float)($data['gst_amount'] ?? 0);      // GST
+			$gstRate       = (float)($data['gst_rate'] ?? 0);
+			$gstTrans      = $data['gst_trans'] ?? 'intrastate';
+
+			// ================= GST SPLIT =================
+			$cgst = 0;
+			$sgst = 0;
+			$igst = 0;
+
+			if (strtolower($gstTrans) == 'intrastate') {
+				$cgst = round($gstAmount / 2, 2);
+				$sgst = round($gstAmount / 2, 2);
+			} else {
+				$igst = $gstAmount;
+			}
+
+			// ================= CHECK EXISTING =================
+			$existing = $this->checkExisting($autoId, $userId, $source);
+			$journalNo = $this->getJournalNo($autoId, $userId, $source);
+
+			if ($existing->count() > 0) {
+				Journals::where('autoId', $autoId)
+					->where('source', $source)
+					->delete();
+			}
+
+			// ================= COMMON DATA =================
+			$common = [
+				'journal_no'       => $journalNo,
+				'added_by'         => $userId,
+				'autoId'           => $autoId,
+				'propId'           => $propId,
+				'journal_date'     => $date,
+				'reference_type'   => 'New Ref',
+				'reference_no'     => $refNo,
+				'entry_type'       => $entryType,
+				'source'           => $source,
+				'payment_status'   => $payStatus,
+
+				'tds_applicable'   => 'no',
+				'tds_percent'      => 0,
+				'tds_amt'          => 0,
+				'tds_id'           => null,
+
+				'hsn_sac_code'     => null,
+				'other_note'       => null,
+
+				'status'           => 'Posted',
+				'rev_amend_status' => null,
+			];
+
+			$entries = [];
+
+			// ===========================================================
+			// PURCHASE CREDIT NOTE
+			// ===========================================================
+
+			if (strtolower($entryType) == 'purchase credit') {
+
+				// Purchase DR
+				$entries[] = array_merge($common, [
+					'ledger' => 'Purchase',
+					'party_name' => null,
+					'debit_credit' => 'Debit',
+					'amount' => $invoiceAmount,
+					'tot_amt' => $baseAmount,
+					'notes' => $notes,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+
+				// Input CGST DR
+				if ($cgst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Input CGST',
+						'party_name' => null,
+						'debit_credit' => 'Debit',
+						'amount' => $cgst,
+						'tot_amt' => $cgst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+
+				// Input SGST DR
+				if ($sgst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Input SGST',
+						'party_name' => null,
+						'debit_credit' => 'Debit',
+						'amount' => $sgst,
+						'tot_amt' => $sgst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+
+				// Input IGST DR
+				if ($igst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Input IGST',
+						'party_name' => null,
+						'debit_credit' => 'Debit',
+						'amount' => $igst,
+						'tot_amt' => $igst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+
+				// Supplier CR
+				$entries[] = array_merge($common, [
+					'ledger' => $party,
+					'party_name' => 'Vendor',
+					'debit_credit' => 'Credit',
+					'amount' => $invoiceAmount,
+					'tot_amt' => $invoiceAmount,
+					'notes' => $notes,
+					'gst_applicable' => 'yes',
+					'gst_rate' => $gstRate,
+					'gst_trans' => $gstTrans,
+				]);
+			}
+
+			// ===========================================================
+			// PURCHASE DEBIT NOTE
+			// ===========================================================
+
+			elseif (strtolower($entryType) == 'purchase debit') {
+
+				// Supplier DR
+				$entries[] = array_merge($common, [
+					'ledger' => $party,
+					'party_name' => 'Vendor',
+					'debit_credit' => 'Debit',
+					'amount' => $invoiceAmount,
+					'tot_amt' => $invoiceAmount,
+					'notes' => $notes,
+					'gst_applicable' => 'yes',
+					'gst_rate' => $gstRate,
+					'gst_trans' => $gstTrans,
+				]);
+
+				// Purchase CR
+				$entries[] = array_merge($common, [
+					'ledger' => 'Purchase',
+					'party_name' => null,
+					'debit_credit' => 'Credit',
+					'amount' => $baseAmount,
+					'tot_amt' => $baseAmount,
+					'notes' => $notes,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+
+				// Input CGST CR
+				if ($cgst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Input CGST',
+						'party_name' => null,
+						'debit_credit' => 'Credit',
+						'amount' => $cgst,
+						'tot_amt' => $cgst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+
+				// Input SGST CR
+				if ($sgst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Input SGST',
+						'party_name' => null,
+						'debit_credit' => 'Credit',
+						'amount' => $sgst,
+						'tot_amt' => $sgst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+
+				// Input IGST CR
+				if ($igst > 0) {
+					$entries[] = array_merge($common, [
+						'ledger' => 'Input IGST',
+						'party_name' => null,
+						'debit_credit' => 'Credit',
+						'amount' => $igst,
+						'tot_amt' => $igst,
+						'notes' => 'GST',
+						'gst_applicable' => 'no',
+						'gst_rate' => 0,
+						'gst_trans' => null,
+					]);
+				}
+			}
+
+			// ================= INSERT =================
+			if (!empty($entries)) {
+				Journals::insert($entries);
+			}
+
+			DB::commit();
+
+			return true;
+
+		} catch (\Exception $e) {
+
+			DB::rollBack();
+
+			\Log::error('Purchase Voucher Journal Error : '.$e->getMessage());
+
 			return false;
 		}
 	}

@@ -132,6 +132,26 @@
 								</tr>
 								
 								<tr>
+									<td></td>
+									<td class="text-center">c.</td>
+									<td class="text-start">Less: Sales Credit Notes</td>
+									<td></td>
+									<td></td>
+									<td class="text-start text-danger" id="curr_salesCredit"></td>
+									<td class="text-start text-danger" id="prev_salesCredit"></td>
+								</tr>
+
+								<tr>
+									<td></td>
+									<td class="text-center">d.</td>
+									<td class="text-start">Add: Sales Debit Notes</td>
+									<td></td>
+									<td></td>
+									<td class="text-start text-success" id="curr_salesDebit"></td>
+									<td class="text-start text-success" id="prev_salesDebit"></td>
+								</tr>
+								
+								<tr>
 									<td class="text-center" style="border: 1px solid #ddd; width: 50px;"><strong>2.</strong></td>
 									<td class="text-center" style="border: 1px solid #ddd; width: 50px;"></td>
 									<td colspan="2" style="border: 1px solid #ddd; background-color: #f7e7b8;"><strong>Other Operating Income</strong></td>
@@ -204,6 +224,26 @@
 								
 								<tr>
 									<td></td>
+									<td class="text-center">i.</td>
+									<td class="text-start">Less: Purchases Credit Notes</td>
+									<td></td>
+									<td></td>
+									<td class="text-start text-danger" id="curr_purchaseCredit"></td>
+									<td class="text-start text-danger" id="prev_purchaseCredit"></td>
+								</tr>
+
+								<tr>
+									<td></td>
+									<td class="text-center">ii.</td>
+									<td class="text-start">Add: Purchases Debit Notes</td>
+									<td></td>
+									<td></td>
+									<td class="text-start text-success" id="curr_purchaseDebit"></td>
+									<td class="text-start text-success" id="prev_purchaseDebit"></td>
+								</tr>
+								
+								<tr>
+									<td></td>
 									<td class="text-center" style="width: 50px;">c.</td>
 									<td class="text-start">Direct Expenses </td>
 									<td></td>
@@ -212,34 +252,6 @@
 									<td class="text-start" id="prev_directExpenseTotal">00.00</td>
 								</tr>
 								
-								<!--<tr>
-									<td></td>
-									<td class="text-center" style="width: 50px;">i.</td>
-									<td class="text-start">Trade Payable</td>
-									<td></td>
-									<td class="text-start"></td>
-									<td class="text-start" id="curr_trade_payable">00.00</td>
-									<td class="text-start" id="prev_trade_payable"></td>
-								</tr>-->
-	
-								<!--<tr>
-									<td class="text-center" style="border: 1px solid #ddd; width: 50px;"><strong></strong></td>
-									<td class="text-center" style="border: 1px solid #ddd; width: 50px;">c.</td>
-									<td colspan="2" style="border: 1px solid #ddd; background-color: #f7e7b8;"><strong>Direct Expenses</strong></td>
-									<td style="border: 1px solid #ddd;"></td>
-									<td style="border: 1px solid #ddd;"></td>
-									<td style="border: 1px solid #ddd;"></td>
-								</tr>
-								
-								<tr id="direct-expense-body"></tr>
-								
-								<tr>
-									<td class="text-center" style="border: 1px solid #ddd;"><strong> </strong></td>
-									<td class="text-center" style="border: 1px solid #ddd; width: 50px;"></td>
-									<td colspan="3" class="text-start" style="background-color:#ffffe6;color:#664d03;border:1px solid #ddd;"><strong>Total Direct Expenses</strong></td>
-									<td class="text-start" style="border: 1px solid #ddd;"><strong>₹ <span id="curr_directExpenseTotal">00.00</span></strong></td>
-									<td class="text-start" style="border: 1px solid #ddd;"><strong>₹ <span id="prev_directExpenseTotal">00.00</span></strong></td>
-								</tr>-->
 								<tr>
 									<td></td>
 									<td class="text-center" style="width: 50px;">d.</td>
@@ -598,7 +610,9 @@
 							   CURRENT YEAR – REVENUE
 							====================== */
 							setText('curr_totalReseller', curr.revenue.totalReseller);
-							setText('curr_totalService', curr.revenue.totalService);					
+							setText('curr_totalService', curr.revenue.totalService);	
+							setText('curr_salesCredit', curr.revenue.totalSalesVoucherCr);
+							setText('curr_salesDebit', curr.revenue.totalSalesVoucherDr);
 							
 							//Start Operating Income
 							let opRows = '';
@@ -661,8 +675,8 @@
 							====================== */
 							setText('curr_openingStock', curr.cogs.opening_stock);
 							setText('curr_purchase', curr.cogs.purchases);
-							//setText('curr_trade_payable', curr.cogs.trade_payable);
-							//setText('curr_directExpense', curr.cogs.direct_expense);
+							setText('curr_purchaseCredit', curr.cogs.totalPurchaseVoucherCr);
+							setText('curr_purchaseDebit', curr.cogs.totalPurchaseVoucherDr);
 							
 							//Start Direct Expense
 							let directRows = '';
@@ -817,6 +831,8 @@
 							====================== */
 							setText('prev_totalReseller', prev.revenue.totalReseller);
 							setText('prev_totalService', prev.revenue.totalService);
+							setText('prev_salesCredit', prev.revenue.totalSalesVoucherCr);
+							setText('prev_salesDebit', prev.revenue.totalSalesVoucherDr);
 							
 							//Start Operating Income
 							let nonRows = '';
@@ -873,8 +889,8 @@
 							====================== */
 							setText('prev_openingStock', prev.cogs.opening_stock);
 							setText('prev_purchase', prev.cogs.purchases);
-							//setText('prev_trade_payable', prev.cogs.trade_payable);
-							setText('prev_directExpense', prev.cogs.direct_expense);
+							setText('prev_purchaseCredit', prev.cogs.totalPurchaseVoucherCr);
+							setText('prev_purchaseDebit', prev.cogs.totalPurchaseVoucherDr);
 							setText('prev_closingStock', prev.cogs.closing_stock);
 							setText('prev_totalCogs', prev.cogs.total_cogs);
 							

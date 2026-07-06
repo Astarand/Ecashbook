@@ -282,10 +282,20 @@
 														$editUrl   = url('/edit-sales-invoice/'.base64_encode($journal->autoId));
 														$listRoute = route('user.SalesInvoices');
 														break;
+													case 'Sales Voucher':
+														$viewUrl   = url('/view-sales-credit-debit/'.base64_encode($journal->autoId));
+														$editUrl   = url('/edit-sales-credit-debit/'.base64_encode($journal->autoId));
+														$listRoute = route('user.SalesCreditDebit');
+														break;
 													case 'Purchase':
 														$viewUrl   = url('/view-purchase-invoice/'.base64_encode($journal->autoId));
 														$editUrl   = url('/edit-purchase-invoice/'.base64_encode($journal->autoId));
 														$listRoute = route('user.PurchaseInvoices');
+														break;
+													case 'Purchase Voucher':
+														$viewUrl   = url('/view-purchase-credit-debit/'.base64_encode($journal->autoId));
+														$editUrl   = url('/edit-purchase-credit-debit/'.base64_encode($journal->autoId));
+														$listRoute = route('user.PurchaseCreditDebit');
 														break;
 													case 'Expense':
 														$viewUrl   = url('/view-expenses/'.base64_encode($journal->autoId));
