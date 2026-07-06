@@ -583,102 +583,102 @@
 
                                         {{-- Sub-table 2: PF Summary --}}
                                         <div id="summary_pf_summary" class="summary-table-section d-none">
-                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">Employee Provident Fund Statement</h6>
+                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">PF ECR (Electronic Challan cum Return) - ECR TXT / CSV Compatible</h6>
                                             <div class="table-responsive border rounded mb-4">
                                                 <table class="table align-middle mb-0 table-sm" id="pfTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">EMP ID</th>
-                                                            <th>Employee Name</th>
-                                                            <th>UAN</th>
-                                                            <th>PF Wage</th>
-                                                            <th>Employee PF (12%)</th>
-                                                            <th>Employer PF (3.67%)</th>
-                                                            <th>EPS (8.33%)</th>
-                                                            <th>EPF Total</th>
-                                                            <th>NCP Days</th>
+                                                            <th class="ps-2">UAN</th>
+                                                            <th>Member Name</th>
                                                             <th>Gross Wages</th>
-                                                            <th class="pe-2">Total Payment</th>
+                                                            <th>EPF Wages</th>
+                                                            <th>EPS Wages</th>
+                                                            <th>EDLI Wages</th>
+                                                            <th>EPF Cont. (Emp 12%)</th>
+                                                            <th>EPF Cont. (Employer 3.67%)</th>
+                                                            <th>EPS Cont. (Employer 8.33%)</th>
+                                                            <th>NCP Days</th>
+                                                            <th class="pe-2">Refund of Advances</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP001</td>
-                                                            <td class="fw-bold">Rahul Verma</td>
-                                                            <td>100984523190</td>
-                                                            <td>₹60,000</td>
-                                                            <td>₹7,200</td>
-                                                            <td>₹2,202</td>
-                                                            <td>₹4,998</td>
-                                                            <td>₹9,402</td>
+                                                            <td class="ps-2 fw-bold text-dark">100984523190</td>
+                                                            <td class="fw-bold text-dark">Rahul Verma</td>
+                                                            <td>₹1,20,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td class="text-primary fw-bold">₹1,800.00</td>
+                                                            <td class="text-success fw-semibold">₹550.50</td>
+                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
                                                             <td>0</td>
-                                                            <td>₹1,20,000</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹14,400</td>
+                                                            <td class="pe-2">₹0.00</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP002</td>
-                                                            <td class="fw-bold">Sneha Iyer</td>
-                                                            <td>100984523910</td>
-                                                            <td>₹47,500</td>
-                                                            <td>₹5,700</td>
-                                                            <td>₹1,743</td>
-                                                            <td>₹3,957</td>
-                                                            <td>₹7,443</td>
+                                                            <td class="ps-2 fw-bold text-dark">100984523910</td>
+                                                            <td class="fw-bold text-dark">Sneha Iyer</td>
+                                                            <td>₹95,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td class="text-primary fw-bold">₹1,800.00</td>
+                                                            <td class="text-success fw-semibold">₹550.50</td>
+                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
                                                             <td>1</td>
-                                                            <td>₹95,000</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹11,400</td>
+                                                            <td class="pe-2">₹0.00</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP003</td>
-                                                            <td class="fw-bold">David Miller</td>
-                                                            <td>100984523212</td>
-                                                            <td>₹42,500</td>
-                                                            <td>₹5,100</td>
-                                                            <td>₹1,560</td>
-                                                            <td>₹3,540</td>
-                                                            <td>₹6,660</td>
+                                                            <td class="ps-2 fw-bold text-dark">100984523212</td>
+                                                            <td class="fw-bold text-dark">David Miller</td>
+                                                            <td>₹85,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td class="text-primary fw-bold">₹1,800.00</td>
+                                                            <td class="text-success fw-semibold">₹550.50</td>
+                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
                                                             <td>0</td>
-                                                            <td>₹85,000</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹10,200</td>
+                                                            <td class="pe-2">₹0.00</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP004</td>
-                                                            <td class="fw-bold">Ananya Sen</td>
-                                                            <td>100984523010</td>
-                                                            <td>₹40,000</td>
-                                                            <td>₹4,800</td>
-                                                            <td>₹1,468</td>
-                                                            <td>₹3,332</td>
-                                                            <td>₹6,268</td>
+                                                            <td class="ps-2 fw-bold text-dark">100984523010</td>
+                                                            <td class="fw-bold text-dark">Ananya Sen</td>
+                                                            <td>₹80,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td class="text-primary fw-bold">₹1,800.00</td>
+                                                            <td class="text-success fw-semibold">₹550.50</td>
+                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
                                                             <td>0</td>
-                                                            <td>₹80,000</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹9,600</td>
+                                                            <td class="pe-2">₹0.00</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP005</td>
-                                                            <td class="fw-bold">Vikram Rathore</td>
-                                                            <td>100984523182</td>
-                                                            <td>₹75,000</td>
-                                                            <td>₹9,000</td>
-                                                            <td>₹2,753</td>
-                                                            <td>₹6,247</td>
-                                                            <td>₹11,753</td>
+                                                            <td class="ps-2 fw-bold text-dark">100984523182</td>
+                                                            <td class="fw-bold text-dark">Vikram Rathore</td>
+                                                            <td>₹1,50,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td class="text-primary fw-bold">₹1,800.00</td>
+                                                            <td class="text-success fw-semibold">₹550.50</td>
+                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
                                                             <td>2</td>
-                                                            <td>₹1,50,000</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹18,000</td>
+                                                            <td class="pe-2">₹0.00</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP006</td>
-                                                            <td class="fw-bold">Priya Sharma</td>
-                                                            <td>100984523120</td>
-                                                            <td>₹36,000</td>
-                                                            <td>₹4,320</td>
-                                                            <td>₹1,321</td>
-                                                            <td>₹2,999</td>
-                                                            <td>₹5,641</td>
+                                                            <td class="ps-2 fw-bold text-dark">100984523120</td>
+                                                            <td class="fw-bold text-dark">Priya Sharma</td>
+                                                            <td>₹72,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td>₹15,000.00</td>
+                                                            <td class="text-primary fw-bold">₹1,800.00</td>
+                                                            <td class="text-success fw-semibold">₹550.50</td>
+                                                            <td class="text-danger fw-semibold">₹1,249.50</td>
                                                             <td>0</td>
-                                                            <td>₹72,000</td>
-                                                            <td class="pe-2 fw-bold text-dark">₹8,640</td>
+                                                            <td class="pe-2">₹0.00</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -687,80 +687,80 @@
 
                                         {{-- Sub-table 3: ESI Summary --}}
                                         <div id="summary_esi_summary" class="summary-table-section d-none">
-                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">Employee State Insurance Statement</h6>
+                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">ESI Summary - MC Excel</h6>
                                             <div class="table-responsive border rounded mb-4">
                                                 <table class="table align-middle mb-0 table-sm" id="esiTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">EMP ID</th>
+                                                            <th class="ps-2">Employee ID</th>
                                                             <th>Employee Name</th>
                                                             <th>ESI Number</th>
-                                                            <th>Gross Wage</th>
-                                                            <th>ESI Wage</th>
+                                                            <th>ECR Gross Wages</th>
+                                                            <th>ESI Wages</th>
                                                             <th>Employee ESI (0.75%)</th>
                                                             <th>Employer ESI (3.25%)</th>
-                                                            <th class="pe-2">Total ESI</th>
+                                                            <th class="pe-2">Total ESI (4%)</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP001</td>
-                                                            <td class="fw-bold">Rahul Verma</td>
+                                                            <td class="ps-2 fw-bold text-dark">EMP001</td>
+                                                            <td class="fw-bold text-dark">Rahul Verma</td>
                                                             <td>21-00-123456-001-0001</td>
-                                                            <td>₹1,20,000</td>
-                                                            <td>₹21,000</td>
-                                                            <td>₹157.50</td>
-                                                            <td>₹682.50</td>
+                                                            <td>₹1,20,000.00</td>
+                                                            <td>₹21,000.00</td>
+                                                            <td class="text-primary fw-semibold">₹157.50</td>
+                                                            <td class="text-success fw-semibold">₹682.50</td>
                                                             <td class="pe-2 fw-bold text-dark">₹840.00</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP002</td>
-                                                            <td class="fw-bold">Sneha Iyer</td>
+                                                            <td class="ps-2 fw-bold text-dark">EMP002</td>
+                                                            <td class="fw-bold text-dark">Sneha Iyer</td>
                                                             <td>21-00-123456-002-0002</td>
-                                                            <td>₹95,000</td>
-                                                            <td>₹21,000</td>
-                                                            <td>₹157.50</td>
-                                                            <td>₹682.50</td>
+                                                            <td>₹95,000.00</td>
+                                                            <td>₹21,000.00</td>
+                                                            <td class="text-primary fw-semibold">₹157.50</td>
+                                                            <td class="text-success fw-semibold">₹682.50</td>
                                                             <td class="pe-2 fw-bold text-dark">₹840.00</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP003</td>
-                                                            <td class="fw-bold">David Miller</td>
+                                                            <td class="ps-2 fw-bold text-dark">EMP003</td>
+                                                            <td class="fw-bold text-dark">David Miller</td>
                                                             <td>21-00-123456-003-0003</td>
-                                                            <td>₹85,000</td>
-                                                            <td>₹21,000</td>
-                                                            <td>₹157.50</td>
-                                                            <td>₹682.50</td>
+                                                            <td>₹85,000.00</td>
+                                                            <td>₹21,000.00</td>
+                                                            <td class="text-primary fw-semibold">₹157.50</td>
+                                                            <td class="text-success fw-semibold">₹682.50</td>
                                                             <td class="pe-2 fw-bold text-dark">₹840.00</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP004</td>
-                                                            <td class="fw-bold">Ananya Sen</td>
+                                                            <td class="ps-2 fw-bold text-dark">EMP004</td>
+                                                            <td class="fw-bold text-dark">Ananya Sen</td>
                                                             <td>21-00-123456-004-0004</td>
-                                                            <td>₹80,000</td>
-                                                            <td>₹21,000</td>
-                                                            <td>₹157.50</td>
-                                                            <td>₹682.50</td>
+                                                            <td>₹80,000.00</td>
+                                                            <td>₹21,000.00</td>
+                                                            <td class="text-primary fw-semibold">₹157.50</td>
+                                                            <td class="text-success fw-semibold">₹682.50</td>
                                                             <td class="pe-2 fw-bold text-dark">₹840.00</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP005</td>
-                                                            <td class="fw-bold">Vikram Rathore</td>
+                                                            <td class="ps-2 fw-bold text-dark">EMP005</td>
+                                                            <td class="fw-bold text-dark">Vikram Rathore</td>
                                                             <td>21-00-123456-005-0005</td>
-                                                            <td>₹1,50,000</td>
-                                                            <td>₹21,000</td>
-                                                            <td>₹157.50</td>
-                                                            <td>₹682.50</td>
+                                                            <td>₹1,50,000.00</td>
+                                                            <td>₹21,000.00</td>
+                                                            <td class="text-primary fw-semibold">₹157.50</td>
+                                                            <td class="text-success fw-semibold">₹682.50</td>
                                                             <td class="pe-2 fw-bold text-dark">₹840.00</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP006</td>
-                                                            <td class="fw-bold">Priya Sharma</td>
+                                                            <td class="ps-2 fw-bold text-dark">EMP006</td>
+                                                            <td class="fw-bold text-dark">Priya Sharma</td>
                                                             <td>21-00-123456-006-0006</td>
-                                                            <td>₹72,000</td>
-                                                            <td>₹21,000</td>
-                                                            <td>₹157.50</td>
-                                                            <td>₹682.50</td>
+                                                            <td>₹72,000.00</td>
+                                                            <td>₹21,000.00</td>
+                                                            <td class="text-primary fw-semibold">₹157.50</td>
+                                                            <td class="text-success fw-semibold">₹682.50</td>
                                                             <td class="pe-2 fw-bold text-dark">₹840.00</td>
                                                         </tr>
                                                     </tbody>
@@ -770,81 +770,47 @@
 
                                         {{-- Sub-table 4: PT Summary --}}
                                         <div id="summary_pt_summary" class="summary-table-section d-none">
-                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">Professional Tax Deductions Statement</h6>
+                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">P-Tax Return Summary</h6>
                                             <div class="table-responsive border rounded mb-4">
                                                 <table class="table align-middle mb-0 table-sm" id="ptTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">EMP ID</th>
-                                                            <th>Employee Name</th>
-                                                            <th>State</th>
+                                                            <th class="ps-2">Registration No</th>
+                                                            <th>Employer Name</th>
+                                                            <th>Employee Count</th>
                                                             <th>Gross Salary</th>
-                                                            <th>PT Slab</th>
                                                             <th>PT Deduction</th>
-                                                            <th>Enrollment No</th>
-                                                            <th class="pe-2">Registration No</th>
+                                                            <th>Total PT Payable</th>
+                                                            <th class="pe-2">Period</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP001</td>
-                                                            <td class="fw-bold">Rahul Verma</td>
-                                                            <td>Maharashtra</td>
-                                                            <td>₹1,20,000</td>
-                                                            <td>&gt; ₹10,000</td>
-                                                            <td class="fw-bold text-dark">₹200</td>
-                                                            <td>MH-PT-98235210</td>
-                                                            <td class="pe-2">REG-MH-123456</td>
+                                                             <td class="ps-2 fw-bold text-dark">REG-WB-123459</td>
+                                                             <td class="fw-bold text-dark">E-CASHBOOK SYSTEMS LTD</td>
+                                                             <td>24 Employees</td>
+                                                             <td class="fw-semibold">₹6,02,000.00</td>
+                                                             <td class="fw-bold text-danger">₹1,200.00</td>
+                                                             <td class="fw-bold text-success">₹1,200.00</td>
+                                                             <td class="pe-2 text-muted">June 2026</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP002</td>
-                                                            <td class="fw-bold">Sneha Iyer</td>
-                                                            <td>Karnataka</td>
-                                                            <td>₹95,000</td>
-                                                            <td>&gt; ₹15,000</td>
-                                                            <td class="fw-bold text-dark">₹200</td>
-                                                            <td>KA-PT-87235211</td>
-                                                            <td class="pe-2">REG-KA-123457</td>
+                                                             <td class="ps-2 fw-bold text-dark">REG-WB-123459</td>
+                                                             <td class="fw-bold text-dark">E-CASHBOOK SYSTEMS LTD</td>
+                                                             <td>20 Employees</td>
+                                                             <td class="fw-semibold">₹5,10,000.00</td>
+                                                             <td class="fw-bold text-danger">₹1,000.00</td>
+                                                             <td class="fw-bold text-success">₹1,000.00</td>
+                                                             <td class="pe-2 text-muted">May 2026</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP003</td>
-                                                            <td class="fw-bold">David Miller</td>
-                                                            <td>Tamil Nadu</td>
-                                                            <td>₹85,000</td>
-                                                            <td>&gt; ₹12,500</td>
-                                                            <td class="fw-bold text-dark">₹200</td>
-                                                            <td>TN-PT-76235212</td>
-                                                            <td class="pe-2">REG-TN-123458</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP004</td>
-                                                            <td class="fw-bold">Ananya Sen</td>
-                                                            <td>West Bengal</td>
-                                                            <td>₹80,000</td>
-                                                            <td>&gt; ₹10,000</td>
-                                                            <td class="fw-bold text-dark">₹200</td>
-                                                            <td>WB-PT-65235213</td>
-                                                            <td class="pe-2">REG-WB-123459</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP005</td>
-                                                            <td class="fw-bold">Vikram Rathore</td>
-                                                            <td>Delhi</td>
-                                                            <td>₹1,50,000</td>
-                                                            <td>&gt; ₹15,000</td>
-                                                            <td class="fw-bold text-dark">₹200</td>
-                                                            <td>DL-PT-54235214</td>
-                                                            <td class="pe-2">REG-DL-123460</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP006</td>
-                                                            <td class="fw-bold">Priya Sharma</td>
-                                                            <td>Maharashtra</td>
-                                                            <td>₹72,000</td>
-                                                            <td>&gt; ₹10,000</td>
-                                                            <td class="fw-bold text-dark">₹200</td>
-                                                            <td>MH-PT-98235210</td>
-                                                            <td class="pe-2">REG-MH-123456</td>
+                                                             <td class="ps-2 fw-bold text-dark">REG-WB-123459</td>
+                                                             <td class="fw-bold text-dark">E-CASHBOOK SYSTEMS LTD</td>
+                                                             <td>18 Employees</td>
+                                                             <td class="fw-semibold">₹4,85,000.00</td>
+                                                             <td class="fw-bold text-danger">₹900.00</td>
+                                                             <td class="fw-bold text-success">₹900.00</td>
+                                                             <td class="pe-2 text-muted">April 2026</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -853,102 +819,88 @@
 
                                         {{-- Sub-table 5: TDS Summary --}}
                                         <div id="summary_tds_summary" class="summary-table-section d-none">
-                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">Income Tax TDS Deduction & Deposit Statement</h6>
+                                            <h6 class="fw-bold mb-3 text-dark uppercase-label">TDS FVU (File Validation Utility) - RPU/FVU compatible</h6>
                                             <div class="table-responsive border rounded mb-4">
                                                 <table class="table align-middle mb-0 table-sm" id="tdsTable">
                                                     <thead class="bg-light">
                                                         <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-2">EMP ID</th>
-                                                            <th>Employee Name</th>
+                                                            <th class="ps-2">TAN</th>
                                                             <th>PAN</th>
-                                                            <th>Annual Taxable Salary</th>
-                                                            <th>Exemption</th>
-                                                            <th>Deduction</th>
-                                                            <th>Taxable Income</th>
-                                                            <th>TDS Deducted</th>
-                                                            <th>TDS Deposited</th>
-                                                            <th>Section</th>
-                                                            <th class="pe-2">Challan Ref</th>
+                                                            <th>Employee Name</th>
+                                                            <th>Salary Amount</th>
+                                                            <th>TDS Amount</th>
+                                                            <th>Section Code</th>
+                                                            <th>Challan No</th>
+                                                            <th>BSR Code</th>
+                                                            <th class="pe-2">Deposit Date</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP001</td>
-                                                            <td class="fw-bold">Rahul Verma</td>
+                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
                                                             <td>ABCDE1234F</td>
-                                                            <td>₹14,40,000</td>
-                                                            <td>₹1,50,000</td>
-                                                            <td>₹2,00,000</td>
-                                                            <td>₹10,90,000</td>
-                                                            <td class="fw-bold text-danger">₹4,300</td>
-                                                            <td class="fw-bold text-success">₹4,300</td>
+                                                            <td class="fw-bold text-dark">Rahul Verma</td>
+                                                            <td>₹1,20,000.00</td>
+                                                            <td class="fw-bold text-danger">₹4,300.00</td>
                                                             <td>Section 192</td>
-                                                            <td class="pe-2">CHL-984321</td>
+                                                            <td>CHL-984321</td>
+                                                            <td>0210452</td>
+                                                            <td class="pe-2 text-muted">05-07-2026</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP002</td>
-                                                            <td class="fw-bold">Sneha Iyer</td>
+                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
                                                             <td>FGHIJ5678K</td>
-                                                            <td>₹11,40,000</td>
-                                                            <td>₹1,20,000</td>
-                                                            <td>₹1,80,000</td>
-                                                            <td>₹8,40,000</td>
-                                                            <td class="fw-bold text-danger">₹3,538</td>
-                                                            <td class="fw-bold text-success">₹3,538</td>
+                                                            <td class="fw-bold text-dark">Sneha Iyer</td>
+                                                            <td>₹95,000.00</td>
+                                                            <td class="fw-bold text-danger">₹3,538.00</td>
                                                             <td>Section 192</td>
-                                                            <td class="pe-2">CHL-984322</td>
+                                                            <td>CHL-984322</td>
+                                                            <td>0210452</td>
+                                                            <td class="pe-2 text-muted">05-07-2026</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP003</td>
-                                                            <td class="fw-bold">David Miller</td>
+                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
                                                             <td>KLMNO9012P</td>
-                                                            <td>₹10,20,000</td>
-                                                            <td>₹1,00,000</td>
-                                                            <td>₹1,50,000</td>
-                                                            <td>₹7,70,000</td>
-                                                            <td class="fw-bold text-danger">₹3,213</td>
-                                                            <td class="fw-bold text-success">₹3,213</td>
+                                                            <td class="fw-bold text-dark">David Miller</td>
+                                                            <td>₹85,000.00</td>
+                                                            <td class="fw-bold text-danger">₹3,213.00</td>
                                                             <td>Section 192</td>
-                                                            <td class="pe-2">CHL-984323</td>
+                                                            <td>CHL-984323</td>
+                                                            <td>0210452</td>
+                                                            <td class="pe-2 text-muted">05-07-2026</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP004</td>
-                                                            <td class="fw-bold">Ananya Sen</td>
+                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
                                                             <td>PQRST3456Q</td>
-                                                            <td>₹9,60,000</td>
-                                                            <td>₹90,000</td>
-                                                            <td>₹1,20,000</td>
-                                                            <td>₹7,50,000</td>
-                                                            <td class="fw-bold text-danger">₹1,000</td>
-                                                            <td class="fw-bold text-success">₹1,000</td>
+                                                            <td class="fw-bold text-dark">Ananya Sen</td>
+                                                            <td>₹80,000.00</td>
+                                                            <td class="fw-bold text-danger">₹1,000.00</td>
                                                             <td>Section 192</td>
-                                                            <td class="pe-2">CHL-984324</td>
+                                                            <td>CHL-984324</td>
+                                                            <td>0210452</td>
+                                                            <td class="pe-2 text-muted">05-07-2026</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP005</td>
-                                                            <td class="fw-bold">Vikram Rathore</td>
+                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
                                                             <td>UVWXY7890R</td>
-                                                            <td>₹18,00,000</td>
-                                                            <td>₹2,50,000</td>
-                                                            <td>₹2,50,000</td>
-                                                            <td>₹13,00,000</td>
-                                                            <td class="fw-bold text-danger">₹8,075</td>
-                                                            <td class="fw-bold text-success">₹8,075</td>
+                                                            <td class="fw-bold text-dark">Vikram Rathore</td>
+                                                            <td>₹1,50,000.00</td>
+                                                            <td class="fw-bold text-danger">₹8,075.00</td>
                                                             <td>Section 192</td>
-                                                            <td class="pe-2">CHL-984325</td>
+                                                            <td>CHL-984325</td>
+                                                            <td>0210452</td>
+                                                            <td class="pe-2 text-muted">05-07-2026</td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="ps-2 fw-bold">EMP006</td>
-                                                            <td class="fw-bold">Priya Sharma</td>
+                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
                                                             <td>ZEXRD4523S</td>
-                                                            <td>₹8,64,000</td>
-                                                            <td>₹80,000</td>
-                                                            <td>₹1,00,000</td>
-                                                            <td>₹6,84,000</td>
-                                                            <td class="fw-bold text-danger">₹1,540</td>
-                                                            <td class="fw-bold text-warning" id="tds6Status">Pending</td>
+                                                            <td class="fw-bold text-dark">Priya Sharma</td>
+                                                            <td>₹72,000.00</td>
+                                                            <td class="fw-bold text-danger">₹1,540.00</td>
                                                             <td>Section 192</td>
-                                                            <td class="pe-2">N/A</td>
+                                                            <td>N/A</td>
+                                                            <td>N/A</td>
+                                                            <td class="pe-2 text-muted">N/A</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
