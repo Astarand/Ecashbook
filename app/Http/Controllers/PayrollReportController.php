@@ -138,6 +138,7 @@ class PayrollReportController extends Controller
         ]);
     }
 
+    //------- Payroll Register Report -------//
     public function payrollRegister(Request $request)
     {
         $ownerId = currentOwnerId();
@@ -220,4 +221,5 @@ class PayrollReportController extends Controller
 
         return response()->json($employees);
     }
+
 }
