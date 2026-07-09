@@ -1545,6 +1545,7 @@ class SalesController extends Controller
 						'other_dispa_det' => isset($request->other_dispa_det) ? $request->other_dispa_det : "",
 						'terms_delivery' => isset($request->terms_delivery) ? $request->terms_delivery : "",
 						'bank_id' => isset($request->bank_id) ? $request->bank_id : null,
+						'status' => 1,
 					)
 				);
 			$userId = currentOwnerId();

@@ -58,6 +58,7 @@ use App\Http\Controllers\User\Reports\ProfitLossController;
 use App\Http\Controllers\User\Reports\BalanceSheetController;
 use App\Http\Controllers\User\DigitalSignedController;
 use App\Http\Controllers\User\MSMEBenefitHubController;
+use App\Http\Controllers\PayrollReportController;
 
 
 /* User/Company Employee Controller */
@@ -1260,4 +1261,8 @@ Route::middleware(['ensure.login'])->group(function () {
 
 	Route::post('/purchase_shipping_cost',[PurchaseController::class,'purchaseShippingCost']);
 
+	//-------- payroll report routes --------//
+	Route::get('/payroll-report/summary', [PayrollReportController::class, 'summary'])->name('payroll.report.summary');
+	Route::get('/payroll-report/register', [PayrollReportController::class, 'payrollRegister'])->name('payroll.report.register');
+	
 });

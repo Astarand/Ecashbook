@@ -135,18 +135,24 @@ class ReportsController extends Controller
 				->where('added_by', $userId)
 				->when($propId, fn($q) => $q->where('propId', $propId))
 				->whereBetween('journal_date', [$from, $to])
+				->where('status','Posted')
+				->orderBy('journal_date')
+				->orderBy('id')
 				->where(function($q) {
 					$q->whereNull('rev_amend_status')
-					  ->orWhere('rev_amend_status', '!=', 'reverse');
+					  //->orWhere('rev_amend_status', '!=', 'reverse');
+					  ->orWhere('rev_amend_status', '');
 				})
 				->get();
 
 		$trial = [];
 		//echo "<pre>";print_r($journals);exit;
-		foreach ($journals as $row) {
-
-			$ledger = $row->ledger ?: 'Unknown';
-
+		foreach ($journals as $row) 
+		{
+			if (empty($row->ledger)) {
+				continue;
+			}
+			$ledger = trim($row->ledger);
 			$group    = $this->getLedgerGroup($row);
 			$subGroup = $this->getLedgerSubGroup($row);
 
@@ -157,7 +163,6 @@ class ReportsController extends Controller
 			// ================= INIT =================
 			if (!isset($trial[$group][$subGroup][$ledger])) {
 
-				//Opening Balance (IMPORTANT FIX)
 				$opening = $this->getOpeningBalanceFromJournal($ledger, $userId, $from, $propId);
 				//echo "<pre>";print_r($opening);exit;
 
@@ -173,39 +178,40 @@ class ReportsController extends Controller
 			}
 
 			// ================= DR / CR =================
+			$value = $this->getTrialAmount($row);
 			if (strtolower($row->debit_credit) === 'debit') {
-				//$trial[$group][$subGroup][$ledger]['debit'] += $row->tot_amt;
-				$trial[$group][$subGroup][$ledger]['debit'] += $row->amount;
+				$trial[$group][$subGroup][$ledger]['debit'] += $value;
 			} else {
-				//$trial[$group][$subGroup][$ledger]['credit'] += $row->tot_amt;
-				$trial[$group][$subGroup][$ledger]['credit'] += $row->amount;
+				$trial[$group][$subGroup][$ledger]['credit'] += $value;
 			}
 		}
 
 		// ================= CLOSING =================
 		$totalDr = 0;
 		$totalCr = 0;
-
 		foreach ($trial as &$subs) {
 			foreach ($subs as &$ledgers) {
 				foreach ($ledgers as &$v) {
 
-					$net = ($v['opening_dr'] + $v['debit'])
-						 - ($v['opening_cr'] + $v['credit']);
+					$totalDebit  = $v['opening_dr'] + $v['debit'];
+					$totalCredit = $v['opening_cr'] + $v['credit'];
 
-					if ($net > 0) {
-						$v['closing_dr'] = $net;
+					if ($totalDebit > $totalCredit) {
+						$v['closing_dr'] = $totalDebit - $totalCredit;
 						$v['closing_cr'] = 0;
 					} else {
 						$v['closing_dr'] = 0;
-						$v['closing_cr'] = abs($net);
+						$v['closing_cr'] = $totalCredit - $totalDebit;
 					}
 
 					$totalDr += $v['closing_dr'];
 					$totalCr += $v['closing_cr'];
 				}
+				unset($v);
 			}
+			unset($ledgers);
 		}
+		unset($subs);
 
 		return response()->json([
 			'trial'      => $trial,
@@ -219,24 +225,29 @@ class ReportsController extends Controller
 	private function getOpeningBalanceFromJournal($ledger, $userId, $fromDate, $propId)
 	{
 		// Step 1: Previous FY dates
-		[$prevFrom, $prevTo] = $this->getPreviousFYRange($fromDate);
-		//echo $prevFrom;echo $prevTo;exit; //2024-04-01,2025-03-31
+		//[$prevFrom, $prevTo] = $this->getPreviousFYRange($fromDate);
 		$rows = DB::table('journals')
-			->where('added_by', $userId)
-			->where('ledger', $ledger)
-			->when($propId, fn($q) => $q->where('propId', $propId))
-			//->whereBetween('journal_date', [$prevFrom, $prevTo])
-			->where('journal_date', '<', $fromDate)
-			->get();
+					->where('added_by',$userId)
+					->where('ledger',$ledger)
+					->where('status','Posted')
+					->whereDate('journal_date','<',$fromDate)
+					->when($propId,function($q) use($propId){
+						$q->where('propId',$propId);
+					})
+					->where(function($q){
+						$q->whereNull('rev_amend_status')
+						  ->orWhere('rev_amend_status','');
+					})
+					->get();
 
 		$dr = 0;
 		$cr = 0;
-
 		foreach ($rows as $r) {
+			$value = $this->getTrialAmount($r);
 			if (strtolower($r->debit_credit) === 'debit') {
-				$dr += $r->tot_amt;
+				$dr += $value;
 			} else {
-				$cr += $r->tot_amt;
+				$cr += $value;
 			}
 		}
 
@@ -245,21 +256,50 @@ class ReportsController extends Controller
 	
 	private function getLedgerGroup($row)
 	{
-		$ledger = strtolower($row->ledger);
+		$ledger = strtolower(trim($row->ledger));
+		$source = strtolower(trim($row->source));
+		$entry  = strtolower(trim($row->entry_type));
 
-		//GST FIRST (highest priority)
-		if (str_contains($ledger, 'gst') || str_contains($ledger, 'cgst') || str_contains($ledger, 'sgst') || str_contains($ledger, 'igst')) {
+		// ================= GST =================
+		if (
+			str_contains($ledger, 'gst') ||
+			str_contains($ledger, 'cgst') ||
+			str_contains($ledger, 'sgst') ||
+			str_contains($ledger, 'igst')
+		) {
 			return 'Duties & Taxes';
 		}
-		
-		if ($row->source === 'Asset') return 'Assets';
-		if ($row->source === 'Liability') return 'Liabilities';
-		if ($row->source === 'Sales' || $row->source === 'Income' || str_contains($ledger, 'sales')) return 'Income';
-		if ($row->source === 'Purchase' || $row->source === 'Expense' || str_contains($ledger, 'purchase')) return 'Expenses';
-		//BANK FIX
-		if (str_contains($ledger, 'bank') || str_contains($ledger, 'cash')) {
-			//return 'Bank';
+
+		// ================= ASSETS =================
+		if (
+			$source == 'asset' ||
+			str_contains($ledger, 'cash') ||
+			str_contains($ledger, 'bank')
+		) {
 			return 'Assets';
+		}
+
+		// ================= LIABILITIES =================
+		if ($source == 'liability') {
+			return 'Liabilities';
+		}
+
+		// ================= SALES =================
+		if (
+			str_contains($entry,'sales')
+			|| str_contains($ledger,'sales')
+			|| $source=='sales' || $source == 'income'
+		){
+			return 'Income';
+		}
+
+		// ================= PURCHASE =================
+		if (
+			str_contains($entry,'purchase')
+			|| str_contains($ledger,'purchase')
+			|| $source=='purchase' || $source == 'expense'
+		){
+			return 'Expenses';
 		}
 
 		return 'Others';
@@ -269,14 +309,36 @@ class ReportsController extends Controller
 	{
 		$ledger = strtolower($row->ledger);
 
-		if ($row->party_name === 'Customer' || str_contains($ledger, 'customer')) return 'Customer';
-		if ($row->party_name === 'Vendor' || str_contains($ledger, 'supplier')) return 'Vendor';
+		if (
+			strtolower(trim($row->party_name ?? '')) == 'customer'
+			|| str_contains($ledger,'customer')
+		){
+			return 'Customer';
+		}
+		if (
+			in_array(strtolower($row->party_name), ['vendor','supplier'])
+			|| str_contains($ledger,'supplier')
+			|| str_contains($ledger,'vendor')
+		){
+			return 'Vendor';
+		}
 		if (str_contains($ledger, 'cgst') || str_contains($ledger, 'sgst') || str_contains($ledger, 'igst')) {
 			return 'GST';
 		}
 
 		return '';
 	}
+	
+	private function getTrialAmount($row)
+	{
+		$ledger = strtolower(trim($row->ledger));
+		$entry = strtolower(trim($row->entry_type));
+		if (in_array($ledger, ['sales', 'purchase'])) {
+			return (float) $row->tot_amt;
+		}
+
+		return (float) $row->amount;
+	}	
 	//End new trial balance logic
 	
 	public function downloadTrialBalanceSheetPdf(Request $request)

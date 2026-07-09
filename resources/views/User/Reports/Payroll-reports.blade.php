@@ -2,82 +2,82 @@
 
 @section('container')
 <style>
-.custom-action-btn-pdf {
-    background-color: #ffeef0 !important;
-    color: #dc3545 !important;
-}
-.custom-action-btn-pdf:hover {
-    background-color: #dc3545 !important;
-    color: #ffffff !important;
-}
-.custom-action-btn-excel {
-    background-color: #e8fadf !important;
-    color: #198754 !important;
-}
-.custom-action-btn-excel:hover {
-    background-color: #198754 !important;
-    color: #ffffff !important;
-}
-.custom-action-btn-print {
-    background-color: #e7f3ff !important;
-    color: #0d6efd !important;
-}
-.custom-action-btn-print:hover {
-    background-color: #0d6efd !important;
-    color: #ffffff !important;
-}
+    .custom-action-btn-pdf {
+        background-color: #ffeef0 !important;
+        color: #dc3545 !important;
+    }
+    .custom-action-btn-pdf:hover {
+        background-color: #dc3545 !important;
+        color: #ffffff !important;
+    }
+    .custom-action-btn-excel {
+        background-color: #e8fadf !important;
+        color: #198754 !important;
+    }
+    .custom-action-btn-excel:hover {
+        background-color: #198754 !important;
+        color: #ffffff !important;
+    }
+    .custom-action-btn-print {
+        background-color: #e7f3ff !important;
+        color: #0d6efd !important;
+    }
+    .custom-action-btn-print:hover {
+        background-color: #0d6efd !important;
+        color: #ffffff !important;
+    }
 
-/* Datatable style normalization */
-.datatable-top {
-    padding: 10px 10px 15px 10px !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    flex-wrap: wrap !important;
-    gap: 10px !important;
-}
-.datatable-bottom {
-    padding: 15px 10px 10px 10px !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    flex-wrap: wrap !important;
-    gap: 10px !important;
-}
-.datatable-search {
-    float: none !important;
-    margin-left: 0 !important;
-    position: relative !important;
-}
-.datatable-search input {
-    border-radius: 8px !important;
-    border: 1px solid #e3e6f6 !important;
-    padding: 8px 16px 8px 38px !important;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: 14px center !important;
-    background-size: 14px !important;
-    font-size: 13.5px !important;
-    width: 220px !important;
-}
-.datatable-selector {
-    border-radius: 8px !important;
-    border: 1px solid #e3e6f6 !important;
-    padding: 6px 32px 6px 12px !important;
-    font-size: 13.5px !important;
-}
-.datatable-pagination a {
-    border-radius: 6px !important;
-    margin: 0 2px !important;
-    font-size: 13.5px !important;
-}
-.datatable-container {
-    border-top: 1px solid #f1f3f9 !important;
-    border-bottom: 1px solid #f1f3f9 !important;
-}
-.datatable-search .icon-search {
-    display: none !important;
-}
+    /* Datatable style normalization */
+    .datatable-top {
+        padding: 10px 10px 15px 10px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+    }
+    .datatable-bottom {
+        padding: 15px 10px 10px 10px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+    }
+    .datatable-search {
+        float: none !important;
+        margin-left: 0 !important;
+        position: relative !important;
+    }
+    .datatable-search input {
+        border-radius: 8px !important;
+        border: 1px solid #e3e6f6 !important;
+        padding: 8px 16px 8px 38px !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: 14px center !important;
+        background-size: 14px !important;
+        font-size: 13.5px !important;
+        width: 220px !important;
+    }
+    .datatable-selector {
+        border-radius: 8px !important;
+        border: 1px solid #e3e6f6 !important;
+        padding: 6px 32px 6px 12px !important;
+        font-size: 13.5px !important;
+    }
+    .datatable-pagination a {
+        border-radius: 6px !important;
+        margin: 0 2px !important;
+        font-size: 13.5px !important;
+    }
+    .datatable-container {
+        border-top: 1px solid #f1f3f9 !important;
+        border-bottom: 1px solid #f1f3f9 !important;
+    }
+    .datatable-search .icon-search {
+        display: none !important;
+    }
 </style>
 <div class="pc-content">
     {{-- PAGE HEADER --}}
@@ -97,15 +97,14 @@
                         </div>
                         {{-- Controls --}}
                         <div class="d-flex gap-2">
-                            <select id="payrollMonth" class="form-select form-select-sm border-0 text-dark fw-bold bg-white bg-opacity-90 ps-3 pe-4" style="width: auto; min-width: 130px; border-radius: 8px;">
-                                <option value="July">July 2026</option>
-                                <option value="June">June 2026</option>
-                                <option value="May">May 2026</option>
-                                <option value="April">April 2026</option>
+                            <select id="payrollMonth"
+                                class="form-select form-select-sm border-0 text-dark fw-bold bg-white bg-opacity-90 ps-3 pe-4"
+                                style="width: auto; min-width: 130px; border-radius: 8px;">
                             </select>
-                            <select id="payrollFY" class="form-select form-select-sm border-0 text-dark fw-bold bg-white bg-opacity-90 ps-3 pe-4" style="width: auto; min-width: 130px; border-radius: 8px;">
-                                <option value="2026-27">FY 2026-27</option>
-                                <option value="2025-26">FY 2025-26</option>
+
+                            <select id="payrollFY"
+                                class="form-select form-select-sm border-0 text-dark fw-bold bg-white bg-opacity-90 ps-3 pe-4"
+                                style="width: auto; min-width: 140px; border-radius: 8px;">
                             </select>
                         </div>
                     </div>
@@ -124,7 +123,7 @@
                         <span class="text-secondary small fw-bold uppercase-label">Total Active Employees</span>
                         <i class="ph-duotone ph-users text-primary fs-3"></i>
                     </div>
-                    <h3 class="fw-bold mb-1 text-dark">28</h3>
+                    <h3 class="fw-bold mb-1 text-dark" id="totalActiveEmployees">0</h3>
                     <p class="text-muted small mb-0"><span class="text-success"><i class="ph ph-trend-up"></i> +2</span> compared to last month</p>
                 </div>
             </div>
@@ -138,7 +137,7 @@
                         <span class="text-secondary small fw-bold uppercase-label">Total Gross Salary</span>
                         <i class="ph-duotone ph-currency-inr text-info fs-3"></i>
                     </div>
-                    <h3 class="fw-bold mb-1 text-dark">₹14,85,000</h3>
+                    <h3 class="fw-bold mb-1 text-dark" id="grossSalary">₹0</h3>
                     <p class="text-muted small mb-0">Calculated for active employees</p>
                 </div>
             </div>
@@ -152,8 +151,8 @@
                         <span class="text-secondary small fw-bold uppercase-label">Net Salary Payable</span>
                         <i class="ph-duotone ph-wallet text-success fs-3"></i>
                     </div>
-                    <h3 class="fw-bold mb-1 text-dark">₹13,10,400</h3>
-                    <p class="text-muted small mb-0"><span class="text-success fw-semibold">₹12,42,000 Paid</span> &nbsp;·&nbsp; <span class="text-warning fw-semibold">₹68,400 Pending</span></p>
+                    <h3 class="fw-bold mb-1 text-dark" id="netSalary">₹0</h3>
+                    <p class="text-muted small mb-0">Calculated for active employees</p>
                 </div>
             </div>
         </div>
@@ -166,7 +165,7 @@
                         <span class="text-secondary small fw-bold uppercase-label">PF Liability</span>
                         <i class="ph-duotone ph-coins text-warning fs-3"></i>
                     </div>
-                    <h3 class="fw-bold mb-1 text-dark">₹86,400</h3>
+                    <h3 class="fw-bold mb-1 text-dark" id="pfLiability">₹0</h3>
                     <p class="text-muted small mb-0">Due Date: 15th of next month</p>
                 </div>
             </div>
@@ -180,7 +179,7 @@
                         <span class="text-secondary small fw-bold uppercase-label">ESI Liability</span>
                         <i class="ph-duotone ph-first-aid text-danger fs-3"></i>
                     </div>
-                    <h3 class="fw-bold mb-1 text-dark">₹14,200</h3>
+                    <h3 class="fw-bold mb-1 text-dark" id="esiLiability">₹0</h3>
                     <p class="text-muted small mb-0">Due Date: 15th of next month</p>
                 </div>
             </div>
@@ -194,7 +193,7 @@
                         <span class="text-secondary small fw-bold uppercase-label">PT Liability</span>
                         <i class="ph-duotone ph-bank text-secondary fs-3"></i>
                     </div>
-                    <h3 class="fw-bold mb-1 text-dark">₹5,600</h3>
+                    <h3 class="fw-bold mb-1 text-dark" id="ptLiability">₹0</h3>
                     <p class="text-muted small mb-0">Professional tax slab deductions</p>
                 </div>
             </div>
@@ -208,7 +207,7 @@
                         <span class="text-secondary small fw-bold uppercase-label">TDS Liability</span>
                         <i class="ph-duotone ph-receipt text-indigo fs-3" style="color: #6610f2 !important;"></i>
                     </div>
-                    <h3 class="fw-bold mb-1 text-dark">₹68,400</h3>
+                    <h3 class="fw-bold mb-1 text-dark" id="tdsLiability">₹0</h3>
                     <p class="text-muted small mb-0">IT Section 192 compliance</p>
                 </div>
             </div>
@@ -223,11 +222,11 @@
                             <span class="text-secondary small fw-bold uppercase-label">Payment Status</span>
                             <span class="badge bg-light-success text-success px-2.5 py-1 rounded-pill small">Processed</span>
                         </div>
-                        <h4 class="fw-bold text-dark mb-1">Paid: 27 / 28</h4>
+                        <h4 class="fw-bold text-dark mb-1" id="paymentSummary">Paid: 0 / 0</h4>
                     </div>
                     <div class="pt-2 border-top mt-2 d-flex justify-content-between align-items-center">
-                        <span class="text-success small fw-semibold"><i class="ph ph-check-circle"></i> 27 Paid</span>
-                        <span class="text-danger small fw-semibold"><i class="ph ph-x-circle"></i> 1 Unpaid</span>
+                        <span class="text-success small fw-semibold" id="paidCount"><i class="ph ph-check-circle"></i> 0 Paid</span>
+                        <span class="text-danger small fw-semibold" id="unpaidCount"><i class="ph ph-x-circle"></i> 0 Unpaid</span>
                     </div>
                 </div>
             </div>
@@ -274,7 +273,7 @@
                         <div class="tab-pane fade show active" id="register" role="tabpanel" aria-labelledby="register-tab">
                             <h5 class="fw-bold mb-3 text-dark d-flex align-items-center"><i class="ph-duotone ph-table text-primary me-2 fs-5"></i> Payroll Register - <span class="active-month-text text-primary">July 2026</span></h5>
                             <div class="table-responsive border rounded-3">
-                                <table class="table tbl-product m-0 custom-list-table align-middle" id="pc-dt-simple">
+                                <table class="table tbl-product m-0 custom-list-table align-middle" id="payrollRegisterTable">
                                     <thead class="bg-light">
                                         <tr class="text-secondary small fw-bold">
                                             <th class="ps-3 py-3">Employee ID</th>
@@ -292,97 +291,8 @@
                                             <th class="pe-3 py-3">Payment Status</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP001</td>
-                                            <td class="fw-bold text-dark">Rahul Verma</td>
-                                            <td>Senior Developer</td>
-                                            <td>12-05-2021</td>
-                                            <td>₹1,20,000</td>
-                                            <td class="fw-bold text-primary">₹1,07,400</td>
-                                            <td>₹7,200</td>
-                                            <td>₹900</td>
-                                            <td>₹200</td>
-                                            <td>₹4,300</td>
-                                            <td>₹0</td>
-                                            <td>₹0</td>
-                                            <td><span class="badge bg-light-success text-success rounded-pill px-2.5 py-1 small">Salary Done</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP002</td>
-                                            <td class="fw-bold text-dark">Sneha Iyer</td>
-                                            <td>Product Designer</td>
-                                            <td>18-09-2022</td>
-                                            <td>₹95,000</td>
-                                            <td class="fw-bold text-primary">₹84,850</td>
-                                            <td>₹5,700</td>
-                                            <td>₹712</td>
-                                            <td>₹200</td>
-                                            <td>₹3,538</td>
-                                            <td>₹0</td>
-                                            <td>₹0</td>
-                                            <td><span class="badge bg-light-success text-success rounded-pill px-2.5 py-1 small">Salary Done</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP003</td>
-                                            <td class="fw-bold text-dark">David Miller</td>
-                                            <td>QA Lead</td>
-                                            <td>01-02-2023</td>
-                                            <td>₹85,000</td>
-                                            <td class="fw-bold text-primary">₹75,850</td>
-                                            <td>₹5,100</td>
-                                            <td>₹637</td>
-                                            <td>₹200</td>
-                                            <td>₹3,213</td>
-                                            <td>₹0</td>
-                                            <td>₹0</td>
-                                            <td><span class="badge bg-light-success text-success rounded-pill px-2.5 py-1 small">Salary Done</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP004</td>
-                                            <td class="fw-bold text-dark">Ananya Sen</td>
-                                            <td>HR Manager</td>
-                                            <td>15-11-2020</td>
-                                            <td>₹80,000</td>
-                                            <td class="fw-bold text-primary">₹70,400</td>
-                                            <td>₹4,800</td>
-                                            <td>₹600</td>
-                                            <td>₹200</td>
-                                            <td>₹1,000</td>
-                                            <td>₹3,000</td>
-                                            <td>₹0</td>
-                                            <td><span class="badge bg-light-success text-success rounded-pill px-2.5 py-1 small">Salary Done</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP005</td>
-                                            <td class="fw-bold text-dark">Vikram Rathore</td>
-                                            <td>Sales Director</td>
-                                            <td>20-03-2019</td>
-                                            <td>₹1,50,000</td>
-                                            <td class="fw-bold text-primary">₹1,26,600</td>
-                                            <td>₹9,000</td>
-                                            <td>₹1,125</td>
-                                            <td>₹200</td>
-                                            <td>₹8,075</td>
-                                            <td>₹0</td>
-                                            <td>₹5,000</td>
-                                            <td><span class="badge bg-light-success text-success rounded-pill px-2.5 py-1 small">Salary Done</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP006</td>
-                                            <td class="fw-bold text-dark">Priya Sharma</td>
-                                            <td>Operations Analyst</td>
-                                            <td>05-01-2024</td>
-                                            <td>₹72,000</td>
-                                            <td class="fw-bold text-primary">₹62,400</td>
-                                            <td>₹4,320</td>
-                                            <td>₹540</td>
-                                            <td>₹200</td>
-                                            <td>₹1,540</td>
-                                            <td>₹0</td>
-                                            <td>₹3,000</td>
-                                            <td><span class="badge bg-light-warning text-warning rounded-pill px-2.5 py-1 small">Payment Pending</span></td>
-                                        </tr>
+                                    <tbody id="payrollRegisterBody">
+                                        
                                     </tbody>
                                 </table>
                             </div>
@@ -840,12 +750,12 @@
                                                     <span class="badge bg-light-warning text-warning border border-warning-subtle">Separator: #~#</span>
                                                 </div>
                                                 <pre class="bg-dark text-success p-3 rounded-3 mb-0 text-start overflow-auto fw-bold" style="font-family: monospace; font-size: 13.5px; line-height: 1.8; letter-spacing: 0.5px;">
-100984523190#~#Rahul Verma#~#120000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
-100984523910#~#Sneha Iyer#~#95000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#1#~#0
-100984523212#~#David Miller#~#85000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
-100984523010#~#Ananya Sen#~#80000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
-100984523182#~#Vikram Rathore#~#150000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#2#~#0
-100984523120#~#Priya Sharma#~#72000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0</pre>
+                                                100984523190#~#Rahul Verma#~#120000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
+                                                100984523910#~#Sneha Iyer#~#95000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#1#~#0
+                                                100984523212#~#David Miller#~#85000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
+                                                100984523010#~#Ananya Sen#~#80000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
+                                                100984523182#~#Vikram Rathore#~#150000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#2#~#0
+                                                100984523120#~#Priya Sharma#~#72000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0</pre>
                                                 <div class="mt-3">
                                                     <h6 class="fw-bold text-dark font-13 mb-1.5">Guidelines for EPFO Portal upload:</h6>
                                                     <ul class="list-unstyled mb-0 text-secondary font-12">
@@ -1404,220 +1314,347 @@
 </div>
 
 <style>
-.header-icon-box {
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-.uppercase-label {
-    font-size: 0.72rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}
-.transition-all {
-    transition: all 0.3s ease;
-}
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-}
-
-/* Tab design overrides */
-.nav-tabs .nav-link {
-    color: #6c757d;
-    background-color: transparent;
-    border-color: transparent;
-    transition: all 0.2s ease;
-}
-.nav-tabs .nav-link:hover {
-    color: #495057;
-    border-color: transparent;
-}
-.nav-tabs .nav-link.active {
-    color: #667eea !important;
-    border-bottom-color: #667eea !important;
-    background-color: transparent !important;
-}
-
-/* Mirror datatable custom theme styling for payroll tables */
-#registerTable, #attendanceTable {
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    border-bottom: none;
-}
-#registerTable thead, #attendanceTable thead {
-    padding: 5px;
-}
-#registerTable thead th, #attendanceTable thead th {
-    background-color: #cbcbcb !important;
-    color: #4b4b4b !important;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 12px;
-    padding: 17px 15px;
-    border-top: none;
-}
-#registerTable tbody tr, #attendanceTable tbody tr {
-    transition: background-color 0.2s ease;
-}
-#registerTable tbody tr:hover, #attendanceTable tbody tr:hover {
-    background-color: #f8f9fa;
-}
-#registerTable tbody td, #attendanceTable tbody td {
-    padding: 12px 15px;
-    border-top: 1px solid #eeeeee;
-    vertical-align: middle;
-}
-#registerTable + .datatable-bottom .datatable-pagination button,
-#attendanceTable + .datatable-bottom .datatable-pagination button {
-    border-radius: 4px;
-    margin: 0 2px;
-}
-#registerTable + .datatable-bottom .datatable-pagination .datatable-active a,
-#registerTable + .datatable-bottom .datatable-pagination .datatable-active button,
-#registerTable + .datatable-bottom .datatable-pagination .active a,
-#registerTable + .datatable-bottom .datatable-pagination .active button,
-#attendanceTable + .datatable-bottom .datatable-pagination .datatable-active a,
-#attendanceTable + .datatable-bottom .datatable-pagination .datatable-active button,
-#attendanceTable + .datatable-bottom .datatable-pagination .active a,
-#attendanceTable + .datatable-bottom .datatable-pagination .active button {
-    background-color: #422f90 !important;
-    border-color: #422f90 !important;
-    color: white !important;
-}
-#registerTable + .datatable-bottom, #attendanceTable + .datatable-bottom {
-    border-top: none;
-    margin-top: 0;
-    box-shadow: none;
-}
-#registerTable + .datatable-bottom .datatable-info, #attendanceTable + .datatable-bottom .datatable-info {
-    border-top: none;
-    margin-top: 10px;
-}
-#registerTable + .datatable-top .datatable-selector, #attendanceTable + .datatable-top .datatable-selector {
-    border: 1px solid #e4e7eb;
-    border-radius: 4px;
-    padding: 5px 10px;
-    background-color: #fff;
-}
-#registerTable + .datatable-container, #attendanceTable + .datatable-container {
-    border-bottom: none;
-}
-
-/* Premium Sidebar Menu in Report Downloads */
-#summarySelectorList {
-    background-color: transparent !important;
-    border: none !important;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-#summarySelectorList .list-group-item {
-    border: 1px solid #e4e7eb !important;
-    background-color: #ffffff !important;
-    border-radius: 8px !important;
-    color: #4b4b4b !important;
-    padding: 14px 16px !important;
-    transition: all 0.25s ease-in-out;
-    position: relative;
-    overflow: hidden;
-}
-#summarySelectorList .list-group-item:hover {
-    background-color: #f8f9fa !important;
-    border-color: #cbcbcb !important;
-    color: #111111 !important;
-    transform: translateX(4px);
-}
-#summarySelectorList .list-group-item.active {
-    background-color: #f2f0fa !important;
-    border-color: #422f90 !important;
-    color: #422f90 !important;
-    font-weight: 700 !important;
-    box-shadow: 0 4px 12px rgba(66, 47, 144, 0.08) !important;
-}
-#summarySelectorList .list-group-item.active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background-color: #422f90;
-}
-
-/* Print Report Container Styles */
-#printReportContainer {
-    background-color: #ffffff;
-    transition: all 0.3s ease;
-}
-#printReportContainer table th {
-    background-color: #f8f9fa !important;
-    color: #555555 !important;
-    text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 0.5px;
-    font-weight: 700;
-}
-#printReportContainer table td {
-    font-size: 13px;
-    padding: 10px 12px !important;
-}
-.summary-table-section h6 {
-    position: relative;
-    padding-left: 12px;
-}
-.summary-table-section h6::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 3px;
-    bottom: 3px;
-    width: 3px;
-    background-color: #422f90;
-    border-radius: 2px;
-}
-#summarySelectorList .list-group-item i {
-    transition: transform 0.25s ease;
-}
-#summarySelectorList .list-group-item:hover i {
-    transform: scale(1.15);
-}
-
-/* Printing optimization styling */
-@media print {
-    body * {
-        visibility: hidden;
+    .header-icon-box {
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
-    #printReportContainer, #printReportContainer * {
-        visibility: visible;
+    .uppercase-label {
+        font-size: 0.72rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
     }
-    #printReportContainer {
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+
+    /* Tab design overrides */
+    .nav-tabs .nav-link {
+        color: #6c757d;
+        background-color: transparent;
+        border-color: transparent;
+        transition: all 0.2s ease;
+    }
+    .nav-tabs .nav-link:hover {
+        color: #495057;
+        border-color: transparent;
+    }
+    .nav-tabs .nav-link.active {
+        color: #667eea !important;
+        border-bottom-color: #667eea !important;
+        background-color: transparent !important;
+    }
+
+    /* Mirror datatable custom theme styling for payroll tables */
+    #registerTable, #attendanceTable {
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        border-bottom: none;
+    }
+    #registerTable thead, #attendanceTable thead {
+        padding: 5px;
+    }
+    #registerTable thead th, #attendanceTable thead th {
+        background-color: #cbcbcb !important;
+        color: #4b4b4b !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        padding: 17px 15px;
+        border-top: none;
+    }
+    #registerTable tbody tr, #attendanceTable tbody tr {
+        transition: background-color 0.2s ease;
+    }
+    #registerTable tbody tr:hover, #attendanceTable tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    #registerTable tbody td, #attendanceTable tbody td {
+        padding: 12px 15px;
+        border-top: 1px solid #eeeeee;
+        vertical-align: middle;
+    }
+    #registerTable + .datatable-bottom .datatable-pagination button,
+    #attendanceTable + .datatable-bottom .datatable-pagination button {
+        border-radius: 4px;
+        margin: 0 2px;
+    }
+    #registerTable + .datatable-bottom .datatable-pagination .datatable-active a,
+    #registerTable + .datatable-bottom .datatable-pagination .datatable-active button,
+    #registerTable + .datatable-bottom .datatable-pagination .active a,
+    #registerTable + .datatable-bottom .datatable-pagination .active button,
+    #attendanceTable + .datatable-bottom .datatable-pagination .datatable-active a,
+    #attendanceTable + .datatable-bottom .datatable-pagination .datatable-active button,
+    #attendanceTable + .datatable-bottom .datatable-pagination .active a,
+    #attendanceTable + .datatable-bottom .datatable-pagination .active button {
+        background-color: #422f90 !important;
+        border-color: #422f90 !important;
+        color: white !important;
+    }
+    #registerTable + .datatable-bottom, #attendanceTable + .datatable-bottom {
+        border-top: none;
+        margin-top: 0;
+        box-shadow: none;
+    }
+    #registerTable + .datatable-bottom .datatable-info, #attendanceTable + .datatable-bottom .datatable-info {
+        border-top: none;
+        margin-top: 10px;
+    }
+    #registerTable + .datatable-top .datatable-selector, #attendanceTable + .datatable-top .datatable-selector {
+        border: 1px solid #e4e7eb;
+        border-radius: 4px;
+        padding: 5px 10px;
+        background-color: #fff;
+    }
+    #registerTable + .datatable-container, #attendanceTable + .datatable-container {
+        border-bottom: none;
+    }
+
+    /* Premium Sidebar Menu in Report Downloads */
+    #summarySelectorList {
+        background-color: transparent !important;
+        border: none !important;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    #summarySelectorList .list-group-item {
+        border: 1px solid #e4e7eb !important;
+        background-color: #ffffff !important;
+        border-radius: 8px !important;
+        color: #4b4b4b !important;
+        padding: 14px 16px !important;
+        transition: all 0.25s ease-in-out;
+        position: relative;
+        overflow: hidden;
+    }
+    #summarySelectorList .list-group-item:hover {
+        background-color: #f8f9fa !important;
+        border-color: #cbcbcb !important;
+        color: #111111 !important;
+        transform: translateX(4px);
+    }
+    #summarySelectorList .list-group-item.active {
+        background-color: #f2f0fa !important;
+        border-color: #422f90 !important;
+        color: #422f90 !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 12px rgba(66, 47, 144, 0.08) !important;
+    }
+    #summarySelectorList .list-group-item.active::before {
+        content: '';
         position: absolute;
         left: 0;
         top: 0;
-        width: 100%;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
+        bottom: 0;
+        width: 4px;
+        background-color: #422f90;
     }
-    /* Hide scrollbars & page menus */
-    .pc-sidebar, .pc-header, .pc-footer, .nav-tabs, .btn, .page-header, #summarySelectorList, .nav-item, #payrollMonth, #payrollFY, .pc-content > .row:first-of-type {
-        display: none !important;
+
+    /* Print Report Container Styles */
+    #printReportContainer {
+        background-color: #ffffff;
+        transition: all 0.3s ease;
     }
-}
+    #printReportContainer table th {
+        background-color: #f8f9fa !important;
+        color: #555555 !important;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+    }
+    #printReportContainer table td {
+        font-size: 13px;
+        padding: 10px 12px !important;
+    }
+    .summary-table-section h6 {
+        position: relative;
+        padding-left: 12px;
+    }
+    .summary-table-section h6::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 3px;
+        bottom: 3px;
+        width: 3px;
+        background-color: #422f90;
+        border-radius: 2px;
+    }
+    #summarySelectorList .list-group-item i {
+        transition: transform 0.25s ease;
+    }
+    #summarySelectorList .list-group-item:hover i {
+        transform: scale(1.15);
+    }
+
+    /* Printing optimization styling */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #printReportContainer, #printReportContainer * {
+            visibility: visible;
+        }
+        #printReportContainer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+        /* Hide scrollbars & page menus */
+        .pc-sidebar, .pc-header, .pc-footer, .nav-tabs, .btn, .page-header, #summarySelectorList, .nav-item, #payrollMonth, #payrollFY, .pc-content > .row:first-of-type {
+            display: none !important;
+        }
+    }
 </style>
 @endsection
 
 @section('page-script')
 <script>
-$(document).ready(function() {
-    // Initialize simpleDatatables for Payroll Register and Attendance tables
-    if (typeof simpleDatatables !== 'undefined') {
-        const initializeTable = (tableId) => {
-            const table = document.getElementById(tableId);
-            if (!table || table.dataset.initialized) return;
-            table.dataset.initialized = "true";
+    $(document).ready(function() {
+        // Keep payroll register rendering simple so rows appear immediately after the AJAX response.
+        if (typeof simpleDatatables !== 'undefined') {
+            const attendanceTable = document.getElementById('pc-dt-attendance');
+            if (attendanceTable && !attendanceTable.dataset.initialized) {
+                attendanceTable.dataset.initialized = 'true';
+                new simpleDatatables.DataTable(attendanceTable, {
+                    sortable: true,
+                    perPage: 10,
+                    perPageSelect: [5, 10, 15, 20, 25, 50, attendanceTable.querySelectorAll('tbody tr').length],
+                    searchable: true,
+                    fixedHeight: false,
+                    labels: {
+                        placeholder: "Search...",
+                        perPage: "entries per page",
+                        noRows: "No data available",
+                        info: "Showing {start} to {end} of {rows} entries",
+                    },
+                    layout: {
+                        top: "{select}{search}",
+                        bottom: "{info}{pager}",
+                    },
+                    classes: {
+                        active: "active",
+                        disabled: "disabled",
+                        selector: "form-select",
+                        input: "form-control",
+                        paginationList: "pagination",
+                    },
+                });
+            }
+        }
 
-            const totalRows = table.querySelectorAll('tbody tr').length;
-            const dataTable = new simpleDatatables.DataTable(table, {
+        // Dynamic month selector sync
+        $('#payrollMonth, #payrollFY').on('change', function() {
+            let m = $('#payrollMonth').val();
+            let fy = $('#payrollFY').val();
+            let fullStr = m + ' ' + (fy === '2026-27' ? '2026' : '2025');
+
+            $('.active-month-text').text(fullStr);
+            $('#generationDate').text('05-' + (m === 'July' ? '07' : m === 'June' ? '06' : m === 'May' ? '05' : '04') + '-' + (fy === '2026-27' ? '2026' : '2025'));
+        });
+    });
+
+    // Select Summary display logic
+    function selectSummary(type) {
+        // Manage active menu highlights
+        $('#summarySelectorList button').removeClass('active');
+        event.currentTarget.classList.add('active');
+
+        // Update badge text
+        let badgeText = 'Salary Sheet Summary';
+        if(type === 'pf_summary') badgeText = 'PF Liability Summary';
+        if(type === 'esi_summary') badgeText = 'ESI Summary';
+        if(type === 'pt_summary') badgeText = 'P-Tax Summary';
+        if(type === 'tds_summary') badgeText = 'TDS Summary';
+        if(type === 'lwf_summary') badgeText = 'LWF Summary';
+        if(type === 'gratuity_summary') badgeText = 'Gratuity Summary';
+        $('#summaryBadge').text(badgeText);
+
+        // Switch visible table section
+        $('.summary-table-section').addClass('d-none');
+        $('#summary_' + type).removeClass('d-none');
+    }
+
+    // Print Handler
+    function printReport() {
+        window.print();
+    }
+
+    // Export PDF Handler
+    function exportToPDF() {
+        window.print();
+    }
+
+    // Export Excel Handler
+    function exportToExcel() {
+        alert('Exporting report as Excel spreadsheet...');
+    }
+
+    // Download ECR Text file return
+    function downloadEcrText() {
+        const preElement = document.querySelector("#pf_text_view pre");
+        if (preElement) {
+            const text = preElement.innerText;
+            const blob = new Blob([text], { type: "text/plain" });
+            const anchor = document.createElement("a");
+            anchor.download = "PF_ECR_Return.txt";
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.target = "_blank";
+            anchor.style.display = "none";
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+        } else {
+            alert("ECR text content not found.");
+        }
+    }
+
+    // Switch ESI tabs
+    function switchEsiTab(tab, btn) {
+        $('.active-esi-tab-btn').removeClass('active bg-white text-primary').addClass('text-secondary');
+        $(btn).addClass('active bg-white text-primary').removeClass('text-secondary');
+        
+        if (tab === 'summary') {
+            $('#esiSummaryTitle').text('ESI Summary - MC Excel');
+            $('#esi_summary_table_view').removeClass('d-none');
+            $('#esi_upload_table_view').addClass('d-none');
+        } else {
+            $('#esiSummaryTitle').text('ESIC ONLINE SHEET FOR UPLOAD');
+            $('#esi_summary_table_view').addClass('d-none');
+            $('#esi_upload_table_view').removeClass('d-none');
+        }
+    }
+
+    // Switch PF tabs
+    function switchPfTab(tab, btn) {
+        $('.active-pf-tab-btn').removeClass('active bg-white text-primary').addClass('text-secondary');
+        $(btn).addClass('active bg-white text-primary').removeClass('text-secondary');
+        
+        if (tab === 'table') {
+            $('#pfSummaryTitle').text('PF ECR - Table View');
+            $('#pf_table_view').removeClass('d-none');
+            $('#pf_text_view').addClass('d-none');
+        } else {
+            $('#pfSummaryTitle').text('EPF ECR Text File Return Format');
+            $('#pf_table_view').addClass('d-none');
+            $('#pf_text_view').removeClass('d-none');
+        }
+    }
+
+    // Initialize custom Datatables for Attendance
+    document.addEventListener("DOMContentLoaded", function () {
+        const attendanceTable = document.getElementById("pc-dt-attendance");
+        if (attendanceTable && typeof simpleDatatables !== 'undefined') {
+            const totalRows = attendanceTable.querySelectorAll('tbody tr').length;
+            const dataTable = new simpleDatatables.DataTable(attendanceTable, {
                 sortable: true,
                 perPage: 10,
                 perPageSelect: [5, 10, 15, 20, 25, 50, totalRows],
@@ -1639,320 +1676,376 @@ $(document).ready(function() {
                     selector: "form-select",
                     input: "form-control",
                     paginationList: "pagination",
-                },
+                }
             });
 
-            // Post-initialization layout matching customer list table configuration
+            // Add action buttons and style layout like pc-dt-simple
             setTimeout(function () {
-                const wrapper = table.closest(".datatable-wrapper");
+                const wrapper = attendanceTable.closest(".datatable-wrapper");
                 if (wrapper) {
-                    const selectorLabel = wrapper.querySelector(".datatable-selector-wrapper label, .datatable-dropdown label");
-                    if (selectorLabel) {
-                        selectorLabel.innerHTML = selectorLabel.innerHTML.replace(/\{select\}\s*/g, "");
-                    }
-
-                    const selector = wrapper.querySelector('.datatable-dropdown select');
-                    if (selector) {
-                        const lastOption = selector.lastElementChild;
-                        if (lastOption) {
-                            lastOption.textContent = 'All';
-                        }
-                    }
-
                     const topSection = wrapper.querySelector(".datatable-top");
                     if (topSection) {
+                        // Create search and buttons container
+                        const searchAndButtonsContainer = document.createElement("div");
+                        searchAndButtonsContainer.className = "datatable-search-and-buttons";
+
+                        // Get search element
                         const searchElement = topSection.querySelector(".datatable-search");
                         if (searchElement) {
-                            const searchAndButtons = document.createElement("div");
-                            searchAndButtons.className = "datatable-search-and-buttons";
-
                             topSection.removeChild(searchElement);
-                            searchAndButtons.appendChild(searchElement);
-                            topSection.appendChild(searchAndButtons);
+                            searchAndButtonsContainer.appendChild(searchElement);
+                        }
 
-                            searchElement.style.float = "none";
-                            searchElement.style.margin = "0";
-                            searchElement.style.maxWidth = "180px";
+                        // Append container to top section
+                        topSection.appendChild(searchAndButtonsContainer);
 
-                            if (!searchElement.querySelector(".icon-search")) {
-                                const iconElement = document.createElement("i");
-                                iconElement.className = "ph-duotone ph-magnifying-glass icon-search";
-                                searchElement.prepend(iconElement);
+                        // Add download and print buttons
+                        const buttonContainer = document.createElement("div");
+                        buttonContainer.className = "datatable-custom-buttons";
+
+                        const downloadBtn = document.createElement("a");
+                        downloadBtn.href = "#";
+                        downloadBtn.className = "btn btn-secondary me-2";
+                        downloadBtn.setAttribute("data-bs-toggle", "tooltip");
+                        downloadBtn.setAttribute("title", "Download Now");
+                        downloadBtn.innerHTML = '<i class="ti ti-download"></i>';
+                        downloadBtn.addEventListener("click", function(e) {
+                            e.preventDefault();
+                            exportToExcel();
+                        });
+
+                        const printBtn = document.createElement("a");
+                        printBtn.href = "#";
+                        printBtn.className = "btn btn-primary";
+                        printBtn.setAttribute("data-bs-toggle", "tooltip");
+                        printBtn.setAttribute("title", "Print");
+                        printBtn.innerHTML = '<i class="ti ti-printer"></i>';
+                        printBtn.addEventListener("click", function(e) {
+                            e.preventDefault();
+                            printReport();
+                        });
+
+                        buttonContainer.appendChild(downloadBtn);
+                        buttonContainer.appendChild(printBtn);
+                        searchAndButtonsContainer.appendChild(buttonContainer);
+                    }
+
+                    // Move Entries selector to bottom
+                    const bottomSection = wrapper.querySelector(".datatable-bottom");
+                    if (bottomSection && topSection) {
+                        const topSelector = topSection.querySelector(".datatable-selector-wrapper");
+                        if (topSelector) {
+                            const infoElement = bottomSection.querySelector(".datatable-info");
+                            if (infoElement) {
+                                bottomSection.insertBefore(topSelector, infoElement);
+                            } else {
+                                bottomSection.prepend(topSelector);
+                            }
+                            topSelector.style.float = "left";
+                            topSelector.style.clear = "left";
+                            topSelector.style.marginBottom = "10px";
+                            topSelector.style.width = "auto";
+                            if (infoElement) {
+                                infoElement.style.clear = "left";
+                                infoElement.style.marginTop = "5px";
                             }
                         }
                     }
 
-                    const bottomSection = wrapper.querySelector(".datatable-bottom");
+                    // Normalize perPage label and All text
+                    const selectorLabel = wrapper.querySelector(".datatable-selector-wrapper label, .datatable-dropdown label");
+                    if (selectorLabel) {
+                        selectorLabel.innerHTML = selectorLabel.innerHTML.replace(/\{select\}\s*/g, "");
+                    }
+                    const selector = wrapper.querySelector('.datatable-dropdown select');
+                    if (selector && selector.lastElementChild) {
+                        selector.lastElementChild.textContent = 'All';
+                    }
+
+                    // Make pagination float right
                     if (bottomSection) {
                         const paginationElement = bottomSection.querySelector(".datatable-pagination");
                         if (paginationElement) {
                             paginationElement.style.float = "right";
-                            paginationElement.style.marginTop = "0px";
+                            paginationElement.style.marginTop = "-45px";
                         }
                     }
+
+                    // Bind perPage selector for pc-dt-attendance
+                    const bindAttendancePerPageSelector = function (wrapperElement) {
+                        if (!wrapperElement || wrapperElement.dataset.boundPerPageDelegate === "1") return;
+
+                        wrapperElement.addEventListener("change", function (e) {
+                            const target = e.target;
+                            if (!(target instanceof HTMLSelectElement)) return;
+
+                            if (
+                                !target.closest(".datatable-dropdown") &&
+                                !target.classList.contains("datatable-selector") &&
+                                !target.classList.contains("form-select")
+                            ) {
+                                return;
+                            }
+
+                            const nextPerPage = parseInt(target.value, 10);
+                            if (!Number.isFinite(nextPerPage) || nextPerPage <= 0) return;
+
+                            dataTable.options.perPage = nextPerPage;
+                            dataTable._currentPage = 1;
+                            dataTable.update();
+
+                            if (typeof dataTable._fixHeight === "function") {
+                                dataTable._fixHeight();
+                            }
+                        });
+
+                        wrapperElement.dataset.boundPerPageDelegate = "1";
+                    };
+
+                    bindAttendancePerPageSelector(wrapper);
                 }
-            }, 100);
-        };
-
-        initializeTable("registerTable");
-        initializeTable("attendanceTable");
-    }
-
-    // Dynamic month selector sync
-    $('#payrollMonth, #payrollFY').on('change', function() {
-        let m = $('#payrollMonth').val();
-        let fy = $('#payrollFY').val();
-        let fullStr = m + ' ' + (fy === '2026-27' ? '2026' : '2025');
-
-        $('.active-month-text').text(fullStr);
-        $('#generationDate').text('05-' + (m === 'July' ? '07' : m === 'June' ? '06' : m === 'May' ? '05' : '04') + '-' + (fy === '2026-27' ? '2026' : '2025'));
+            }, 500);
+        }
     });
-});
 
-// Select Summary display logic
-function selectSummary(type) {
-    // Manage active menu highlights
-    $('#summarySelectorList button').removeClass('active');
-    event.currentTarget.classList.add('active');
 
-    // Update badge text
-    let badgeText = 'Salary Sheet Summary';
-    if(type === 'pf_summary') badgeText = 'PF Liability Summary';
-    if(type === 'esi_summary') badgeText = 'ESI Summary';
-    if(type === 'pt_summary') badgeText = 'P-Tax Summary';
-    if(type === 'tds_summary') badgeText = 'TDS Summary';
-    if(type === 'lwf_summary') badgeText = 'LWF Summary';
-    if(type === 'gratuity_summary') badgeText = 'Gratuity Summary';
-    $('#summaryBadge').text(badgeText);
-
-    // Switch visible table section
-    $('.summary-table-section').addClass('d-none');
-    $('#summary_' + type).removeClass('d-none');
-}
-
-// Print Handler
-function printReport() {
-    window.print();
-}
-
-// Export PDF Handler
-function exportToPDF() {
-    window.print();
-}
-
-// Export Excel Handler
-function exportToExcel() {
-    alert('Exporting report as Excel spreadsheet...');
-}
-
-// Download ECR Text file return
-function downloadEcrText() {
-    const preElement = document.querySelector("#pf_text_view pre");
-    if (preElement) {
-        const text = preElement.innerText;
-        const blob = new Blob([text], { type: "text/plain" });
-        const anchor = document.createElement("a");
-        anchor.download = "PF_ECR_Return.txt";
-        anchor.href = window.URL.createObjectURL(blob);
-        anchor.target = "_blank";
-        anchor.style.display = "none";
-        document.body.appendChild(anchor);
-        anchor.click();
-        document.body.removeChild(anchor);
-    } else {
-        alert("ECR text content not found.");
-    }
-}
-
-// Switch ESI tabs
-function switchEsiTab(tab, btn) {
-    $('.active-esi-tab-btn').removeClass('active bg-white text-primary').addClass('text-secondary');
-    $(btn).addClass('active bg-white text-primary').removeClass('text-secondary');
+    //------------ Yearly and monthly Initialization ------------
     
-    if (tab === 'summary') {
-        $('#esiSummaryTitle').text('ESI Summary - MC Excel');
-        $('#esi_summary_table_view').removeClass('d-none');
-        $('#esi_upload_table_view').addClass('d-none');
-    } else {
-        $('#esiSummaryTitle').text('ESIC ONLINE SHEET FOR UPLOAD');
-        $('#esi_summary_table_view').addClass('d-none');
-        $('#esi_upload_table_view').removeClass('d-none');
-    }
-}
+    document.addEventListener("DOMContentLoaded", function () {
 
-// Switch PF tabs
-function switchPfTab(tab, btn) {
-    $('.active-pf-tab-btn').removeClass('active bg-white text-primary').addClass('text-secondary');
-    $(btn).addClass('active bg-white text-primary').removeClass('text-secondary');
+        const monthSelect = document.getElementById("payrollMonth");
+        const fySelect = document.getElementById("payrollFY");
+
+        // Financial Year starts from April
+        const fyMonths = [
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+            "January",
+            "February",
+            "March"
+        ];
+
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth(); // 0=Jan
+
+        // Current FY
+        let fyStartYear = (currentMonth >= 3) ? currentYear : currentYear - 1;
+
+        // Generate FY options (Previous, Current, Next)
+        for (let y = fyStartYear - 1; y <= fyStartYear + 1; y++) {
+            let option = document.createElement("option");
+            option.value = `${y}-${y + 1}`;
+            option.text = `FY ${y}-${y + 1}`;
+            if (y === fyStartYear) {
+                option.selected = true;
+            }
+            fySelect.appendChild(option);
+        }
+
+        // Populate months
+        function loadMonths(selectedFY) {
+
+            monthSelect.innerHTML = "";
+
+            fyMonths.forEach(month => {
+                let option = document.createElement("option");
+                option.value = month;
+                option.text = month;
+
+                // Default current month only for current FY
+                const currentMonthName = today.toLocaleString('default', { month: 'long' });
+
+                if (
+                    selectedFY === `${fyStartYear}-${fyStartYear + 1}` &&
+                    month === currentMonthName
+                ) {
+                    option.selected = true;
+                }
+
+                monthSelect.appendChild(option);
+            });
+        }
+
+        // Initial load
+        loadMonths(fySelect.value);
+
+        // Reload months when FY changes
+        fySelect.addEventListener("change", function () {
+            loadMonths(this.value);
+        });
+
+    });
+
     
-    if (tab === 'table') {
-        $('#pfSummaryTitle').text('PF ECR - Table View');
-        $('#pf_table_view').removeClass('d-none');
-        $('#pf_text_view').addClass('d-none');
-    } else {
-        $('#pfSummaryTitle').text('EPF ECR Text File Return Format');
-        $('#pf_table_view').addClass('d-none');
-        $('#pf_text_view').removeClass('d-none');
-    }
-}
+    
+    $(document).ready(function () {
+        $('#register-tab').on('shown.bs.tab', function () {
+            loadPayrollRegister();
+        });
 
-// Initialize custom Datatables for Attendance
-document.addEventListener("DOMContentLoaded", function () {
-    const attendanceTable = document.getElementById("pc-dt-attendance");
-    if (attendanceTable && typeof simpleDatatables !== 'undefined') {
-        const totalRows = attendanceTable.querySelectorAll('tbody tr').length;
-        const dataTable = new simpleDatatables.DataTable(attendanceTable, {
-            sortable: true,
-            perPage: 10,
-            perPageSelect: [5, 10, 15, 20, 25, 50, totalRows],
-            searchable: true,
-            fixedHeight: false,
-            labels: {
-                placeholder: "Search...",
-                perPage: "entries per page",
-                noRows: "No data available",
-                info: "Showing {start} to {end} of {rows} entries",
-            },
-            layout: {
-                top: "{select}{search}",
-                bottom: "{info}{pager}",
-            },
-            classes: {
-                active: "active",
-                disabled: "disabled",
-                selector: "form-select",
-                input: "form-control",
-                paginationList: "pagination",
+        loadPayrollSummary();
+        loadPayrollRegister();
+
+        $('#payrollMonth, #payrollFY').on('change', function () {
+            loadPayrollSummary();
+
+            if ($('#register-tab').hasClass('active')) {
+                loadPayrollRegister();
             }
         });
 
-        // Add action buttons and style layout like pc-dt-simple
-        setTimeout(function () {
-            const wrapper = attendanceTable.closest(".datatable-wrapper");
-            if (wrapper) {
-                const topSection = wrapper.querySelector(".datatable-top");
-                if (topSection) {
-                    // Create search and buttons container
-                    const searchAndButtonsContainer = document.createElement("div");
-                    searchAndButtonsContainer.className = "datatable-search-and-buttons";
+        function loadPayrollSummary() {
 
-                    // Get search element
-                    const searchElement = topSection.querySelector(".datatable-search");
-                    if (searchElement) {
-                        topSection.removeChild(searchElement);
-                        searchAndButtonsContainer.appendChild(searchElement);
+            $.ajax({
+                url: "{{ route('payroll.report.summary') }}",
+                type: "GET",
+                data: {
+                    month: $('#payrollMonth').val(),
+                    fy: $('#payrollFY').val()
+                },
+                success: function(res) {
+
+                    $('#totalActiveEmployees').text(res.total_active_employees);
+
+                    $('#grossSalary').text('₹' + Number(res.gross_salary).toLocaleString('en-IN'));
+                    $('#netSalary').text('₹' + Number(res.net_salary).toLocaleString('en-IN'));
+                    $('#pfLiability').text('₹' + Number(res.pf_liability).toLocaleString('en-IN'));
+                    $('#esiLiability').text('₹' + Number(res.esi_liability).toLocaleString('en-IN'));
+                    $('#ptLiability').text('₹' + Number(res.pt_liability).toLocaleString('en-IN'));
+                    $('#tdsLiability').text('₹' + Number(res.tds_liability).toLocaleString('en-IN'));
+
+                    $('#paymentSummary').text(
+                        'Paid: ' + res.paid + ' / ' + res.total_active_employees
+                    );
+
+                    $('#paidCount').html(
+                        '<i class="ph ph-check-circle"></i> ' + res.paid + ' Paid'
+                    );
+
+                    $('#unpaidCount').html(
+                        '<i class="ph ph-x-circle"></i> ' + res.unpaid + ' Unpaid'
+                    );
+
+                }
+            });
+
+        }
+
+        function loadPayrollRegister() {
+
+            $.ajax({
+                url: "{{ route('payroll.report.register') }}",
+                type: "GET",
+                data: {
+                    month: $('#payrollMonth').val(),
+                    fy: $('#payrollFY').val()
+                },
+                beforeSend: function () {
+                    $('#payrollRegisterBody').html(`
+                        <tr>
+                            <td colspan="13" class="text-center py-4">
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                Loading...
+                            </td>
+                        </tr>
+                    `);
+                },
+                success: function (response) {
+
+                    console.log(response);
+
+                    const rows = Array.isArray(response)
+                        ? response
+                        : (response?.data || response?.employees || []);
+
+                    let html = '';
+
+                    if (rows.length > 0) {
+
+                        $.each(rows, function(index, row){
+
+                            html += `
+                                <tr>
+                                    <td class="fw-bold">${row.employee_id || ''}</td>
+
+                                    <td>${row.name || ''}</td>
+
+                                    <td>${row.designation_name || ''}</td>
+
+                                    <td>${row.joining_date || ''}</td>
+
+                                    <td>₹${Number(row.total_addition || 0).toLocaleString('en-IN',{
+                                        minimumFractionDigits:2,
+                                        maximumFractionDigits:2
+                                    })}</td>
+
+                                    <td class="fw-bold text-primary">
+                                        ₹${Number(row.net_sal || 0).toLocaleString('en-IN',{
+                                            minimumFractionDigits:2,
+                                            maximumFractionDigits:2
+                                        })}
+                                    </td>
+
+                                    <td>₹${Number(row.provident_fund || 0).toLocaleString('en-IN')}</td>
+
+                                    <td>₹${Number(row.esi || 0).toLocaleString('en-IN')}</td>
+
+                                    <td>₹${Number(row.ptax || 0).toLocaleString('en-IN')}</td>
+
+                                    <td>₹${Number(row.tds || 0).toLocaleString('en-IN')}</td>
+
+                                    <td>₹${Number(row.advance || 0).toLocaleString('en-IN')}</td>
+
+                                    <td>₹${Number(row.loan_deduction || 0).toLocaleString('en-IN')}</td>
+
+                                    <td>
+                                        ${
+                                            row.payment_status === 'Salary Done'
+                                            ? '<span class="badge bg-light-success text-success rounded-pill">Salary Done</span>'
+                                            : '<span class="badge bg-light-warning text-warning rounded-pill">Payment Pending</span>'
+                                        }
+                                    </td>
+                                </tr>`;
+                        });
+
+                    } else {
+
+                        html = `
+                            <tr>
+                                <td colspan="13" class="text-center text-muted">
+                                    No employee found.
+                                </td>
+                            </tr>`;
                     }
 
-                    // Append container to top section
-                    topSection.appendChild(searchAndButtonsContainer);
+                    $('#payrollRegisterBody').html(html);
+                    
 
-                    // Add download and print buttons
-                    const buttonContainer = document.createElement("div");
-                    buttonContainer.className = "datatable-custom-buttons";
+                },
+                error: function(xhr) {
+                    console.log(xhr);
 
-                    const downloadBtn = document.createElement("a");
-                    downloadBtn.href = "#";
-                    downloadBtn.className = "btn btn-secondary me-2";
-                    downloadBtn.setAttribute("data-bs-toggle", "tooltip");
-                    downloadBtn.setAttribute("title", "Download Now");
-                    downloadBtn.innerHTML = '<i class="ti ti-download"></i>';
-                    downloadBtn.addEventListener("click", function(e) {
-                        e.preventDefault();
-                        exportToExcel();
-                    });
-
-                    const printBtn = document.createElement("a");
-                    printBtn.href = "#";
-                    printBtn.className = "btn btn-primary";
-                    printBtn.setAttribute("data-bs-toggle", "tooltip");
-                    printBtn.setAttribute("title", "Print");
-                    printBtn.innerHTML = '<i class="ti ti-printer"></i>';
-                    printBtn.addEventListener("click", function(e) {
-                        e.preventDefault();
-                        printReport();
-                    });
-
-                    buttonContainer.appendChild(downloadBtn);
-                    buttonContainer.appendChild(printBtn);
-                    searchAndButtonsContainer.appendChild(buttonContainer);
+                    $('#payrollRegisterBody').html(`
+                        <tr>
+                            <td colspan="13" class="text-center text-danger">
+                                Failed to load payroll register.
+                            </td>
+                        </tr>
+                    `);
                 }
+            });
+        }
 
-                // Move Entries selector to bottom
-                const bottomSection = wrapper.querySelector(".datatable-bottom");
-                if (bottomSection && topSection) {
-                    const topSelector = topSection.querySelector(".datatable-selector-wrapper");
-                    if (topSelector) {
-                        const infoElement = bottomSection.querySelector(".datatable-info");
-                        if (infoElement) {
-                            bottomSection.insertBefore(topSelector, infoElement);
-                        } else {
-                            bottomSection.prepend(topSelector);
-                        }
-                        topSelector.style.float = "left";
-                        topSelector.style.clear = "left";
-                        topSelector.style.marginBottom = "10px";
-                        topSelector.style.width = "auto";
-                        if (infoElement) {
-                            infoElement.style.clear = "left";
-                            infoElement.style.marginTop = "5px";
-                        }
-                    }
-                }
+    });
 
-                // Normalize perPage label and All text
-                const selectorLabel = wrapper.querySelector(".datatable-selector-wrapper label, .datatable-dropdown label");
-                if (selectorLabel) {
-                    selectorLabel.innerHTML = selectorLabel.innerHTML.replace(/\{select\}\s*/g, "");
-                }
-                const selector = wrapper.querySelector('.datatable-dropdown select');
-                if (selector && selector.lastElementChild) {
-                    selector.lastElementChild.textContent = 'All';
-                }
 
-                // Make pagination float right
-                if (bottomSection) {
-                    const paginationElement = bottomSection.querySelector(".datatable-pagination");
-                    if (paginationElement) {
-                        paginationElement.style.float = "right";
-                        paginationElement.style.marginTop = "-45px";
-                    }
-                }
-
-                // Bind perPage selector for pc-dt-attendance
-                const bindAttendancePerPageSelector = function (wrapperElement) {
-                    if (!wrapperElement || wrapperElement.dataset.boundPerPageDelegate === "1") return;
-
-                    wrapperElement.addEventListener("change", function (e) {
-                        const target = e.target;
-                        if (!(target instanceof HTMLSelectElement)) return;
-
-                        if (
-                            !target.closest(".datatable-dropdown") &&
-                            !target.classList.contains("datatable-selector") &&
-                            !target.classList.contains("form-select")
-                        ) {
-                            return;
-                        }
-
-                        const nextPerPage = parseInt(target.value, 10);
-                        if (!Number.isFinite(nextPerPage) || nextPerPage <= 0) return;
-
-                        dataTable.options.perPage = nextPerPage;
-                        dataTable._currentPage = 1;
-                        dataTable.update();
-
-                        if (typeof dataTable._fixHeight === "function") {
-                            dataTable._fixHeight();
-                        }
-                    });
-
-                    wrapperElement.dataset.boundPerPageDelegate = "1";
-                };
-
-                bindAttendancePerPageSelector(wrapper);
-            }
-        }, 500);
-    }
-});
 </script>
 @endsection
