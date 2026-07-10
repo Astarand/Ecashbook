@@ -495,6 +495,17 @@
 					.focus();
 
 				$('#inv_date').val('').prop('readonly', false);
+				
+				// Enable seller fields
+				$('#seller_name,#seller_contact,#seller_email,#seller_pan,#seller_gst')
+					.prop('readonly', false)
+					.val('');
+
+				$('#seller_addone,#seller_addtwo,#seller_pin')
+					.prop('readonly', false)
+					.val('');
+
+				$('#seller_state,#city').prop('disabled', false).val('');
 
 				return; // Stop API call
 			}

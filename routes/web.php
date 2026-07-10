@@ -1264,5 +1264,6 @@ Route::middleware(['ensure.login'])->group(function () {
 	//-------- payroll report routes --------//
 	Route::get('/payroll-report/summary', [PayrollReportController::class, 'summary'])->name('payroll.report.summary');
 	Route::get('/payroll-report/register', [PayrollReportController::class, 'payrollRegister'])->name('payroll.report.register');
+	Route::get('/payroll/report/attendance', [PayrollReportController::class, 'attendanceRegister'])->name('payroll.report.attendance');
 	
 });

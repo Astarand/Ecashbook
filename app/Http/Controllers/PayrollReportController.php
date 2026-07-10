@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+
 
 class PayrollReportController extends Controller
 {
@@ -220,6 +223,244 @@ class PayrollReportController extends Controller
         }
 
         return response()->json($employees);
+    }
+
+    public function attendanceRegister(Request $request)
+    {
+        $ownerId = currentOwnerId();
+
+        $month = Carbon::parse('1 ' . $request->month)->month;
+
+        [$fyStart, $fyEnd] = explode('-', $request->fy);
+
+        $year = ($month >= 4) ? $fyStart : $fyEnd;
+
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate   = Carbon::create($year, $month, 1)->endOfMonth();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Weekly Schedule
+        |--------------------------------------------------------------------------
+        */
+
+        $weeklySchedule = DB::table('weekly_schedules')
+            ->where('added_by', $ownerId)
+            ->get()
+            ->keyBy(function ($row) {
+                return strtolower($row->day);
+            });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Holidays
+        |--------------------------------------------------------------------------
+        */
+
+        $holidayDates = DB::table('holidays')
+            ->where('added_by', $ownerId)
+            ->whereBetween('holidayDate', [$startDate, $endDate])
+            ->pluck('holidayDate')
+            ->map(function ($date) {
+                return Carbon::parse($date)->format('Y-m-d');
+            })
+            ->toArray();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Employees
+        |--------------------------------------------------------------------------
+        */
+
+        $employees = DB::table('employees')
+            ->where('added_by', $ownerId)
+            ->get();
+
+        $data = [];
+
+        foreach ($employees as $employee) {
+
+            $user = DB::table('users')
+                ->where('id', $employee->empId)
+                ->first();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Attendance Records
+            |--------------------------------------------------------------------------
+            */
+
+            $attendanceRecords = DB::table('attendance')
+                ->where('userId', $employee->empId)
+                ->whereBetween('present_date', [$startDate, $endDate])
+                ->get();
+
+            $attendanceDays = $attendanceRecords->count();
+
+            $wfhDays = $attendanceRecords
+                ->where('work_location_status', 'WFH')
+                ->count();
+
+            $attendanceDates = $attendanceRecords
+                ->pluck('present_date')
+                ->map(function ($date) {
+                    return Carbon::parse($date)->format('Y-m-d');
+                })
+                ->toArray();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Late Hours & Overtime Hours
+            |--------------------------------------------------------------------------
+            */
+
+            $lateHours = 0;
+            $overtimeHours = 0;
+
+            foreach ($attendanceRecords as $record) {
+
+                $dayName = strtolower(Carbon::parse($record->present_date)->format('l'));
+
+                $schedule = $weeklySchedule[$dayName] ?? null;
+
+                if (!$schedule || $schedule->status != 'open') {
+                    continue;
+                }
+
+                // Late Hours
+                if (!empty($record->in_time)) {
+
+                    $openingTime = Carbon::parse($record->present_date . ' ' . $schedule->opening_time);
+
+                    $inTime = Carbon::parse($record->present_date . ' ' . $record->in_time);
+
+                    if ($inTime->gt($openingTime)) {
+
+                        $lateHours += $openingTime->diffInMinutes($inTime) / 60;
+                    }
+                }
+
+                // Overtime Hours
+                if (!empty($record->out_time)) {
+
+                    $closingTime = Carbon::parse($record->present_date . ' ' . $schedule->closing_time);
+
+                    $outTime = Carbon::parse($record->present_date . ' ' . $record->out_time);
+
+                    if ($outTime->gt($closingTime)) {
+
+                        $overtimeHours += $closingTime->diffInMinutes($outTime) / 60;
+                    }
+                }
+            }
+
+            $lateHours = round($lateHours, 2);
+            $overtimeHours = round($overtimeHours, 2);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Approved Leave
+            |--------------------------------------------------------------------------
+            */
+
+            $approvedLeaves = DB::table('leaves')
+                ->where('employee_id', $employee->employee_id)
+                ->where('status', 'approved')
+                ->where(function ($q) use ($startDate, $endDate) {
+
+                    $q->whereBetween('start_date', [$startDate, $endDate])
+                        ->orWhereBetween('end_date', [$startDate, $endDate])
+                        ->orWhere(function ($qq) use ($startDate, $endDate) {
+
+                            $qq->where('start_date', '<=', $startDate)
+                                ->where('end_date', '>=', $endDate);
+                        });
+                })
+                ->get();
+
+            $leaveDays = 0;
+            $leaveDates = [];
+
+            foreach ($approvedLeaves as $leave) {
+
+                $leaveStart = Carbon::parse($leave->start_date);
+
+                $leaveEnd = Carbon::parse($leave->end_date);
+
+                if ($leaveStart->lt($startDate)) {
+                    $leaveStart = $startDate->copy();
+                }
+
+                if ($leaveEnd->gt($endDate)) {
+                    $leaveEnd = $endDate->copy();
+                }
+
+                $leaveDays += $leaveStart->diffInDays($leaveEnd) + 1;
+
+                $period = CarbonPeriod::create($leaveStart, $leaveEnd);
+
+                foreach ($period as $day) {
+
+                    $leaveDates[] = $day->format('Y-m-d');
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Absent Days
+            |--------------------------------------------------------------------------
+            */
+
+            $absentDays = 0;
+
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+
+                $currentDate = $date->format('Y-m-d');
+
+                $dayName = strtolower($date->format('l'));
+
+                // Weekly Off
+                if (!isset($weeklySchedule[$dayName]) || $weeklySchedule[$dayName]->status != 'open') {
+                    continue;
+                }
+
+                // Holiday
+                if (in_array($currentDate, $holidayDates)) {
+                    continue;
+                }
+
+                // Leave
+                if (in_array($currentDate, $leaveDates)) {
+                    continue;
+                }
+
+                // Present
+                if (in_array($currentDate, $attendanceDates)) {
+                    continue;
+                }
+
+                $absentDays++;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Response
+            |--------------------------------------------------------------------------
+            */
+
+            $data[] = [
+                'employee_id'     => $employee->employee_id,
+                'employee_name'   => $user->name ?? '',
+                'attendance_days' => $attendanceDays,
+                'absent_days'     => $absentDays,
+                'leave_days'      => $leaveDays,
+                'late_hours'      => $lateHours,
+                'overtime_hours'  => $overtimeHours,
+                'wfh_days'        => $wfhDays,
+            ];
+        }
+
+        return response()->json($data);
     }
 
 }

@@ -279,30 +279,33 @@
                     @else
                     {{$item->selling_price}}
                     @endif</span></td>
-                <td>
-                  <span><i class="ti ti-dots-vertical f-20"></i></span>
-                  <div class="prod-action-links">
-                    <ul class="list-inline me-auto mb-0">
-                      <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="History">
-                        <a href="javascript:void(0);" class="avtar avtar-xs btn-link-warning btn-pc-default view-history" data-id="{{$item->id}}" data-code="{{$item->prodId}}" data-name="{{ $item->item_type == 'service' ? ($item->service_name ?? 'No Service Name') : ($item->item_name ?? 'No Product Name') }}" data-bs-toggle="modal" data-bs-target="#historyModal">
-                          <i class="ti ti-eye f-18"></i>
-                        </a>
-                      </li>
+                <td class="text-end">
+                  <ul class="list-inline mb-0">
+                    <li class="list-inline-item">
+                      <a href="javascript:void(0);" class="btn btn-warning btn-sm view-history" data-id="{{$item->id}}" data-code="{{$item->prodId}}" data-name="{{ $item->item_type == 'service' ? ($item->service_name ?? 'No Service Name') : ($item->item_name ?? 'No Product Name') }}" data-bs-toggle="modal" data-bs-target="#historyModal" aria-label="History">
+                        <i class="ti ti-eye f-20 me-2"></i> History
+                      </a>
+                    </li>
 
-                      @if($req_type != 1)
-                      <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Stock In">
-                        <a href="{{ route('user.CreatePurchaseInvoices') }}" class="avtar avtar-xs btn-link-success btn-pc-default item-row">
-                          <i class="ti ti-circle-plus f-18"></i>
-                        </a>
-                      </li>
-                      <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Stock Out">
-                        <a href="{{ route('user.CreateSalesInvoices') }}" class="avtar avtar-xs btn-link-danger btn-pc-default item-row">
-                          <i class="ti ti-circle-minus f-18"></i>
-                        </a>
-                      </li>
-                      @endif
-                    </ul>
-                  </div>
+                    @if($req_type != 1)
+                    <li class="list-inline-item">
+                      <a href="{{ route('user.CreatePurchaseInvoices') }}" class="btn btn-success btn-sm item-row" aria-label="Stock in">
+                        <i class="ti ti-circle-plus f-20 me-2"></i> Stock in
+                      </a>
+                      {{-- <a href="javascript:void(0);" class="btn btn-success btn-sm item-row" data-id="{{$item->id}}" data-item-type="{{$item->item_type}}" data-name="{{ $item->item_type == 'service' ? ($item->service_name ?? 'No Service Name') : ($item->item_name ?? 'No Product Name') }}" data-bs-toggle="modal" data-bs-target="#stockInModal" aria-label="Stock in">
+                        <i class="ti ti-circle-plus f-20 me-2"></i> Stock in
+                      </a> --}}
+                    </li>
+                    <li class="list-inline-item">
+                      <a href="{{ route('user.CreateSalesInvoices') }}" class="btn btn-danger btn-sm item-row" aria-label="Stock out">
+                        <i class="ti ti-circle-minus f-20 me-2"></i> Stock out
+                      </a>
+                      {{-- <a href="javascript:void(0);" class="btn btn-danger btn-sm item-row" data-bs-toggle="modal" data-id="{{$item->id}}" data-item-type="{{$item->item_type}}" data-name="{{ $item->item_type == 'service' ? ($item->service_name ?? 'No Service Name') : ($item->item_name ?? 'No Product Name') }}" data-bs-target="#stockOutModal" aria-label="Stock out">
+                        <i class="ti ti-circle-minus f-20 me-2"></i> Stock out
+                      </a> --}}
+                    </li>
+                    @endif
+                  </ul>
                 </td>
               </tr>
               @endforeach

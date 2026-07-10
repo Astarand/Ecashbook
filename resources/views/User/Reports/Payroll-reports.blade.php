@@ -315,7 +315,8 @@
                         <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
                             <h5 class="fw-bold mb-3 text-dark d-flex align-items-center"><i class="ph-duotone ph-calendar text-primary me-2 fs-5"></i> Attendance & Leave Register - <span class="active-month-text text-primary">July 2026</span></h5>
                             <div class="table-responsive border rounded-3">
-                                <table class="table tbl-product m-0 custom-list-table align-middle" id="pc-dt-attendance">
+                                <table class="table tbl-product m-0 custom-list-table align-middle" id="payrollAttendance">
+                                {{-- <table class="table tbl-product m-0 custom-list-table align-middle" id="pc-dt-attendance"> --}}
                                     <thead class="bg-light">
                                         <tr class="text-secondary small fw-bold">
                                             <th class="ps-3 py-3">Employee ID</th>
@@ -328,67 +329,8 @@
                                             <th class="pe-3 py-3">WFH (Days)</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP001</td>
-                                            <td class="fw-bold text-dark">Rahul Verma</td>
-                                            <td>22</td>
-                                            <td>0</td>
-                                            <td>1</td>
-                                            <td>1.5</td>
-                                            <td>8</td>
-                                            <td class="pe-3">4</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP002</td>
-                                            <td class="fw-bold text-dark">Sneha Iyer</td>
-                                            <td>20</td>
-                                            <td>1</td>
-                                            <td>2</td>
-                                            <td>0</td>
-                                            <td>4</td>
-                                            <td class="pe-3">8</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP003</td>
-                                            <td class="fw-bold text-dark">David Miller</td>
-                                            <td>23</td>
-                                            <td>0</td>
-                                            <td>0</td>
-                                            <td>2</td>
-                                            <td>10</td>
-                                            <td class="pe-3">0</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP004</td>
-                                            <td class="fw-bold text-dark">Ananya Sen</td>
-                                            <td>21</td>
-                                            <td>0</td>
-                                            <td>2</td>
-                                            <td>0.5</td>
-                                            <td>0</td>
-                                            <td class="pe-3">5</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP005</td>
-                                            <td class="fw-bold text-dark">Vikram Rathore</td>
-                                            <td>18</td>
-                                            <td>2</td>
-                                            <td>3</td>
-                                            <td>4</td>
-                                            <td>12</td>
-                                            <td class="pe-3">2</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="ps-3 fw-bold">EMP006</td>
-                                            <td class="fw-bold text-dark">Priya Sharma</td>
-                                            <td>22</td>
-                                            <td>0</td>
-                                            <td>1</td>
-                                            <td>0.5</td>
-                                            <td>2</td>
-                                            <td class="pe-3">3</td>
-                                        </tr>
+                                    <tbody id="attendanceRegisterBody">
+                                        
                                     </tbody>
                                 </table>
                             </div>
@@ -1896,6 +1838,7 @@
 
         $('#payrollMonth, #payrollFY').on('change', function () {
             loadPayrollSummary();
+            loadAttendanceRegister();
 
             if ($('#register-tab').hasClass('active')) {
                 loadPayrollRegister();
@@ -1959,8 +1902,6 @@
                     `);
                 },
                 success: function (response) {
-
-                    console.log(response);
 
                     const rows = Array.isArray(response)
                         ? response
@@ -2042,6 +1983,70 @@
                     `);
                 }
             });
+        }
+
+        //------------ Attendance Register Initialization ------------
+        $('#attendance-tab').on('click', function () {
+            loadAttendanceRegister();
+        });
+
+        function loadAttendanceRegister() {
+
+            
+            $.ajax({
+                url: "{{ route('payroll.report.attendance') }}",
+                type: "GET",
+                data: {
+                    month: $('#payrollMonth').val(),
+                    fy: $('#payrollFY').val()
+                },
+                beforeSend: function () {
+                    $('#attendanceRegisterBody').html(`
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                Loading...
+                            </td>
+                        </tr>
+                    `);
+                },
+
+                success: function(response) {
+
+                    let html = '';
+
+                    if(response.length == 0){
+
+                        html += `
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                No Record Found
+                            </td>
+                        </tr>`;
+
+                    }else{
+
+                        $.each(response, function(index, row){
+
+                            html += `
+                            <tr>
+                                <td class="ps-3 fw-bold">${row.employee_id}</td>
+                                <td class="fw-bold text-dark">${row.employee_name}</td>
+                                <td>${row.attendance_days}</td>
+                                <td>${row.absent_days}</td>
+                                <td>${row.leave_days}</td>
+                                <td>${row.late_hours}</td>
+                                <td>${row.overtime_hours}</td>
+                                <td class="pe-3">${row.wfh_days}</td>
+                            </tr>`;
+                        });
+
+                    }
+
+                    $('#attendanceRegisterBody').html(html);
+                }
+            });
+
         }
 
     });
