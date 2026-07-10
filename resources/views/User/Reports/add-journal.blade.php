@@ -64,15 +64,23 @@
                             <label class="form-label">Purpose of Entry <span class="text-danger">*</span></label>
                             <select class="form-select" name="entry_type" id="entry_type" required>
                                 <option value="" selected>Please Select</option>
-                                <option value="Adjustment">Adjustment</option>
-                                <!--<option value="Advance">Advance</option>-->
+                                <!--<option value="Adjustment">Adjustment</option>
+                                <option value="Advance">Advance</option>
                                 <option value="Accrual">Accrual</option>
                                 <option value="Depreciation">Depreciation</option>
                                 <option value="Opening Balance">Opening Balance</option>
                                 <option value="Correction">Correction</option>
                                 <option value="Transfer">Transfer</option>
                                 <option value="Provision">Provision</option>
-                                <option value="Third Party Settlement">Third Party Settlement</option>
+                                <option value="Third Party Settlement">Third Party Settlement</option>-->
+								<option value="Depreciation">Depreciation</option>
+								<option value="Provision">Provision</option>
+								<option value="Accrual">Accrual</option>
+								<option value="Opening Balance">Opening Balance</option>
+								<option value="Rectification">Rectification</option>
+								<option value="Year-end Adjustment">Year-end Adjustment</option>
+								<option value="Ledger Transfer">Ledger Transfer</option>
+								<option value="Prior Period Adjustment">Prior Period Adjustment</option>
                             </select>
                         </div>
 

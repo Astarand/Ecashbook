@@ -58,6 +58,7 @@ use App\Http\Controllers\User\Reports\ProfitLossController;
 use App\Http\Controllers\User\Reports\BalanceSheetController;
 use App\Http\Controllers\User\DigitalSignedController;
 use App\Http\Controllers\User\MSMEBenefitHubController;
+use App\Http\Controllers\PayrollReportController;
 
 
 /* User/Company Employee Controller */
@@ -1259,7 +1260,10 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::delete('/dropdown-values/delete/{id}', [DropdownValueController::class, 'destroy'])->name('dropdown.delete');
 
 	Route::post('/purchase_shipping_cost',[PurchaseController::class,'purchaseShippingCost']);
-	
-	Route::get('/payment-voucher/export',[PaymentVoucherController::class, 'exportPaymentVoucher'])->name('paymentVoucher.export');
 
+	//-------- payroll report routes --------//
+	Route::get('/payroll-report/summary', [PayrollReportController::class, 'summary'])->name('payroll.report.summary');
+	Route::get('/payroll-report/register', [PayrollReportController::class, 'payrollRegister'])->name('payroll.report.register');
+	Route::get('/payroll/report/attendance', [PayrollReportController::class, 'attendanceRegister'])->name('payroll.report.attendance');
+	
 });

@@ -251,6 +251,10 @@
 								<i class="ti ti-refresh"></i>
 								Reset
 							</a>
+							<a href="{{ route('paymentVoucher.export', request()->query()) }}"
+							   class="btn btn-success">
+								<i class="ti ti-file-export"></i> Export Excel
+							</a>
 						</div>
 					</form>
 				</div>
@@ -260,7 +264,8 @@
             <div class="card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
                 <div class="card-body table-card p-3">
                     <div class="table-responsive">
-                        <table class="table tbl-product mb-0" id="pc-dt-simple">
+                        <!--<table class="table tbl-product mb-0" id="pc-dt-simple">-->
+                        <table class="table tbl-product mb-0" id="">
                             <thead>
                                 <tr style="background-color: #cbcbcb;">
                                     <th class="text-end py-3">#</th>
@@ -283,7 +288,7 @@
                         <tbody>
                             @forelse($data as $key => $v)
                             <tr>
-								<td>{{ $loop->iteration }}</td>
+								<td>{{ $data->firstItem() + $loop->index }}</td>
 								@if($hasProprietorship)
                                 <td><span class="text-muted text-hover-primary">{{ !empty($v->prop_comp_name) ? $v->prop_comp_name : $v->comp_name }}</span></td>
 								@endif
@@ -390,7 +395,9 @@
 
                         </tbody>
                     </table>
-					
+					<div class="mt-3 d-flex justify-content-end">
+						{{ $data->links('pagination::bootstrap-4') }}
+					</div>
                 </div>
             </div>
         </div>

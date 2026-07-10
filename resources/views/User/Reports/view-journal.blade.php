@@ -63,15 +63,14 @@
 							<label class="form-label">Purpose of Entry <span class="text-danger">*</span></label>
 							<select class="form-select" name="entry_type" id="entry_type" disabled>
 								<option value="" {{ (($journal->entry_type ?? '') === '') ? 'selected' : '' }}>Please Select</option>
-								<option value="Adjustment" {{ (($journal->entry_type ?? '') === 'Adjustment') ? 'selected' : '' }}>Adjustment</option>
-								<!--<option value="Advance" {{ (($journal->entry_type ?? '') === 'Advance') ? 'selected' : '' }}>Advance</option>-->
-								<option value="Accrual" {{ (($journal->entry_type ?? '') === 'Accrual') ? 'selected' : '' }}>Accrual</option>
 								<option value="Depreciation" {{ (($journal->entry_type ?? '') === 'Depreciation') ? 'selected' : '' }}>Depreciation</option>
-								<option value="Opening Balance" {{ (($journal->entry_type ?? '') === 'Opening Balance') ? 'selected' : '' }}>Opening Balance</option>
-								<option value="Correction" {{ (($journal->entry_type ?? '') === 'Correction') ? 'selected' : '' }}>Correction</option>
-								<option value="Transfer" {{ (($journal->entry_type ?? '') === 'Transfer') ? 'selected' : '' }}>Transfer</option>
 								<option value="Provision" {{ (($journal->entry_type ?? '') === 'Provision') ? 'selected' : '' }}>Provision</option>
-								<option value="Third Party Settlement" {{ (($journal->entry_type ?? '') === 'Third Party Settlement') ? 'selected' : '' }}>Third Party Settlement</option>
+								<option value="Accrual" {{ (($journal->entry_type ?? '') === 'Accrual') ? 'selected' : '' }}>Accrual</option>
+								<option value="Opening Balance" {{ (($journal->entry_type ?? '') === 'Opening Balance') ? 'selected' : '' }}>Opening Balance</option>
+								<option value="Rectification" {{ (($journal->entry_type ?? '') === 'Rectification') ? 'selected' : '' }}>Rectification</option>
+								<option value="Year-end Adjustment" {{ (($journal->entry_type ?? '') === 'Year-end Adjustment') ? 'selected' : '' }}>Year-end Adjustment</option>
+								<option value="Ledger Transfer" {{ (($journal->entry_type ?? '') === 'Ledger Transfer') ? 'selected' : '' }}>Ledger Transfer</option>
+								<option value="Prior Period Adjustment" {{ (($journal->entry_type ?? '') === 'Prior Period Adjustment') ? 'selected' : '' }}>Prior Period Adjustment</option>
 							</select>
 						</div>
 						{{-- <div class="col-sm-6 mb-3">

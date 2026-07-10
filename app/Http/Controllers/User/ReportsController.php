@@ -135,7 +135,7 @@ class ReportsController extends Controller
 				->where('added_by', $userId)
 				->when($propId, fn($q) => $q->where('propId', $propId))
 				->whereBetween('journal_date', [$from, $to])
-				->where('status','Posted')
+				//->where('status','Posted')
 				->orderBy('journal_date')
 				->orderBy('id')
 				->where(function($q) {
@@ -229,7 +229,7 @@ class ReportsController extends Controller
 		$rows = DB::table('journals')
 					->where('added_by',$userId)
 					->where('ledger',$ledger)
-					->where('status','Posted')
+					//->where('status','Posted')
 					->whereDate('journal_date','<',$fromDate)
 					->when($propId,function($q) use($propId){
 						$q->where('propId',$propId);
@@ -469,7 +469,9 @@ class ReportsController extends Controller
 			->leftJoin('banks as b', 'b.id', '=', 'bt.bankId')
 			->select('bt.*', 'b.bank_name')
 			->where('bt.added_by', $userId)
-			->where('bt.prop_id', $propId)
+			->when(!empty($propId), function ($query) use ($propId) {
+				$query->where('bt.prop_id', $propId);
+			})
 			->whereBetween('bt.tran_date', [$startDate, $endDate])
 			->orderBy('bt.tran_date', 'ASC')
 			->get();
@@ -527,34 +529,30 @@ class ReportsController extends Controller
 				if ((float)$voucher->amount == (float)$bankTran->tran_amt) {
 					$score += 50;
 				}
-
+				// Date Matching
 				if ($voucher->date == $tranDate) {
+					$score += 30;
+
+				} elseif (
+					$voucher->date == date('Y-m-d', strtotime($tranDate . ' -1 day')) ||
+					$voucher->date == date('Y-m-d', strtotime($tranDate . ' +1 day'))
+				) {
+					$score += 25;
+
+				} elseif (
+					$voucher->date == date('Y-m-d', strtotime($tranDate . ' -2 day')) ||
+					$voucher->date == date('Y-m-d', strtotime($tranDate . ' +2 day'))
+				) {
 					$score += 20;
-				} elseif (in_array($voucher->date, $datesToCheck)) {
-					$score += 10;
 				}
 
-				if (
-					!empty($voucher->reference_id)
-					&&
-					!empty($bankTran->ref_no)
-				) {
-
-					if (
-						trim($voucher->reference_id)
-						==
-						trim($bankTran->ref_no)
-					) {
-
+				if (!empty($voucher->reference_id) && !empty($bankTran->ref_no)) {
+					if (trim($voucher->reference_id) == trim($bankTran->ref_no)) {
 						$score += 40;
 					}
 				}
 
-				if (
-					!empty($bankTran->purpose)
-					&&
-					!empty($voucher->party_name)
-				) {
+				if (!empty($bankTran->purpose) && !empty($voucher->party_name)) {
 
 					if (
 						stripos(
@@ -600,7 +598,7 @@ class ReportsController extends Controller
 					'voucher_date'   => $bestMatch->date,
 					'voucher_amount' => $bestMatch->amount,
 					'purpose' 		 => $bestMatch->narration ?? '-',
-					'score'          => $bestScore,
+					'score'          => 100,
 					'status'         => 'Matched'
 				];
 
@@ -638,7 +636,7 @@ class ReportsController extends Controller
 					'voucher_date'   => '-',
 					'voucher_amount' => '-',
 					'purpose' 		 => $bestMatch->narration ?? '-',
-					'score'          => $bestScore,
+					'score'          => 0,
 					'status'         => 'Unmatched'
 				];
 			}
@@ -987,7 +985,7 @@ class ReportsController extends Controller
 		$rows = [];
 
 		$query = DB::table('journals')
-			->where('status', 'Posted')
+			//->where('status', 'Posted')
 			->whereBetween('journal_date', [$from, $to]);
 
 		// ================= FILTER: PROP OR USER =================
@@ -1049,11 +1047,49 @@ class ReportsController extends Controller
 		}
 
 		// ================= FILTER: LEDGER TYPE =================
-		if (!empty($ledger) && $ledger !== 'all') {
-			$query->where(function ($q) use ($ledger) {
-				$q->where('entry_type', ucfirst($ledger))
-				  ->orWhere('ledger', ucfirst($ledger));
-			});
+		if (!empty($ledger) && $ledger != 'all') {
+
+			switch ($ledger) {
+
+				case 'Sales':
+					$query->where('ledger', 'Sales');
+					break;
+
+				case 'Purchase':
+					$query->where('ledger', 'Purchase');
+					break;
+
+				case 'Customer':
+					$query->where('party_name', 'Customer');
+					break;
+
+				case 'Vendor':
+					$query->where('party_name', 'Vendor');
+					break;
+
+				case 'Bank':
+					$query->where(function ($q) {
+						$q->where('party_name', 'Bank')
+						  ->orWhere('ledger', 'LIKE', '%Bank%');
+					});
+					break;
+
+				case 'gst_output':
+					$query->whereIn('ledger', [
+						'Output CGST',
+						'Output SGST',
+						'Output IGST'
+					]);
+					break;
+
+				case 'gst_input':
+					$query->whereIn('ledger', [
+						'Input CGST',
+						'Input SGST',
+						'Input IGST'
+					]);
+					break;
+			}
 		}
 
 		// ================= FILTER: LEDGER GROUP =================
@@ -1116,7 +1152,8 @@ class ReportsController extends Controller
 
 				'balance'    => 0,
 				'dc'         => ($dcType === 'credit') ? 'Cr' : 'Dr',
-				'ledgername' => $j->ledger ?? ''
+				'ledgername' => $j->ledger ?? '',
+				'payment_status' => $j->payment_status ?? ''
 			];
 		}
 
@@ -1391,7 +1428,7 @@ class ReportsController extends Controller
 
 
 		$query = DB::table('payment_vouchers')
-			->where('record_type','Posted')
+			//->where('record_type','Posted')
 			->whereBetween('date',[$from,$to]);
 
 		if(!empty($propId)){

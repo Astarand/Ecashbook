@@ -472,7 +472,7 @@
 				$('.netCashFlow')
 					.text("₹ " + formatINR(net))
 					.toggleClass('text-danger', net < 0)
-					.toggleClass('text-success', net >= 0);
+					.toggleClass('text-black', net >= 0);
 				
 			}
 		});

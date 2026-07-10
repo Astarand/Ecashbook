@@ -32,6 +32,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Exports\PaymentVoucherExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\AuditLogger;
 use App\Services\JournalService;
 
@@ -473,6 +475,20 @@ class PaymentVoucherController extends Controller
 				'message' => $e->getMessage()
 			]);
 		}
+	}
+	
+	public function exportPaymentVoucher(Request $request)
+	{
+		$userId = currentOwnerId();
+
+		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
+			$userId = getAccessCompanyId($request);
+		}
+
+		return Excel::download(
+			new PaymentVoucherExport($request, $userId),
+			'Payment_Voucher_List_' . date('d-m-Y:His') . '.xlsx'
+		);
 	}
 
 

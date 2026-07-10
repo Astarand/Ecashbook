@@ -211,13 +211,13 @@
 
 									<option value="">Select Ledger</option>
 									<option value="all">General Entries</option>
-									<option value="sales">Sales Ledger</option>
-									<option value="purchase">Purchase Ledger</option>
-									<option value="customer">Customer Ledger</option>
-									<option value="supplier">Supplier Ledger</option>
-									<option value="bank">Bank Ledger</option>
-									<option value="gst_output">GST Output Ledger</option>
-									<option value="gst_input">GST Input Ledger</option>
+									<option value="Sales">Sales Ledger</option>
+                                    <option value="Purchase">Purchase Ledger</option>
+                                    <option value="Customer">Customer Ledger</option>
+                                    <option value="Vendor">Supplier Ledger</option>                                    
+                                    <option value="Bank">Bank Ledger</option>
+                                    <option value="gst_output">GST Output Ledger</option>
+                                    <option value="gst_input">GST Input Ledger</option>
 
 								</select>
 							</div>
