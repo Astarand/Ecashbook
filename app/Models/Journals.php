@@ -24,6 +24,7 @@ class Journals extends Model
         'debit_credit',
         'amount',
         'tot_amt',
+        'payment_status',
         'notes',
         'other_note',
 		'tds_applicable',

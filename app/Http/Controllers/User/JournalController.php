@@ -14,10 +14,15 @@ use PDF;
 use App\Models\Journals;
 use App\Models\JournalAttachments;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Services\PaymentVoucherService;
 
 
 class JournalController extends Controller
 {
+	public function __construct(PaymentVoucherService $paymentVoucherService = null)
+    {
+        $this->paymentVoucherService = $paymentVoucherService;
+    }
     
 	public function JournalList(Request $request)
 	{
@@ -354,11 +359,12 @@ class JournalController extends Controller
 				'reference_type'=> $request->reference_type,
 				'reference_no'  => $request->reference_no,
 				'entry_type'    => $request->entry_type,
-				'source'        => $request->source ?? null,
+				'source'        => $request->source ?? 'Journal',
 				'ledger'        => $request->ledger,
 				'party_name'    => $request->party_name ?? null,
 				'debit_credit'  => $request->debit_credit,
 				'amount'        => $request->amount,
+				'payment_status'=> 'Full',
 				'notes'         => $request->notes,
 				'other_note'    => $request->other_note,
 				'tds_applicable' 	  => $tdsData['tds_applicable'],
@@ -394,6 +400,9 @@ class JournalController extends Controller
 					]);
 				}
 			}
+			
+			$amount = $request->amount ?? 0;
+			$this->paymentVoucherService->storePaymentVoucherEntries($journal->id,'Journal',$amount);
 
 			DB::commit();
 
@@ -429,11 +438,12 @@ class JournalController extends Controller
 				'reference_type' => $request->reference_type,
 				'reference_no'   => $request->reference_no,
 				'entry_type'     => $request->entry_type,
-				'source'         => $request->source ?? null,
+				'source'         => $request->source ?? 'Journal',
 				'ledger'         => $request->ledger,
 				'party_name'     => $request->party_name ?? null,
 				'debit_credit'   => $request->debit_credit,
 				'amount'         => $request->amount,
+				'payment_status' => 'Full',
 				'notes'          => $request->notes,
 				'other_note'     => $request->other_note,
 				'tds_applicable' 	  => $tdsData['tds_applicable'],
@@ -471,6 +481,9 @@ class JournalController extends Controller
 				}
 			}
 
+			$amount = $request->amount ?? 0;
+			$this->paymentVoucherService->storePaymentVoucherEntries($id,'Journal',$amount);
+			
 			DB::commit();
 
 			return response()->json([

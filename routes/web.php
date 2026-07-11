@@ -58,6 +58,7 @@ use App\Http\Controllers\User\Reports\ProfitLossController;
 use App\Http\Controllers\User\Reports\BalanceSheetController;
 use App\Http\Controllers\User\DigitalSignedController;
 use App\Http\Controllers\User\MSMEBenefitHubController;
+use App\Http\Controllers\PayrollReportController;
 
 
 /* User/Company Employee Controller */
@@ -458,6 +459,9 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::post('/check-payslip', [EmployeeManagemnet::class, 'checkPayslip'])->name('check.payslip');
 	Route::post('/save-payslip', [EmployeeManagemnet::class, 'savePayslip']);
 	Route::get('/download-payslip/{id}', [EmployeeManagemnet::class, 'downloadPayslip']);
+
+	Route::get('/payslip/update', [EmployeeManagemnet::class, 'updatePayslip'])->name('payroll.payslip_update');
+
 
 	/* Employee Policies */
 	Route::get('/employee-policy/create/{subject}', [EmployeePolicy::class, 'create'])->name('employee.policy.create');
@@ -1262,4 +1266,8 @@ Route::middleware(['ensure.login'])->group(function () {
 	
 	Route::get('/payment-voucher/export',[PaymentVoucherController::class, 'exportPaymentVoucher'])->name('paymentVoucher.export');
 
+	//-------- payroll report routes --------//
+	Route::get('/payroll-report/summary', [PayrollReportController::class, 'summary'])->name('payroll.report.summary');
+	Route::get('/payroll-report/register', [PayrollReportController::class, 'payrollRegister'])->name('payroll.report.register');
+	Route::get('/payroll/report/attendance', [PayrollReportController::class, 'attendanceRegister'])->name('payroll.report.attendance');
 });

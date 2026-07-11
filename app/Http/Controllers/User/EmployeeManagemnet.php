@@ -5387,4 +5387,9 @@ public function downloadPayslip($id)
 		return response()->json($slabs);
 	}
 
+	public function updatePayslip()
+    {	
+        return view('User.payslip_update');
+    }
+
 }

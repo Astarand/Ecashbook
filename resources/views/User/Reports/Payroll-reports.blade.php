@@ -353,8 +353,68 @@
                         <div class="tab-pane fade" id="summaries" role="tabpanel" aria-labelledby="summaries-tab">
                             <div class="row">
                                 {{-- Left panel: Report selection --}}
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <!-- Financial Year -->
+                                    <select class="form-select form-select-sm" id="financial_year" style="width:150px;">
+                                        @php
+                                            $currentYear = date('Y');
+                                            $currentMonth = date('n');
+                                            $fyStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
+                                        @endphp
+
+                                        @for($i = 0; $i < 5; $i++)
+                                            @php
+                                                $start = $fyStart - $i;
+                                                $end = $start + 1;
+                                            @endphp
+
+                                            <option value="{{ $start }}-{{ $end }}" {{ $i==0 ? 'selected' : '' }}>
+                                                FY {{ $start }}-{{ $end }}
+                                            </option>
+                                        @endfor
+                                    </select>
+
+                                    <!-- Summary Type -->
+                                    <select class="form-select form-select-sm" id="summary_type" style="width:130px;">
+                                        <option value="monthly" selected>Monthly</option>
+                                        <option value="quarterly">Quarterly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
+
+                                    <!-- Month -->
+                                    <select class="form-select form-select-sm" id="month" style="width:130px;">
+                                        <option value="April">April</option>
+                                        <option value="May">May</option>
+                                        <option value="June">June</option>
+                                        <option value="July" selected>July</option>
+                                        <option value="August">August</option>
+                                        <option value="September">September</option>
+                                        <option value="October">October</option>
+                                        <option value="November">November</option>
+                                        <option value="December">December</option>
+                                        <option value="January">January</option>
+                                        <option value="February">February</option>
+                                        <option value="March">March</option>
+                                    </select>
+
+                                    <!-- Quarter -->
+                                    <select class="form-select form-select-sm d-none" id="quarter" style="width:150px;">
+                                        <option value="Q1">Q1 (Apr-Jun)</option>
+                                        <option value="Q2" selected>Q2 (Jul-Sep)</option>
+                                        <option value="Q3">Q3 (Oct-Dec)</option>
+                                        <option value="Q4">Q4 (Jan-Mar)</option>
+                                    </select>
+                                </div>
+
                                 <div class="col-md-4 mb-3">
-                                    <h6 class="fw-bold mb-3 text-dark text-uppercase small-text"><i class="ph-duotone ph-folders text-primary me-2"></i>Available Summaries</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+
+                                        <h6 class="fw-bold mb-0 text-dark text-uppercase small-text">
+                                            <i class="ph-duotone ph-folders text-primary me-2"></i>
+                                            Available Summaries
+                                        </h6>
+                                    </div>
+
                                     <div class="list-group rounded-3 shadow-none border" id="summarySelectorList">
                                         <button onclick="selectSummary('salary_sheet')" class="list-group-item list-group-item-action active py-3 d-flex align-items-center justify-content-between fw-semibold">
                                             <span class="d-flex align-items-center gap-2">
@@ -2048,6 +2108,32 @@
             });
 
         }
+
+
+        ///------- --- Report Financial Year dropdown ------------
+
+        function updateFilters() {
+
+            let type = $('#summary_type').val();
+
+            $('#month').addClass('d-none');
+            $('#quarter').addClass('d-none');
+
+            if (type === 'monthly') {
+                $('#month').removeClass('d-none');
+            } else if (type === 'quarterly') {
+                $('#quarter').removeClass('d-none');
+            }
+            // Yearly: neither month nor quarter is shown.
+        }
+
+        updateFilters();
+
+        $('#summary_type').on('change', function () {
+            updateFilters();
+        });
+
+        
 
     });
 

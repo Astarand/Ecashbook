@@ -42,6 +42,9 @@
                     <div class="page-header-title">
                         <h2 class="mb-0">Payslip Management</h2>
                     </div>
+                    <a href="{{ route('payroll.payslip_update') }}" class="btn btn-primary float-end">
+                        Update Payslip
+                    </a>
                 </div>
             </div>
         </div>

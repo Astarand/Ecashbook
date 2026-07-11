@@ -113,21 +113,47 @@ class ProfitLossController extends Controller
 							COALESCE(sv.gov_pay,0) +
 							COALESCE(sv.ser_pay,0)
 						"));
-		//Get Sales Vouchers
-		$voucherTotals = DB::table('vouchers')
-						->selectRaw("
-							SUM(CASE WHEN note_type = 'Credit' THEN total_amt ELSE 0 END) AS total_credit,
-							SUM(CASE WHEN note_type = 'Debit' THEN total_amt ELSE 0 END) AS total_debit
-						")
-						->where('added_by', $userId)
-						//->where('status', 1)
-						->whereBetween('inv_date', [$startDate, $endDate])
-						->first();
-
-		$totalSalesVoucherCr = $voucherTotals->total_credit ?? 0;
-		$totalSalesVoucherDr = $voucherTotals->total_debit ?? 0;
 		
-		$profit_sale = ($totalReseller + $totalService) - $totalSalesVoucherCr + $totalSalesVoucherDr;
+		//Start Sales credit/debit
+		$invoiceType = DB::table('sales as s')
+						->join('sales_values as sv', 'sv.sid', '=', 's.id')
+						->join('products as p', 'p.id', '=', 'sv.prod_id')
+						->select(
+							's.inv_num',
+							DB::raw('MAX(p.item_type) as item_type')
+						)
+						->where('s.added_by', $userId)
+						->whereBetween('s.inv_date', [$startDate, $endDate])
+						->groupBy('s.inv_num');
+						
+		$voucherAdjustments = DB::table('vouchers as v')
+				->joinSub($invoiceType, 't', function ($join) {
+					$join->on('t.inv_num', '=', 'v.invoice_number');
+				})
+				->selectRaw("
+					t.item_type,
+					SUM(CASE WHEN v.note_type='Credit' THEN v.total_amt ELSE 0 END) AS credit,
+					SUM(CASE WHEN v.note_type='Debit' THEN v.total_amt ELSE 0 END) AS debit
+				")
+				->where('v.added_by', $userId)
+				->whereBetween('v.inv_date', [$startDate, $endDate])
+				->groupBy('t.item_type')
+				->get();
+		//End Sales credit/debit
+		$productCr = $productDr = $serviceCr = $serviceDr = 0;
+		foreach ($voucherAdjustments as $row) {
+			if ($row->item_type == 'product') {
+				$productCr = $row->credit;
+				$productDr = $row->debit;
+			} else {
+				$serviceCr = $row->credit;
+				$serviceDr = $row->debit;
+			}
+		}
+
+		$totalReseller = ($totalReseller - $productCr + $productDr);
+		$totalService  = ($totalService - $serviceCr + $serviceDr);
+		$profit_sale = $totalReseller + $totalService;
 
 		/* ================================
 		 | OTHER INCOME - TDS amount
@@ -224,25 +250,52 @@ class ProfitLossController extends Controller
 						->where('status', 1)
 						->whereBetween('inv_date', [$startDate, $endDate])
 						->sum('shipping_cost');
-						
-		//Get Purchase Vouchers
-		$voucherPurTotals = DB::table('voucher_purchases')
-						->selectRaw("
-							SUM(CASE WHEN note_type = 'Credit' THEN total_amt ELSE 0 END) AS total_credit,
-							SUM(CASE WHEN note_type = 'Debit' THEN total_amt ELSE 0 END) AS total_debit
-						")
-						->where('added_by', $userId)
-						//->where('status', 1)
-						->whereBetween('inv_date', [$startDate, $endDate])
-						->first();
+		
+		//Start Purchase credit/debit
+		$purchaseInvoiceType = DB::table('purchases as p')
+			->join('purchase_values as pv', 'pv.sid', '=', 'p.id')
+			->join('products as pr', 'pr.id', '=', 'pv.prod_id')
+			->selectRaw('
+				p.inv_num,
+				MAX(pr.item_type) as item_type
+			')
+			->where('p.added_by', $userId)
+			->whereBetween('p.inv_date', [$startDate, $endDate])
+			->groupBy('p.id', 'p.inv_num');
 
-		$totalPurchaseVoucherCr = $voucherPurTotals->total_credit ?? 0;
-		$totalPurchaseVoucherDr = $voucherPurTotals->total_debit ?? 0;
+		$purchaseVoucherAdjustments = DB::table('voucher_purchases as vp')
+			->joinSub($purchaseInvoiceType, 't', function ($join) {
+				$join->on('t.inv_num', '=', 'vp.inv_number');
+			})
+			->selectRaw("
+				t.item_type,
+				SUM(CASE WHEN vp.note_type='Credit' THEN vp.total_amt ELSE 0 END) AS credit,
+				SUM(CASE WHEN vp.note_type='Debit' THEN vp.total_amt ELSE 0 END) AS debit
+			")
+			->where('vp.added_by', $userId)
+			->whereBetween('vp.inv_date', [$startDate, $endDate])
+			->groupBy('t.item_type')
+			->get();
 
-		//$purchases = ($itemTotal ?? 0) + ($shippingTotal ?? 0);
-		$purchases = ($itemTotal ?? 0);
-		$totalPurchases = ($itemTotal ?? 0) - ($totalPurchaseVoucherCr ?? 0)  + ($totalPurchaseVoucherDr ?? 0);
+		$productPurchaseCr = $productPurchaseDr = 0;
+		$servicePurchaseCr = $servicePurchaseDr = 0;
 
+		foreach ($purchaseVoucherAdjustments as $row) {
+			if ($row->item_type == 'product') {
+				$productPurchaseCr = $row->credit;
+				$productPurchaseDr = $row->debit;
+			} elseif ($row->item_type == 'service') {
+				$servicePurchaseCr = $row->credit;
+				$servicePurchaseDr = $row->debit;
+			}
+		}
+		
+		$totalPurchaseVoucherCr = $productPurchaseCr + $servicePurchaseCr;
+		$totalPurchaseVoucherDr = $productPurchaseDr + $servicePurchaseDr;
+		$purchases = (($itemTotal ?? 0) - $totalPurchaseVoucherCr  + $totalPurchaseVoucherDr);
+		$totalPurchases = (($itemTotal ?? 0) - $totalPurchaseVoucherCr  + $totalPurchaseVoucherDr);
+		//End Purchase credit/debit
+		
 		/*
 		|--------------------------------------------------------------------------
 		| Direct Expenses
@@ -338,13 +391,10 @@ class ProfitLossController extends Controller
 
 		$closingStock = $closingStock ?? 0;
 		$directExpenseTotal = array_sum($directExpenseArray);
-		//$cogsTotal = ($openingStock + $purchases + $directExpenseTotal - $closingStock);
 		$cogsTotal = ($openingStock + $totalPurchases + $directExpenseTotal - $closingStock);
 		$cogs = [
 			'opening_stock'  => $openingStock,
 			'purchases'      => $purchases,
-			'totalPurchaseVoucherCr'      => $totalPurchaseVoucherCr,
-			'totalPurchaseVoucherDr'      => $totalPurchaseVoucherDr,
 			'direct_expense' => $directExpenseArray,
 			'directExpenseTotal'=> $directExpenseTotal,
 			'closing_stock'  => $closingStock,
@@ -458,9 +508,7 @@ class ProfitLossController extends Controller
 		return [
 			'revenue' => [
 				'totalReseller' => $totalReseller,
-				'totalService' => $totalService,				
-				'totalSalesVoucherCr' => $totalSalesVoucherCr,				
-				'totalSalesVoucherDr' => $totalSalesVoucherDr,				
+				'totalService' => $totalService,								
 				'operatingIncomeDetails' => $operatingIncomeDetails,
 				'operatingIncomeTotal' => $operatingIncomeTotal,
 				'nonOperatingIncomeDetails' => $nonOperatingIncomeDetails,
