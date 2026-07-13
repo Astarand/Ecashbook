@@ -244,7 +244,12 @@
                     </div>
                     <div class="col-md-12 text-end mt-4">
                         <button type="button" id="" onclick="printBankReport()" class="btn btn-secondary me-2">Print</button>
-                        <a href="javascript:void(0);" onclick="downloadBalanceSheetPdf()" class="btn btn-primary">Download</a>
+                        <a href="javascript:void(0);" onclick="downloadBalanceSheetPdf(0)" class="btn btn-primary">Download</a>
+						<a href="javascript:void(0)"
+						   class="btn btn-success"
+						   onclick="downloadBalanceSheetPdf(1)">
+							Summary PDF
+						</a>
                     </div>
                 </div>
             </div>
@@ -281,23 +286,37 @@
 		location.reload();
 	}
 
-	function downloadBalanceSheetPdf() {
+	function downloadBalanceSheetPdf(details) {
 		let tableHtml = document.querySelector('.table-responsive').innerHTML;
 		$.ajax({
 			url: "{{ route('balancesheet.download.pdf') }}",
 			type: "POST",
 			data: {
 				_token: "{{ csrf_token() }}",
+				financial_year:$('#financial-year').val(),
+				period_type:$('#period-type').val(),
+				dynamic_period:$('#dynamic-period').val(),
+				details:details,
 				html: tableHtml
 			},
 			xhrFields: {
 				responseType: 'blob'
 			},
-			success: function (response) {
-				let blob = new Blob([response], { type: "application/pdf" });
+			success: function(response) {
+
+				let blob = new Blob([response], {
+					type: "application/pdf"
+				});
+
 				let link = document.createElement('a');
 				link.href = window.URL.createObjectURL(blob);
-				link.download = "Balance_Sheet.pdf";
+
+				if(details == 1){
+					link.download = "Balance_Sheet_Summary.pdf";
+				}else{
+					link.download = "Balance_Sheet.pdf";
+				}
+
 				link.click();
 			}
 		});

@@ -4305,6 +4305,7 @@ class EmployeeManagemnet extends Controller
 				'payslip_text' => $request->notes ?? '',
 				'date' => $request->generate_date,
 				'emp_salary_slip_response' => $jsonToStore,
+				'added_by' => $uid,
 				'created_at' => now(),
 				'updated_at' => now(),
 			]);

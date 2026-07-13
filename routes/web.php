@@ -1270,4 +1270,8 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/payroll-report/summary', [PayrollReportController::class, 'summary'])->name('payroll.report.summary');
 	Route::get('/payroll-report/register', [PayrollReportController::class, 'payrollRegister'])->name('payroll.report.register');
 	Route::get('/payroll/report/attendance', [PayrollReportController::class, 'attendanceRegister'])->name('payroll.report.attendance');
+	Route::get('/payroll/payslip/list', [PayrollReportController::class, 'getPayslipList'])->name('payroll.payslip.list');
+	Route::post('/payroll/payslip/update', [PayrollReportController::class, 'updatePayslips'])->name('payroll.payslip.update');
+	Route::get('/payroll/tds/list', [PayrollReportController::class, 'getTdsList'])->name('payroll.tds.list');
+	Route::post('/payroll/tds/update', [PayrollReportController::class, 'updateTds'])->name('payroll.tds.update');
 });

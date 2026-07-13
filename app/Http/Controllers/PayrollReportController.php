@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
 
+
 class PayrollReportController extends Controller
 {
     public function summary(Request $request)
@@ -461,6 +462,207 @@ class PayrollReportController extends Controller
         }
 
         return response()->json($data);
+    }
+
+    //------- Payslip List -------//
+    public function getPayslipList(Request $request)
+    {
+        $ownerId = currentOwnerId();
+
+        $financialYear = $request->financial_year;
+        $month = Carbon::parse('1 ' . $request->month)->month;
+
+        $payslips = DB::table('user_payslip')
+            ->leftJoin('employees', 'employees.empId', '=', 'user_payslip.user_emp_id')
+            ->leftJoin('users', 'users.id', '=', 'user_payslip.user_emp_id')
+            ->where('user_payslip.added_by', $ownerId)
+            ->where('user_payslip.financial_year', $financialYear)
+            ->where('user_payslip.month', $month)
+            ->select(
+                'user_payslip.id',
+                'user_payslip.user_emp_id',
+                'employees.employee_id',
+                'users.name',
+                'user_payslip.date',
+                'user_payslip.payment_date',
+                'user_payslip.payment_trans_id'
+            )
+            ->orderBy('users.name')
+            ->get();
+
+        return response()->json($payslips);
+    }
+
+    //------- Update Payslips -------//
+    public function updatePayslips(Request $request)
+    {
+        $ownerId = currentOwnerId();
+
+        $ids = (array) $request->input('ids', []);
+
+        if (empty($ids)) {
+            return response()->json(['message' => 'No payslip IDs provided.'], 422);
+        }
+
+        $paymentDate = $request->input('payment_date');
+        $transactionId = $request->input('transaction_id');
+
+        $update = [];
+
+        if ($paymentDate) {
+            $update['payment_date'] = $paymentDate;
+        }
+
+        if ($transactionId) {
+            $update['payment_trans_id'] = $transactionId;
+        }
+
+        $update['payment_status'] = 'Done';
+
+        try {
+            $affected = DB::table('user_payslip')
+                ->whereIn('id', $ids)
+                ->where('added_by', $ownerId)
+                ->update($update);
+
+            return response()->json(['message' => "Updated {$affected} record(s)", 'updated' => $affected]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Update failed: ' . $e->getMessage()], 500);
+        }
+    }
+
+    //------- Update TDS -------//
+    public function updateTds(Request $request)
+    {
+        $ownerId = currentOwnerId();
+
+        $ids = (array) $request->input('ids', []);
+
+        if (empty($ids)) {
+            return response()->json(['message' => 'No TDS IDs provided.'], 422);
+        }
+
+        $utr = $request->input('tds_challan_no');
+        $bsr = $request->input('tds_bsr_code');
+        $depositDate = $request->input('tds_deposit_date');
+
+        $update = [];
+
+        if ($utr) {
+            $update['tds_challan_no'] = $utr;
+        }
+        if ($bsr) {
+            $update['tds_bsr_code'] = $bsr;
+        }
+        if ($depositDate) {
+            $update['tds_deposit_date'] = $depositDate;
+        }
+
+        $update['tds_deposit_status'] = 'Done';
+
+        try {
+            $affected = DB::table('user_payslip')
+                ->whereIn('id', $ids)
+                ->where('added_by', $ownerId)
+                ->update($update);
+
+            return response()->json(['message' => "Updated {$affected} record(s)", 'updated' => $affected]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'TDS update failed: ' . $e->getMessage()], 500);
+        }
+    }
+
+    //------- TDS List -------//
+
+    public function getTdsList(Request $request)
+    {
+        $ownerId = currentOwnerId();
+
+        $financialYear = $request->financial_year;
+        $filterType = $request->filter_type;
+        $period = $request->period;
+
+        $query = DB::table('user_payslip')
+            ->leftJoin('employees', 'employees.empId', '=', 'user_payslip.user_emp_id')
+            ->leftJoin('users', 'users.id', '=', 'user_payslip.user_emp_id')
+            ->where('user_payslip.added_by', $ownerId)
+            ->where('user_payslip.financial_year', $financialYear);
+
+        // Apply filter based on filter type
+        if ($filterType == 'monthly' && !empty($period)) {
+
+            $month = Carbon::parse('1 ' . $period)->month;
+            $query->where('user_payslip.month', $month);
+
+        } elseif ($filterType == 'quarterly' && !empty($period)) {
+
+            switch ($period) {
+                case 'Q1':
+                    $months = [4, 5, 6];
+                    break;
+
+                case 'Q2':
+                    $months = [7, 8, 9];
+                    break;
+
+                case 'Q3':
+                    $months = [10, 11, 12];
+                    break;
+
+                case 'Q4':
+                    $months = [1, 2, 3];
+                    break;
+
+                default:
+                    $months = [];
+            }
+
+            if (!empty($months)) {
+                $query->whereIn('user_payslip.month', $months);
+            }
+
+        } elseif ($filterType == 'half-yearly' && !empty($period)) {
+
+            switch ($period) {
+                case 'H1':
+                    $months = [4, 5, 6, 7, 8, 9];
+                    break;
+
+                case 'H2':
+                    $months = [10, 11, 12, 1, 2, 3];
+                    break;
+
+                default:
+                    $months = [];
+            }
+
+            if (!empty($months)) {
+                $query->whereIn('user_payslip.month', $months);
+            }
+
+        } elseif ($filterType == 'yearly') {
+
+            // No month filter required.
+            // Only financial_year condition will be applied.
+
+        }
+
+        $tds = $query->select(
+                'user_payslip.id',
+                'user_payslip.user_emp_id',
+                'employees.employee_id',
+                'users.name',
+                'user_payslip.financial_year',
+                'user_payslip.month',
+                'user_payslip.tds_challan_no',
+                'user_payslip.tds_bsr_code',
+                'user_payslip.tds_deposit_date',
+                'user_payslip.tds_deposit_status'
+            )
+            ->orderBy('users.name')
+            ->get();
+
+        return response()->json($tds);
     }
 
 }

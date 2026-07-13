@@ -30,7 +30,7 @@
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                         <h4 class="mb-0">Update Center</h4>
                         <div class="btn-group" role="group" aria-label="Update section switcher">
-                            <button type="button" class="btn btn-primary active" data-target="payslip-section">Payslip</button>
+                            <button type="button" class="btn btn-primary" data-target="payslip-section">Payslip</button>
                             <button type="button" class="btn btn-outline-primary" data-target="tds-section">Update TDS</button>
                         </div>
                     </div>
@@ -41,42 +41,75 @@
                         $currentYear = date('Y');
                         $financialYears = [];
                         for ($year = $currentYear - 2; $year <= $currentYear + 1; $year++) {
-                            $financialYears[] = $year . '-' . ($year + 1);
+                           $financialYears[] = $year . '-' . ($year + 1);
                         }
 
-                        $payslipRecords = [
-                            ['emp_id' => 'EMP-001', 'name' => 'John Doe', 'generated_on' => '2026-07-01', 'payment_date' => '2026-07-10', 'transaction_id' => 'TXN-1001'],
-                            ['emp_id' => 'EMP-002', 'name' => 'Jane Smith', 'generated_on' => '2026-07-02', 'payment_date' => '', 'transaction_id' => ''],
-                            ['emp_id' => 'EMP-003', 'name' => 'Mark Wilson', 'generated_on' => '2026-07-03', 'payment_date' => '2026-07-11', 'transaction_id' => 'TXN-1003'],
-                        ];
+                        $currentYear = date('Y');
+                        $currentMonth = date('n');
 
-                        $tdsRecords = [
-                            ['emp_id' => 'EMP-001', 'name' => 'John Doe', 'financial_year' => '2025-2026', 'period_type' => 'Monthly', 'period' => 'July', 'amount' => '₹ 5,000', 'utr' => '-', 'update_date' => '-'],
-                            ['emp_id' => 'EMP-002', 'name' => 'Jane Smith', 'financial_year' => '2026-2027', 'period_type' => 'Quarterly', 'period' => 'Q1 (Jan-Mar)', 'amount' => '₹ 8,400', 'utr' => '-', 'update_date' => '-'],
-                            ['emp_id' => 'EMP-003', 'name' => 'Mark Wilson', 'financial_year' => '2024-2025', 'period_type' => 'Yearly', 'period' => '-', 'amount' => '₹ 12,000', 'utr' => '-', 'update_date' => '-'],
-                        ];
+                        $fyStart = ($currentMonth >= 4)
+                            ? $currentYear
+                            : $currentYear - 1;
+
+                        $previousMonth = date('F', strtotime('first day of last month'));
                     @endphp
+
+                    {{-- Payslip Section --}}
 
                     <div id="payslip-section">
                         <div class="row g-3 align-items-end mb-4">
                             <div class="col-md-4">
                                 <label class="form-label">Financial Year</label>
-                                <select class="form-select">
-                                    @foreach($financialYears as $financialYear)
-                                        <option value="{{ $financialYear }}" {{ $financialYear == end($financialYears) ? 'selected' : '' }}>{{ $financialYear }}</option>
-                                    @endforeach
+                                <select class="form-select" id="financial_year">
+
+                                    @for($i=0;$i<5;$i++)
+
+                                        @php
+                                            $start = $fyStart-$i;
+                                            $end = $start+1;
+                                        @endphp
+
+                                        <option value="{{ $start }}-{{ $end }}"
+                                            {{ $i==0 ? 'selected':'' }}>
+                                            {{ $start }}-{{ $end }}
+                                        </option>
+
+                                    @endfor
+
                                 </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Month</label>
-                                <select class="form-select">
-                                    @foreach(['January','February','March','April','May','June','July','August','September','October','November','December'] as $month)
-                                        <option value="{{ $month }}" {{ $month == $currentMonth ? 'selected' : '' }}>{{ $month }}</option>
+                                <select class="form-select" id="month">
+
+                                    @foreach([
+                                    'January',
+                                    'February',
+                                    'March',
+                                    'April',
+                                    'May',
+                                    'June',
+                                    'July',
+                                    'August',
+                                    'September',
+                                    'October',
+                                    'November',
+                                    'December'
+                                    ] as $month)
+
+                                    <option value="{{ $month }}"
+                                        {{ $month==$previousMonth ? 'selected':'' }}>
+
+                                        {{ $month }}
+
+                                    </option>
+
                                     @endforeach
+
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <button type="button" class="btn btn-primary w-100">Apply Filter</button>
+                                <button type="button" class="btn btn-primary w-100" id="btnFilter">Apply Filter</button>
                             </div>
                         </div>
 
@@ -85,16 +118,16 @@
                                 <div class="row g-3 align-items-end">
                                     <div class="col-md-4">
                                         <label class="form-label">Payment Date</label>
-                                        <input type="date" class="form-control">
+                                        <input type="date" id="payment_date_input" class="form-control">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Transaction ID</label>
-                                        <input type="text" class="form-control" placeholder="Enter transaction ID">
+                                        <input type="text" id="transaction_id_input" class="form-control" placeholder="Enter transaction ID">
                                     </div>
                                     <div class="col-md-4">
                                         <div class="d-flex gap-2">
-                                            <button type="button" class="btn btn-success">Single Update</button>
-                                            <button type="button" class="btn btn-outline-success">Multiple Update</button>
+                                            <button type="button" id="btnSingleUpdate" class="btn btn-success">Single Update</button>
+                                            <button type="button" id="btnMultipleUpdate" class="btn btn-outline-success">Multiple Update</button>
                                         </div>
                                     </div>
                                 </div>
@@ -113,36 +146,45 @@
                                         <th>Transaction ID</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @foreach($payslipRecords as $record)
-                                        <tr>
-                                            <td><input type="checkbox" class="payslip-row-checkbox"></td>
-                                            <td>{{ $record['emp_id'] }}</td>
-                                            <td>{{ $record['name'] }}</td>
-                                            <td>{{ $record['generated_on'] }}</td>
-                                            <td>{{ $record['payment_date'] ?: '-' }}</td>
-                                            <td>{{ $record['transaction_id'] ?: '-' }}</td>
-                                        </tr>
-                                    @endforeach
+                                <tbody id="payslipTable">
+                                    
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
+                    {{-- TDS Section --}}
                     <div id="tds-section" style="display:none;">
                         <div class="row g-3 align-items-end mb-4">
                             <div class="col-md-3">
                                 <label class="form-label">Financial Year</label>
-                                <select class="form-select">
-                                    @foreach($financialYears as $financialYear)
-                                        <option value="{{ $financialYear }}" {{ $financialYear == end($financialYears) ? 'selected' : '' }}>{{ $financialYear }}</option>
-                                    @endforeach
+                                @php
+                                    $currentYear = date('Y');
+                                    $currentMonth = date('n');
+
+                                    // Current Financial Year
+                                    $fyStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
+                                @endphp
+
+                                <select class="form-select" id="tds_financial_year">
+
+                                    @for($i = 0; $i < 5; $i++)
+                                        @php
+                                            $start = $fyStart - $i;
+                                            $end = $start + 1;
+                                        @endphp
+
+                                        <option value="{{ $start }}-{{ $end }}" {{ $i == 0 ? 'selected' : '' }}>
+                                            {{ $start }}-{{ $end }}
+                                        </option>
+                                    @endfor
+
                                 </select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Filter Type</label>
-                                <select class="form-select" id="tds-period-type">
-                                    <option value="monthly">Monthly</option>
+                                <select class="form-select" id="tds-period-type" >
+                                    <option value="monthly" selected>Monthly</option>
                                     <option value="quarterly">Quarterly</option>
                                     <option value="half-yearly">Half Yearly</option>
                                     <option value="yearly">Yearly</option>
@@ -150,10 +192,28 @@
                             </div>
                             <div class="col-md-3" id="tds-period-wrapper">
                                 <label class="form-label">Period</label>
-                                <select class="form-select" id="tds-period-value"></select>
+                                @php
+                                    $months = [
+                                        'January','February','March','April','May','June',
+                                        'July','August','September','October','November','December'
+                                    ];
+
+                                    $previousMonth = date('F', strtotime('first day of last month'));
+                                @endphp
+
+                                <select class="form-select" id="tds-period-value">
+
+                                    @foreach($months as $month)
+                                        <option value="{{ $month }}"
+                                            {{ $month == $previousMonth ? 'selected' : '' }}>
+                                            {{ $month }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
                             </div>
                             <div class="col-md-3">
-                                <button type="button" class="btn btn-primary w-100">Apply Filter</button>
+                                <button type="button" class="btn btn-primary w-100" id="btnTdsFilter">Apply Filter</button>
                             </div>
                         </div>
 
@@ -162,16 +222,20 @@
                                 <div class="row g-3 align-items-end">
                                     <div class="col-md-4">
                                         <label class="form-label">UTR Number</label>
-                                        <input type="text" class="form-control" placeholder="Enter UTR number">
+                                        <input type="text" id="tds_utr_input" class="form-control" placeholder="Enter UTR number">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">BSR Code</label>
+                                        <input type="text" id="tds_bsr_input" class="form-control" placeholder="Enter BSR Code">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Update Date</label>
-                                        <input type="date" class="form-control">
+                                        <input type="date" id="tds_deposit_date_input" class="form-control">
                                     </div>
                                     <div class="col-md-4">
                                         <div class="d-flex gap-2">
-                                            <button type="button" class="btn btn-success">Single Update</button>
-                                            <button type="button" class="btn btn-outline-success">Multiple Update</button>
+                                            <button type="button" id="btnTdsSingleUpdate" class="btn btn-success">Single Update</button>
+                                            <button type="button" id="btnTdsMultipleUpdate" class="btn btn-outline-success">Multiple Update</button>
                                         </div>
                                     </div>
                                 </div>
@@ -190,23 +254,11 @@
                                         <th>Period</th>
                                         <th>UTR</th>
                                         <th>Update Date</th>
-                                        <th>TDS Amount</th>
+                                        <th>BSR Code</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @foreach($tdsRecords as $record)
-                                        <tr>
-                                            <td><input type="checkbox" class="tds-row-checkbox"></td>
-                                            <td>{{ $record['emp_id'] }}</td>
-                                            <td>{{ $record['name'] }}</td>
-                                            <td>{{ $record['financial_year'] }}</td>
-                                            <td>{{ $record['period_type'] }}</td>
-                                            <td>{{ $record['period'] }}</td>
-                                            <td>{{ $record['utr'] }}</td>
-                                            <td>{{ $record['update_date'] }}</td>
-                                            <td>{{ $record['amount'] }}</td>
-                                        </tr>
-                                    @endforeach
+                                <tbody id="tdsTable">
+                                    
                                 </tbody>
                             </table>
                         </div>
@@ -242,91 +294,458 @@
         });
 
         const selectAllPayslips = document.getElementById('select-all-payslips');
-        const payslipRowCheckboxes = document.querySelectorAll('.payslip-row-checkbox');
         const selectAllTds = document.getElementById('select-all-tds');
-        const tdsRowCheckboxes = document.querySelectorAll('.tds-row-checkbox');
+
+        function getPayslipRowCheckboxes() {
+            return document.querySelectorAll('.payslip-row-checkbox');
+        }
+
+        function getTdsRowCheckboxes() {
+            return document.querySelectorAll('.tds-row-checkbox');
+        }
+
+        function updateSelectAllPayslipsState() {
+            const checkboxes = getPayslipRowCheckboxes();
+            if (!selectAllPayslips) return;
+            selectAllPayslips.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+        }
+
+        function updateSelectAllTdsState() {
+            const checkboxes = getTdsRowCheckboxes();
+            if (!selectAllTds) return;
+            selectAllTds.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+        }
 
         if (selectAllPayslips) {
             selectAllPayslips.addEventListener('change', function () {
-                payslipRowCheckboxes.forEach(function (checkbox) {
+                const checkboxes = getPayslipRowCheckboxes();
+                checkboxes.forEach(function (checkbox) {
                     checkbox.checked = selectAllPayslips.checked;
-                });
-            });
-
-            payslipRowCheckboxes.forEach(function (checkbox) {
-                checkbox.addEventListener('change', function () {
-                    const allChecked = Array.from(payslipRowCheckboxes).every(function (item) {
-                        return item.checked;
-                    });
-                    selectAllPayslips.checked = allChecked;
                 });
             });
         }
 
         if (selectAllTds) {
             selectAllTds.addEventListener('change', function () {
-                tdsRowCheckboxes.forEach(function (checkbox) {
+                const checkboxes = getTdsRowCheckboxes();
+                checkboxes.forEach(function (checkbox) {
                     checkbox.checked = selectAllTds.checked;
                 });
             });
+        }
 
-            tdsRowCheckboxes.forEach(function (checkbox) {
-                checkbox.addEventListener('change', function () {
-                    const allChecked = Array.from(tdsRowCheckboxes).every(function (item) {
-                        return item.checked;
-                    });
-                    selectAllTds.checked = allChecked;
-                });
+        function attachTdsCheckboxHandlers() {
+            const checkboxes = getTdsRowCheckboxes();
+            checkboxes.forEach(function (checkbox) {
+                checkbox.removeEventListener('change', onTdsCheckboxChange);
+                checkbox.addEventListener('change', onTdsCheckboxChange);
             });
+            updateSelectAllTdsState();
+        }
+
+        function onTdsCheckboxChange() {
+            updateSelectAllTdsState();
         }
 
         const typeSelect = document.getElementById('tds-period-type');
         const periodWrapper = document.getElementById('tds-period-wrapper');
         const periodValue = document.getElementById('tds-period-value');
 
+        const previousMonth = "{{ $previousMonth }}";
+
         function renderPeriodOptions() {
-            if (!typeSelect || !periodValue) return;
 
-            const current = typeSelect.value;
-            const monthOptions = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-            const quarterOptions = ['Q1 (Jan-Mar)', 'Q2 (Apr-Jun)', 'Q3 (Jul-Sep)', 'Q4 (Oct-Dec)'];
-            const halfYearOptions = ['Half 1 (Jan-Jun)', 'Half 2 (Jul-Dec)'];
+            const current = $('#tds-period-type').val();
 
-            if (periodWrapper) {
-                periodWrapper.style.display = current === 'yearly' ? 'none' : '';
+            const monthOptions = [
+                'January','February','March','April','May','June',
+                'July','August','September','October','November','December'
+            ];
+
+            const quarterOptions = ['Q1','Q2','Q3','Q4'];
+            const halfYearOptions = ['Half 1','Half 2'];
+
+            let html = '';
+
+            if(current === 'monthly'){
+
+                monthOptions.forEach(function(month){
+
+                    html += `<option value="${month}"
+                                ${month === previousMonth ? 'selected' : ''}>
+                                ${month}
+                            </option>`;
+
+                });
+
+            }else if(current === 'quarterly'){
+
+                html += `
+                    <option value="Q1">Q1 (Apr-Jun)</option>
+                    <option value="Q2">Q2 (Jul-Sep)</option>
+                    <option value="Q3">Q3 (Oct-Dec)</option>
+                    <option value="Q4">Q4 (Jan-Mar)</option>
+                `;
+
+            }else if(current === 'half-yearly'){
+
+                html += `
+                    <option value="H1">Apr-Sep</option>
+                    <option value="H2">Oct-Mar</option>
+                `;
+
+            }else{
+
+                html = '';
             }
 
-            periodValue.innerHTML = '';
-
-            if (current === 'yearly') {
-                const placeholder = document.createElement('option');
-                placeholder.value = '';
-                placeholder.textContent = 'No period required';
-                periodValue.appendChild(placeholder);
-                return;
-            }
-
-            let options = [];
-            if (current === 'monthly') {
-                options = monthOptions;
-            } else if (current === 'quarterly') {
-                options = quarterOptions;
-            } else if (current === 'half-yearly') {
-                options = halfYearOptions;
-            }
-
-            options.forEach(function (value) {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                periodValue.appendChild(option);
-            });
+            $('#tds-period-value').html(html);
         }
 
         if (typeSelect) {
-            typeSelect.addEventListener('change', renderPeriodOptions);
+            typeSelect.addEventListener('change', function () {
+                renderPeriodOptions();
+                toggleTdsPeriodVisibility();
+            });
             renderPeriodOptions();
+            toggleTdsPeriodVisibility();
         }
     });
+
+    $(document).ready(function(){
+        loadPayslipData();
+
+        $('#btnFilter').click(function(){
+            loadPayslipData();
+        });
+
+        // TDS Section
+        loadTdsData();
+
+        $('#btnTdsFilter').click(function () {
+            loadTdsData();
+        });
+
+        $('#btnTdsSingleUpdate').click(function(){
+            const selected = Array.from(document.querySelectorAll('.tds-row-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) {
+                showToast('Please select a TDS record to update.', 'warning');
+                return;
+            }
+            if (selected.length > 1) {
+                showToast('Single Update requires exactly one selection. Use Multiple Update for more.', 'warning');
+                return;
+            }
+            doTdsUpdate(selected);
+        });
+
+        $('#btnTdsMultipleUpdate').click(function(){
+            const selected = Array.from(document.querySelectorAll('.tds-row-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) {
+                showToast('Please select at least one TDS record to update.', 'warning');
+                return;
+            }
+            doTdsUpdate(selected);
+        });
+    });
+
+    function toggleTdsPeriodVisibility() {
+        const selectedType = $('#tds-period-type').val();
+        if (selectedType === 'yearly') {
+            $('#tds-period-wrapper').hide();
+        } else {
+            $('#tds-period-wrapper').show();
+        }
+    }
+
+    // Load Payslip Data
+    function loadPayslipData()
+    {
+
+        $.ajax({
+
+            url:"{{ route('payroll.payslip.list') }}",
+
+            type:"GET",
+
+            data:{
+
+                financial_year:$('#financial_year').val(),
+
+                month:$('#month').val()
+
+            },
+            beforeSend: function () {
+
+                $('#payslipTable').html(`
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            Loading...
+                        </td>
+                    </tr>
+                `);
+
+            },
+
+            success:function(response){
+
+
+                let html='';
+
+                if(response.length==0)
+                {
+                    html+=`
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            No Record Found
+                        </td>
+                    </tr>
+                    `;
+                }
+                else
+                {
+
+                    $.each(response,function(index,row){
+
+                        html+=`
+
+                        <tr>
+
+                            <td>
+
+                                <input
+                                type="checkbox"
+                                class="payslip-row-checkbox"
+                                value="${row.id}">
+
+                            </td>
+
+                            <td>${row.employee_id ?? '-'}</td>
+
+                            <td>${row.name ?? '-'}</td>
+
+                            <td>${row.date ?? '-'}</td>
+
+                            <td>${row.payment_date ?? '-'}</td>
+
+                            <td>${row.payment_trans_id ?? '-'}</td>
+
+                        </tr>
+
+                        `;
+
+                    });
+
+                }
+
+                $('#payslipTable').html(html);
+
+                // After rows are inserted, rebind payslip checkbox handlers so select-all works
+                attachPayslipCheckboxHandlers();
+
+
+            }
+
+        });
+
+
+        function attachPayslipCheckboxHandlers() {
+            const checkboxes = document.querySelectorAll('.payslip-row-checkbox');
+
+            checkboxes.forEach(function (checkbox) {
+                checkbox.removeEventListener('change', onPayslipCheckboxChange);
+                checkbox.addEventListener('change', onPayslipCheckboxChange);
+            });
+
+            updateSelectAllPayslipsState();
+        }
+
+        function onPayslipCheckboxChange() {
+            updateSelectAllPayslipsState();
+        }
+
+        // Update actions
+        $(document).ready(function(){
+            $('#btnSingleUpdate').on('click', function(){
+                const selected = Array.from(document.querySelectorAll('.payslip-row-checkbox:checked')).map(cb => cb.value);
+                if (selected.length === 0) {
+                    
+                    showToast('Please select a payslip to update.', 'warning');
+                    return;
+                }
+                if (selected.length > 1) {
+                    showToast('Single Update requires exactly one selection. Use Multiple Update for more.', 'warning');
+                    return;
+                }
+                doPayslipUpdate(selected);
+            });
+
+            $('#btnMultipleUpdate').on('click', function(){
+                const selected = Array.from(document.querySelectorAll('.payslip-row-checkbox:checked')).map(cb => cb.value);
+                if (selected.length === 0) {
+                    showToast('Please select at least one payslip to update.', 'warning');
+                    return;
+                }
+                doPayslipUpdate(selected);
+            });
+        });
+
+        function doPayslipUpdate(selectedIds) {
+            const paymentDate = $('#payment_date_input').val();
+            const transactionId = $('#transaction_id_input').val();
+
+            if (!paymentDate || !transactionId) {
+                if (!confirm('Payment Date or Transaction ID is empty. Proceed anyway?')) return;
+            }
+
+            $.ajax({
+                url: "{{ route('payroll.payslip.update') }}",
+                type: 'POST',
+                data: {
+                    ids: selectedIds,
+                    payment_date: paymentDate,
+                    transaction_id: transactionId,
+                    _token: '{{ csrf_token() }}'
+                },
+                beforeSend: function(){
+                    // optional: show loading
+                },
+                success: function(resp){
+                    showToast(resp.message || 'Payslip(s) updated successfully', 'success');
+                    loadPayslipData();
+                },
+                error: function(xhr){
+                    showToast('Update failed: ' + (xhr.responseJSON?.message || xhr.statusText), 'error');
+                }
+            });
+        }
+    }
+
+    //---- Load TDS Data----
+    function loadTdsData()
+    {
+        $.ajax({
+
+            url: "{{ route('payroll.tds.list') }}",
+
+            type: "GET",
+
+            data: {
+
+                financial_year: $('#tds_financial_year').val(),
+
+                filter_type: $('#tds-period-type').val(),
+
+                period: $('#tds-period-value').val()
+
+            },
+
+            beforeSend:function(){
+
+                $('#tdsTable').html(`
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            Loading...
+                        </td>
+                    </tr>
+                `);
+
+            },
+
+            success:function(response){
+
+                let html='';
+
+                if(response.length==0){
+
+                    html=`
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                No Record Found
+                            </td>
+                        </tr>
+                    `;
+
+                }else{
+
+                    $.each(response,function(index,row){
+
+                        html+=`
+
+                        <tr>
+
+                            <td>
+                                <input type="checkbox"
+                                    class="tds-row-checkbox"
+                                    value="${row.id}">
+                            </td>
+
+                            <td>${row.employee_id ?? '-'}</td>
+
+                            <td>${row.name ?? '-'}</td>
+
+                            <td>${row.financial_year}</td>
+
+                            <td>${$('#tds-period-type option:selected').text()}</td>
+
+                            <td>${row.month}</td>
+
+                            <td>${row.tds_challan_no ?? '-'}</td>
+
+                            <td>${row.tds_deposit_date ?? '-'}</td>
+
+                            <td>${row.tds_bsr_code ?? '-'}</td>
+
+                        </tr>
+
+                        `;
+
+                    });
+
+                }
+
+                $('#tdsTable').html(html);
+
+                // Rebind TDS checkbox handlers after row injection
+                attachTdsCheckboxHandlers();
+            }
+
+        });
+
+    }
+
+    function doTdsUpdate(selectedIds) {
+        const utr = $('#tds_utr_input').val();
+        const bsr = $('#tds_bsr_input').val();
+        const depositDate = $('#tds_deposit_date_input').val();
+
+        if (!utr || !bsr || !depositDate) {
+            if (!confirm('UTR, BSR or Update Date is empty. Proceed anyway?')) return;
+        }
+
+        $.ajax({
+            url: "{{ route('payroll.tds.update') }}",
+            type: 'POST',
+            data: {
+                ids: selectedIds,
+                tds_challan_no: utr,
+                tds_bsr_code: bsr,
+                tds_deposit_date: depositDate,
+                _token: '{{ csrf_token() }}'
+            },
+            beforeSend: function(){
+                // optional: show loading
+            },
+            success: function(resp){
+                showToast(resp.message || 'TDS record(s) updated successfully', 'success');
+                loadTdsData();
+            },
+            error: function(xhr){
+                showToast('Update failed: ' + (xhr.responseJSON?.message || xhr.statusText), 'error');
+            }
+        });
+    }
+
+
 </script>
 @endsection

@@ -547,14 +547,149 @@ class BalanceSheetController extends Controller
 
 	public function downloadBalanceSheetPdf(Request $request)
 	{
-		$userId = currentOwnerId();
+		$details = $request->details;
 		$html = $request->html; // full table HTML
+		
+		$financialYear = $request->input('financial_year'); // e.g., "2024-2025"
+        $periodType = $request->input('period_type');       // e.g., "monthly", "quarterly", etc.
+        $dynamicPeriod = $request->input('dynamic_period'); // e.g., "april", "april-june", etc.
+        $userId = currentOwnerId();
+		if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5) {
+			$userId = currentOwnerId();
+		} else {
+			$userId = session('compId'); //ca-accountant access
+		}
 
+		$propId = $request->propId ?? null;
+        [$startYear, $endYear] = explode('-', $financialYear);
+        $startDate = null;
+        $endDate = null;
+
+		switch ($periodType) {
+
+			/* ---------- FULL YEAR ---------- */
+			case 'full-yearly':
+				$startDate = Carbon::create($startYear, 4, 1)->startOfDay();
+				$endDate   = Carbon::create($endYear, 3, 31)->endOfDay();
+				break;
+
+			/* ---------- MONTHLY ---------- */
+			case 'monthly':
+				$monthMap = [
+					'april' => 4, 'may' => 5, 'june' => 6,
+					'july' => 7, 'august' => 8, 'september' => 9,
+					'october' => 10, 'november' => 11, 'december' => 12,
+					'january' => 1, 'february' => 2, 'march' => 3,
+				];
+
+				$month = $monthMap[$dynamicPeriod];
+
+				// Jan–Mar belong to end year
+				$year = ($month >= 4) ? $startYear : $endYear;
+
+				$startDate = Carbon::create($year, $month, 1)->startOfMonth();
+				$endDate   = Carbon::create($year, $month, 1)->endOfMonth();
+				break;
+
+			/* ---------- QUARTERLY ---------- */
+			case 'quarterly':
+				$quarters = [
+					'april-june'        => [4, 6],
+					'july-september'    => [7, 9],
+					'october-december'  => [10, 12],
+					'january-march'     => [1, 3],
+				];
+
+				[$startMonth, $endMonth] = $quarters[$dynamicPeriod];
+
+				// Indian FY logic
+				$startYearCalc = ($startMonth >= 4) ? $startYear : $endYear;
+				$endYearCalc   = ($endMonth >= 4) ? $startYear : $endYear;
+
+				$startDate = Carbon::create($startYearCalc, $startMonth, 1)->startOfMonth();
+				$endDate   = Carbon::create($endYearCalc, $endMonth, 1)->endOfMonth();
+				break;
+
+			/* ---------- HALF YEARLY ---------- */
+			case 'half-yearly':
+				if ($dynamicPeriod === 'h1') { // Apr–Sep
+					$startDate = Carbon::create($startYear, 4, 1)->startOfMonth();
+					$endDate   = Carbon::create($startYear, 9, 30)->endOfMonth();
+				} else { // h2 => Oct–Mar
+					$startDate = Carbon::create($startYear, 10, 1)->startOfMonth();
+					$endDate   = Carbon::create($endYear, 3, 31)->endOfMonth();
+				}
+				break;
+		}
+		
+		// Company Profile
+		$company = DB::table('company_profiles as comp')
+			->where('userId', $userId)
+			->select(
+				'comp.comp_name',
+				'comp.comp_bill_addone',
+				'comp.gst_no'
+			)
+			->first();
+
+		// Assigned CA
+		$ca = DB::table('ca_assigns as assign')
+			->join('ca_profiles as ca', 'ca.userId', '=', 'assign.ca_id')
+			->where('assign.comp_id', $userId)
+			->where('assign.ca_assign_status', 1)
+			->where('assign.ca_current_status', 1)
+			->select(
+				'ca.comp_name',
+				'ca.signature_doc'
+			)
+			->first();
+
+		$result = [];
+		if($details)
+		{
+			// Share Capital
+			$result['Share Capital'] = DB::table('share_holder_fund_liabilities as shfl')
+				->join('liabilities as l', 'l.id', '=', 'shfl.liabilities_id')
+				->where('l.added_by', $userId)
+				->whereBetween('l.added_date', [$startDate, $endDate])
+				->where('l.status', 1)
+				->where('shfl.share_holder_fund_type', 'share_capital')
+				->select(
+					'shfl.share_holder_type',
+					'shfl.class_of_shares',
+					'shfl.shares_issued',
+					'shfl.face_value_per_share',
+					'shfl.total_amount'
+				)
+				->get();
+
+			// Reserves & Surplus
+			$result['Reserves and Surplus'] = DB::table('share_holder_fund_liabilities as shfl')
+				->join('liabilities as l', 'l.id', '=', 'shfl.liabilities_id')
+				->where('l.added_by', $userId)
+				->whereBetween('l.added_date', [$startDate, $endDate])
+				->where('l.status', 1)
+				->where('shfl.share_holder_fund_type', 'reserves_surplus')
+				->select(
+					'shfl.reserves_surplus_type',
+					'shfl.opening_balance',
+					'shfl.transfer_amount',
+					'shfl.total_dividend_amount'
+				)
+				->get();
+		}
+		//echo "<pre>";print_r($result);exit;
 		$pdf = Pdf::loadView('balance-sheet-pdf', [
-			'html' => $html
+			'html' => $html,
+			'details' => $details,
+			'result' => $result,
+			'company' => $company,
+			'ca'      => $ca,
 		])->setPaper('A4', 'landscape');
 
-		return $pdf->download('Balance_Sheet.pdf');
+		return $pdf->download(
+			$details ? 'Balance_Sheet_Summary.pdf' : 'Balance_Sheet.pdf'
+		);
 	}    
 	
 	//Start to enter previous balance-sheet
