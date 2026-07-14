@@ -59,6 +59,13 @@ class PayController extends Controller
 				->first();
 
 			$invoiceTotal = getRoundedAmount($invoice->amount + $invoice->tax_amt + $invoice->ser_pay + $invoice->gov_pay);
+		}else if($type=='Expense')
+		{
+			$expense = DB::table('expenses')
+				->where('id',$id)
+				->first();
+
+			$invoiceTotal = getRoundedAmount(($expense->expense_amt ?? 0));
 		}else{			
 			$invoice = DB::table('purchase_values as pv')
 							->leftJoin('purchases as p', 'p.id', '=', 'pv.sid')
@@ -113,6 +120,8 @@ class PayController extends Controller
 					
 				} else if ($request->voucher_type == 'Purchase') {
 					$this->deletePurchasePaymentJournalEntries($sid);
+				}else if($request->voucher_type=='Expense'){
+					//$this->deleteExpensePaymentJournalEntries($sid);
 				}
 			}
 
@@ -133,7 +142,8 @@ class PayController extends Controller
 				
 				$data = [
 							'date' => $row['date'],
-							'payment_mode' => $row['payment_mode']
+							'payment_mode' => $row['payment_mode'],
+							'bank_id' => $row['bank_id']
 						];
 				$this->paymentVoucherService->storePaymentVoucherEntries($request->f_id,$request->voucher_type,$row['amount'],$data);
 			}
@@ -334,6 +344,44 @@ class PayController extends Controller
 					'due_amount'=>max(0,$total-$paid)
 				]);
 		}
+		else if($type=='Expense')
+		{
+			$expense = DB::table('expenses')
+				->where('id',$id)
+				->first();
+
+			$total = getRoundedAmount(($expense->expense_amt ?? 0));
+
+			$paid = DB::table('payment_vouchers')
+				->where('source','Expense')
+				->where('f_id',$id)
+				->sum('amount');
+
+			if($paid==0)
+				$status='due';
+			elseif($paid >= $total)
+				$status='full';
+			else
+				$status='advance';
+
+			//update payment status in expenses
+			DB::table('expenses')
+				->where('id',$id)
+				->update([
+					'payment_status'=>$status,
+					'advance_amount'=>$paid,
+					'adjusted_now'=>$paid,
+					'balance_amount'=>max(0,$total-$paid)
+				]);
+			//update payment status in journal
+			$payStatus = ucfirst(strtolower($status ?? ''));
+			DB::table('journals')
+				->where('entry_type', 'Expense')
+				->where('autoId', $id)
+				->update([
+					'payment_status' => $payStatus
+				]);
+		}
 	}
 	
 	public function deletePayment($id)
@@ -369,6 +417,14 @@ class PayController extends Controller
 		DB::table('journals')
 			->where('entry_type', 'Purchase')
 			->where('autoId', $purchaseId)
+			->delete();
+	}
+	
+	private function deleteExpensePaymentJournalEntries($expenseId)
+	{
+		DB::table('journals')
+			->where('entry_type','Expense')
+			->where('autoId',$expenseId)
 			->delete();
 	}
 	

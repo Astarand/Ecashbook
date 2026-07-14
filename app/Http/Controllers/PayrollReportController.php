@@ -539,36 +539,69 @@ class PayrollReportController extends Controller
         $ids = (array) $request->input('ids', []);
 
         if (empty($ids)) {
-            return response()->json(['message' => 'No TDS IDs provided.'], 422);
+            return response()->json([
+                'message' => 'No TDS IDs provided.'
+            ], 422);
         }
-
-        $utr = $request->input('tds_challan_no');
-        $bsr = $request->input('tds_bsr_code');
-        $depositDate = $request->input('tds_deposit_date');
 
         $update = [];
 
-        if ($utr) {
-            $update['tds_challan_no'] = $utr;
+        if ($request->filled('tds_tan')) {
+            $update['tds_tan'] = $request->tds_tan;
         }
-        if ($bsr) {
-            $update['tds_bsr_code'] = $bsr;
+
+        if ($request->filled('tds_financial_year')) {
+            $update['tds_financial_year'] = $request->tds_financial_year;
         }
-        if ($depositDate) {
-            $update['tds_deposit_date'] = $depositDate;
+
+        if ($request->filled('tds_nature_of_payment')) {
+            $update['tds_nature_of_payment'] = $request->tds_nature_of_payment;
+        }
+
+        if ($request->filled('tds_amount')) {
+            $update['tds_amount'] = $request->tds_amount;
+        }
+
+        if ($request->filled('tds_cin')) {
+            $update['tds_cin'] = $request->tds_cin;
+        }
+
+        if ($request->filled('tds_challan_no')) {
+            $update['tds_challan_no'] = $request->tds_challan_no;
+        }
+
+        if ($request->filled('tds_bsr_code')) {
+            $update['tds_bsr_code'] = $request->tds_bsr_code;
+        }
+
+        if ($request->filled('tds_deposit_date')) {
+            $update['tds_deposit_date'] = $request->tds_deposit_date;
+        }
+
+        if ($request->filled('tds_tender_date')) {
+            $update['tds_tender_date'] = $request->tds_tender_date;
         }
 
         $update['tds_deposit_status'] = 'Done';
 
         try {
+
             $affected = DB::table('user_payslip')
                 ->whereIn('id', $ids)
                 ->where('added_by', $ownerId)
                 ->update($update);
 
-            return response()->json(['message' => "Updated {$affected} record(s)", 'updated' => $affected]);
+            return response()->json([
+                'message' => "Updated {$affected} record(s)",
+                'updated' => $affected
+            ]);
+
         } catch (\Exception $e) {
-            return response()->json(['message' => 'TDS update failed: ' . $e->getMessage()], 500);
+
+            return response()->json([
+                'message' => 'TDS update failed: '.$e->getMessage()
+            ],500);
+
         }
     }
 
@@ -579,8 +612,8 @@ class PayrollReportController extends Controller
         $ownerId = currentOwnerId();
 
         $financialYear = $request->financial_year;
-        $filterType = $request->filter_type;
-        $period = $request->period;
+        $filterType    = $request->filter_type;
+        $period        = $request->period;
 
         $query = DB::table('user_payslip')
             ->leftJoin('employees', 'employees.empId', '=', 'user_payslip.user_emp_id')
@@ -642,10 +675,21 @@ class PayrollReportController extends Controller
 
         } elseif ($filterType == 'yearly') {
 
-            // No month filter required.
-            // Only financial_year condition will be applied.
+            // No additional month filter
 
         }
+
+        // Only employees having TDS > 0
+        $query->whereRaw("
+            CAST(
+                JSON_UNQUOTE(
+                    JSON_EXTRACT(
+                        user_payslip.emp_salary_slip_response,
+                        '$.visible_data.final_salary_calculation.tds'
+                    )
+                ) AS DECIMAL(15,2)
+            ) > 0
+        ");
 
         $tds = $query->select(
                 'user_payslip.id',
@@ -657,12 +701,127 @@ class PayrollReportController extends Controller
                 'user_payslip.tds_challan_no',
                 'user_payslip.tds_bsr_code',
                 'user_payslip.tds_deposit_date',
-                'user_payslip.tds_deposit_status'
+                'user_payslip.tds_deposit_status',
+
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(
+                            JSON_EXTRACT(
+                                user_payslip.emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.tds'
+                            )
+                        ) AS DECIMAL(15,2)
+                    ) as tds_amount
+                ")
             )
             ->orderBy('users.name')
             ->get();
 
         return response()->json($tds);
+    }
+
+    //------- PF List -------//
+    public function getPfList(Request $request)
+    {
+        $ownerId = currentOwnerId();
+
+        $financialYear = $request->financial_year;
+        $filterType    = $request->filter_type;
+        $period        = $request->period;
+
+        $query = DB::table('user_payslip')
+            ->leftJoin('employees', 'employees.empId', '=', 'user_payslip.user_emp_id')
+            ->leftJoin('users', 'users.id', '=', 'user_payslip.user_emp_id')
+            ->where('user_payslip.added_by', $ownerId)
+            ->where('user_payslip.financial_year', $financialYear);
+
+        // Monthly
+        if ($filterType == 'monthly' && !empty($period)) {
+
+            $month = Carbon::parse('1 '.$period)->month;
+
+            $query->where('user_payslip.month', $month);
+
+        }
+
+        // Quarterly
+        elseif ($filterType == 'quarterly' && !empty($period)) {
+
+            switch ($period) {
+                case 'Q1':
+                    $months = [4,5,6];
+                    break;
+                case 'Q2':
+                    $months = [7,8,9];
+                    break;
+                case 'Q3':
+                    $months = [10,11,12];
+                    break;
+                case 'Q4':
+                    $months = [1,2,3];
+                    break;
+                default:
+                    $months = [];
+            }
+
+            if ($months) {
+                $query->whereIn('user_payslip.month', $months);
+            }
+
+        }
+
+        // Half Yearly
+        elseif ($filterType == 'half-yearly' && !empty($period)) {
+
+            switch ($period) {
+                case 'H1':
+                    $months = [4,5,6,7,8,9];
+                    break;
+                case 'H2':
+                    $months = [10,11,12,1,2,3];
+                    break;
+                default:
+                    $months = [];
+            }
+
+            if ($months) {
+                $query->whereIn('user_payslip.month', $months);
+            }
+
+        }
+
+        // Only employees having PF > 0
+        $query->whereRaw("
+            CAST(
+                JSON_UNQUOTE(
+                    JSON_EXTRACT(
+                        emp_salary_slip_response,
+                        '$.visible_data.final_salary_calculation.provident_fund'
+                    )
+                ) AS DECIMAL(12,2)
+            ) > 0
+        ");
+
+        $pf = $query->select(
+                'user_payslip.id',
+                'user_payslip.user_emp_id',
+                'employees.employee_id',
+                'users.name',
+                'user_payslip.financial_year',
+                'user_payslip.month',
+                DB::raw("
+                    JSON_UNQUOTE(
+                        JSON_EXTRACT(
+                            emp_salary_slip_response,
+                            '$.visible_data.final_salary_calculation.provident_fund'
+                        )
+                    ) as provident_fund
+                ")
+            )
+            ->orderBy('users.name')
+            ->get();
+
+        return response()->json($pf);
     }
 
 }

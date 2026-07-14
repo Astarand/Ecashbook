@@ -32,6 +32,9 @@
                         <div class="btn-group" role="group" aria-label="Update section switcher">
                             <button type="button" class="btn btn-primary" data-target="payslip-section">Payslip</button>
                             <button type="button" class="btn btn-outline-primary" data-target="tds-section">Update TDS</button>
+                            <button type="button" class="btn btn-outline-primary" data-target="pf-section">Update PF</button>
+                            <button type="button" class="btn btn-outline-primary" data-target="esi-section">Update ESI</button>
+                            <button type="button" class="btn btn-outline-primary" data-target="ptax-section">Update PTAX</button>
                         </div>
                     </div>
                 </div>
@@ -55,7 +58,6 @@
                     @endphp
 
                     {{-- Payslip Section --}}
-
                     <div id="payslip-section">
                         <div class="row g-3 align-items-end mb-4">
                             <div class="col-md-4">
@@ -220,25 +222,66 @@
                         <div class="card border mb-4">
                             <div class="card-body">
                                 <div class="row g-3 align-items-end">
-                                    <div class="col-md-4">
-                                        <label class="form-label">UTR Number</label>
-                                        <input type="text" id="tds_utr_input" class="form-control" placeholder="Enter UTR number">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">BSR Code</label>
-                                        <input type="text" id="tds_bsr_input" class="form-control" placeholder="Enter BSR Code">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Update Date</label>
-                                        <input type="date" id="tds_deposit_date_input" class="form-control">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="d-flex gap-2">
-                                            <button type="button" id="btnTdsSingleUpdate" class="btn btn-success">Single Update</button>
-                                            <button type="button" id="btnTdsMultipleUpdate" class="btn btn-outline-success">Multiple Update</button>
-                                        </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">TAN</label>
+                                    <input type="text" id="tds_tan_input" class="form-control" placeholder="Enter TAN">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Financial Year</label>
+                                    <input type="text" id="tds_financial_year_input" class="form-control" placeholder="Enter Financial Year">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Nature of Payment</label>
+                                    <input type="text" id="tds_nature_payment_input" class="form-control" placeholder="e.g. 92B">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Amount (₹)</label>
+                                    <input type="number" id="tds_amount_input" class="form-control" placeholder="Enter Amount">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">CIN Number</label>
+                                    <input type="text" id="tds_cin_input" class="form-control" placeholder="Enter CIN">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">UTR / Bank Reference Number</label>
+                                    <input type="text" id="tds_utr_input" class="form-control" placeholder="Enter UTR / Bank Reference">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Date of Deposit</label>
+                                    <input type="date" id="tds_deposit_date_input" class="form-control">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">BSR Code</label>
+                                    <input type="text" id="tds_bsr_input" class="form-control" placeholder="Enter BSR Code">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Challan Number</label>
+                                    <input type="text" id="tds_challan_input" class="form-control" placeholder="Enter Challan No">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Tender Date</label>
+                                    <input type="date" id="tds_tender_date_input" class="form-control">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="d-flex gap-2">
+                                        <button type="button" id="btnTdsMultipleUpdate" class="btn btn-success">
+                                            Update Selected TDS Records
+                                        </button>
                                     </div>
                                 </div>
+
+                            </div>
                             </div>
                         </div>
 
@@ -263,6 +306,161 @@
                             </table>
                         </div>
                     </div>
+
+                    {{-- PF Section --}}
+                    <div id="pf-section" style="display:none;">
+                        <div class="row g-3 align-items-end mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">Financial Year</label>
+                                @php
+                                    $currentYear = date('Y');
+                                    $currentMonth = date('n');
+
+                                    // Current Financial Year
+                                    $fyStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
+                                @endphp
+
+                                <select class="form-select" id="pf_financial_year">
+
+                                    @for($i = 0; $i < 5; $i++)
+                                        @php
+                                            $start = $fyStart - $i;
+                                            $end = $start + 1;
+                                        @endphp
+
+                                        <option value="{{ $start }}-{{ $end }}" {{ $i == 0 ? 'selected' : '' }}>
+                                            {{ $start }}-{{ $end }}
+                                        </option>
+                                    @endfor
+
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Filter Type</label>
+                                <select class="form-select" id="pf-period-type" >
+                                    <option value="monthly" selected>Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="half-yearly">Half Yearly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3" id="pf-period-wrapper">
+                                <label class="form-label">Period</label>
+                                @php
+                                    $months = [
+                                        'January','February','March','April','May','June',
+                                        'July','August','September','October','November','December'
+                                    ];
+
+                                    $previousMonth = date('F', strtotime('first day of last month'));
+                                @endphp
+
+                                <select class="form-select" id="pf-period-value">
+
+                                    @foreach($months as $month)
+                                        <option value="{{ $month }}"
+                                            {{ $month == $previousMonth ? 'selected' : '' }}>
+                                            {{ $month }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-primary w-100" id="btnPfFilter">Apply Filter</button>
+                            </div>
+                        </div>
+
+                        <div class="card border mb-4">
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-3">
+                                        <label class="form-label">TRRN</label>
+                                        <input type="text" id="pf_trrn_input" class="form-control" placeholder="Enter TRRN">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Challan Generated On</label>
+                                        <input type="datetime-local" id="pf_challan_generated_input" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Establishment ID</label>
+                                        <input type="text" id="pf_establishment_id_input" class="form-control" placeholder="Enter Establishment ID">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Wage Month</label>
+                                        <input type="month" id="pf_wage_month_input" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Total Amount (₹)</label>
+                                        <input type="number" step="0.01" id="pf_total_amount_input" class="form-control" placeholder="Enter Total Amount">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">CRN</label>
+                                        <input type="text" id="pf_crn_input" class="form-control" placeholder="Enter CRN">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Payment Confirmation Date</label>
+                                        <input type="date" id="pf_payment_date_input" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Payment Type</label>
+                                        <select id="pf_payment_type_input" class="form-select">
+                                            <option value="">Select</option>
+                                            <option value="Full">Full</option>
+                                            <option value="Partial">Partial</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="d-flex gap-2">
+                                            <button type="button" id="btnPfMultipleUpdate" class="btn btn-success">
+                                                Update Selected PF Records
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><input type="checkbox" id="select-all-pf"></th>
+                                        <th>Employee ID</th>
+                                        <th>Name</th>
+                                        <th>Financial Year</th>
+                                        <th>Period</th>
+                                        <th>Challan Number</th>
+                                        <th>Update Date</th>
+                                        <th>BSR Code</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pfTable">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {{-- ESI Section --}}
+                    <div id="esi-section" style="display:none;">
+                        <p>ESI Update Section Coming Soon...</p>
+                    </div>
+                    {{-- PTAX Section --}}
+                    <div id="ptax-section" style="display:none;">
+                        <p>PTAX Update Section Coming Soon...</p>
+                    </div>
+
+
+
                 </div>
             </div>
         </div>
@@ -274,7 +472,10 @@
         const tabButtons = document.querySelectorAll('[data-target]');
         const sections = {
             'payslip-section': document.getElementById('payslip-section'),
-            'tds-section': document.getElementById('tds-section')
+            'tds-section': document.getElementById('tds-section'),
+            'pf-section': document.getElementById('pf-section'),
+            'esi-section': document.getElementById('esi-section'),
+            'ptax-section': document.getElementById('ptax-section')
         };
 
         tabButtons.forEach(function (button) {
@@ -295,6 +496,9 @@
 
         const selectAllPayslips = document.getElementById('select-all-payslips');
         const selectAllTds = document.getElementById('select-all-tds');
+        const selectAllPf = document.getElementById('select-all-pf');
+        const selectAllEsi = document.getElementById('select-all-esi');
+        const selectAllPtax = document.getElementById('select-all-ptax');
 
         function getPayslipRowCheckboxes() {
             return document.querySelectorAll('.payslip-row-checkbox');
@@ -330,6 +534,33 @@
                 const checkboxes = getTdsRowCheckboxes();
                 checkboxes.forEach(function (checkbox) {
                     checkbox.checked = selectAllTds.checked;
+                });
+            });
+        }
+
+        if (selectAllPf) {
+            selectAllPf.addEventListener('change', function () {
+                const checkboxes = getPfRowCheckboxes();
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = selectAllPf.checked;
+                });
+            });
+        }
+
+        if (selectAllEsi) {
+            selectAllEsi.addEventListener('change', function () {
+                const checkboxes = getEsiRowCheckboxes();
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = selectAllEsi.checked;
+                });
+            });
+        }
+
+        if (selectAllPtax) {
+            selectAllPtax.addEventListener('change', function () {
+                const checkboxes = getPtaxRowCheckboxes();
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = selectAllPtax.checked;
                 });
             });
         }
@@ -413,6 +644,11 @@
     });
 
     $(document).ready(function(){
+        if (window.location.hash === '#tds-section') {
+            $('#tds-section').show();
+            $('[data-target="tds-section"]').trigger('click');
+        }
+
         loadPayslipData();
 
         $('#btnFilter').click(function(){
@@ -426,19 +662,6 @@
             loadTdsData();
         });
 
-        $('#btnTdsSingleUpdate').click(function(){
-            const selected = Array.from(document.querySelectorAll('.tds-row-checkbox:checked')).map(cb => cb.value);
-            if (selected.length === 0) {
-                showToast('Please select a TDS record to update.', 'warning');
-                return;
-            }
-            if (selected.length > 1) {
-                showToast('Single Update requires exactly one selection. Use Multiple Update for more.', 'warning');
-                return;
-            }
-            doTdsUpdate(selected);
-        });
-
         $('#btnTdsMultipleUpdate').click(function(){
             const selected = Array.from(document.querySelectorAll('.tds-row-checkbox:checked')).map(cb => cb.value);
             if (selected.length === 0) {
@@ -446,6 +669,12 @@
                 return;
             }
             doTdsUpdate(selected);
+        });
+
+        //----pf Section----
+        loadPfData();
+        $('#btnPfFilter').click(function () {
+            loadPfData();
         });
     });
 
@@ -715,22 +944,25 @@
     }
 
     function doTdsUpdate(selectedIds) {
-        const utr = $('#tds_utr_input').val();
-        const bsr = $('#tds_bsr_input').val();
-        const depositDate = $('#tds_deposit_date_input').val();
-
-        if (!utr || !bsr || !depositDate) {
-            if (!confirm('UTR, BSR or Update Date is empty. Proceed anyway?')) return;
-        }
-
+        
         $.ajax({
             url: "{{ route('payroll.tds.update') }}",
             type: 'POST',
             data: {
+
                 ids: selectedIds,
-                tds_challan_no: utr,
-                tds_bsr_code: bsr,
-                tds_deposit_date: depositDate,
+
+                tds_tan: $('#tds_tan_input').val(),
+                tds_financial_year: $('#tds_financial_year').val(),
+                tds_nature_of_payment: $('#tds_nature_payment_input').val(),
+                tds_amount: $('#tds_amount_input').val(),
+                tds_cin: $('#tds_cin_input').val(),
+
+                tds_challan_no: $('#tds_utr_input').val(),
+                tds_bsr_code: $('#tds_bsr_input').val(),
+                tds_deposit_date: $('#tds_deposit_date_input').val(),
+                tds_tender_date: $('#tds_tender_date_input').val(),
+
                 _token: '{{ csrf_token() }}'
             },
             beforeSend: function(){
@@ -744,6 +976,97 @@
                 showToast('Update failed: ' + (xhr.responseJSON?.message || xhr.statusText), 'error');
             }
         });
+    }
+
+    //----- load Pf Data -----
+    function loadPfData()
+    {
+        $.ajax({
+
+            url: "{{ route('payroll.pf.list') }}",
+
+            type: "GET",
+
+            data: {
+
+                financial_year: $('#pf_financial_year').val(),
+
+                filter_type: $('#pf-period-type').val(),
+
+                period: $('#pf-period-value').val()
+
+            },
+
+            beforeSend:function(){
+
+                $('#pfTable').html(`
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            Loading...
+                        </td>
+                    </tr>
+                `);
+
+            },
+
+            success:function(response){
+
+                let html='';
+
+                if(response.length==0){
+
+                    html=`
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                No Record Found
+                            </td>
+                        </tr>
+                    `;
+
+                }else{
+
+                    $.each(response,function(index,row){
+
+                        html+=`
+
+                        <tr>
+
+                            <td>
+                                <input type="checkbox"
+                                    class="pf-row-checkbox"
+                                    value="${row.id}">
+                            </td>
+
+                            <td>${row.employee_id ?? '-'}</td>
+
+                            <td>${row.name ?? '-'}</td>
+
+                            <td>${row.financial_year}</td>
+
+                            <td>${row.month}</td>
+
+                            <td>${row.pf_challan_no ?? '-'}</td>
+
+                            <td>${row.pf_deposit_date ?? '-'}</td>
+
+                            <td>${row.pf_bsr_code ?? '-'}</td>
+
+                        </tr>
+
+                        `;
+
+                    });
+
+                }
+
+                $('#pfTable').html(html);
+
+                // Rebind PF checkbox handlers after row injection
+                attachPfCheckboxHandlers();
+            }
+
+        });
+
     }
 
 

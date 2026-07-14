@@ -460,7 +460,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::post('/save-payslip', [EmployeeManagemnet::class, 'savePayslip']);
 	Route::get('/download-payslip/{id}', [EmployeeManagemnet::class, 'downloadPayslip']);
 
-	
+	Route::get('/payslip/update', [EmployeeManagemnet::class, 'updatePayslip'])->name('payroll.payslip_update');
 
 
 	/* Employee Policies */
@@ -1265,12 +1265,8 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::post('/purchase_shipping_cost',[PurchaseController::class,'purchaseShippingCost']);
 	
 	Route::get('/payment-voucher/export',[PaymentVoucherController::class, 'exportPaymentVoucher'])->name('paymentVoucher.export');
-	
-	Route::get('/get-banks', [CommonController::class, 'getBankList']);
 
 	//-------- payroll report routes --------//
-	Route::get('/payslip/update', [EmployeeManagemnet::class, 'updatePayslip'])->name('payroll.payslip_update');
-
 	Route::get('/payroll-report/summary', [PayrollReportController::class, 'summary'])->name('payroll.report.summary');
 	Route::get('/payroll-report/register', [PayrollReportController::class, 'payrollRegister'])->name('payroll.report.register');
 	Route::get('/payroll/report/attendance', [PayrollReportController::class, 'attendanceRegister'])->name('payroll.report.attendance');
@@ -1279,5 +1275,4 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/payroll/tds/list', [PayrollReportController::class, 'getTdsList'])->name('payroll.tds.list');
 	Route::post('/payroll/tds/update', [PayrollReportController::class, 'updateTds'])->name('payroll.tds.update');
 	Route::get('/payroll/pf/list', [PayrollReportController::class, 'getPfList'])->name('payroll.pf.list');
-
 });

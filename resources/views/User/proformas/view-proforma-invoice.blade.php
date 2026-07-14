@@ -756,6 +756,7 @@
                         <th>Date</th>
                         <th>Amount</th>
 						<th>Mode</th>
+						<th>Bank</th>
                         <th id="actionHeader" width="80">Action</th>
                     </tr>
                     </thead>

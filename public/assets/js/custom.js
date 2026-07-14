@@ -3555,8 +3555,39 @@ function changeRatePo(el) {
 	}
 
 	//start sales and purchase payment
-	let isViewPage = $("#isViewPage").val() == "1";
+	let bankList = [];
+	function loadBanks(callback)
+	{
+		$.get('/get-banks', function(res){
+			bankList = res;
+			if (typeof callback === 'function') {
+				callback();
+			}
+		});
+	}
+	
+	function getBankOptions(selectedId = '')
+	{
+		let html = '<option value="">Select Bank</option>';
 
+		if (!Array.isArray(bankList) || bankList.length === 0) {
+			return html;
+		}
+
+		bankList.forEach(function(bank){
+
+			html += `
+				<option value="${bank.id}"
+					${String(selectedId) === String(bank.id) ? 'selected' : ''}>
+					${bank.bank_name}
+				</option>`;
+		});
+
+		return html;
+	}
+	
+	let isViewPage = $("#isViewPage").val() == "1";
+	
 	$(document).on('click', '.paymentModalBtn', function () {
 
 		let id = $(this).data('id');
@@ -3565,9 +3596,17 @@ function changeRatePo(el) {
 		$("#f_id").val(id);
 		$("#voucher_type").val(type);
 
-		loadPaymentVouchers(id, type);
+		if (bankList.length === 0) {
 
-		$("#paymentVoucherModal").modal('show');
+			loadBanks(function () {
+				loadPaymentVouchers(id, type);
+				$("#paymentVoucherModal").modal('show');
+			});
+
+		} else {
+			loadPaymentVouchers(id, type);
+			$("#paymentVoucherModal").modal('show');
+		}
 	});
 
 	function loadPaymentVouchers(id, type)
@@ -3620,6 +3659,16 @@ function changeRatePo(el) {
 							<option value="UPI" ${row.payment_mode == 'UPI' ? 'selected' : ''}>UPI</option>
 						</select>
 					</td>
+					
+					<td>
+						<select class="form-select bank_id"
+							${isViewPage ? 'disabled' : ''}
+							style="${(row.payment_mode=='Bank' || row.payment_mode=='UPI') ? '' : 'display:none'}">
+
+							${getBankOptions(row.bank_id)}
+
+						</select>
+					</td>
 
 					${actionBtn}
 				</tr>`;
@@ -3666,6 +3715,12 @@ function changeRatePo(el) {
 					<option value="Cash">Cash</option>
 					<option value="Bank">Bank</option>
 					<option value="UPI">UPI</option>
+				</select>
+			</td>
+			
+			<td>
+				<select class="form-select bank_id" style="display:none">
+					${getBankOptions()}
 				</select>
 			</td>
 
@@ -3724,9 +3779,17 @@ function changeRatePo(el) {
 		$("#voucherRows tr").each(function () {
 
 			let paymentMode = $(this).find('.payment_mode').val();
+			let bankId = $(this).find('.bank_id').val();
 
 			if (!paymentMode) {
 				alert('Please select payment mode for all rows.');
+				hasError = true;
+				return false;
+			}
+			
+			if((paymentMode=='Bank' || paymentMode=='UPI') && !bankId)
+			{
+				alert('Please select bank.');
 				hasError = true;
 				return false;
 			}
@@ -3734,7 +3797,8 @@ function changeRatePo(el) {
 			rows.push({
 				date: $(this).find('.pay_date').val(),
 				amount: $(this).find('.pay_amount').val(),
-				payment_mode: paymentMode
+				payment_mode: paymentMode,
+				bank_id: bankId
 			});
 		});
 
@@ -3794,6 +3858,21 @@ function changeRatePo(el) {
 				);
 			}
 		});
+	});
+	
+	$(document).on('change','.payment_mode',function(){
+
+		let row = $(this).closest('tr');
+
+		if($(this).val()=='Bank' || $(this).val()=='UPI')
+		{
+			row.find('.bank_id').show();
+		}
+		else
+		{
+			row.find('.bank_id').hide().val('');
+		}
+
 	});
 	
 	//end sales and purchase payment

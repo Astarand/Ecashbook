@@ -23,14 +23,18 @@
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
+                    <a href="{{ route('payroll.payslip_update') }}#tds-section" class="btn btn-warning shadow">
+                        TDS Update
+                    </a>
+
                     <a href="#tdsFilterOffcanvas" class="btn btn-primary shadow" style="font-size: 16px;" data-bs-toggle="offcanvas" data-bs-target="#tdsFilterOffcanvas" aria-controls="tdsFilterOffcanvas">
                         Summary of Return
                     </a>
 					<a href="https://www.incometax.gov.in/" 
-					   target="_blank" 
-					   class="btn btn-primary shadow"
-					   style="font-size: 16px;">
-					   Payment of TDS/TCS
+                        target="_blank" 
+                        class="btn btn-primary shadow"
+                        style="font-size: 16px;">
+                        Payment of TDS/TCS
 					</a>
                 </div>
             </div>

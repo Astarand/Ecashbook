@@ -551,6 +551,20 @@ class CommonController extends Controller
 		}, $fileName);
 	}
 	
+	public function getBankList()
+	{
+		$userId = currentOwnerId();
+
+		$banks = DB::table('banks')
+			->select('id', 'bank_name')
+			->where('added_by', $userId)
+			->where('status', 1)
+			->orderBy('bank_name')
+			->get();
+
+		return response()->json($banks);
+	}
+	
 	//end new
 
 }

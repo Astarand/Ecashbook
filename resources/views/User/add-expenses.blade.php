@@ -148,6 +148,20 @@
                             </select>
                         </div>
 						
+						<div class="col-md-4 mb-3">
+							<div class="form-group">
+								<label>Select Bank</label>
+								<select name="bank_id" id="bank_id" class="form-control">
+									<option value="">-- Select Bank --</option>
+									@foreach($bankDetails as $bank)
+										<option value="{{ $bank->id }}">
+											{{ $bank->bank_name }}
+										</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+						
 						<div class="row mt-2 tax-info-section" style="display:none;">
 							<div class="col-md-4">
 								<label>Tax Treatment</label>
@@ -836,6 +850,7 @@
             let exp_invno = $("form#addExpenseFrm #exp_invno").val();
             let expense_amt = parseFloat($("form#addExpenseFrm #expense_amt").val()) || 0;
             let mode_of_expense = $("form#addExpenseFrm #mode_of_expense").val();
+			let bank_id = $("form#addExpenseFrm #bank_id").val();
             let pur_of_expense = $("form#addExpenseFrm #pur_of_expense").val();
             let approved_by = $("form#addExpenseFrm #approved_by").val();
             let designation = $("form#addExpenseFrm #designation").val();
@@ -919,6 +934,7 @@
             expensesData.append("exp_invno", exp_invno);
 
             expensesData.append("mode_of_expense", mode_of_expense);
+            expensesData.append("bank_id", bank_id);
             expensesData.append("pur_of_expense", pur_of_expense);
             expensesData.append("approved_by", approved_by);
             expensesData.append("designation", designation);

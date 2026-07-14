@@ -87,32 +87,47 @@ class ProfitLossController extends Controller
 		 | REVENUE – SALES & SERVICES
 		 ================================*/
 		$totalReseller = DB::table('sales as s')
-						->join('sales_values as sv', 'sv.sid', '=', 's.id')
-						->join('products as p', 'p.id', '=', 'sv.prod_id')
-						->where('s.status', 1) //only active records
-						->where('p.item_type', 'product')
-						->where('s.added_by', $userId)
-						->whereBetween('s.inv_date', [$startDate, $endDate])
-						->sum(DB::raw("
-							COALESCE(sv.amount,0) +
-							COALESCE(sv.tax_amt,0) +
-							COALESCE(sv.gov_pay,0) +
-							COALESCE(sv.ser_pay,0)
-						"));
+							->join('sales_values as sv', 'sv.sid', '=', 's.id')
+							->join('products as p', 'p.id', '=', 'sv.prod_id')
+							->where('s.status', 1)
+							->where('p.item_type', 'product')
+							->where('s.added_by', $userId)
+							->whereBetween('s.inv_date', [$startDate, $endDate])
+							->sum(DB::raw("
+								CASE
+									WHEN s.pay_status = 'Full' THEN
+										COALESCE(sv.amount,0)
 
+									WHEN s.pay_status IN ('Due','Partial') THEN
+										COALESCE(sv.amount,0) +
+										COALESCE(sv.tax_amt,0) +
+										COALESCE(sv.gov_pay,0) +
+										COALESCE(sv.ser_pay,0)
+
+									ELSE 0
+								END
+							"));
 		$totalService = DB::table('sales as s')
-						->join('sales_values as sv', 'sv.sid', '=', 's.id')
-						->join('products as p', 'p.id', '=', 'sv.prod_id')
-						->where('s.status', 1) //only active records
-						->where('p.item_type', 'service')
-						->where('s.added_by', $userId)
-						->whereBetween('s.inv_date', [$startDate, $endDate])
-						->sum(DB::raw("
-							COALESCE(sv.amount,0) +
-							COALESCE(sv.tax_amt,0) +
-							COALESCE(sv.gov_pay,0) +
-							COALESCE(sv.ser_pay,0)
-						"));
+							->join('sales_values as sv', 'sv.sid', '=', 's.id')
+							->join('products as p', 'p.id', '=', 'sv.prod_id')
+							->where('s.status', 1)
+							->where('p.item_type', 'service')
+							->where('s.added_by', $userId)
+							->whereBetween('s.inv_date', [$startDate, $endDate])
+							->sum(DB::raw("
+								CASE
+									WHEN s.pay_status = 'Full' THEN
+										COALESCE(sv.amount,0)
+
+									WHEN s.pay_status IN ('Due','Partial') THEN
+										COALESCE(sv.amount,0) +
+										COALESCE(sv.tax_amt,0) +
+										COALESCE(sv.gov_pay,0) +
+										COALESCE(sv.ser_pay,0)
+
+									ELSE 0
+								END
+							"));
 		
 		//Start Sales credit/debit
 		$invoiceType = DB::table('sales as s')
@@ -242,7 +257,20 @@ class ProfitLossController extends Controller
 						->where('p.added_by', $userId)
 						->where('p.status', 1)
 						->whereBetween('p.inv_date', [$startDate, $endDate])
-						->selectRaw('SUM(COALESCE(pv.amount,0) + COALESCE(pv.tax_amt,0)) as total')
+						->selectRaw("
+							SUM(
+								CASE
+									WHEN p.pay_status = 'Full' THEN
+										COALESCE(pv.amount,0)
+
+									WHEN p.pay_status IN ('Due','Partial') THEN
+										COALESCE(pv.amount,0) +
+										COALESCE(pv.tax_amt,0)
+
+									ELSE 0
+								END
+							) as total
+						")
 						->value('total');
 
 		$shippingTotal = DB::table('purchases')

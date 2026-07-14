@@ -9,6 +9,7 @@ use Auth;
 use Validator;
 use App\Models\User;
 use App\Models\PaymentVoucher;
+use App\Models\Journals;
 use Carbon\Carbon;
 
 class PaymentVoucherService
@@ -145,6 +146,7 @@ class PaymentVoucherService
 					}
 					$creditDebit = 'Credit';
 					$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $sales->mode_of_pay ?? null);
+					$bankId = $data['bank_id'] ?? null;
 					$referenceId = $sales->supplier_refno ?? null;
 					$narration = 'Sales Invoice Entry';
 			}
@@ -214,6 +216,7 @@ class PaymentVoucherService
 					}
 					$creditDebit = 'Credit';
 					$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $sales->mode_of_pay ?? null);
+					$bankId = $data['bank_id'] ?? null;
 					$referenceId = $sales->supplier_refno ?? null;
 					$narration = 'Proforma Invoice Entry';
 			}
@@ -281,6 +284,7 @@ class PaymentVoucherService
 				}
 				$creditDebit = 'Debit';
 				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $purchase->mode_of_pay ?? null);
+				$bankId = $data['bank_id'] ?? null;
 				$referenceId = $purchase->supplier_refno ?? null;
 				$narration = 'Purchase Invoice Entry';
 			}
@@ -365,7 +369,8 @@ class PaymentVoucherService
 					return true; // don't create voucher
 				}
 				$creditDebit = 'Debit';
-				$paymentMode = $this->getPaymentMode($expense->mode_of_expense ?? '');
+				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $expense->mode_of_pay ?? null);
+				$bankId = $data['bank_id'] ?? null;
 				$referenceId = $expense->exp_invno ?? null;
 				$narration = 'Expense Entry';
 				$approved_by = $expense->approved_by ?? null;
@@ -815,6 +820,62 @@ class PaymentVoucherService
 					return true;
 				}
 			}
+			elseif ($source == 'Journal')
+			{
+				$journals = Journals::find($id);
+
+				if (!$journals) {
+					return false;
+				}
+
+				$voucherType = strtolower($journals->debit_credit) == 'credit' ? 'Receipt Voucher' : 'Payment Voucher';
+
+				$paymentVoucher = PaymentVoucher::where('source', 'Journal')
+					->where('f_id', $journals->id)
+					->first();
+
+				$voucherNo = $paymentVoucher
+					? $paymentVoucher->voucher_no
+					: $this->getVoucherNo($userId, $voucherType);
+
+				$propId             = $journals->propId;
+				$date               = $journals->journal_date;
+				$invoiceNo          = $journals->id;
+				$partyType          = $journals->ledger;
+				$partyId            = null;
+				$partyName          = $journals->ledger;
+				$amount             = $journals->amount;
+				$transactionDetails = $journals->reference_type;
+				$creditDebit        = $journals->debit_credit;
+				$paymentMode        = 'Bank';
+				$referenceId        = $journals->reference_no;
+				$narration          = $journals->notes;
+
+				if ($paymentVoucher) {
+
+					$paymentVoucher->update([
+						'added_by'            => $userId,
+						'propId'              => $propId,
+						'voucher_type'        => $voucherType,
+						'date'                => $date,
+						'voucher_no'          => $voucherNo,
+						'party_type'          => $partyType,
+						'party_id'            => $partyId,
+						'party_name'          => $partyName,
+						'transaction_details' => $transactionDetails,
+						'invoice_no'          => $invoiceNo,
+						'amount'              => $amount,
+						'credit_debit'        => $creditDebit,
+						'payment_mode'        => $paymentMode,
+						'reference_id'        => $referenceId,
+						'narration'           => $narration,
+						'record_type'         => 'Posted',
+					]);
+
+					DB::commit();
+					return true;
+				}
+			}
 
 			// GET VOUCHER NO
 			$voucherNo = $this->getVoucherNo($userId,$voucherType);
@@ -837,6 +898,7 @@ class PaymentVoucherService
 				'amount'         => $amount,
 				'credit_debit'   => $creditDebit,
 				'payment_mode'   => $paymentMode,
+				'bank_id'   	 => $bankId,
 				'reference_id'   => $referenceId,
 				'narration'      => $narration,
 				'approved_by'    => auth()->user()->name ?? null,

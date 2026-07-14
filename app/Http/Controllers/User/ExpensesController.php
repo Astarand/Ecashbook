@@ -199,11 +199,17 @@ class ExpensesController extends Controller
 					->where('status', 1)
 					->get();
 		
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name')
+					->where('added_by', $userId)
+					->where('status', 1)
+					->get();
 		//echo "<pre>";print_r($purposes_of_tds);exit;
         return view('User.add-expenses')->with([
 			'purposes_of_tds' => $purposes_of_tds,
 			'proprietorships' => $proprietorships,
-			'vendors' => $vendors
+			'vendors' => $vendors,
+			'bankDetails' => $bankDetails,
         ]);
     }
 
@@ -395,8 +401,12 @@ class ExpensesController extends Controller
 			}else{
 				$currentPayment = $expenseAmount;
 			}
+			
+			$data = [
+						'bank_id' => $request->bank_id ?? null
+					];
 			if ($currentPayment > 0) {
-				$this->paymentVoucherService->storePaymentVoucherEntries($eId, 'Expense', $currentPayment);
+				$this->paymentVoucherService->storePaymentVoucherEntries($eId, 'Expense', $currentPayment,$data);
 			}
 			//end entry for voucher payment
 
@@ -731,7 +741,7 @@ class ExpensesController extends Controller
 					|--------------------------------------------------------------------------
 					*/
 
-					'payment_status' => $request->payment_status ?? null,
+					'payment_status' => $oldRec->payment_status ?? '',
 					'advance_amount' => $advanceAmount,
 					'balance_amount' => $balanceAmount,
 					'adjusted_now'   => $adjustedNow,
@@ -860,7 +870,7 @@ class ExpensesController extends Controller
 				$currentPayment = 0;
 			}
 			if ($currentPayment > 0) {
-				$this->paymentVoucherService->storePaymentVoucherEntries($eId,'Expense',$currentPayment);
+				//$this->paymentVoucherService->storePaymentVoucherEntries($eId,'Expense',$currentPayment);
 			}
 			//end payment voucher entry
 			
