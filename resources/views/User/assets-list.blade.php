@@ -42,6 +42,17 @@
 		
 			<div class="card mb-3">
 				<div class="card-body">
+				
+					<div class="alert alert-info mb-3" style="font-size:13px;">
+						<h6 class="mb-2">
+							<i class="ti ti-alert-circle me-1"></i>
+							Depreciation Update Required
+						</h6>
+						<p class="mb-0">
+							<strong>Please update Depreciation</strong> after adding or modifying Non-Current Assets to ensure accurate <strong>Profit &amp; Loss</strong> and <strong>Balance Sheet</strong> reports. Failure to update depreciation may result in incorrect financial statements.
+						</p>
+					</div>
+	
 					<div class="row">
 
 						<div class="col-md-3">
@@ -75,146 +86,138 @@
             <div class="card card-body table-card">
                 <div class="table-responsive">
                     <table class="table tbl-product" id="pc-dt-simple">
-                        <thead>
-                            <tr>
-                                <th class="text-end">#</th>
+						<thead>
+							<tr>
+								<th>#</th>
 								@if($hasProprietorship)
-								<th>PROPRIETORSHIP COMPANY</th>
+									<th>Company</th>
 								@endif
-                                <th>Asset ID</th>
+								<th>FY</th>
+								<th>Asset ID</th>
 								<th>Asset Type</th>
-								<th>Asset Cate.</th>
-                                <th>Date</th>
-                                <th>Asset Name</th>
-                                <th>Amount</th>     
-                                <th>TDS</th>     
-                                <th>Purchase By</th>
-                                <th>Pay Status</th>
+								<th>Asset Category</th>
+								<th>Asset Name</th>
+								<th class="text-end">Asset Value</th>
+								<th class="non-current-col">Method</th>
+								<th class="non-current-col">Rate (%)</th>
+								<th class="non-current-col">Current Dep.</th>
+								<th class="non-current-col">Closing Value</th>
+								<th>TDS</th>
+								<th>Pay Status</th>
                                 <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+								<th>Action</th>
+							</tr>
+						</thead>
+                        
+						<tbody>
+						
+						@foreach($assets as $asset)
 
-                            @foreach ($assets as $asset)
-							
 							@php
-								$isCwip = $asset->assetType == 'non-current' 
-										  && $asset->nonCurrentAssetType == 'Capital Work in Progress';
-
-								$status = $isCwip 
-										  ? $asset->cwip_pay_status 
-										  : $asset->pay_status;
+								$isCapex = $asset->assetType == 'non-current' && $asset->nonCurrentAssetType != 'Capital Work in Progress';
+								$isCwip = $asset->assetType == 'non-current' && $asset->nonCurrentAssetType == 'Capital Work in Progress';
+								$status = $isCwip ? $asset->cwip_pay_status : $asset->pay_status;
+								$date = \Carbon\Carbon::parse($asset->date);
+								if ($date->month >= 4) {
+									$fy = $date->year . '-' . substr($date->year + 1, 2);
+								} else {
+									$fy = ($date->year - 1) . '-' . substr($date->year, 2);
+								}
 							@endphp
-                            <tr>
-                                <td class="text-end">{{$loop->index + 1}}</td>
-								@if($hasProprietorship)
-								<td>{{$asset->comp_name}}</td>
+							<tr>
+
+							<td>{{ $loop->iteration }}</td>
+
+							@if($hasProprietorship)
+							<td>{{ $asset->comp_name }}</td>
+							@endif
+
+							<td>{{ $fy }}</td>
+							<td>{{ $asset->asset_id }}</td>
+							 <td>{{$asset->assetType}}</td>
+							<td>{{ $asset->nonCurrentAssetType ?? $asset->currentAssetType }}</td>
+							<td>{{ $asset->asset_name ?: $asset->project_name }}</td>
+							<td class="text-end">{{ number_format($asset->amount,2) }}</td>							
+							@if($isCapex)
+								<td>{{ $asset->depreciation_method ?? '-' }}</td>
+								<td>{{ $asset->depreciation_rate ? $asset->depreciation_rate.'%' : '-' }}</td>
+								<td class="text-end">{{ number_format($asset->amount-$asset->depreciation_value,2) }}</td>
+								<td class="text-end">{{ number_format($asset->depreciation_value,2) }}</td>
+
+							@else
+								<td>-</td>
+								<td>-</td>
+								<td>-</td>
+								<td>-</td>
+							@endif
+							<td>{{$asset->tds_amt}}</td>
+							<td>
+								@if (!empty($status))
+									@if ($status == 'Full')
+										<span class="badge bg-success text-dark">{{ $status }}</span>
+									@elseif ($status == 'Advance')
+										<span class="badge bg-warning text-dark">{{ $status }}</span>
+									@else
+										<span class="badge bg-danger text-dark">{{ $status }}</span>
+									@endif
+								@else
+									-
 								@endif
-                                <td>{{$asset->asset_id}}</td>
-                                <td>{{$asset->assetType}}</td>
-								<td>
-									{{ $asset->nonCurrentAssetType ?? $asset->currentAssetType ?? '-' }}
-								</td>
-                                <td>{{$asset->date}}</td>
-                                <td>{{$asset->asset_name ?: $asset->project_name}}</td>
-                                <td>
-                                    {{$asset->amount}}
+							</td>					
+							<td>
+								@if ($asset->isActive == '0')
+								<span class="badge bg-danger">Cancelled</span>
+								@elseif ($asset->isActive == '1')
+								<span class="badge bg-success">Active</span>   
+								@endif
+							</td>
+							<td>
+								<span><i class="ti ti-dots-vertical f-20"></i></span>
+								<div class="prod-action-links">
+									<ul class="list-inline me-auto mb-0">
+										<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="View">
+										   
+											<a
+												href="{{ route('user.ViewAsset', base64_encode($asset->id)) }}"
+												class="avtar avtar-xs btn-link-warning btn-pc-default">
+												<i class="ti ti-eye f-18"></i>
+											</a>
+										</li>
+										@if($req_tag != 1)
 
-                                    @if(strtolower($asset->gst_applicable ?? '') == 'yes')
-                                        @php
-                                            $gstAmt = (float) ($asset->gst_amt ?? 0);
-                                            $baseAmt = (float) ($asset->amount ?? 0);
-                                            $totalWithGst = $baseAmt + $gstAmt;
-                                        @endphp
+											@if ($asset->isActive != '0')
+												<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
+													<a href="{{ route('user.EditAsset', base64_encode($asset->id)) }}"
+													class="avtar avtar-xs btn-link-success btn-pc-default">
+														<i class="ti ti-edit-circle f-18"></i>
+													</a>
+												</li>
+											@endif
 
-                                        <br>
-                                        <span class="badge bg-light text-dark mt-1 d-inline-block">
-                                            {{ ucfirst($asset->gst_trans) }} |
-                                            GST {{ $asset->gst_rate }}% |
-                                            GST Amt: ₹{{ number_format($gstAmt, 2) }} |
-                                            Total: ₹{{ number_format($totalWithGst, 2) }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td>{{$asset->tds_amt}}</td>
-                                <td><a class="text-muted text-hover-primary" href="#">{{ $asset->purchaseByAudit }}</a></td>
-								<td>
-									@if (!empty($status))
+											<li class="list-inline-item align-bottom">
+												<a href="javascript:void(0)" 
+												data-id="{{ base64_encode($asset->id) }}"
+												class="avtar avtar-xs btn-link-danger btn-pc-default delete-btn"
+												data-bs-toggle="modal"
+												data-bs-target="#delete_modal"
+												data-bs-title="Delete"
+												data-bs-toggle="tooltip">
+													<i class="ti ti-trash f-18"></i>
+												</a>
+											</li>
 
-										@if ($status == 'Full')
-											<span class="badge bg-success text-dark">{{ $status }}</span>
-
-										@elseif ($status == 'Advance')
-											<span class="badge bg-warning text-dark">{{ $status }}</span>
-
-										@else
-											<span class="badge bg-danger text-dark">{{ $status }}</span>
 										@endif
 
-									@else
-										-
-									@endif
-								</td>
-                               <td>
-                                    @if ($asset->isActive == '0')
-                                    <span class="badge bg-danger">Cancelled</span>
-                                    @elseif ($asset->isActive == '1')
-                                    <span class="badge bg-success">Active</span>   
-                                    @endif
-                                </td>
-                                <td>
-                                    <span><i class="ti ti-dots-vertical f-20"></i></span>
-                                    <div class="prod-action-links">
-                                        <ul class="list-inline me-auto mb-0">
-                                            <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="View">
-                                                <!-- <a
-                                                    href="#"
-                                                    class="avtar avtar-xs btn-link-warning btn-pc-default"
-                                                    data-bs-toggle="offcanvas"
-                                                    data-bs-target="#productOffcanvas">
-                                                    <i class="ti ti-eye f-18"></i>
-                                                </a> -->
 
-                                                <!-- ritam -->
-                                                <a
-                                                    href="{{ route('user.ViewAsset', base64_encode($asset->id)) }}"
-                                                    class="avtar avtar-xs btn-link-warning btn-pc-default">
-                                                    <i class="ti ti-eye f-18"></i>
-                                                </a>
-                                            </li>
-											@if($req_tag != 1)
+									</ul>
+								</div>
+							</td>
 
-                                                @if ($asset->isActive != '0')
-                                                    <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
-                                                        <a href="{{ route('user.EditAsset', base64_encode($asset->id)) }}"
-                                                        class="avtar avtar-xs btn-link-success btn-pc-default">
-                                                            <i class="ti ti-edit-circle f-18"></i>
-                                                        </a>
-                                                    </li>
-                                                @endif
+							</tr>
 
-                                                <li class="list-inline-item align-bottom">
-                                                    <a href="javascript:void(0)" 
-                                                    data-id="{{ base64_encode($asset->id) }}"
-                                                    class="avtar avtar-xs btn-link-danger btn-pc-default delete-btn"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#delete_modal"
-                                                    data-bs-title="Delete"
-                                                    data-bs-toggle="tooltip">
-                                                        <i class="ti ti-trash f-18"></i>
-                                                    </a>
-                                                </li>
-
-                                            @endif
-
-
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
+						@endforeach
+						
+						</tbody>
                     </table>
 					<div class="d-flex justify-content-end mt-3">
 						{{ $assets_pagination->links('pagination::bootstrap-4') }}

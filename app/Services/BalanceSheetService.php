@@ -642,7 +642,7 @@ class BalanceSheetService
 			// ================= PAYMENT VOUCHERS (BANK MODE) =================
 			$bankVoucher = DB::table('payment_vouchers')
 				->where('added_by', $userId)
-				->where('payment_mode', 'Bank')
+				->whereIn('payment_mode', ['Bank', 'UPI'])
 				->selectRaw("
 					SUM(CASE WHEN credit_debit = 'Credit' THEN amount ELSE 0 END) as credit,
 					SUM(CASE WHEN credit_debit = 'Debit' THEN amount ELSE 0 END) as debit
@@ -904,5 +904,70 @@ class BalanceSheetService
 			'gst_receivable' => max(-$netGST, 0),
 		];
 	}
+	
+	public function calculateDepreciationByPeriod($asset, $fromDate, $toDate, $periodType = 'full-yearly')
+	{
+		$cost      = (float) $asset->invoice_value;
+		$residual  = (float) ($asset->residual_value ?? 0);
+		$rate      = (float) ($asset->depreciation_rate ?? 0);
+		$life      = (float) ($asset->useful_life_years ?? 0);
+		$method    = strtoupper($asset->depreciation_method ?? '');
 
+		$startDate = $asset->depreciation_start_date
+			?? $asset->purchaseDateAudit
+			?? $asset->date;
+
+		if (empty($startDate)) {
+			return 0;
+		}
+
+		$start = Carbon::parse($startDate);
+		$end   = Carbon::parse($toDate);
+
+		if ($start->gt($end)) {
+			return 0;
+		}
+
+		$years = $start->diffInYears($end);
+
+		// Calculate Annual Depreciation
+		if ($method === 'SLM') {
+
+			if ($life > 0) {
+				$annualDepreciation = ($cost - $residual) / $life;
+			} else {
+				$annualDepreciation = $cost * ($rate / 100);
+			}
+
+		} elseif ($method === 'WDV') {
+
+			$opening = $cost;
+
+			for ($i = 0; $i < $years; $i++) {
+				$opening -= ($opening * $rate / 100);
+			}
+
+			$annualDepreciation = $opening * ($rate / 100);
+
+		} else {
+			return 0;
+		}
+
+		// Return depreciation according to selected period
+		switch (strtolower($periodType)) {
+
+			case 'monthly':
+				return $annualDepreciation / 12;
+
+			case 'quarterly':
+				return $annualDepreciation / 4;
+
+			case 'half-yearly':
+				return $annualDepreciation / 2;
+
+			case 'full-yearly':
+			default:
+				return $annualDepreciation;
+		}
+	}
 }

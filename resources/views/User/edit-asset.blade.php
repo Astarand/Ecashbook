@@ -220,6 +220,17 @@
 													</select>
 												</div>
 												
+												<div class="col-sm-4 mb-3 d-flex flex-column">
+													<label class="form-label">&nbsp;</label>
+													<a href="javascript:void(0);"
+														class="btn btn-primary btn-sm paymentModalBtn"
+														data-id="{{ $asset->id ?? '' }}"
+														data-type="Asset"
+														style="width:90px;">
+														Payment
+													</a>
+												</div>
+												
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Advance Amount<span class="text-danger">*</span></label>
 													<input type="number" name="advance_amt" id="advance_amt" value="{{ $asset->advance_amt ?? '' }}" class="form-control">
@@ -278,9 +289,9 @@
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Depreciation Frequency</label>
 													<select name="depreciation_frequency" id="depreciation_frequency" class="form-select">
-														<option value="">Select</option>
+														<!--<option value="">Select</option>-->
 														<option value="Yearly" {{ $asset->depreciation_frequency == 'Yearly' ? 'selected' : '' }}>Yearly</option>
-														<option value="Half Year" {{ $asset->depreciation_frequency == 'Half Year' ? 'selected' : '' }}>Half Year</option>
+														<!--<option value="Half Year" {{ $asset->depreciation_frequency == 'Half Year' ? 'selected' : '' }}>Half Year</option>-->
 													</select>
 												</div>
 
@@ -388,6 +399,17 @@
 														<option value="Advance" {{ $asset->cwip_pay_status == 'Advance' ? 'selected' : '' }}>Advance</option>
 														<option value="Due" {{ $asset->cwip_pay_status == 'Due' ? 'selected' : '' }}>Due</option>
 													</select>
+												</div>
+												
+												<div class="col-sm-4 mb-3 d-flex flex-column">
+													<label class="form-label">&nbsp;</label>
+													<a href="javascript:void(0);"
+														class="btn btn-primary btn-sm paymentModalBtn"
+														data-id="{{ $asset->id ?? '' }}"
+														data-type="Asset"
+														style="width:90px;">
+														Payment
+													</a>
 												</div>
 
 												<div class="col-xl-4 mb-3">
@@ -827,6 +849,92 @@
     </div>
     <!-- [ Main Content ] end -->
 </div>
+
+<div class="modal fade" id="paymentVoucherModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Details</h5>
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="f_id">
+                <input type="hidden" id="voucher_type">
+				<input type="hidden" id="isViewPage" value="0">
+				
+				<div id="paymentNoteArea" class="alert alert-warning mt-2">
+					<strong>Note:</strong>
+					Please click <strong>Save</strong> to update payment vouchers,
+					journal entries and payment status.
+				</div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Total Invoice Amount</label>
+                        <input type="text"
+                            id="invoice_total"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Paid Amount</label>
+                        <input type="text"
+                            id="total_paid"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Balance Due</label>
+                        <input type="text"
+                            id="balance_due"
+                            class="form-control"
+                            readonly>
+                    </div>
+					
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Mode</th>
+						<th>Bank</th>
+                        <th width="80">Action</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="voucherRows">
+
+                    </tbody>
+                </table>
+
+                <button type="button"
+                    class="btn btn-success"
+                    id="addVoucherRow">
+                    Add Payment
+                </button>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                    class="btn btn-primary"
+                    id="saveVoucherPayments">
+                    Save
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <script>
 	var assetData = @json($asset);
 	 
@@ -1818,9 +1926,9 @@
             $('#useful_life_years').val('');
 
             if ($('#depreciation_frequency option[value="Half Year"]').length === 0) {
-                $('#depreciation_frequency').append(
+                /*$('#depreciation_frequency').append(
                     '<option value="Half Year">Half Year</option>'
-                );
+                );*/
             }
 
             calculateWDV();

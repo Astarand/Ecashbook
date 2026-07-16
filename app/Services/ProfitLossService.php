@@ -243,5 +243,117 @@ class ProfitLossService
 			'diluted_eps'        => round($dilutedEPS, 2),
 		];
 	}
+	
+	public function calculateDepreciationByPeriod($asset, $fromDate, $toDate, $periodType = 'full-yearly')
+	{
+		$cost      = (float) $asset->invoice_value;
+		$residual  = (float) ($asset->residual_value ?? 0);
+		$rate      = (float) ($asset->depreciation_rate ?? 0);
+		$life      = (float) ($asset->useful_life_years ?? 0);
+		$method    = strtoupper($asset->depreciation_method ?? '');
+
+		$startDate = $asset->depreciation_start_date
+			?? $asset->purchaseDateAudit
+			?? $asset->date;
+
+		if (empty($startDate)) {
+			return 0;
+		}
+
+		$start = Carbon::parse($startDate);
+		$end   = Carbon::parse($toDate);
+
+		if ($start->gt($end)) {
+			return 0;
+		}
+
+		$years = $start->diffInYears($end);
+
+		// Calculate Annual Depreciation
+		if ($method === 'SLM') {
+
+			if ($life > 0) {
+				$annualDepreciation = ($cost - $residual) / $life;
+			} else {
+				$annualDepreciation = $cost * ($rate / 100);
+			}
+
+		} elseif ($method === 'WDV') {
+
+			$opening = $cost;
+
+			for ($i = 0; $i < $years; $i++) {
+				$opening -= ($opening * $rate / 100);
+			}
+
+			$annualDepreciation = $opening * ($rate / 100);
+
+		} else {
+			return 0;
+		}
+
+		// Return depreciation according to selected period
+		switch (strtolower($periodType)) {
+
+			case 'monthly':
+				return $annualDepreciation / 12;
+
+			case 'quarterly':
+				return $annualDepreciation / 4;
+
+			case 'half-yearly':
+				return $annualDepreciation / 2;
+
+			case 'full-yearly':
+			default:
+				return $annualDepreciation;
+		}
+	}
+	
+	public function calculateDepreciation($asset, $fromDate, $toDate, $period_type)
+	{
+		$cost      = $asset->invoice_value;
+		$residual  = $asset->residual_value ?? 0;
+		$rate      = $asset->depreciation_rate;
+		$life      = $asset->useful_life_years;
+		$method    = strtoupper($asset->depreciation_method);
+		$frequency = strtolower($asset->depreciation_frequency);
+
+		$startDate = $asset->depreciation_start_date ?? $asset->purchaseDateAudit ?? $asset->date;
+		if (!$startDate) {
+			return 0;
+		}
+
+		$start = Carbon::parse($startDate);
+		if ($start->gt(Carbon::parse($toDate))) {
+			return 0;
+		}
+
+		$years = $start->diffInYears(Carbon::parse($toDate));
+
+		if ($method == 'SLM') 
+		{
+			if ($life > 0) {
+				$annual = ($cost - $residual) / $life;
+			} else {
+				$annual = $cost * ($rate / 100);
+			}
+		} 
+		else 
+		{
+			// WDV
+			$opening = $cost;
+			for ($i=0;$i<$years;$i++) {
+				$opening -= ($opening * $rate /100);
+			}
+			$annual = $opening * ($rate /100);
+		}
+
+		if ($frequency == 'half year') {
+			return $annual/2;
+		}
+		
+		return $annual;
+	}
 
 }

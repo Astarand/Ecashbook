@@ -98,6 +98,16 @@
 								<option value="UPI" <?=($income->pay_mode == "UPI") ? 'selected' : '' ?>>UPI</option>														
 							</select>
 						</div>
+						<div class="col-sm-4 mb-3 d-flex flex-column">
+							<label class="form-label">&nbsp;</label>
+							<a href="javascript:void(0);"
+								class="btn btn-primary btn-sm paymentModalBtn"
+								data-id="{{ $income->id ?? '' }}"
+								data-type="Income"
+								style="width:90px;">
+								Payment
+							</a>
+						</div>
 						<div class="col-md-3 mb-3">
                             <label class="form-label">Advance Amount</label>
                             <input type="number" step="0.01" name="advance_amt" id="advance_amt" value="{{$income->advance_amt}}" class="form-control" placeholder="Amount">
@@ -257,6 +267,69 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="paymentVoucherModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Details</h5>
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="f_id">
+                <input type="hidden" id="voucher_type">
+				<input type="hidden" id="isViewPage" value="1">
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Total Invoice Amount</label>
+                        <input type="text"
+                            id="invoice_total"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Paid Amount</label>
+                        <input type="text"
+                            id="total_paid"
+                            class="form-control"
+                            readonly>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Balance Due</label>
+                        <input type="text"
+                            id="balance_due"
+                            class="form-control"
+                            readonly>
+                    </div>
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+						<th>Mode</th>
+						<th>Bank</th>
+                        <th id="actionHeader" width="80">Action</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="voucherRows">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 
 	document.querySelectorAll('input, textarea, select').forEach(el => {

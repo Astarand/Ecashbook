@@ -31,14 +31,16 @@ use Illuminate\Support\Facades\Cookie;
 use App\Helpers\AuditLogger;
 use App\Services\JournalService;
 use App\Services\PaymentVoucherService;
+use App\Services\ProfitLossService;
 
 
 class AssetController extends Controller
 {
-    public function __construct(JournalService $journalService, PaymentVoucherService $paymentVoucherService = null)
+    public function __construct(JournalService $journalService, PaymentVoucherService $paymentVoucherService = null, ProfitLossService $profitLossService = null)
     {
         $this->journalService = $journalService;
 		$this->paymentVoucherService = $paymentVoucherService;
+		$this->profitLossService = $profitLossService;
     }
 	
     public function AssetList(Request $request)
@@ -206,6 +208,7 @@ class AssetController extends Controller
 							->leftJoin('asset_non_currents', 'assets.id', '=', 'asset_non_currents.asid')
 							->orderBy('id', 'DESC')->paginate(10);
 		}
+		
 		$assets_pagination = $assets;
 		// echo "<pre>"; print_r($assets);exit;
 		return view('User.assets-list')->with([
@@ -234,10 +237,18 @@ class AssetController extends Controller
 			->where('userId', $userId)
 			->where('status', 1)
 			->get();
+			
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name')
+					->where('added_by', $userId)
+					->where('status', 1)
+					->get();
+					
         return view('User.add-asset')->with([
 			'purposes_of_tds' => $purposes_of_tds,
 			'proprietorships' => $proprietorships,
-			'vendors' => $vendors
+			'vendors' => $vendors,
+			'bankDetails' => $bankDetails
         ]);
     }
 
@@ -392,9 +403,35 @@ class AssetController extends Controller
 		if ($data['assetType'] === 'current') {
 			$this->storeCurrentAsset($asset, $data);
 		}
-		// ================= JOURNAL =================
+		// ================= Normal JOURNAL + Depreciation =================
 		if($data['assetType'] === 'non-current'){
+			$assetId = $asset;
 			$this->journalEntry($asset);
+			
+			$assetData = DB::table('assets')
+						->where('id', $assetId)
+						->where('added_by', $userId)
+						->first();
+			$startDate = $assetData->depreciation_start_date ?? $assetData->purchaseDateAudit ?? $data['date'];
+			$toDate = now()->toDateString();
+			$invoiceValue = !$isWip ? ($data['invoice_value'] ?? 0) : 0;
+			$depreciation = !$isWip ? (($invoiceValue - $data['depreciation_value']) ?? 0) : 0;
+			if ($depreciation > 0) {
+				$isWip = (($assetData->assetType === 'non-current') &&($assetData->nonCurrentAssetType === 'Capital Work in Progress'));
+				$payStatus = $isWip ? ($assetData->cwip_pay_status ?? ''): ($assetData->pay_status ?? 0);
+				$party = $isWip ? ($assetData->cwip_vendor_id ?? '') : ($assetData->vendor_id ?? '');
+				$vendorName = $party ? DB::table('vendors')->where('id', $party)->value('vendor_name') : '';
+				$this->journalService->storeDepreciationJournal([
+					'added_by'=>$assetData->added_by,
+					'autoId'=>$assetId,
+					'propId'=>$assetData->propId,
+					'date'=>$assetData->date,
+					'asset_name'=>$assetData->asset_name,
+					'party_name'    => $vendorName,
+					'pay_status'    => $payStatus,
+					'depreciation'=>$depreciation
+				]);
+			}
 		}
 		
 
@@ -436,7 +473,15 @@ class AssetController extends Controller
 		}
 
 		if ($currentPayment > 0) {
-			$this->paymentVoucherService->storePaymentVoucherEntries($asset,'Asset',$currentPayment);
+			$bankId = ($data['nonCurrentAssetType'] == 'Capital Work in Progress') ? $data['cwip_bank_id'] : $data['bank_id'];
+			$pay_mode = ($data['nonCurrentAssetType'] == 'Capital Work in Progress') ? $data['cwip_pay_mode'] : $data['pay_mode'];
+			$data = [
+						'date' => $data['date'] ?? null,
+						'payment_mode' => $pay_mode ?? null,
+						'bank_id' => $bankId ?? null,
+						'addFlag' => 1
+					];
+			$this->paymentVoucherService->storePaymentVoucherEntries($asset,'Asset',$currentPayment,$data);
 		}
 		// ======= End payment voucher entry ========
 
@@ -890,6 +935,9 @@ class AssetController extends Controller
 
 			// ================= MAIN UPDATE =================
 			$isWip = (($data['assetType'] ?? '') === 'non-current' && ($data['nonCurrentAssetType'] ?? '') === 'Capital Work in Progress');
+			$depreciationMethod = !$isWip ? ($data['depreciation_method'] ?? null) : null;
+			$hasDepreciation = !empty($depreciationMethod);
+			
 			DB::table('assets')
 				->where('id', $assetId)
 				->where('added_by', $uid)
@@ -912,11 +960,11 @@ class AssetController extends Controller
 					'invoice_no' => !$isWip ? ($data['invoice_no'] ?? null) : null,
 					'invoice_date' => !$isWip ? ($data['invoice_date'] ?? null) : null,
 					'invoice_value' => !$isWip ? ($data['invoice_value'] ?? null) : null,
-					'pay_status' => !$isWip ? ($data['pay_status'] ?? null) : null,
+					//'pay_status' => !$isWip ? ($data['pay_status'] ?? null) : null,
 					'advance_amt' => !$isWip ? ($data['advance_amt'] ?? 0) : 0,
 					'payable_amt' => !$isWip ? ($data['payable_amt'] ?? 0) : 0,
 					'adjusted_amt' => !$isWip ? ($data['adjusted_amt'] ?? 0) : 0,
-					'cwip_pay_status' => $isWip ? ($data['cwip_pay_status'] ?? null) : null,
+					//'cwip_pay_status' => $isWip ? ($data['cwip_pay_status'] ?? null) : null,
 					'cwip_advance_amt' => $isWip ? ($data['cwip_advance_amt'] ?? 0) : 0,
 					'cwip_payable_amt' => $isWip ? ($data['cwip_payable_amt'] ?? 0) : 0,
 					'cwip_adjusted_amt' => $isWip ? ($data['cwip_adjusted_amt'] ?? 0) : 0,
@@ -929,9 +977,9 @@ class AssetController extends Controller
 					'depreciation_frequency' => !$isWip ? ($data['depreciation_frequency'] ?? null) : null,
 					'useful_life_years' => !$isWip ? ($data['useful_life_years'] ?? 0) : 0,
 					'depreciation_method' => !$isWip ? ($data['depreciation_method'] ?? null) : null,
-					'residual_value' => !$isWip ? ($data['residual_value'] ?? 0) : 0,
-					'depreciation_value' => !$isWip ? ($data['depreciation_value'] ?? 0) : 0,
-					'depreciation_rate' => !$isWip ? ($data['depreciation_rate'] ?? 0) : 0,
+					'residual_value'      => $hasDepreciation ? ($data['residual_value'] ?? 0) : 0,
+					'depreciation_value'  => $hasDepreciation ? ($data['depreciation_value'] ?? 0) : 0,
+					'depreciation_rate'   => $hasDepreciation ? ($data['depreciation_rate'] ?? 0) : 0,
 
 					// ================= CWIP (ONLY IF WIP) =================
 					'project_name' => $isWip ? ($data['project_name'] ?? null) : null,
@@ -992,8 +1040,34 @@ class AssetController extends Controller
 					->delete();
 			}
 
-			// ================= JOURNAL =================
+			// ================= Normal JOURNAL + Depreciation =================
+			$asset = DB::table('assets')
+				->where('id', $assetId)
+				->where('added_by', $uid)
+				->first();
+				
 			$this->journalEntry($assetId);
+			
+			$startDate = $asset->depreciation_start_date ?? $asset->purchaseDateAudit ?? $asset->date;
+			$toDate = now()->toDateString();
+			$isWip = (($asset->assetType === 'non-current') &&($asset->nonCurrentAssetType === 'Capital Work in Progress'));
+			$payStatus = $isWip ? ($asset->cwip_pay_status ?? ''): ($asset->pay_status ?? 0);
+			$party = $isWip ? ($asset->cwip_vendor_id ?? '') : ($asset->vendor_id ?? '');
+			$vendorName = $party ? DB::table('vendors')->where('id', $party)->value('vendor_name') : '';
+			
+			$invoiceValue = !$isWip ? ($data['invoice_value'] ?? 0) : 0;
+			$depreciation = $hasDepreciation ? (($invoiceValue-$data['depreciation_value']) ?? 0) : 0;
+			
+			$this->journalService->storeDepreciationJournal([
+				'added_by'=>$asset->added_by,
+				'autoId'=>$assetId,
+				'propId'=>$asset->propId,
+				'date'=>$asset->date,
+				'asset_name'=>$asset->asset_name,
+				'party_name'    => $vendorName,
+				'pay_status'    => $payStatus,
+				'depreciation'=>$depreciation
+			]);
 			
 			// ======= Start payment voucher entry ========
 			$currentPayment = 0;
@@ -1044,7 +1118,7 @@ class AssetController extends Controller
 				$currentPayment = 0;
 			}
 			if ($currentPayment > 0) {
-				$this->paymentVoucherService->storePaymentVoucherEntries($assetId,'Asset',$currentPayment);
+				//$this->paymentVoucherService->storePaymentVoucherEntries($assetId,'Asset',$currentPayment);
 			}
 			// ======= End payment voucher entry ========
 

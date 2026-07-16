@@ -411,7 +411,7 @@ class PaymentVoucherService
 
 				$voucherType = 'Receipt Voucher';
 				$propId = $income->propId;
-				$date = $income->dateInput;
+				$date = $data['date'];
 				$invoiceNo = $income->id;
 				// ==========================================
 				// PARTY DETAILS
@@ -432,25 +432,20 @@ class PaymentVoucherService
 				// ==========================================
 				$amount = $currentPayment;
 				$transactionDetails = '';
-				if (strtolower($income->pay_status) == 'full') {
-					$transactionDetails = 'Adjustment';
-				} else if (strtolower($income->pay_status) == 'advance') {
-					$transactionDetails = 'Advance';
-				} else {
-					$transactionDetails = 'Due';
-				}
 				
-				if ($income->pay_status == 'Due') {
+				$addFlag = $data['addFlag'] ?? 0;
+				if ($addFlag == 1 && $income->pay_status == 'Due') {
 					return true; // don't create voucher
 				}
 				// ==========================================
 				// TRANSACTION DETAILS
 				// ==========================================
 				$creditDebit = 'Credit';
-				$paymentMode = $this->getPaymentMode($income->pay_mode ?? '');
+				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? null);
 				$referenceId = $income->invoice_no ?? null;
 				$narration = $income->categoryIncome ?? 'Income Entry';
 				$approved_by = null;
+				$bankId = $data['bank_id'] ?? null;
 			}
 			// ======================================================
 			// ASSET
@@ -505,7 +500,7 @@ class PaymentVoucherService
 
 				$voucherType = 'Payment Voucher';
 				$propId = $asset->propId;
-				$date = $asset->date;
+				$date = $data['date'];
 				$isWip = (
 					strtolower($asset->assetType ?? '') == 'non-current'
 					&&
@@ -541,24 +536,19 @@ class PaymentVoucherService
 					$paymentStatus = strtolower(trim($asset->pay_status ?? ''));
 				}
 				
-				if ($paymentStatus == 'due') {
+				$addFlag = $data['addFlag'] ?? 0;
+				if ($addFlag == 1 && $paymentStatus == 'due') {
 					return true; // don't create voucher
 				}
 
 				$transactionDetails = '';
-				if ($paymentStatus == 'full') {
-					$transactionDetails = 'Adjustment';
-				} else if ($paymentStatus == 'advance') {
-					$transactionDetails = 'Advance';
-				} else {
-					$transactionDetails = 'Due';
-				}
 
 				$creditDebit = 'Debit';
-				$paymentMode = 'Bank';
+				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? null);
 				$referenceId = $invoiceNo ?? null;
 				$narration = $isWip ? 'CWIP Asset Entry' : ($asset->asset_category ?? 'Asset Entry');
 				$approved_by = null;
+				$bankId = $data['bank_id'] ?? null;
 			}
 			// ======================================================
 			// Liability
@@ -664,6 +654,7 @@ class PaymentVoucherService
 				$approved_by = null;
 
 				$amount = $currentPayment;
+				$bankId = $data['bank_id'] ?? null;
 
 				// ======================================================
 				// CURRENT LIABILITY

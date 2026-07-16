@@ -66,10 +66,10 @@ class ProfitLossController extends Controller
 		// Current period
 		[$startDate, $endDate] = $this->getDateRange($financial_year,$period_type,$dynamic_period);
 		// Previous period
-		[$prevStartDate, $prevEndDate] = $this->getPreviousDateRange($startDate, $endDate);
+		[$prevStartDate, $prevEndDate] = $this->getPreviousDateRange($startDate, $endDate, $period_type);
 
-		$pYearData = $this->calculatePL($prevStartDate, $prevEndDate, $userId);
-		$cYearData = $this->calculatePL($startDate, $endDate, $userId);
+		$pYearData = $this->calculatePL($prevStartDate, $prevEndDate, $userId, $period_type);
+		$cYearData = $this->calculatePL($startDate, $endDate, $userId, $period_type);
 
         return response()->json([
             'success' => true,
@@ -81,7 +81,7 @@ class ProfitLossController extends Controller
         ]);
 	}
 	
-	private function calculatePL($startDate, $endDate, $userId)
+	private function calculatePL($startDate, $endDate, $userId, $period_type)
 	{
 		/* ================================
 		 | REVENUE – SALES & SERVICES
@@ -456,13 +456,26 @@ class ProfitLossController extends Controller
 			->groupBy('expense_type')
 			->get();
 
-		$depreciationExpense = DB::table('assets')
-								->where('added_by', $userId)
-								->where('isActive', 1)
-								->where('assetType','non-current')
-								//->whereBetween('depreciation_start_date', [$startDate, $endDate])
-								->whereBetween('date', [$startDate, $endDate])
-								->sum('depreciation_value');
+		//Start Asset Depericiation Calculation
+		$inputDate = Carbon::parse($endDate);
+		if ($inputDate->month >= 4) {
+			$fyStart = Carbon::create($inputDate->year, 4, 1)->toDateString();
+			$fyEnd   = Carbon::create($inputDate->year + 1, 3, 31)->toDateString();
+		} else {
+			$fyStart = Carbon::create($inputDate->year - 1, 4, 1)->toDateString();
+			$fyEnd   = Carbon::create($inputDate->year, 3, 31)->toDateString();
+		}
+		$assets = DB::table('assets')
+						->where('added_by', $userId)
+						->where('assetType', 'non-current')
+						->whereBetween('date', [$fyStart, $fyEnd])
+						->where('isActive', 1)
+						->get();
+
+		$depreciationExpense = 0;
+		foreach ($assets as $asset) {
+			$depreciationExpense += $this->profitLossService->calculateDepreciationByPeriod($asset,$fyStart,$fyEnd,$period_type);
+		}
 								
 		$financeCosts = DB::table('expenses')
 							->whereBetween('expense_date', [$startDate, $endDate])

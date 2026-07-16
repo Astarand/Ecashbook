@@ -59,13 +59,40 @@ class PayController extends Controller
 				->first();
 
 			$invoiceTotal = getRoundedAmount($invoice->amount + $invoice->tax_amt + $invoice->ser_pay + $invoice->gov_pay);
-		}else if($type=='Expense')
-		{
+		}else if($type=='Expense'){
 			$expense = DB::table('expenses')
 				->where('id',$id)
 				->first();
 
 			$invoiceTotal = getRoundedAmount(($expense->expense_amt ?? 0));
+		}else if($type=='Income'){
+			$income = DB::table('income')
+				->where('id',$id)
+				->first();
+
+			$invoiceTotal = getRoundedAmount(($income->amount ?? 0));
+		}else if($type == 'Asset'){
+			$asset = DB::table('assets')
+				->where('id', $id)
+				->first();
+
+			if($asset)
+			{
+				// Normal Asset
+				if($asset->nonCurrentAssetType != 'Capital Work in Progress')
+				{
+					$invoiceTotal = getRoundedAmount($asset->invoice_value ?? 0);
+				}
+				// CWIP Asset
+				else
+				{
+					$invoiceTotal = getRoundedAmount($asset->cwip_amount ?? 0);
+				}
+			}
+			else
+			{
+				$invoiceTotal = 0;
+			}
 		}else{			
 			$invoice = DB::table('purchase_values as pv')
 							->leftJoin('purchases as p', 'p.id', '=', 'pv.sid')
@@ -382,6 +409,112 @@ class PayController extends Controller
 					'payment_status' => $payStatus
 				]);
 		}
+		else if($type == 'Income')
+		{
+			$income = DB::table('income')
+				->where('id', $id)
+				->first();
+
+			if($income)
+			{
+				$total = getRoundedAmount($income->amount ?? 0);
+
+				$received = DB::table('payment_vouchers')
+					->where('source', 'Income')
+					->where('f_id', $id)
+					->sum('amount');
+
+				if($received == 0)
+					$status = 'Due';
+				elseif($received >= $total)
+					$status = 'Full';
+				else
+					$status = 'Advance';
+
+				// Update Income
+				DB::table('income')
+					->where('id', $id)
+					->update([
+						'pay_status'     => $status,
+						'advance_amt'    => $received,
+						'adjust_amt'     => $received,
+						'receivable_amt' => max(0, $total - $received)
+					]);
+
+				// Update Journal
+				DB::table('journals')
+					->where('entry_type', 'Income')
+					->where('autoId', $id)
+					->update([
+						'payment_status' => $status
+					]);
+			}
+		}
+		else if($type == 'Asset')
+		{
+			$asset = DB::table('assets')
+				->where('id', $id)
+				->first();
+
+			if($asset)
+			{
+				// Determine total amount
+				if($asset->nonCurrentAssetType == 'Capital Work in Progress')
+				{
+					$total = getRoundedAmount($asset->cwip_amount ?? 0);
+				}
+				else
+				{
+					$total = getRoundedAmount($asset->invoice_value ?? 0);
+				}
+
+				$paid = DB::table('payment_vouchers')
+					->where('source', 'Asset')
+					->where('f_id', $id)
+					->sum('amount');
+
+				if($paid == 0)
+					$status = 'Due';
+				elseif($paid >= $total)
+					$status = 'Full';
+				else
+					$status = 'Advance';
+
+				// Update Asset
+				if($asset->nonCurrentAssetType == 'Capital Work in Progress')
+				{
+					DB::table('assets')
+					->where('id', $id)
+					->update([
+						'cwip_pay_status'    => $status,
+						'cwip_advance_amt'   => $paid,
+						'cwip_adjusted_amt'  => $paid,
+						'cwip_payable_amt'   => max(0, $total - $paid)
+					]);
+				}
+				else
+				{
+					DB::table('assets')
+					->where('id', $id)
+					->update([
+						'pay_status'    => $status,
+						'advance_amt'   => $paid,
+						'adjusted_amt'  => $paid,
+						'payable_amt'   => max(0, $total - $paid)
+					]);
+				}
+				
+
+				// Update Journal
+				DB::table('journals')
+					->where('entry_type', 'Asset')
+					->where('autoId', $id)
+					->update([
+						'payment_status' => $status
+					]);
+			}
+		}
+		
 	}
 	
 	public function deletePayment($id)

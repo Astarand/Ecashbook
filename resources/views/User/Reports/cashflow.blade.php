@@ -85,6 +85,30 @@
                                     <option value="financing">Financing Activities</option>
                                 </select>
                             </div>
+							
+							<!-- MODE OF PAYMENT -->
+                            <div class="col-md-3">
+                                <label class="form-label">Mode of Payment</label>
+                                <select class="form-select" name="payment_mode" id="payment_mode">
+                                    <option value="all">All</option>
+									<option value="Cash">Cash</option>
+									<option value="Bank">Bank</option>
+                                </select>
+                            </div>
+							
+							<div class="col-md-3" id="bank_div" style="display:none;">
+								<div class="form-group">
+									<label class="form-label">Select Bank</label>
+									<select name="bank_id" id="bank_id" class="form-control">
+										<option value="">-- Select Bank --</option>
+										@foreach($bankDetails as $bank)
+											<option value="{{ $bank->id }}">
+												{{ $bank->bank_name }}
+											</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
 
                             <!-- VOUCHER TYPE -->
                             <div class="col-md-3">
@@ -93,29 +117,18 @@
                                     <option value="all">All</option>
                                     <option value="receipt">Receipt</option>
                                     <option value="payment">Payment</option>
-                                    <!--<option value="contra">Contra (Cash + Banking)</option>-->
                                 </select>
-                            </div>
+                            </div>                            
 
-                            <!-- MODE OF PAYMENT -->
-                            <div class="col-md-3">
-                                <label class="form-label">Mode of Payment</label>
-                                <select class="form-select" name="payment_mode" id="payment_mode">
-                                    <option value="all">All</option>
-                                    <option value="Bank">Bank Transfer</option>
-                                    <option value="UPI">UPI / QR</option>
-									<option value="Cash">Cash</option>
-                                    <!--<option value="card">Card / POS</option>
-                                    <option value="cheque">Cheque</option>                                    
-                                    <option value="payment_gateway">Payment Gateway</option>
-                                    <option value="international_transfer">International Transfer</option>-->
-                                </select>
+                            <!-- OPENING CASH & BANK BALANCE -->                           
+							<div class="col-md-3">
+                                <label class="form-label">Opening Cash (₹)</label>
+                                <input type="number" step="0.01" readonly value="{{ $openingCash }}" class="form-control" name="opening_cash" id="opening_cash">
                             </div>
-
-                            <!-- OPENING CASH & BANK BALANCE -->
-                            <div class="col-md-3">
-                                <label class="form-label">Opening Cash & Bank Balance (₹)</label>
-                                <input type="number" step="0.01" readonly value="{{ $openingBalance }}" class="form-control" name="opening_balance" id="opening_balance">
+							
+							<div class="col-md-3">
+                                <label class="form-label">Opening Bank Balance (₹)</label>
+                                <input type="number" step="0.01" readonly value="{{ $openingBank }}" class="form-control" name="opening_bank" id="opening_bank">
                             </div>
 
                             <!-- GENERATE BUTTON -->
@@ -221,7 +234,7 @@
 			<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 		  </div>
 		  <div class="modal-body">
-			<h6>Opening balance is zero. Please update Opening Balance in (Cash & Banking -> Cash Management) to continue.</h6>
+			<h6>Opening balance is zero. Please update Opening Balance in (Cash & Banking -> Bank Account Master) to continue.</h6>
 		  </div>
 		  <div class="modal-footer">
 			<button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
@@ -236,6 +249,27 @@
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
+
+	$(document).ready(function () {
+
+		function toggleBankDropdown() {
+			if ($('#payment_mode').val() === 'Bank') {
+				$('#bank_div').show();
+			} else {
+				$('#bank_div').hide();
+				$('#bank_id').val(''); // Reset bank selection
+			}
+		}
+
+		// Initial page load
+		toggleBankDropdown();
+
+		// On payment mode change
+		$('#payment_mode').on('change', function () {
+			toggleBankDropdown();
+		});
+
+	});
 
 	function exportCashFlowToExcel() 
 	{
@@ -322,14 +356,17 @@
 		let msg = '';
 
 		//let financial_year = $('#financial_year option:selected').val();
-		let opening_balance = $('#opening_balance').val();
 		let fromDate = $('#from_date').val();
 		let toDate   = $('#to_date').val();
 		let cashflow_type = $('#cashflow_type option:selected').val();
 		let voucher_type = $('#voucher_type option:selected').val();
 		let payment_mode = $('#payment_mode option:selected').val();
+		
+		let openingCash = parseFloat($('#opening_cash').val() || 0);
+		let openingBank = parseFloat($('#opening_bank').val() || 0);
+		let openingBalance = openingCash + openingBank;
 
-		opening_balance = parseFloat(opening_balance || 0);
+		openingBalance = parseFloat(openingBalance || 0);
 		if (cashflow_type == "") {
 			msg = 'Please select cashflow type';
 			isValid = false;
@@ -346,7 +383,7 @@
 			msg = 'From Date cannot be greater than To Date';
 			isValid = false;
 		}
-		else if (opening_balance === 0) {
+		else if (openingBalance === 0) {
 			// show modal & block submit
 			$('#openingBalanceModal').modal('show');
 			return false;
@@ -445,8 +482,6 @@
 	
 	$('#frmCashFlow').on('submit', function(e) {
 		e.preventDefault();
-		let openingBalance = $('#opening_balance').val();
-		openingBalance = parseFloat(openingBalance || 0);
 		if (!validateCashFlowForm()) {
 			return false;
 		}

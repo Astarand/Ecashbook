@@ -220,6 +220,30 @@
 														<option value="Due">Due</option>														
 													</select>
 												</div>
+												
+												<div class="col-xl-4 mb-3">
+													<label class="form-label">Payment Mode<span class="text-danger">*</span></label>
+													<select name="pay_mode" id="pay_mode"  class="form-select">
+														<option value="">Select</option>
+														<option value="Cash">Cash</option>
+														<option value="Bank">Bank</option>														
+														<option value="UPI">UPI</option>														
+													</select>
+												</div>
+												
+												<div class="col-xl-4 mb-3">
+													<div class="form-group">
+														<label class="form-label">Select Bank</label>
+														<select name="bank_id" id="bank_id" class="form-control">
+															<option value="">-- Select Bank --</option>
+															@foreach($bankDetails as $bank)
+																<option value="{{ $bank->id }}">
+																	{{ $bank->bank_name }}
+																</option>
+															@endforeach
+														</select>
+													</div>
+												</div>
 
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Advance Amount<span class="text-danger">*</span></label>
@@ -281,7 +305,7 @@
 												<div class="col-xl-4 mb-3">
 													<label class="form-label">Depreciation Frequency</label>
 													<select name="depreciation_frequency" id="depreciation_frequency" class="form-select">
-														<option value="">select</option>
+														<!--<option value="">select</option>-->
 														<option value="Yearly">Yearly</option>
 													</select>
 												</div>
@@ -389,6 +413,28 @@
 														<option value="Advance">Advance</option>
 														<option value="Due">Due</option>
 													</select>
+												</div>
+												<div class="col-xl-4 mb-3">
+													<label class="form-label">Payment Mode<span class="text-danger">*</span></label>
+													<select name="cwip_pay_mode" id="cwip_pay_mode" class="form-select">
+														<option value="">Select</option>
+														<option value="Cash">Cash</option>
+														<option value="Bank">Bank</option>														
+														<option value="UPI">UPI</option>														
+													</select>
+												</div>
+												<div class="col-xl-4 mb-3">
+													<div class="form-group">
+														<label class="form-label">Select Bank</label>
+														<select name="cwip_bank_id" id="cwip_bank_id" class="form-control">
+															<option value="">-- Select Bank --</option>
+															@foreach($bankDetails as $bank)
+																<option value="{{ $bank->id }}">
+																	{{ $bank->bank_name }}
+																</option>
+															@endforeach
+														</select>
+													</div>
 												</div>
 
 												<div class="col-xl-4 mb-3">
@@ -1803,9 +1849,9 @@
 				
 				if ($('#depreciation_frequency option[value="Half Year"]').length === 0) {
 
-					$('#depreciation_frequency').append(
+					/*$('#depreciation_frequency').append(
 						'<option value="Half Year">Half Year</option>'
-					);
+					);*/
 				}
 
 				calculateWDV();

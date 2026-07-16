@@ -343,7 +343,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Upload Document</label>
-                                        <input type="file" id="voucher_doc" name="voucher_doc" class="form-control" aria-label="file example" required="">
+                                        <input type="file" id="voucher_doc" name="voucher_doc" class="form-control" aria-label="file example" >
                                     </div>
                                 </div>
                                 <div class="d-flex wizard justify-content-between mt-3">									

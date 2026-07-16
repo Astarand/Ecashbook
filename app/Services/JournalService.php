@@ -1336,6 +1336,92 @@ class JournalService
 		}
 	}
 	
+	
+	public function storeDepreciationJournal(array $data)
+	{
+		DB::beginTransaction();
+
+		try {
+
+			$userId      = $data['added_by'];
+			$autoId      = $data['autoId'];
+			$propId      = $data['propId'] ?? null;
+			$date        = $data['date'];
+			$source      = $data['source'] ?? 'Asset';
+			$entryType 	 = $data['entry_type'] ?? 'Depreciation';
+			$assetName   = $data['asset_name'];
+			$payStatus = $data['pay_status'] ?? '';
+
+			//$journalNo = $this->getJournalNo($autoId,$userId,'Depreciation');
+			$existing = $this->checkExisting($autoId,$userId,$source);
+			$journalNo = $this->getJournalNo($autoId,$userId,$source);
+			// ================= DELETE OLD =================
+			$rev_amend_status = null;
+			if ($existing->count() > 0) {
+				$rev_amend_status = (isset($data['status']) && $data['status'] == 1) ? 'amend' : null;
+				Journals::where('autoId', $autoId)
+					//->where('source', $source)
+					->where('entry_type', $entryType)
+					->delete();
+			}
+			
+			$depreciation = (float)($data['depreciation'] ?? 0);
+			if ($depreciation <= 0) {
+				return true;
+			}
+
+			$baseRow = [
+				'journal_no'     => $journalNo,
+				'added_by'       => $userId,
+				'propId'         => $propId,
+				'autoId'         => $autoId,
+				'journal_date'   => $date,
+				'reference_type' => 'New Ref',
+				'entry_type'     => $entryType,
+				'source'         => $source,
+				'payment_status' => $payStatus,
+				'status'         => 'Posted',
+
+			];
+
+			$entries = [];
+
+			// Debit Expense
+
+			$entries[] = array_merge($baseRow,[
+
+				'ledger'         => 'Depreciation & Amortisation Expense',
+				'debit_credit'   => 'Debit',
+				'amount'         => $depreciation,
+				'tot_amt'        => $depreciation,
+				'notes'          => 'Depreciation Expense'
+
+			]);
+
+			// Credit Accumulated Depreciation
+
+			$entries[] = array_merge($baseRow,[
+
+				'ledger'         => 'Accumulated Depreciation - '.$assetName,
+				'debit_credit'   => 'Credit',
+				'amount'         => $depreciation,
+				'tot_amt'        => $depreciation,
+				'notes'          => 'Accumulated Depreciation'
+
+			]);
+
+			Journals::insert($entries);
+
+			DB::commit();
+
+		} catch (\Exception $e){
+
+			DB::rollback();
+
+			throw $e;
+		}
+	}
+
 	//Liability journal
 	public function storeLiabilityJournalEntries(array $data)
 	{

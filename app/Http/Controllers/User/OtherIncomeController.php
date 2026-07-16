@@ -100,11 +100,18 @@ class OtherIncomeController extends Controller
 					->where('status', 1)
 					->select('id', 'cust_name', 'cust_gst_no')
 					->get();
+					
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name')
+					->where('added_by', $userId)
+					->where('status', 1)
+					->get();
 			
         return view('User.add-other-income')->with([
             'purposes_of_tds' => $purposes_of_tds,
 			'proprietorships' => $proprietorships,
 			'customers' => $customers,
+			'bankDetails' => $bankDetails,
         ]);
     }
 
@@ -183,7 +190,13 @@ class OtherIncomeController extends Controller
 				$currentPayment = $incomeAmount;
 			}
 			if ($currentPayment > 0) {
-				$this->paymentVoucherService->storePaymentVoucherEntries($lastId,'Income',$currentPayment);
+				$data = [
+						'date' => $request->dateInput ?? null,
+						'payment_mode' => $request->pay_mode ?? null,
+						'bank_id' => $request->bank_id ?? null,
+						'addFlag' => 1
+					];
+				$this->paymentVoucherService->storePaymentVoucherEntries($lastId,'Income',$currentPayment,$data);
 			}
 			//end receipt voucher entry
 
@@ -319,7 +332,7 @@ class OtherIncomeController extends Controller
             $income->advance_amt = $request->input('advance_amt') ?? 0;
             $income->adjust_amt = $request->input('adjust_amt') ?? 0;
             $income->invoice_no = $request->input('invoice_no');
-            $income->pay_status = $request->input('pay_status');
+            //$income->pay_status = $request->input('pay_status');
             $income->pay_mode = $request->input('pay_mode');
             $income->customer_name = $request->input('customer_name');
             $income->specification = $request->input('specification');
@@ -394,7 +407,7 @@ class OtherIncomeController extends Controller
 			}
 
 			if ($currentPayment > 0) {
-				$this->paymentVoucherService->storePaymentVoucherEntries($income->id,'Income',$currentPayment);
+				//$this->paymentVoucherService->storePaymentVoucherEntries($income->id,'Income',$currentPayment);
 			}
 			// END PAYMENT VOUCHER ENTRY
 

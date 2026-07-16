@@ -515,8 +515,10 @@
                                                     <option value="">Select</option>
                                                     <option value="Full" <?php echo ($sales->pay_status=="Full")?
                                                     "selected":"" ?>>Full Payment</option>
-                                                <option value="Partial" <?php echo ($sales->pay_status=="Partial")?
+													<option value="Partial" <?php echo ($sales->pay_status=="Partial")?
                                                     "selected":"" ?>>Advance Payment</option>
+													<option value="Due" <?php echo ($sales->pay_status=="Due")?
+                                                    "selected":"" ?>>Due</option>
                                                 </select>
                                             </div>
                                         </div>

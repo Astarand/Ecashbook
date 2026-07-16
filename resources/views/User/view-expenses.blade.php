@@ -387,13 +387,7 @@
 
                 <input type="hidden" id="f_id">
                 <input type="hidden" id="voucher_type">
-				<input type="hidden" id="isViewPage" value="0">
-				
-				<div id="paymentNoteArea" class="alert alert-warning mt-2">
-					<strong>Note:</strong>
-					Please click <strong>Save</strong> to update payment vouchers,
-					journal entries and payment status.
-				</div>
+				<input type="hidden" id="isViewPage" value="1">
 
                 <div class="row mb-3">
                     <div class="col-md-4">
@@ -419,7 +413,6 @@
                             class="form-control"
                             readonly>
                     </div>
-					
                 </div>
 
                 <table class="table table-bordered">
@@ -427,9 +420,9 @@
                     <tr>
                         <th>Date</th>
                         <th>Amount</th>
-                        <th>Mode</th>
+						<th>Mode</th>
 						<th>Bank</th>
-                        <th width="80">Action</th>
+                        <th id="actionHeader" width="80">Action</th>
                     </tr>
                     </thead>
 
@@ -437,23 +430,7 @@
 
                     </tbody>
                 </table>
-
-                <button type="button"
-                    class="btn btn-success"
-                    id="addVoucherRow">
-                    Add Payment
-                </button>
-
             </div>
-
-            <div class="modal-footer">
-                <button type="button"
-                    class="btn btn-primary"
-                    id="saveVoucherPayments">
-                    Save
-                </button>
-            </div>
-
         </div>
     </div>
 </div>

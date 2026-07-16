@@ -1343,11 +1343,16 @@ class ReportsController extends Controller
 	}
 	
 	
-	public function getPreviousFYOpeningBalance_cashflow($propId, $userId, $fromDate)
+	public function getPreviousFYOpeningBalance_cashflow($propId, $userId, $fromDate, $paymentMode = 'all',$bankId = null)
 	{
-		$openingDate = Carbon::parse($fromDate)->subDay()->toDateString();
-		
-		//CASH BALANCE
+		//$openingDate = Carbon::parse($fromDate)->subDay()->toDateString();
+		$openingDate = $fromDate;
+
+		/*
+		|--------------------------------------------------------------------------
+		| 1. Legacy Cash Opening (mcash_credit_debits)
+		|--------------------------------------------------------------------------
+		*/
 		$cashQuery = DB::table('mcash_credit_debits');
 
 		if (!empty($propId)) {
@@ -1356,31 +1361,153 @@ class ReportsController extends Controller
 			$cashQuery->where('added_by', $userId);
 		}
 
-		$cashRows = $cashQuery
+		$legacyCash = (float) $cashQuery
 			->whereDate('cd_date', '<=', $openingDate)
-			->orderBy('cd_date')
-			->get();
+			->selectRaw("
+				COALESCE(
+					SUM(
+						CASE
+							WHEN LOWER(cd_type)='cr' THEN cd_amount
+							ELSE -cd_amount
+						END
+					),0
+				) as balance
+			")
+			->value('balance');
 
-		$cashBalance = 0;
-
-		foreach ($cashRows as $row) {
-
-			if (strtolower($row->cd_type) == 'cr') {
-				$cashBalance += (float)$row->cd_amount;
-			} else {
-				$cashBalance -= (float)$row->cd_amount;
-			}
-		}
-
-		//BANK BALANCE
+		/*
+		|--------------------------------------------------------------------------
+		| 2. Legacy Bank Opening (banks.curr_bal)
+		|--------------------------------------------------------------------------
+		*/
 		$bankQuery = DB::table('banks');
+
 		if (!empty($propId)) {
 			$bankQuery->where('propId', $propId);
 		} else {
 			$bankQuery->where('added_by', $userId);
 		}
-		$bankBalance = (float)$bankQuery->sum('curr_bal');
-		return round($cashBalance + $bankBalance, 2);
+
+		if (!empty($bankId)) {
+			$bankQuery->where('id', $bankId);
+		}
+		$legacyBank = (float) $bankQuery->sum('curr_bal');
+
+		/*
+		|--------------------------------------------------------------------------
+		| 3. Payment Voucher Adjustment
+		|--------------------------------------------------------------------------
+		*/
+		$voucherQuery = DB::table('payment_vouchers');
+
+		if (!empty($propId)) {
+			$voucherQuery->where('propId', $propId);
+		} else {
+			$voucherQuery->where('added_by', $userId);
+		}
+
+		$voucherQuery->whereDate('date', '<', $openingDate);
+
+		if ($paymentMode == 'cash') {
+			$voucherQuery->where('payment_mode','Cash');
+			$voucher = $voucherQuery
+				->selectRaw("
+					SUM(
+						CASE
+							WHEN LOWER(credit_debit)='credit'
+							THEN amount
+							ELSE -amount
+						END
+					) as cash_balance
+				")
+				->first();
+
+			$cashBalance = $legacyCash + ($voucher->cash_balance ?? 0);
+
+			return [
+				'cash'=>round($cashBalance,2),
+				'bank'=>0,
+				'total'=>round($cashBalance,2)
+			];
+		}
+		// Bank selected -> Bank only
+		if (!empty($bankId)) {
+
+			$bankVoucher = clone $voucherQuery;
+
+			$bankVoucher->where('bank_id', $bankId);
+
+			$bankVoucher = $bankVoucher
+				->selectRaw("
+					SUM(
+						CASE
+							WHEN LOWER(credit_debit)='credit'
+							THEN amount
+							ELSE -amount
+						END
+					) as bank_balance
+				")
+				->first();
+
+			$bankBalance = $legacyBank + ($bankVoucher->bank_balance ?? 0);
+
+			return [
+				'cash'  => 0,
+				'bank'  => round($bankBalance,2),
+				'total' => round($bankBalance,2)
+			];
+		}
+		if ($paymentMode == 'all') {
+
+			$cashVoucher = clone $voucherQuery;
+
+			$cashVoucher = $cashVoucher
+				->where('payment_mode','Cash')
+				->selectRaw("
+					SUM(
+						CASE
+							WHEN LOWER(credit_debit)='credit'
+							THEN amount
+							ELSE -amount
+						END
+					) as cash_balance
+				")
+				->first();
+
+			$bankVoucher = clone $voucherQuery;
+
+			//$bankVoucher->whereIn('payment_mode',['Bank','UPI']);
+			if (!empty($bankId)) {
+				$bankVoucher->where('bank_id', $bankId);
+			} else {
+				$bankVoucher->whereIn('payment_mode', ['Bank', 'UPI']);
+			}
+
+			if(!empty($bankId)){
+				$bankVoucher->where('bank_id',$bankId);
+			}
+
+			$bankVoucher = $bankVoucher
+				->selectRaw("
+					SUM(
+						CASE
+							WHEN LOWER(credit_debit)='credit'
+							THEN amount
+							ELSE -amount
+						END
+					) as bank_balance
+				")
+				->first();
+
+			$cashBalance = $legacyCash + ($cashVoucher->cash_balance ?? 0);
+			$bankBalance = $legacyBank + ($bankVoucher->bank_balance ?? 0);
+
+			return [
+				'cash'=>round($cashBalance,2),
+				'bank'=>round($bankBalance,2),
+				'total'=>round($cashBalance+$bankBalance,2)
+			];
+		}
 	}
 	
 	public function cashflow(request $request)
@@ -1394,14 +1521,27 @@ class ReportsController extends Controller
 		$propId = null;
 		checkCoreAccess('Cashflow Statement');
 		$currentDate = Carbon::now()->toDateString(); // YYYY-MM-DD	
-		$opening = $this->getPreviousFYOpeningBalance_cashflow($propId, $userId, $currentDate);
+		$previousDate = Carbon::now()->subDay()->toDateString();
+		$paymentMode = 'all';
+		$bankId = null;
+		$openingBalance = $this->getPreviousFYOpeningBalance_cashflow($propId, $userId, $previousDate,$paymentMode,$bankId);
+		$openingCash  = $openingBalance['cash'];
+		$openingBank  = $openingBalance['bank'];
+		$openingTotal = $openingBalance['total'];
 		//echo "<pre>";print_r($opening);exit;
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name')
+					->where('added_by', $userId)
+					->where('status', 1)
+					->get();
 		$proprietorships = DB::table('proprietorship_profiles')
 						->select('id','comp_name')
 						->where('userId',$userId)
 						->get();
 		return view('User.Reports.cashflow')->with([
-				'openingBalance' => $opening,
+				'openingCash' => $openingCash,
+				'openingBank' => $openingBank,
+				'bankDetails' => $bankDetails,
 				'proprietorships' => $proprietorships
 			]);
     }
@@ -1423,32 +1563,56 @@ class ReportsController extends Controller
 		$cashflowType = strtolower($r->cashflow_type ?? 'all');
 		$voucherType  = strtolower($r->voucher_type ?? 'all');
 		$paymentMode  = strtolower($r->payment_mode ?? 'all');
+		$bankId = $r->bank_id;
 
-		$opening = (float)$r->opening_balance;
+		$openingData = $this->getPreviousFYOpeningBalance_cashflow(
+			$propId,
+			$userId,
+			$from,
+			$paymentMode,
+			$bankId
+		);
 
+		$openingCash = $openingData['cash'];
+		$openingBank = $openingData['bank'];
+		$opening = $openingCash + $openingBank;
 
-		$query = DB::table('payment_vouchers')
-			//->where('record_type','Posted')
-			->whereBetween('date',[$from,$to]);
+		$query = DB::table('payment_vouchers as pv')
+					->leftJoin('banks as b', 'b.id', '=', 'pv.bank_id')
+					->select('pv.*', 'b.bank_name')
+					->whereBetween('pv.date', [$from, $to]);
 
 		if(!empty($propId)){
-			$query->where('propId',$propId);
+			$query->where('pv.propId',$propId);
 		}else{
-			$query->where('added_by',$userId);
+			$query->where('pv.added_by',$userId);
 		}
 
 		if($voucherType!='all'){
 			if($voucherType=='payment'){
-				$query->where('voucher_type','Payment Voucher');
+				$query->where('pv.voucher_type','Payment Voucher');
 			}
 			if($voucherType=='receipt'){
-				$query->where('voucher_type','Receipt Voucher');
+				$query->where('pv.voucher_type','Receipt Voucher');
 			}
 		}
-
-		if($paymentMode!='all'){
-			$query->whereRaw('LOWER(payment_mode)=?',[$paymentMode]);
+		
+		if ($paymentMode == 'Cash') {
+			$query->where('pv.payment_mode', 'Cash');
 		}
+		elseif (!empty($bankId)) {
+			$query->where('pv.bank_id', $bankId);
+		}
+		
+		if (!empty($bankId)) {
+			// Selected bank only
+			$query->whereIn('pv.payment_mode',['Bank','UPI'])
+				  ->where('pv.bank_id',$bankId);
+		}
+		elseif ($paymentMode == 'cash') {
+			// Cash only
+			$query->where('pv.payment_mode','Cash');
+		}		
 
 		$transactions = $query
 			->orderBy('date')
@@ -1497,7 +1661,7 @@ class ReportsController extends Controller
 				'activity'=>$activity,
 				'source'=>$t->source,
 				'party'=>$t->party_name,
-				'ledger'=>$t->payment_mode,
+				'ledger'=> $t->payment_mode == 'Cash'? 'Cash': ($t->bank_name ?? 'Bank'),
 				'mode'=>$t->payment_mode,
 				'narration'=>$t->narration,
 				'inflow'=>$inflow,

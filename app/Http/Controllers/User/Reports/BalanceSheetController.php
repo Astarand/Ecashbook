@@ -268,10 +268,10 @@ class BalanceSheetController extends Controller
 		///current data
 		if ($previousYearData) {
 			$pYearData = $prevYearData;
-			$cYearData = $this->fetchBalanceSheetData($propId,$userId,$startDate,$endDate);
+			$cYearData = $this->fetchBalanceSheetData($propId,$userId,$startDate,$endDate,$periodType);
 		} else {
-			$pYearData = $this->fetchBalanceSheetData($propId,$userId,$prevStartDate,$prevEndDate);
-			$cYearData = $this->fetchBalanceSheetData($propId,$userId,$startDate,$endDate);
+			$pYearData = $this->fetchBalanceSheetData($propId,$userId,$prevStartDate,$prevEndDate,$periodType);
+			$cYearData = $this->fetchBalanceSheetData($propId,$userId,$startDate,$endDate,$periodType);
 		}
 
         if ($prevYearData) {
@@ -291,7 +291,7 @@ class BalanceSheetController extends Controller
         }
     }
 	
-	public function fetchBalanceSheetData($propId,$userId,$startDate,$endDate)
+	public function fetchBalanceSheetData($propId,$userId,$startDate,$endDate,$periodType)
 	{
 		$equity = DB::table('share_holder_fund_liabilities as shfl')
 				->join('liabilities as l', 'l.id', '=', 'shfl.liabilities_id')
@@ -409,36 +409,23 @@ class BalanceSheetController extends Controller
 		
 		// =========================
 		// NON-CURRENT ASSETS
-		// =========================
-		$nonCurrAssetRaw = DB::table('assets')
-			->whereBetween('date', [$startDate, $endDate])
-			->where('assetType', 'non-current')
-			->where('isActive', 1)
+		// =========================	
+		$inputDate = Carbon::parse($endDate);
+		if ($inputDate->month >= 4) {
+			$fyStart = Carbon::create($inputDate->year, 4, 1)->toDateString();
+			$fyEnd   = Carbon::create($inputDate->year + 1, 3, 31)->toDateString();
+		} else {
+			$fyStart = Carbon::create($inputDate->year - 1, 4, 1)->toDateString();
+			$fyEnd   = Carbon::create($inputDate->year, 3, 31)->toDateString();
+		}		
+		$assets = DB::table('assets')
 			->where('added_by', $userId)
-			->select(
-				'nonCurrentAssetType',
-				DB::raw("
-					SUM(
-						CASE 
-							WHEN nonCurrentAssetType = 'Capital Work in Progress' THEN 
-								CASE 
-									WHEN pay_status = 'Full' THEN COALESCE(cwip_amount,0)
-									ELSE COALESCE(cwip_advance_amt,0)
-								END
-							ELSE 
-								CASE 
-									WHEN pay_status = 'Full' THEN COALESCE(invoice_value,0)
-									ELSE COALESCE(advance_amt,0)
-								END
-						END
-					) as total
-				")
-			)
-			->groupBy('nonCurrentAssetType')
+			->where('isActive', 1)
+			->where('assetType', 'non-current')
+			->whereBetween('date', [$fyStart, $fyEnd])
 			->get();
 
-		// Convert to SAFE associative array (IMPORTANT)
-		$nonCurrAssetTypes = [
+		$nonCurrAssetData = array_fill_keys([
 			'Property Plant Equipment',
 			'Furniture Fixtures',
 			'Computer IT Equipment',
@@ -447,14 +434,24 @@ class BalanceSheetController extends Controller
 			'Intangible Assets',
 			'Capital Work in Progress',
 			'Other Non-Current Assets'
-		];
+		], 0);
 
-		$nonCurrAssetData = array_fill_keys($nonCurrAssetTypes, 0);
+		//Start Asset Depericiation Calculation						
+		foreach ($assets as $asset) {
 
-		foreach ($nonCurrAssetRaw as $row) {
-			$key = $row->nonCurrentAssetType;
-			if (isset($nonCurrAssetData[$key])) {
-				$nonCurrAssetData[$key] = (float) $row->total;
+			// Capital Work In Progress
+			if ($asset->nonCurrentAssetType == 'Capital Work in Progress') {
+				$value = ($asset->pay_status == 'Full') ? $asset->cwip_amount : $asset->cwip_advance_amt;
+			} else {
+				$value = ($asset->pay_status == 'Full') ? $asset->invoice_value : $asset->advance_amt;
+				// Calculate depreciation till report date
+				$depreciation = $this->balanceSheetService->calculateDepreciationByPeriod($asset,$fyStart,$fyEnd,$periodType);
+				// Net Book Value
+				$value = max(0, $value - $depreciation);
+			}
+
+			if (isset($nonCurrAssetData[$asset->nonCurrentAssetType])) {
+				$nonCurrAssetData[$asset->nonCurrentAssetType] += $value;
 			}
 		}
 

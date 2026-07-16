@@ -116,6 +116,19 @@
 							</select>
 						</div>
 						<div class="col-md-3 mb-3">
+							<div class="form-group">
+								<label class="form-label">Select Bank</label>
+								<select name="bank_id" id="bank_id" class="form-control">
+									<option value="">-- Select Bank --</option>
+									@foreach($bankDetails as $bank)
+										<option value="{{ $bank->id }}">
+											{{ $bank->bank_name }}
+										</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+						<div class="col-md-3 mb-3">
                             <label class="form-label">Advance Amount</label>
                             <input type="number" step="0.01" name="advance_amt" id="advance_amt" class="form-control" placeholder="Amount">
                         </div>
