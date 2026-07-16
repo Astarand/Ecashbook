@@ -10,13 +10,13 @@
                         <ul class="breadcrumb mb-0">
                             <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
                             <li class="breadcrumb-item"><a href="#">HR & Payroll Management</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Payslip & TDS Update</li>
+                            <li class="breadcrumb-item active" aria-current="page">Update Center</li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-md-12 mt-2">
                     <div class="page-header-title">
-                        <h2 class="mb-0">Payslip & TDS Update</h2>
+                        <h2 class="mb-0">Update Center</h2>
                     </div>
                 </div>
             </div>
@@ -128,8 +128,8 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="d-flex gap-2">
-                                            <button type="button" id="btnSingleUpdate" class="btn btn-success">Single Update</button>
-                                            <button type="button" id="btnMultipleUpdate" class="btn btn-outline-success">Multiple Update</button>
+                                            {{-- <button type="button" id="btnSingleUpdate" class="btn btn-success">Single Update</button> --}}
+                                            <button type="button" id="btnMultipleUpdate" class="btn btn-success">Update Payslips</button>
                                         </div>
                                     </div>
                                 </div>
@@ -409,15 +409,6 @@
                                         <input type="date" id="pf_payment_date_input" class="form-control">
                                     </div>
 
-                                    <div class="col-md-3">
-                                        <label class="form-label">Payment Type</label>
-                                        <select id="pf_payment_type_input" class="form-select">
-                                            <option value="">Select</option>
-                                            <option value="Full">Full</option>
-                                            <option value="Partial">Partial</option>
-                                        </select>
-                                    </div>
-
                                     <div class="col-md-12">
                                         <div class="d-flex gap-2">
                                             <button type="button" id="btnPfMultipleUpdate" class="btn btn-success">
@@ -437,10 +428,11 @@
                                         <th>Employee ID</th>
                                         <th>Name</th>
                                         <th>Financial Year</th>
-                                        <th>Period</th>
-                                        <th>Challan Number</th>
-                                        <th>Update Date</th>
-                                        <th>BSR Code</th>
+                                        <th>TRRN</th>
+                                        <th>CRN</th>
+                                        <th>Challan Generated On</th>
+                                        <th>Payment Confirmation Date</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="pfTable">
@@ -452,14 +444,307 @@
 
                     {{-- ESI Section --}}
                     <div id="esi-section" style="display:none;">
-                        <p>ESI Update Section Coming Soon...</p>
+                        <div class="row g-3 align-items-end mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">Financial Year</label>
+                                @php
+                                    $currentYear = date('Y');
+                                    $currentMonth = date('n');
+
+                                    // Current Financial Year
+                                    $fyStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
+                                @endphp
+
+                                <select class="form-select" id="esi_financial_year">
+
+                                    @for($i = 0; $i < 5; $i++)
+                                        @php
+                                            $start = $fyStart - $i;
+                                            $end = $start + 1;
+                                        @endphp
+
+                                        <option value="{{ $start }}-{{ $end }}" {{ $i == 0 ? 'selected' : '' }}>
+                                            {{ $start }}-{{ $end }}
+                                        </option>
+                                    @endfor
+
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Filter Type</label>
+                                <select class="form-select" id="esi-period-type" >
+                                    <option value="monthly" selected>Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="half-yearly">Half Yearly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3" id="esi-period-wrapper">
+                                <label class="form-label">Period</label>
+                                @php
+                                    $months = [
+                                        'January','February','March','April','May','June',
+                                        'July','August','September','October','November','December'
+                                    ];
+
+                                    $previousMonth = date('F', strtotime('first day of last month'));
+                                @endphp
+
+                                <select class="form-select" id="esi-period-value">
+
+                                    @foreach($months as $month)
+                                        <option value="{{ $month }}"
+                                            {{ $month == $previousMonth ? 'selected' : '' }}>
+                                            {{ $month }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-primary w-100" id="btnEsiFilter">Apply Filter</button>
+                            </div>
+                        </div>
+
+                        <div class="card border mb-4">
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end">
+
+                                    {{-- <div class="col-md-3">
+                                        <label class="form-label">Employer Code</label>
+                                        <input type="text" id="esi_employer_code_input" class="form-control"
+                                            placeholder="Enter Employer Code">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Employer Name</label>
+                                        <input type="text" id="esi_employer_name_input" class="form-control"
+                                            placeholder="Enter Employer Name">
+                                    </div> --}}
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Contribution Period</label>
+                                        <input type="month" id="esi_contribution_period_input" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Challan Number</label>
+                                        <input type="text" id="esi_challan_no_input" class="form-control"
+                                            placeholder="Enter Challan Number">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Challan Created Date</label>
+                                        <input type="datetime-local" id="esi_challan_created_input" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Challan Submitted Date</label>
+                                        <input type="datetime-local" id="esi_challan_submitted_input" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Amount Paid (₹)</label>
+                                        <input type="number" step="0.01" id="esi_amount_paid_input" class="form-control"
+                                            placeholder="Enter Amount Paid">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Transaction Number</label>
+                                        <input type="text" id="esi_transaction_no_input" class="form-control"
+                                            placeholder="Enter Transaction Number">
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="d-flex gap-2">
+                                            <button type="button" id="btnEsiMultipleUpdate" class="btn btn-success">
+                                                Update Selected ESI Records
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="40">
+                                            <input type="checkbox" id="select-all-esi">
+                                        </th>
+                                        <th>Employee ID</th>
+                                        <th>Name</th>
+                                        <th>Financial Year</th>
+                                        <th>Challan Number</th>
+                                        <th>Challan Submitted Date</th>
+                                        <th>Transaction Number</th>
+                                        <th>Challan Created Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="esiTable">
+                                    <tr>
+                                        <td colspan="8" class="text-center">
+                                            No Record Found
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
                     </div>
+                    
                     {{-- PTAX Section --}}
                     <div id="ptax-section" style="display:none;">
-                        <p>PTAX Update Section Coming Soon...</p>
+                        <div class="row g-3 align-items-end mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">Financial Year</label>
+                                @php
+                                    $currentYear = date('Y');
+                                    $currentMonth = date('n');
+
+                                    // Current Financial Year
+                                    $fyStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
+                                @endphp
+
+                                <select class="form-select" id="ptax_financial_year">
+
+                                    @for($i = 0; $i < 5; $i++)
+                                        @php
+                                            $start = $fyStart - $i;
+                                            $end = $start + 1;
+                                        @endphp
+
+                                        <option value="{{ $start }}-{{ $end }}" {{ $i == 0 ? 'selected' : '' }}>
+                                            {{ $start }}-{{ $end }}
+                                        </option>
+                                    @endfor
+
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Filter Type</label>
+                                <select class="form-select" id="ptax-period-type" >
+                                    <option value="monthly" selected>Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="half-yearly">Half Yearly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3" id="ptax-period-wrapper">
+                                <label class="form-label">Period</label>
+                                @php
+                                    $months = [
+                                        'January','February','March','April','May','June',
+                                        'July','August','September','October','November','December'
+                                    ];
+
+                                    $previousMonth = date('F', strtotime('first day of last month'));
+                                @endphp
+
+                                <select class="form-select" id="ptax-period-value">
+
+                                    @foreach($months as $month)
+                                        <option value="{{ $month }}"
+                                            {{ $month == $previousMonth ? 'selected' : '' }}>
+                                            {{ $month }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-primary w-100" id="btnPtaxFilter">Apply Filter</button>
+                            </div>
+                        </div>
+
+                        <div class="card border mb-4">
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end">
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">GRIPS Payment ID</label>
+                                        <input type="text" id="ptax_grips_payment_id_input" class="form-control" placeholder="Enter GRIPS Payment ID">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Payment Initiated Date</label>
+                                        <input type="datetime-local" id="ptax_payment_initiated_date_input" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">BRN</label>
+                                        <input type="text" id="ptax_brn_input" class="form-control" placeholder="Enter BRN">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">GRN</label>
+                                        <input type="text" id="ptax_grn_input" class="form-control" placeholder="Enter GRN">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Period From</label>
+                                        <input type="date" id="ptax_period_from_input" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Period To</label>
+                                        <input type="date" id="ptax_period_to_input" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Payment Reference No.</label>
+                                        <input type="text" id="ptax_payment_ref_no_input" class="form-control" placeholder="Enter Payment Reference No">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Amount Paid (₹)</label>
+                                        <input type="number" step="0.01" id="ptax_amount_paid_input" class="form-control" placeholder="Enter Amount Paid">
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="d-flex gap-2">
+                                            <button type="button" id="btnPtaxMultipleUpdate" class="btn btn-success">
+                                                Update Selected PTax Records
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="40">
+                                            <input type="checkbox" id="select-all-ptax">
+                                        </th>
+                                        <th>Employee ID</th>
+                                        <th>Name</th>
+                                        <th>Financial Year</th>
+                                        <th>GRIPS Payment ID</th>
+                                        <th>Period From</th>
+                                        <th>Period To</th>
+                                        <th>Payment Reference No</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ptaxTable">
+                                    <tr>
+                                        <td colspan="8" class="text-center">
+                                            No Record Found
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-
-
 
                 </div>
             </div>
@@ -648,6 +933,19 @@
             $('#tds-section').show();
             $('[data-target="tds-section"]').trigger('click');
         }
+        if (window.location.hash === '#ptax-section') {
+            $('#ptax-section').show();
+            $('[data-target="ptax-section"]').trigger('click');
+        }
+        if (window.location.hash === '#pf-section') {
+            $('#pf-section').show();
+            $('[data-target="pf-section"]').trigger('click');
+        }
+
+        if (window.location.hash === '#esi-section') {
+            $('#esi-section').show();
+            $('[data-target="esi-section"]').trigger('click');
+        }
 
         loadPayslipData();
 
@@ -675,6 +973,20 @@
         loadPfData();
         $('#btnPfFilter').click(function () {
             loadPfData();
+        });
+
+        //----esi Section----
+        loadEsiData();
+
+        $('#btnEsiFilter').click(function () {
+            loadEsiData();
+        });
+
+        //------ Ptax Section ------
+        loadPtaxData();
+
+        $('#btnPtaxFilter').click(function () {
+            loadPtaxData();
         });
     });
 
@@ -795,19 +1107,7 @@
 
         // Update actions
         $(document).ready(function(){
-            $('#btnSingleUpdate').on('click', function(){
-                const selected = Array.from(document.querySelectorAll('.payslip-row-checkbox:checked')).map(cb => cb.value);
-                if (selected.length === 0) {
-                    
-                    showToast('Please select a payslip to update.', 'warning');
-                    return;
-                }
-                if (selected.length > 1) {
-                    showToast('Single Update requires exactly one selection. Use Multiple Update for more.', 'warning');
-                    return;
-                }
-                doPayslipUpdate(selected);
-            });
+            
 
             $('#btnMultipleUpdate').on('click', function(){
                 const selected = Array.from(document.querySelectorAll('.payslip-row-checkbox:checked')).map(cb => cb.value);
@@ -1027,33 +1327,35 @@
 
                     $.each(response,function(index,row){
 
-                        html+=`
+                        html += `
+                            <tr>
+                                <td>
+                                    <input type="checkbox"
+                                        class="pf-row-checkbox"
+                                        value="${row.id}">
+                                </td>
 
-                        <tr>
+                                <td>${row.employee_id ?? '-'}</td>
 
-                            <td>
-                                <input type="checkbox"
-                                    class="pf-row-checkbox"
-                                    value="${row.id}">
-                            </td>
+                                <td>${row.name ?? '-'}</td>
 
-                            <td>${row.employee_id ?? '-'}</td>
+                                <td>${row.financial_year ?? '-'}</td>
 
-                            <td>${row.name ?? '-'}</td>
+                                <td>${row.pf_trrn ?? '-'}</td>
 
-                            <td>${row.financial_year}</td>
+                                <td>${row.pf_crn ?? '-'}</td>
 
-                            <td>${row.month}</td>
+                                <td>${row.pf_challan_generated_on ?? '-'}</td>
 
-                            <td>${row.pf_challan_no ?? '-'}</td>
+                                <td>${row.pf_payment_confirmation_date ?? '-'}</td>
 
-                            <td>${row.pf_deposit_date ?? '-'}</td>
+                                <td>
+                                    ${row.pf_payment_status === 'Done'
+                                        ? '<span class="badge bg-success">Done</span>'
+                                        : '<span class="badge bg-warning text-dark">Pending</span>'}
+                                </td>
 
-                            <td>${row.pf_bsr_code ?? '-'}</td>
-
-                        </tr>
-
-                        `;
+                            </tr>`;
 
                     });
 
@@ -1068,6 +1370,434 @@
         });
 
     }
+
+    $('#btnPfMultipleUpdate').click(function () {
+
+        let ids = [];
+
+        $('.pf-row-checkbox:checked').each(function () {
+            ids.push($(this).val());
+        });
+
+        if (ids.length === 0) {
+            showToast('Please select at least one PF record to update.', 'warning');
+            return;
+        }
+
+        $.ajax({
+
+            url: "{{ route('payroll.pf.update') }}",
+
+            type: "POST",
+
+            data: {
+                _token: "{{ csrf_token() }}",
+
+                ids: ids,
+
+                pf_trrn: $('#pf_trrn_input').val(),
+
+                pf_challan_generated: $('#pf_challan_generated_input').val(),
+
+                pf_establishment_id: $('#pf_establishment_id_input').val(),
+
+                pf_wage_month: $('#pf_wage_month_input').val(),
+
+                pf_total_amount: $('#pf_total_amount_input').val(),
+
+                pf_crn: $('#pf_crn_input').val(),
+
+                pf_payment_date: $('#pf_payment_date_input').val()
+            },
+
+            success: function (response) {
+
+                showToast(response.message, 'success');
+
+                // Clear all input fields
+                $('#pf_trrn_input').val('');
+                $('#pf_challan_generated_input').val('');
+                $('#pf_establishment_id_input').val('');
+                $('#pf_wage_month_input').val('');
+                $('#pf_total_amount_input').val('');
+                $('#pf_crn_input').val('');
+                $('#pf_payment_date_input').val('');
+
+                // Uncheck all checkboxes
+                $('.pf-row-checkbox').prop('checked', false);
+                $('#select-all-pf').prop('checked', false);
+
+                // Reload table
+                loadPfData();
+            },
+
+            error: function (xhr) {
+
+                let message = 'Something went wrong.';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+
+                showToast(message, 'error');
+            }
+
+        });
+
+    });
+
+    //---- ESI Section ---
+    function loadEsiData()
+    {
+        $.ajax({
+
+            url: "{{ route('payroll.esi.list') }}",
+
+            type: "GET",
+
+            data: {
+
+                financial_year: $('#esi_financial_year').val(),
+
+                filter_type: $('#esi-period-type').val(),
+
+                period: $('#esi-period-value').val()
+
+            },
+
+            beforeSend:function(){
+
+                $('#esiTable').html(`
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            Loading...
+                        </td>
+                    </tr>
+                `);
+
+            },
+
+            success:function(response){
+
+                let html='';
+
+                if(response.length==0){
+
+                    html=`
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                No Record Found
+                            </td>
+                        </tr>
+                    `;
+
+                }else{
+
+                    $.each(response,function(index,row){
+
+                        html += `
+                            <tr>
+
+                                <td>
+                                    <input type="checkbox"
+                                        class="esi-row-checkbox"
+                                        value="${row.id}">
+                                </td>
+
+                                <td>${row.employee_id ?? '-'}</td>
+
+                                <td>${row.name ?? '-'}</td>
+
+                                <td>${row.financial_year ?? '-'}</td>
+
+                                <td>${row.esi_challan_no ?? '-'}</td>
+
+                                <td>${row.esi_transaction_no ?? '-'}</td>
+
+                                <td>${row.esi_challan_created_date ?? '-'}</td>
+
+                                <td>${row.esi_challan_submitted_date ?? '-'}</td>
+
+                                <td>
+                                    ${
+                                        row.esi_payment_status === 'Done'
+                                        ? '<span class="badge bg-success">Done</span>'
+                                        : '<span class="badge bg-warning text-dark">Pending</span>'
+                                    }
+                                </td>
+
+                            </tr>`;
+                    });
+
+                }
+
+                $('#esiTable').html(html);
+
+                attachEsiCheckboxHandlers();
+
+            }
+
+        });
+    }
+
+    $('#btnEsiMultipleUpdate').click(function () {
+
+        let ids = [];
+
+        $('.esi-row-checkbox:checked').each(function () {
+            ids.push($(this).val());
+        });
+
+        if (ids.length === 0) {
+            showToast('Please select at least one ESI record to update.', 'warning');
+            return;
+        }
+
+        $.ajax({
+
+            url: "{{ route('payroll.esi.update') }}",
+
+            type: "POST",
+
+            data: {
+
+                _token: "{{ csrf_token() }}",
+
+                ids: ids,
+
+                // esi_employer_code: $('#esi_employer_code_input').val(),
+
+                // esi_employer_name: $('#esi_employer_name_input').val(),
+
+                esi_contribution_period: $('#esi_contribution_period_input').val(),
+
+                esi_challan_no: $('#esi_challan_no_input').val(),
+
+                esi_challan_created_date: $('#esi_challan_created_input').val(),
+
+                esi_challan_submitted_date: $('#esi_challan_submitted_input').val(),
+
+                esi_amount_paid: $('#esi_amount_paid_input').val(),
+
+                esi_transaction_no: $('#esi_transaction_no_input').val()
+
+            },
+
+            success: function (response) {
+
+                showToast(response.message, 'success');
+
+                // Clear form
+                $('#esi_employer_code_input').val('');
+                $('#esi_employer_name_input').val('');
+                $('#esi_contribution_period_input').val('');
+                $('#esi_challan_no_input').val('');
+                $('#esi_challan_created_input').val('');
+                $('#esi_challan_submitted_input').val('');
+                $('#esi_amount_paid_input').val('');
+                $('#esi_transaction_no_input').val('');
+
+                // Uncheck checkboxes
+                $('.esi-row-checkbox').prop('checked', false);
+                $('#select-all-esi').prop('checked', false);
+
+                // Reload table
+                loadEsiData();
+
+            },
+
+            error: function (xhr) {
+
+                let message = 'Something went wrong.';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+
+                showToast(message, 'error');
+            }
+
+        });
+
+    });
+
+    //----- PTax Section -----
+    function loadPtaxData()
+    {
+        $.ajax({
+
+            url: "{{ route('payroll.ptax.list') }}",
+
+            type: "GET",
+
+            data: {
+
+                financial_year: $('#ptax_financial_year').val(),
+
+                filter_type: $('#ptax-period-type').val(),
+
+                period: $('#ptax-period-value').val()
+
+            },
+
+            beforeSend:function(){
+
+                $('#ptaxTable').html(`
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            Loading...
+                        </td>
+                    </tr>
+                `);
+
+            },
+
+            success:function(response){
+
+                let html='';
+
+                if(response.length==0){
+
+                    html=`
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                No Record Found
+                            </td>
+                        </tr>
+                    `;
+
+                }else{
+
+                    $.each(response,function(index,row){
+
+                        html += `
+                        <tr>
+
+                            <td>
+                                <input type="checkbox"
+                                    class="ptax-row-checkbox"
+                                    value="${row.id}">
+                            </td>
+
+                            <td>${row.employee_id ?? '-'}</td>
+
+                            <td>${row.name ?? '-'}</td>
+
+                            <td>${row.financial_year ?? '-'}</td>
+
+                            <td>${row.ptax_grips_payment_id ?? '-'}</td>
+
+                            <td>${row.ptax_period_from ?? '-'}</td>
+
+                            <td>${row.ptax_period_to ?? '-'}</td>
+
+                            <td>${row.ptax_payment_ref_no ?? '-'}</td>
+
+                            <td>
+                                ${
+                                    row.ptax_payment_status === 'Done'
+                                    ? '<span class="badge bg-success">Done</span>'
+                                    : '<span class="badge bg-warning text-dark">Pending</span>'
+                                }
+                            </td>
+
+                        </tr>
+                        `;
+
+                    });
+
+                }
+
+                $('#ptaxTable').html(html);
+
+                attachPtaxCheckboxHandlers();
+
+            }
+
+        });
+    }
+
+    $('#btnPtaxMultipleUpdate').click(function () {
+
+        let ids = [];
+
+        $('.ptax-row-checkbox:checked').each(function () {
+            ids.push($(this).val());
+        });
+
+        if (ids.length === 0) {
+            showToast('Please select at least one PTax record to update.', 'warning');
+            return;
+        }
+
+        $.ajax({
+
+            url: "{{ route('payroll.ptax.update') }}",
+
+            type: "POST",
+
+            data: {
+
+                _token: "{{ csrf_token() }}",
+
+                ids: ids,
+
+                ptax_grips_payment_id: $('#ptax_grips_payment_id_input').val(),
+
+                ptax_payment_initiated_date: $('#ptax_payment_initiated_date_input').val(),
+
+                ptax_brn: $('#ptax_brn_input').val(),
+
+                ptax_grn: $('#ptax_grn_input').val(),
+
+                ptax_period_from: $('#ptax_period_from_input').val(),
+
+                ptax_period_to: $('#ptax_period_to_input').val(),
+
+                ptax_payment_ref_no: $('#ptax_payment_ref_no_input').val(),
+
+                ptax_amount_paid: $('#ptax_amount_paid_input').val()
+
+            },
+
+            success: function (response) {
+
+                showToast(response.message, 'success');
+
+                // Clear form
+                $('#ptax_grips_payment_id_input').val('');
+                $('#ptax_payment_initiated_date_input').val('');
+                $('#ptax_brn_input').val('');
+                $('#ptax_grn_input').val('');
+                $('#ptax_period_from_input').val('');
+                $('#ptax_period_to_input').val('');
+                $('#ptax_payment_ref_no_input').val('');
+                $('#ptax_amount_paid_input').val('');
+
+                // Uncheck checkboxes
+                $('.ptax-row-checkbox').prop('checked', false);
+                $('#select-all-ptax').prop('checked', false);
+
+                // Reload table
+                loadPtaxData();
+
+            },
+
+            error: function (xhr) {
+
+                let message = 'Something went wrong.';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+
+                showToast(message, 'error');
+
+            }
+
+        });
+
+    });
 
 
 </script>

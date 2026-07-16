@@ -809,6 +809,11 @@ class PayrollReportController extends Controller
                 'users.name',
                 'user_payslip.financial_year',
                 'user_payslip.month',
+                'user_payslip.pf_trrn',
+                'user_payslip.pf_crn',
+                'user_payslip.pf_challan_generated_on',
+                'user_payslip.pf_payment_confirmation_date',
+                'user_payslip.pf_payment_status',
                 DB::raw("
                     JSON_UNQUOTE(
                         JSON_EXTRACT(
@@ -822,6 +827,347 @@ class PayrollReportController extends Controller
             ->get();
 
         return response()->json($pf);
+    }
+
+    //------- Update PF -------//
+    public function updatePf(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+        ]);
+
+        DB::table('user_payslip')
+            ->whereIn('id', $request->ids)
+            ->update([
+
+                'pf_trrn' => $request->pf_trrn,
+
+                'pf_challan_generated_on' => $request->pf_challan_generated,
+
+                'pf_establishment_id' => $request->pf_establishment_id,
+
+                'pf_wage_month' => $request->pf_wage_month,
+
+                'pf_total_amount' => $request->pf_total_amount,
+
+                'pf_crn' => $request->pf_crn,
+
+                'pf_payment_confirmation_date' => $request->pf_payment_date,
+
+                'updated_at' => now()
+
+            ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Selected PF records updated successfully.'
+        ]);
+    }
+
+    //------- ESI List -------//
+    public function getEsiList(Request $request)
+    {
+        $ownerId = currentOwnerId();
+
+        $financialYear = $request->financial_year;
+        $filterType    = $request->filter_type;
+        $period        = $request->period;
+
+        $query = DB::table('user_payslip')
+            ->leftJoin('employees', 'employees.empId', '=', 'user_payslip.user_emp_id')
+            ->leftJoin('users', 'users.id', '=', 'user_payslip.user_emp_id')
+            ->where('user_payslip.added_by', $ownerId)
+            ->where('user_payslip.financial_year', $financialYear);
+
+        // Monthly
+        if ($filterType == 'monthly' && !empty($period)) {
+
+            $month = Carbon::parse('1 ' . $period)->month;
+
+            $query->where('user_payslip.month', $month);
+
+        }
+
+        // Quarterly
+        elseif ($filterType == 'quarterly' && !empty($period)) {
+
+            switch ($period) {
+                case 'Q1':
+                    $months = [4, 5, 6];
+                    break;
+                case 'Q2':
+                    $months = [7, 8, 9];
+                    break;
+                case 'Q3':
+                    $months = [10, 11, 12];
+                    break;
+                case 'Q4':
+                    $months = [1, 2, 3];
+                    break;
+                default:
+                    $months = [];
+            }
+
+            if ($months) {
+                $query->whereIn('user_payslip.month', $months);
+            }
+
+        }
+
+        // Half Yearly
+        elseif ($filterType == 'half-yearly' && !empty($period)) {
+
+            switch ($period) {
+                case 'H1':
+                    $months = [4, 5, 6, 7, 8, 9];
+                    break;
+                case 'H2':
+                    $months = [10, 11, 12, 1, 2, 3];
+                    break;
+                default:
+                    $months = [];
+            }
+
+            if ($months) {
+                $query->whereIn('user_payslip.month', $months);
+            }
+
+        }
+
+        // Only employees having ESI > 0
+        $query->whereRaw("
+            CAST(
+                JSON_UNQUOTE(
+                    JSON_EXTRACT(
+                        emp_salary_slip_response,
+                        '$.visible_data.final_salary_calculation.esi'
+                    )
+                ) AS DECIMAL(12,2)
+            ) > 0
+        ");
+
+        $records = $query->select(
+                'user_payslip.id',
+                'user_payslip.user_emp_id',
+
+                'employees.employee_id',
+                'users.name',
+
+                'user_payslip.financial_year',
+                'user_payslip.month',
+
+                'user_payslip.esi_employer_code',
+                'user_payslip.esi_employer_name',
+                'user_payslip.esi_contribution_period',
+                'user_payslip.esi_challan_no',
+                'user_payslip.esi_challan_created_date',
+                'user_payslip.esi_challan_submitted_date',
+                'user_payslip.esi_amount_paid',
+                'user_payslip.esi_transaction_no',
+                'user_payslip.esi_payment_status',
+
+                DB::raw("
+                    JSON_UNQUOTE(
+                        JSON_EXTRACT(
+                            emp_salary_slip_response,
+                            '$.visible_data.final_salary_calculation.esi'
+                        )
+                    ) as esi
+                ")
+            )
+            ->orderBy('users.name')
+            ->get();
+
+        return response()->json($records);
+    }
+
+    //------- Update ESI -------//
+    public function updateEsi(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+        ]);
+
+        DB::table('user_payslip')
+            ->whereIn('id', $request->ids)
+            ->update([
+
+                // 'esi_employer_code'            => $request->esi_employer_code,
+                // 'esi_employer_name'            => $request->esi_employer_name,
+                'esi_contribution_period'      => $request->esi_contribution_period,
+                'esi_challan_no'               => $request->esi_challan_no,
+                'esi_challan_created_date'     => $request->esi_challan_created_date,
+                'esi_challan_submitted_date'   => $request->esi_challan_submitted_date,
+                'esi_amount_paid'              => $request->esi_amount_paid,
+                'esi_transaction_no'           => $request->esi_transaction_no,
+                'esi_payment_status'           => 'Done',
+                'updated_at'                   => now()
+
+            ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Selected ESI records updated successfully.'
+        ]);
+    }
+
+    //------- PTAX List -------//
+    public function getPtaxList(Request $request)
+    {
+        $ownerId = currentOwnerId();
+
+        $financialYear = $request->financial_year;
+        $filterType    = $request->filter_type;
+        $period        = $request->period;
+
+        $query = DB::table('user_payslip')
+            ->leftJoin('employees', 'employees.empId', '=', 'user_payslip.user_emp_id')
+            ->leftJoin('users', 'users.id', '=', 'user_payslip.user_emp_id')
+            ->where('user_payslip.added_by', $ownerId)
+            ->where('user_payslip.financial_year', $financialYear);
+
+        // Monthly
+        if ($filterType == 'monthly' && !empty($period)) {
+
+            $month = Carbon::parse('1 '.$period)->month;
+
+            $query->where('user_payslip.month', $month);
+
+        }
+
+        // Quarterly
+        elseif ($filterType == 'quarterly' && !empty($period)) {
+
+            switch ($period) {
+
+                case 'Q1':
+                    $months = [4,5,6];
+                    break;
+
+                case 'Q2':
+                    $months = [7,8,9];
+                    break;
+
+                case 'Q3':
+                    $months = [10,11,12];
+                    break;
+
+                case 'Q4':
+                    $months = [1,2,3];
+                    break;
+
+                default:
+                    $months = [];
+
+            }
+
+            if ($months) {
+                $query->whereIn('user_payslip.month', $months);
+            }
+
+        }
+
+        // Half-Yearly
+        elseif ($filterType == 'half-yearly' && !empty($period)) {
+
+            switch ($period) {
+
+                case 'H1':
+                    $months = [4,5,6,7,8,9];
+                    break;
+
+                case 'H2':
+                    $months = [10,11,12,1,2,3];
+                    break;
+
+                default:
+                    $months = [];
+
+            }
+
+            if ($months) {
+                $query->whereIn('user_payslip.month', $months);
+            }
+
+        }
+
+        // Only PTAX > 0
+        $query->whereRaw("
+            CAST(
+                JSON_UNQUOTE(
+                    JSON_EXTRACT(
+                        emp_salary_slip_response,
+                        '$.visible_data.final_salary_calculation.ptax'
+                    )
+                ) AS DECIMAL(12,2)
+            ) > 0
+        ");
+
+        $records = $query->select(
+
+                'user_payslip.id',
+                'user_payslip.user_emp_id',
+
+                'employees.employee_id',
+                'users.name',
+
+                'user_payslip.financial_year',
+                'user_payslip.month',
+
+                'user_payslip.ptax_grips_payment_id',
+                'user_payslip.ptax_payment_initiated_date',
+                'user_payslip.ptax_brn',
+                'user_payslip.ptax_grn',
+                'user_payslip.ptax_period_from',
+                'user_payslip.ptax_period_to',
+                'user_payslip.ptax_payment_ref_no',
+                'user_payslip.ptax_amount_paid',
+                'user_payslip.ptax_payment_status',
+
+                DB::raw("
+                    JSON_UNQUOTE(
+                        JSON_EXTRACT(
+                            emp_salary_slip_response,
+                            '$.visible_data.final_salary_calculation.ptax'
+                        )
+                    ) AS ptax
+                ")
+
+            )
+            ->orderBy('users.name')
+            ->get();
+
+        return response()->json($records);
+    }
+    
+    public function updatePtax(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array|min:1',
+        ]);
+
+        DB::table('user_payslip')
+            ->whereIn('id', $request->ids)
+            ->update([
+
+                'ptax_grips_payment_id'      => $request->ptax_grips_payment_id,
+                'ptax_payment_initiated_date'=> $request->ptax_payment_initiated_date,
+                'ptax_brn'                  => $request->ptax_brn,
+                'ptax_grn'                  => $request->ptax_grn,
+                'ptax_period_from'          => $request->ptax_period_from,
+                'ptax_period_to'            => $request->ptax_period_to,
+                'ptax_payment_ref_no'       => $request->ptax_payment_ref_no,
+                'ptax_amount_paid'          => $request->ptax_amount_paid,
+                'ptax_payment_status'       => 'Done',
+
+                'updated_at' => now()
+
+            ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Selected PTax records updated successfully.'
+        ]);
     }
 
 }

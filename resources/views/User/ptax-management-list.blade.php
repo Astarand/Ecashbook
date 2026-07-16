@@ -14,12 +14,16 @@
                         <li class="breadcrumb-item active" aria-current="page">Professional Tax Payment</li>
                     </ul>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-3">
                     <div class="page-header-title">
                         <h2 class="mb-0 text-dark fw-bold">Professional Tax Payment</h2>
                     </div>
                 </div>
-                <div class="col-md-7 text-end">
+                <div class="col-md-9 text-end">
+                    <a href="{{ route('payroll.payslip_update') }}#ptax-section" class="btn btn-warning shadow">
+                        PTAX Update
+                    </a>
+
 					<button class="btn btn-outline-primary px-3 py-2 rounded-3 me-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#aboutPTaxModal">
                         <i class="ti ti-info-circle f-16"></i> About P Tax Registration
                     </button>

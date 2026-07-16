@@ -20,6 +20,9 @@
                     </div>
                 </div>
                 <div class="col-md-7 text-end">
+                    <a href="{{ route('payroll.payslip_update') }}#esi-section" class="btn btn-warning shadow">
+                        ESI Update
+                    </a>
 					<button class="btn btn-outline-primary px-3 py-2 rounded-3 me-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#aboutESIModal">
                         <i class="ti ti-info-circle f-16"></i> About ESI Registration
                     </button>

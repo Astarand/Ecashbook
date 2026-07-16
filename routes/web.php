@@ -930,7 +930,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/subscriber-stats/{range}', [BusinessEarningController::class, 'getSubscriberStats']);
 	Route::get('/tds-returns-download', [TdsPfEsiController::class, 'download_tds_returns'])->name('user.tds_returns_download');
 	Route::post('/download-pf-filing', [TdsPfEsiController::class, 'download_pf_filing'])->name('download.pf.filing');
-	Route::get('/esi-management-list', [TdsPfEsiController::class, 'esi_management_list'])->name('user.esi_management_list');
+	// Route::get('/esi-management-list', [TdsPfEsiController::class, 'esi_management_list'])->name('user.esi_management_list');
     Route::post('/download-esi-filing', [TdsPfEsiController::class, 'download_esi_filing'])->name('download.esi.filing');
     Route::get('/ptax_management_list', [TdsPfEsiController::class, 'ptax_management_list'])->name('user.ptax_management_list');
     Route::post('/download-ptax-filing', [TdsPfEsiController::class, 'download_ptax_filing'])->name('download.ptax.filing');
@@ -1279,5 +1279,10 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/payroll/tds/list', [PayrollReportController::class, 'getTdsList'])->name('payroll.tds.list');
 	Route::post('/payroll/tds/update', [PayrollReportController::class, 'updateTds'])->name('payroll.tds.update');
 	Route::get('/payroll/pf/list', [PayrollReportController::class, 'getPfList'])->name('payroll.pf.list');
+	Route::post('/payroll/pf/update', [PayrollReportController::class, 'updatePf'])->name('payroll.pf.update');
+	Route::get('/payroll/esi/list', [PayrollReportController::class, 'getEsiList'])->name('payroll.esi.list');
+	Route::post('/payroll/esi/update', [PayrollReportController::class, 'updateEsi'])->name('payroll.esi.update');
+	Route::get('/payroll/ptax/list', [PayrollReportController::class, 'getPtaxList'])->name('payroll.ptax.list');
+	Route::post('/payroll/ptax/update', [PayrollReportController::class, 'updatePtax'])->name('payroll.ptax.update');
 
 });
