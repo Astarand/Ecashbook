@@ -209,7 +209,6 @@
 										id="ledger_name"
 										required>
 
-									<option value="">Select Ledger</option>
 									<option value="all">General Entries</option>
 									<option value="Sales">Sales Ledger</option>
                                     <option value="Purchase">Purchase Ledger</option>

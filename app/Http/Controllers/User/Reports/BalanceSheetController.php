@@ -422,7 +422,8 @@ class BalanceSheetController extends Controller
 			->where('added_by', $userId)
 			->where('isActive', 1)
 			->where('assetType', 'non-current')
-			->whereBetween('date', [$fyStart, $fyEnd])
+			//->whereBetween('date', [$fyStart, $fyEnd])
+			->whereDate('date', '<=', $endDate)
 			->get();
 
 		$nonCurrAssetData = array_fill_keys([
@@ -445,7 +446,7 @@ class BalanceSheetController extends Controller
 			} else {
 				$value = ($asset->pay_status == 'Full') ? $asset->invoice_value : $asset->advance_amt;
 				// Calculate depreciation till report date
-				$depreciation = $this->balanceSheetService->calculateDepreciationByPeriod($asset,$fyStart,$fyEnd,$periodType);
+				$depreciation = $this->balanceSheetService->calculateDepreciationByPeriod($asset,$fyStart,$endDate,$periodType);
 				// Net Book Value
 				$value = max(0, $value - $depreciation);
 			}

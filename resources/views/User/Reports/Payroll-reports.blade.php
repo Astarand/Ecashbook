@@ -194,7 +194,7 @@
                         <i class="ph-duotone ph-bank text-secondary fs-3"></i>
                     </div>
                     <h3 class="fw-bold mb-1 text-dark" id="ptLiability">₹0</h3>
-                    <p class="text-muted small mb-0">Professional tax slab deductions</p>
+                    <p class="text-muted small mb-0">Due date : 10th - 21st of next month</p>
                 </div>
             </div>
         </div>
@@ -208,7 +208,7 @@
                         <i class="ph-duotone ph-receipt text-indigo fs-3" style="color: #6610f2 !important;"></i>
                     </div>
                     <h3 class="fw-bold mb-1 text-dark" id="tdsLiability">₹0</h3>
-                    <p class="text-muted small mb-0">IT Section 192 compliance</p>
+                    <p class="text-muted small mb-0">Due date : 7th of the next month</p>
                 </div>
             </div>
         </div>
@@ -219,7 +219,7 @@
                 <div class="card-body p-3.5 d-flex flex-column justify-content-between">
                     <div>
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-secondary small fw-bold uppercase-label">Payment Status</span>
+                            <span class="text-secondary small fw-bold uppercase-label">Salary Payment Status</span>
                             <span class="badge bg-light-success text-success px-2.5 py-1 rounded-pill small">Processed</span>
                         </div>
                         <h4 class="fw-bold text-dark mb-1" id="paymentSummary">Paid: 0 / 0</h4>
@@ -305,9 +305,7 @@
                                 <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                     <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
                                 </button>
-                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
-                                </button>
+                                
                             </div>
                         </div>
 
@@ -343,9 +341,7 @@
                                 <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                     <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
                                 </button>
-                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
-                                </button>
+                                
                             </div>
                         </div>
 
@@ -353,58 +349,6 @@
                         <div class="tab-pane fade" id="summaries" role="tabpanel" aria-labelledby="summaries-tab">
                             <div class="row">
                                 {{-- Left panel: Report selection --}}
-                                <div class="d-flex align-items-center gap-2 flex-wrap">
-                                    <!-- Financial Year -->
-                                    <select class="form-select form-select-sm" id="financial_year" style="width:150px;">
-                                        @php
-                                            $currentYear = date('Y');
-                                            $currentMonth = date('n');
-                                            $fyStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
-                                        @endphp
-
-                                        @for($i = 0; $i < 5; $i++)
-                                            @php
-                                                $start = $fyStart - $i;
-                                                $end = $start + 1;
-                                            @endphp
-
-                                            <option value="{{ $start }}-{{ $end }}" {{ $i==0 ? 'selected' : '' }}>
-                                                FY {{ $start }}-{{ $end }}
-                                            </option>
-                                        @endfor
-                                    </select>
-
-                                    <!-- Summary Type -->
-                                    <select class="form-select form-select-sm" id="summary_type" style="width:130px;">
-                                        <option value="monthly" selected>Monthly</option>
-                                        <option value="quarterly">Quarterly</option>
-                                        <option value="yearly">Yearly</option>
-                                    </select>
-
-                                    <!-- Month -->
-                                    <select class="form-select form-select-sm" id="month" style="width:130px;">
-                                        <option value="April">April</option>
-                                        <option value="May">May</option>
-                                        <option value="June">June</option>
-                                        <option value="July" selected>July</option>
-                                        <option value="August">August</option>
-                                        <option value="September">September</option>
-                                        <option value="October">October</option>
-                                        <option value="November">November</option>
-                                        <option value="December">December</option>
-                                        <option value="January">January</option>
-                                        <option value="February">February</option>
-                                        <option value="March">March</option>
-                                    </select>
-
-                                    <!-- Quarter -->
-                                    <select class="form-select form-select-sm d-none" id="quarter" style="width:150px;">
-                                        <option value="Q1">Q1 (Apr-Jun)</option>
-                                        <option value="Q2" selected>Q2 (Jul-Sep)</option>
-                                        <option value="Q3">Q3 (Oct-Dec)</option>
-                                        <option value="Q4">Q4 (Jan-Mar)</option>
-                                    </select>
-                                </div>
 
                                 <div class="col-md-4 mb-3">
                                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -483,6 +427,18 @@
 
                                         {{-- Sub-table 1: Salary Sheet --}}
                                         <div id="summary_salary_sheet" class="summary-table-section">
+                                            {{-- Filter bar --}}
+                                            <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                                                <select id="ss_type" class="form-select form-select-sm" style="width:140px;" onchange="renderSsFilter()">
+                                                    <option value="monthly">Monthly</option>
+                                                    <option value="quarterly">Quarterly</option>
+                                                    <option value="half-yearly">Half-Yearly</option>
+                                                    <option value="yearly">Full Year</option>
+                                                </select>
+                                                <select id="ss_period" class="form-select form-select-sm" style="width:160px;"></select>
+                                                <button class="btn btn-primary btn-sm px-3" onclick="loadSalarySheet()">Load</button>
+                                            </div>
+
                                             <div class="table-responsive border rounded-3 mb-3">
                                                 <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="salarySheetTable">
                                                     <thead class="bg-light">
@@ -499,135 +455,55 @@
                                                             <th class="pe-3 py-2.5">Status</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP001</td>
-                                                            <td class="fw-bold">Rahul Verma</td>
-                                                            <td>HDFC Bank</td>
-                                                            <td>502000452319</td>
-                                                            <td>HDFC0000120</td>
-                                                            <td class="fw-bold text-dark">₹1,07,400</td>
-                                                            <td>July 2026</td>
-                                                            <td>01-07-2026</td>
-                                                            <td>UTR74523190</td>
-                                                            <td><span class="badge bg-light-success text-success px-2 py-0.5 small rounded">Paid</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP002</td>
-                                                            <td class="fw-bold">Sneha Iyer</td>
-                                                            <td>ICICI Bank</td>
-                                                            <td>000401562391</td>
-                                                            <td>ICIC0000004</td>
-                                                            <td class="fw-bold text-dark">₹84,850</td>
-                                                            <td>July 2026</td>
-                                                            <td>01-07-2026</td>
-                                                            <td>UTR98542310</td>
-                                                            <td><span class="badge bg-light-success text-success px-2 py-0.5 small rounded">Paid</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP003</td>
-                                                            <td class="fw-bold">David Miller</td>
-                                                            <td>SBI</td>
-                                                            <td>31234918239</td>
-                                                            <td>SBIN0000212</td>
-                                                            <td class="fw-bold text-dark">₹75,850</td>
-                                                            <td>July 2026</td>
-                                                            <td>01-07-2026</td>
-                                                            <td>UTR12903841</td>
-                                                            <td><span class="badge bg-light-success text-success px-2 py-0.5 small rounded">Paid</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP004</td>
-                                                            <td class="fw-bold">Ananya Sen</td>
-                                                            <td>Axis Bank</td>
-                                                            <td>912010045213</td>
-                                                            <td>UTIB0000010</td>
-                                                            <td class="fw-bold text-dark">₹70,400</td>
-                                                            <td>July 2026</td>
-                                                            <td>01-07-2026</td>
-                                                            <td>UTR83940212</td>
-                                                            <td><span class="badge bg-light-success text-success px-2 py-0.5 small rounded">Paid</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP005</td>
-                                                            <td class="fw-bold">Vikram Rathore</td>
-                                                            <td>Kotak Bank</td>
-                                                            <td>120038475213</td>
-                                                            <td>KKBK0000182</td>
-                                                            <td class="fw-bold text-dark">₹1,26,600</td>
-                                                            <td>July 2026</td>
-                                                            <td>01-07-2026</td>
-                                                            <td>UTR48237512</td>
-                                                            <td><span class="badge bg-light-success text-success px-2 py-0.5 small rounded">Paid</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP006</td>
-                                                            <td class="fw-bold">Priya Sharma</td>
-                                                            <td>HDFC Bank</td>
-                                                            <td>502000854291</td>
-                                                            <td>HDFC0000120</td>
-                                                            <td class="fw-bold text-dark">₹62,400</td>
-                                                            <td>July 2026</td>
-                                                            <td>Pending</td>
-                                                            <td>N/A</td>
-                                                            <td><span class="badge bg-light-warning text-warning px-2 py-0.5 small rounded" id="emp6SalaryStatus">Pending</span></td>
-                                                        </tr>
+                                                    <tbody id="salarySheetBody">
+                                                        <tr><td colspan="10" class="text-center text-muted py-4">Select filters and click Load</td></tr>
                                                     </tbody>
                                                 </table>
                                             </div>
-
                                             <div class="row bg-light rounded p-3 mb-4 mx-0">
                                                 <div class="col-6">
-                                                    <span class="d-block text-secondary small uppercase-label">Total Employees</span>
-                                                    <h6 class="fw-bold text-dark mb-0">6 Active Records</h6>
+                                                    <span class="d-block text-secondary small uppercase-label">Total Records</span>
+                                                    <h6 class="fw-bold text-dark mb-0" id="ssTotalCount">—</h6>
                                                 </div>
                                                 <div class="col-6 text-end">
-                                                    <span class="d-block text-secondary small uppercase-label">Total Salary Amount</span>
-                                                    <h6 class="fw-bold text-primary mb-0" id="totalSalaryText">₹5,27,500</h6>
+                                                    <span class="d-block text-secondary small uppercase-label">Total Net Salary</span>
+                                                    <h6 class="fw-bold text-primary mb-0" id="ssTotalSalary">—</h6>
                                                 </div>
                                             </div>
-
                                             {{-- Signatory Blocks --}}
                                             <div class="row pt-4 mt-5 border-top text-center" style="font-size: 0.8rem;">
-                                                <div class="col-3">
-                                                    <div class="border-bottom pb-2 mb-1" style="height: 40px;"></div>
-                                                    <span class="fw-bold text-dark">Prepared By</span>
-                                                </div>
-                                                <div class="col-3">
-                                                    <div class="border-bottom pb-2 mb-1" style="height: 40px;"></div>
-                                                    <span class="fw-bold text-dark">Checked By</span>
-                                                </div>
-                                                <div class="col-3">
-                                                    <div class="border-bottom pb-2 mb-1" style="height: 40px;"></div>
-                                                    <span class="fw-bold text-dark">Approved By</span>
-                                                </div>
-                                                <div class="col-3">
-                                                    <div class="border-bottom pb-2 mb-1" style="height: 40px;"></div>
-                                                    <span class="fw-bold text-dark">Authorized Signatory</span>
-                                                </div>
+                                                <div class="col-3"><div class="border-bottom pb-2 mb-1" style="height: 40px;"></div><span class="fw-bold text-dark">Prepared By</span></div>
+                                                <div class="col-3"><div class="border-bottom pb-2 mb-1" style="height: 40px;"></div><span class="fw-bold text-dark">Checked By</span></div>
+                                                <div class="col-3"><div class="border-bottom pb-2 mb-1" style="height: 40px;"></div><span class="fw-bold text-dark">Approved By</span></div>
+                                                <div class="col-3"><div class="border-bottom pb-2 mb-1" style="height: 40px;"></div><span class="fw-bold text-dark">Authorized Signatory</span></div>
                                             </div>
-
                                             <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
-                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                    <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
-                                                </button>
-                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                    <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
-                                                </button>
-                                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
-                                                </button>
+                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF</button>
+                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-file-xls fs-4"></i> Export Excel</button>
+                                                
                                             </div>
                                         </div>
 
                                         {{-- Sub-table 2: PF Summary --}}
                                         <div id="summary_pf_summary" class="summary-table-section d-none">
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                                 <h6 class="fw-bold text-dark mb-0 uppercase-label" id="pfSummaryTitle">PF ECR - Table View</h6>
                                                 <div class="btn-group btn-group-sm border rounded-pill overflow-hidden p-0.5 bg-light" role="group">
                                                     <button type="button" class="btn btn-sm rounded-pill px-3 active-pf-tab-btn active bg-white text-primary border-0 fw-bold" onclick="switchPfTab('table', this)">Table View</button>
                                                     <button type="button" class="btn btn-sm rounded-pill px-3 active-pf-tab-btn text-secondary border-0 fw-bold" onclick="switchPfTab('text', this)">ECR TXT Format</button>
                                                 </div>
+                                            </div>
+
+                                            {{-- Filter bar --}}
+                                            <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                                                <select id="pf_type" class="form-select form-select-sm" style="width:140px;" onchange="renderPfFilter()">
+                                                    <option value="monthly">Monthly</option>
+                                                    <option value="quarterly">Quarterly</option>
+                                                    <option value="half-yearly">Half-Yearly</option>
+                                                    <option value="yearly">Full Year</option>
+                                                </select>
+                                                <select id="pf_period" class="form-select form-select-sm" style="width:160px;"></select>
+                                                <button class="btn btn-primary btn-sm px-3" onclick="loadPfData()">Load</button>
                                             </div>
 
                                             {{-- PF Table View --}}
@@ -642,106 +518,22 @@
                                                                 <th class="py-2.5">EPF Wages</th>
                                                                 <th class="py-2.5">EPS Wages</th>
                                                                 <th class="py-2.5">EDLI Wages</th>
-                                                                <th class="py-2.5">EPF Contribution (Employee 12%)</th>
-                                                                <th class="py-2.5">EPS Contribution (Employer 8.33%)</th>
-                                                                <th class="py-2.5">EPF Contribution (Employer 3.67%)</th>
+                                                                <th class="py-2.5">Employee EPF Contribution</th>
+                                                                <th class="py-2.5">Employer EPS Contribution</th>
+                                                                <th class="py-2.5">EPF Difference (Employer Share)</th>
                                                                 <th class="py-2.5">NCP Days</th>
                                                                 <th class="pe-3 py-2.5">Refund of Advances</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">100984523190</td>
-                                                                <td class="fw-bold text-dark">Rahul Verma</td>
-                                                                <td>₹1,20,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td class="text-primary fw-bold">₹1,800.00</td>
-                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                                <td class="text-success fw-semibold">₹550.50</td>
-                                                                <td>0</td>
-                                                                <td class="pe-2">₹0.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">100984523910</td>
-                                                                <td class="fw-bold text-dark">Sneha Iyer</td>
-                                                                <td>₹95,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td class="text-primary fw-bold">₹1,800.00</td>
-                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                                <td class="text-success fw-semibold">₹550.50</td>
-                                                                <td>1</td>
-                                                                <td class="pe-2">₹0.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">100984523212</td>
-                                                                <td class="fw-bold text-dark">David Miller</td>
-                                                                <td>₹85,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td class="text-primary fw-bold">₹1,800.00</td>
-                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                                <td class="text-success fw-semibold">₹550.50</td>
-                                                                <td>0</td>
-                                                                <td class="pe-2">₹0.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">100984523010</td>
-                                                                <td class="fw-bold text-dark">Ananya Sen</td>
-                                                                <td>₹80,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td class="text-primary fw-bold">₹1,800.00</td>
-                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                                <td class="text-success fw-semibold">₹550.50</td>
-                                                                <td>0</td>
-                                                                <td class="pe-2">₹0.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">100984523182</td>
-                                                                <td class="fw-bold text-dark">Vikram Rathore</td>
-                                                                <td>₹1,50,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td class="text-primary fw-bold">₹1,800.00</td>
-                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                                <td class="text-success fw-semibold">₹550.50</td>
-                                                                <td>2</td>
-                                                                <td class="pe-2">₹0.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">100984523120</td>
-                                                                <td class="fw-bold text-dark">Priya Sharma</td>
-                                                                <td>₹72,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td>₹15,000.00</td>
-                                                                <td class="text-primary fw-bold">₹1,800.00</td>
-                                                                <td class="text-danger fw-semibold">₹1,249.50</td>
-                                                                <td class="text-success fw-semibold">₹550.50</td>
-                                                                <td>0</td>
-                                                                <td class="pe-2">₹0.00</td>
-                                                            </tr>
+                                                        <tbody id="pfTableBody">
+                                                            <tr><td colspan="11" class="text-center text-muted py-4">Select filters and click Load</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
-
                                                 <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
-                                                    <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                        <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
-                                                    </button>
-                                                    <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                        <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
-                                                    </button>
-                                                    <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                        <i class="ph-duotone ph-printer fs-4"></i> Print Report
-                                                    </button>
+                                                    <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF</button>
+                                                    <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-file-xls fs-4"></i> Export Excel</button>
+                                                    {{-- <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-printer fs-4"></i> Print Report</button> --}}
                                                 </div>
                                             </div>
 
@@ -751,13 +543,7 @@
                                                     <h6 class="fw-bold text-dark font-14 mb-0"><i class="ti ti-file-text text-primary f-18 me-1"></i> ECR Text Return Output (.txt)</h6>
                                                     <span class="badge bg-light-warning text-warning border border-warning-subtle">Separator: #~#</span>
                                                 </div>
-                                                <pre class="bg-dark text-success p-3 rounded-3 mb-0 text-start overflow-auto fw-bold" style="font-family: monospace; font-size: 13.5px; line-height: 1.8; letter-spacing: 0.5px;">
-                                                100984523190#~#Rahul Verma#~#120000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
-                                                100984523910#~#Sneha Iyer#~#95000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#1#~#0
-                                                100984523212#~#David Miller#~#85000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
-                                                100984523010#~#Ananya Sen#~#80000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0
-                                                100984523182#~#Vikram Rathore#~#150000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#2#~#0
-                                                100984523120#~#Priya Sharma#~#72000#~#15000#~#15000#~#15000#~#1800#~#1250#~#550#~#0#~#0</pre>
+                                                <pre class="bg-dark text-success p-3 rounded-3 mb-0 text-start overflow-auto fw-bold" id="pfEcrTextOutput" style="font-family: monospace; font-size: 13.5px; line-height: 1.8; letter-spacing: 0.5px;">Load data first to generate ECR text...</pre>
                                                 <div class="mt-3">
                                                     <h6 class="fw-bold text-dark font-13 mb-1.5">Guidelines for EPFO Portal upload:</h6>
                                                     <ul class="list-unstyled mb-0 text-secondary font-12">
@@ -767,21 +553,33 @@
                                                     </ul>
                                                 </div>
                                                 <div class="d-flex justify-content-end mt-4 pt-3 border-top no-print">
-                                                    <button onclick="downloadEcrText()" class="btn btn-light-warning px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm custom-action-btn-excel" style="transition: all 0.2s ease;">
+                                                    <button onclick="downloadEcrText()" class="btn btn-light-warning px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm custom-action-btn-excel">
                                                         <i class="ph-duotone ph-download-simple fs-4"></i> Download ECR (.txt)
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
-
+                                                
                                         {{-- Sub-table 3: ESI Summary --}}
                                         <div id="summary_esi_summary" class="summary-table-section d-none">
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                                 <h6 class="fw-bold text-dark mb-0 uppercase-label" id="esiSummaryTitle">ESI Summary - MC Excel</h6>
                                                 <div class="btn-group btn-group-sm border rounded-pill overflow-hidden p-0.5 bg-light" role="group">
                                                     <button type="button" class="btn btn-sm rounded-pill px-3 active-esi-tab-btn active bg-white text-primary border-0 fw-bold" onclick="switchEsiTab('summary', this)">ESI Summary</button>
                                                     <button type="button" class="btn btn-sm rounded-pill px-3 active-esi-tab-btn text-secondary border-0 fw-bold" onclick="switchEsiTab('upload', this)">ESIC Upload Sheet</button>
                                                 </div>
+                                            </div>
+
+                                            {{-- Filter bar --}}
+                                            <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                                                <select id="esi_type" class="form-select form-select-sm" style="width:140px;" onchange="renderEsiFilter()">
+                                                    <option value="monthly">Monthly</option>
+                                                    <option value="quarterly">Quarterly</option>
+                                                    <option value="half-yearly">Half-Yearly</option>
+                                                    <option value="yearly">Full Year</option>
+                                                </select>
+                                                <select id="esi_period" class="form-select form-select-sm" style="width:160px;"></select>
+                                                <button class="btn btn-primary btn-sm px-3" onclick="loadEsiData()">Load</button>
                                             </div>
 
                                             {{-- ESI Contribution Summary Table --}}
@@ -792,7 +590,7 @@
                                                             <tr class="text-secondary small fw-bold">
                                                                 <th class="ps-3 py-2.5">Employee ID</th>
                                                                 <th class="py-2.5">Employee Name</th>
-                                                                <th class="py-2.5">ESI Number</th>
+                                                                <th class="py-2.5">ESI (IP) Number</th>
                                                                 <th class="py-2.5">ECR Gross Wages</th>
                                                                 <th class="py-2.5">ESI Wages</th>
                                                                 <th class="py-2.5">Employee ESI (0.75%)</th>
@@ -800,160 +598,61 @@
                                                                 <th class="pe-3 py-2.5">Total ESI (4%)</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">EMP001</td>
-                                                                <td class="fw-bold text-dark">Rahul Verma</td>
-                                                                <td>21-00-123456-001-0001</td>
-                                                                <td>₹1,20,000.00</td>
-                                                                <td>₹21,000.00</td>
-                                                                <td class="text-primary fw-semibold">₹157.50</td>
-                                                                <td class="text-success fw-semibold">₹682.50</td>
-                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">EMP002</td>
-                                                                <td class="fw-bold text-dark">Sneha Iyer</td>
-                                                                <td>21-00-123456-002-0002</td>
-                                                                <td>₹95,000.00</td>
-                                                                <td>₹21,000.00</td>
-                                                                <td class="text-primary fw-semibold">₹157.50</td>
-                                                                <td class="text-success fw-semibold">₹682.50</td>
-                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">EMP003</td>
-                                                                <td class="fw-bold text-dark">David Miller</td>
-                                                                <td>21-00-123456-003-0003</td>
-                                                                <td>₹85,000.00</td>
-                                                                <td>₹21,000.00</td>
-                                                                <td class="text-primary fw-semibold">₹157.50</td>
-                                                                <td class="text-success fw-semibold">₹682.50</td>
-                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">EMP004</td>
-                                                                <td class="fw-bold text-dark">Ananya Sen</td>
-                                                                <td>21-00-123456-004-0004</td>
-                                                                <td>₹80,000.00</td>
-                                                                <td>₹21,000.00</td>
-                                                                <td class="text-primary fw-semibold">₹157.50</td>
-                                                                <td class="text-success fw-semibold">₹682.50</td>
-                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">EMP005</td>
-                                                                <td class="fw-bold text-dark">Vikram Rathore</td>
-                                                                <td>21-00-123456-005-0005</td>
-                                                                <td>₹1,50,000.00</td>
-                                                                <td>₹21,000.00</td>
-                                                                <td class="text-primary fw-semibold">₹157.50</td>
-                                                                <td class="text-success fw-semibold">₹682.50</td>
-                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td class="ps-2 fw-bold text-dark">EMP006</td>
-                                                                <td class="fw-bold text-dark">Priya Sharma</td>
-                                                                <td>21-00-123456-006-0006</td>
-                                                                <td>₹72,000.00</td>
-                                                                <td>₹21,000.00</td>
-                                                                <td class="text-primary fw-semibold">₹157.50</td>
-                                                                <td class="text-success fw-semibold">₹682.50</td>
-                                                                <td class="pe-2 fw-bold text-dark">₹840.00</td>
-                                                            </tr>
+                                                        <tbody id="esiTableBody">
+                                                            <tr><td colspan="8" class="text-center text-muted py-4">Select filters and click Load</td></tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
-
                                                 <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
-                                                    <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                        <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
-                                                    </button>
-                                                    <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                        <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
-                                                    </button>
-                                                    <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                        <i class="ph-duotone ph-printer fs-4"></i> Print Report
-                                                    </button>
+                                                    <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF</button>
+                                                    <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-file-xls fs-4"></i> Export Excel</button>
+                                                    {{-- <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-printer fs-4"></i> Print Report</button> --}}
                                                 </div>
                                             </div>
 
                                             {{-- ESIC Upload Sheet Table --}}
-                                            <div id="esi_upload_table_view" class="table-responsive border rounded-3 mb-4 d-none">
-                                                <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="esiUploadTable">
-                                                    <thead class="bg-light">
-                                                        <tr class="text-secondary small fw-bold">
-                                                            <th class="ps-3 py-2.5">IP Number (10 Digits)</th>
-                                                            <th class="py-2.5">IP Name (Only alphabets and space)</th>
-                                                            <th class="py-2.5">No of Days for which wages paid/payable during the month</th>
-                                                            <th class="py-2.5">Total Monthly Wages</th>
-                                                            <th class="py-2.5">Reason Code for Zero working days</th>
-                                                            <th class="pe-3 py-2.5">Last Working Day</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">2100123456</td>
-                                                            <td class="fw-bold text-dark">Rahul Verma</td>
-                                                            <td>26</td>
-                                                            <td class="fw-semibold">₹1,20,000.00</td>
-                                                            <td>0</td>
-                                                            <td class="pe-2 text-muted">N/A</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">2100123457</td>
-                                                            <td class="fw-bold text-dark">Sneha Iyer</td>
-                                                            <td>26</td>
-                                                            <td class="fw-semibold">₹95,000.00</td>
-                                                            <td>0</td>
-                                                            <td class="pe-2 text-muted">N/A</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">2100123458</td>
-                                                            <td class="fw-bold text-dark">David Miller</td>
-                                                            <td>26</td>
-                                                            <td class="fw-semibold">₹85,000.00</td>
-                                                            <td>0</td>
-                                                            <td class="pe-2 text-muted">N/A</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">2100123459</td>
-                                                            <td class="fw-bold text-dark">Ananya Sen</td>
-                                                            <td>26</td>
-                                                            <td class="fw-semibold">₹80,000.00</td>
-                                                            <td>0</td>
-                                                            <td class="pe-2 text-muted">N/A</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">2100123460</td>
-                                                            <td class="fw-bold text-dark">Vikram Rathore</td>
-                                                            <td>26</td>
-                                                            <td class="fw-semibold">₹1,50,000.00</td>
-                                                            <td>0</td>
-                                                            <td class="pe-2 text-muted">N/A</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">2100123461</td>
-                                                            <td class="fw-bold text-dark">Priya Sharma</td>
-                                                            <td>26</td>
-                                                            <td class="fw-semibold">₹72,000.00</td>
-                                                            <td>0</td>
-                                                            <td class="pe-2 text-muted">N/A</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-
-                                            <div class="d-flex justify-content-end mt-4 pt-3 border-top no-print">
-                                                <button onclick="exportToExcel()" class="btn btn-light-success px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm custom-action-btn-excel" style="transition: all 0.2s ease;">
-                                                    <i class="ph-duotone ph-file-xls fs-4"></i> Download ESIC Upload Sheet
-                                                </button>
+                                            <div id="esi_upload_table_view" class="d-none">
+                                                <div class="table-responsive border rounded-3 mb-4">
+                                                    <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="esiUploadTable">
+                                                        <thead class="bg-light">
+                                                            <tr class="text-secondary small fw-bold">
+                                                                <th class="ps-3 py-2.5">IP Number (10 Digits)</th>
+                                                                <th class="py-2.5">IP Name</th>
+                                                                <th class="py-2.5">Days Wages Paid</th>
+                                                                <th class="py-2.5">Total Monthly Wages</th>
+                                                                <th class="py-2.5">Reason Code</th>
+                                                                <th class="pe-3 py-2.5">Last Working Day</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="esiUploadTableBody">
+                                                            <tr><td colspan="6" class="text-center text-muted py-4">Load ESI Summary first</td></tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="d-flex justify-content-end mt-4 pt-3 border-top no-print">
+                                                    <button onclick="exportToExcel()" class="btn btn-light-success px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm custom-action-btn-excel">
+                                                        <i class="ph-duotone ph-file-xls fs-4"></i> Download ESIC Upload Sheet
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
 
                                         {{-- Sub-table 4: PT Summary --}}
                                         <div id="summary_pt_summary" class="summary-table-section d-none">
                                             <h6 class="fw-bold mb-3 text-dark uppercase-label">P-Tax Return Summary</h6>
+
+                                            {{-- Filter bar --}}
+                                            <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                                                <select id="pt_type" class="form-select form-select-sm" style="width:140px;" onchange="renderPtFilter()">
+                                                    <option value="monthly">Monthly</option>
+                                                    <option value="quarterly">Quarterly</option>
+                                                    <option value="half-yearly">Half-Yearly</option>
+                                                    <option value="yearly">Full Year</option>
+                                                </select>
+                                                <select id="pt_period" class="form-select form-select-sm" style="width:160px;"></select>
+                                                <button class="btn btn-primary btn-sm px-3" onclick="loadPtData()">Load</button>
+                                            </div>
+
                                             <div class="table-responsive border rounded-3 mb-4">
                                                 <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="ptTable">
                                                     <thead class="bg-light">
@@ -967,34 +666,8 @@
                                                             <th class="pe-3 py-2.5">Period</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                             <td class="ps-2 fw-bold text-dark">REG-WB-123459</td>
-                                                             <td class="fw-bold text-dark">E-CASHBOOK SYSTEMS LTD</td>
-                                                             <td>24 Employees</td>
-                                                             <td class="fw-semibold">₹6,02,000.00</td>
-                                                             <td class="fw-bold text-danger">₹1,200.00</td>
-                                                             <td class="fw-bold text-success">₹1,200.00</td>
-                                                             <td class="pe-2 text-muted">June 2026</td>
-                                                        </tr>
-                                                        <tr>
-                                                             <td class="ps-2 fw-bold text-dark">REG-WB-123459</td>
-                                                             <td class="fw-bold text-dark">E-CASHBOOK SYSTEMS LTD</td>
-                                                             <td>20 Employees</td>
-                                                             <td class="fw-semibold">₹5,10,000.00</td>
-                                                             <td class="fw-bold text-danger">₹1,000.00</td>
-                                                             <td class="fw-bold text-success">₹1,000.00</td>
-                                                             <td class="pe-2 text-muted">May 2026</td>
-                                                        </tr>
-                                                        <tr>
-                                                             <td class="ps-2 fw-bold text-dark">REG-WB-123459</td>
-                                                             <td class="fw-bold text-dark">E-CASHBOOK SYSTEMS LTD</td>
-                                                             <td>18 Employees</td>
-                                                             <td class="fw-semibold">₹4,85,000.00</td>
-                                                             <td class="fw-bold text-danger">₹900.00</td>
-                                                             <td class="fw-bold text-success">₹900.00</td>
-                                                             <td class="pe-2 text-muted">April 2026</td>
-                                                        </tr>
+                                                    <tbody id="ptTableBody">
+                                                        <tr><td colspan="7" class="text-center text-muted py-4">Select filters and click Load</td></tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -1006,15 +679,28 @@
                                                 <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                                     <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
                                                 </button>
-                                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                {{-- <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                                     <i class="ph-duotone ph-printer fs-4"></i> Print Report
-                                                </button>
+                                                </button> --}}
                                             </div>
                                         </div>
 
                                         {{-- Sub-table 5: TDS Summary --}}
                                         <div id="summary_tds_summary" class="summary-table-section d-none">
                                             <h6 class="fw-bold mb-3 text-dark uppercase-label">TDS FVU (File Validation Utility) - RPU/FVU compatible</h6>
+
+                                            {{-- Filter bar --}}
+                                            <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                                                <select id="tds_type" class="form-select form-select-sm" style="width:140px;" onchange="renderTdsFilter()">
+                                                    <option value="monthly">Monthly</option>
+                                                    <option value="quarterly">Quarterly</option>
+                                                    <option value="half-yearly">Half-Yearly</option>
+                                                    <option value="yearly">Full Year</option>
+                                                </select>
+                                                <select id="tds_period" class="form-select form-select-sm" style="width:160px;"></select>
+                                                <button class="btn btn-primary btn-sm px-3" onclick="loadTdsData()">Load</button>
+                                            </div>
+
                                             <div class="table-responsive border rounded-3 mb-4">
                                                 <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="tdsTable">
                                                     <thead class="bg-light">
@@ -1024,79 +710,17 @@
                                                             <th class="py-2.5">Employee Name</th>
                                                             <th class="py-2.5">Salary Amount</th>
                                                             <th class="py-2.5">TDS Amount</th>
-                                                            <th class="py-2.5">Section Code</th>
+                                                            <th class="py-2.5">Nature of Payment</th>
                                                             <th class="py-2.5">Challan No</th>
                                                             <th class="py-2.5">BSR Code</th>
-                                                            <th class="pe-3 py-2.5">Deposit Date</th>
+                                                            <th class="py-2.5">Deposit Date</th>
+                                                            <th class="py-2.5">Tender Date</th>
+                                                            <th class="py-2.5">CIN</th>
+                                                            <th class="pe-3 py-2.5">Status</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
-                                                            <td>ABCDE1234F</td>
-                                                            <td class="fw-bold text-dark">Rahul Verma</td>
-                                                            <td>₹1,20,000.00</td>
-                                                            <td class="fw-bold text-danger">₹4,300.00</td>
-                                                            <td>Section 192</td>
-                                                            <td>CHL-984321</td>
-                                                            <td>0210452</td>
-                                                            <td class="pe-2 text-muted">05-07-2026</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
-                                                            <td>FGHIJ5678K</td>
-                                                            <td class="fw-bold text-dark">Sneha Iyer</td>
-                                                            <td>₹95,000.00</td>
-                                                            <td class="fw-bold text-danger">₹3,538.00</td>
-                                                            <td>Section 192</td>
-                                                            <td>CHL-984322</td>
-                                                            <td>0210452</td>
-                                                            <td class="pe-2 text-muted">05-07-2026</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
-                                                            <td>KLMNO9012P</td>
-                                                            <td class="fw-bold text-dark">David Miller</td>
-                                                            <td>₹85,000.00</td>
-                                                            <td class="fw-bold text-danger">₹3,213.00</td>
-                                                            <td>Section 192</td>
-                                                            <td>CHL-984323</td>
-                                                            <td>0210452</td>
-                                                            <td class="pe-2 text-muted">05-07-2026</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
-                                                            <td>PQRST3456Q</td>
-                                                            <td class="fw-bold text-dark">Ananya Sen</td>
-                                                            <td>₹80,000.00</td>
-                                                            <td class="fw-bold text-danger">₹1,000.00</td>
-                                                            <td>Section 192</td>
-                                                            <td>CHL-984324</td>
-                                                            <td>0210452</td>
-                                                            <td class="pe-2 text-muted">05-07-2026</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
-                                                            <td>UVWXY7890R</td>
-                                                            <td class="fw-bold text-dark">Vikram Rathore</td>
-                                                            <td>₹1,50,000.00</td>
-                                                            <td class="fw-bold text-danger">₹8,075.00</td>
-                                                            <td>Section 192</td>
-                                                            <td>CHL-984325</td>
-                                                            <td>0210452</td>
-                                                            <td class="pe-2 text-muted">05-07-2026</td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold text-dark">CALG01234E</td>
-                                                            <td>ZEXRD4523S</td>
-                                                            <td class="fw-bold text-dark">Priya Sharma</td>
-                                                            <td>₹72,000.00</td>
-                                                            <td class="fw-bold text-danger">₹1,540.00</td>
-                                                            <td>Section 192</td>
-                                                            <td>N/A</td>
-                                                            <td>N/A</td>
-                                                            <td class="pe-2 text-muted">N/A</td>
-                                                        </tr>
+                                                    <tbody id="tdsTableBody">
+                                                        <tr><td colspan="12" class="text-center text-muted py-4">Select filters and click Load</td></tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -1108,15 +732,31 @@
                                                 <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                                     <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
                                                 </button>
-                                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
+                                                {{-- <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                                     <i class="ph-duotone ph-printer fs-4"></i> Print Report
-                                                </button>
+                                                </button> --}}
                                             </div>
                                         </div>
 
                                         {{-- Sub-table 5: Labour Welfare Fund --}}
                                         <div id="summary_lwf_summary" class="summary-table-section d-none">
-                                            <h6 class="fw-bold text-dark mb-3">Labour Welfare Fund (LWF) Liability Report</h6>
+                                            <div class="d-flex align-items-center gap-2 mb-3">
+                                                <h6 class="fw-bold text-dark mb-0">Labour Welfare Fund (LWF) Liability Report</h6>
+                                                <button type="button" class="btn btn-sm btn-light border-0 p-1 lh-1" onclick="document.getElementById('lwfInfoModal').style.display='flex'" title="About LWF">
+                                                    <i class="ph-duotone ph-eye fs-5 text-primary"></i>
+                                                </button>
+                                            </div>
+                                            {{-- Filter bar --}}
+                                            <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                                                <select id="lwf_type" class="form-select form-select-sm" style="width:140px;" onchange="renderLwfFilter()">
+                                                    <option value="monthly">Monthly</option>
+                                                    <option value="quarterly">Quarterly</option>
+                                                    <option value="half-yearly">Half-Yearly</option>
+                                                    <option value="yearly">Full Year</option>
+                                                </select>
+                                                <select id="lwf_period" class="form-select form-select-sm" style="width:160px;"></select>
+                                                <button class="btn btn-primary btn-sm px-3" onclick="loadLwfData()">Load</button>
+                                            </div>
                                             <div class="table-responsive border rounded-3 mb-4">
                                                 <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="lwfTable">
                                                     <thead class="bg-light">
@@ -1131,87 +771,26 @@
                                                             <th class="pe-3 py-2.5">Status</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP001</td>
-                                                            <td class="fw-bold">Rahul Verma</td>
-                                                            <td>West Bengal</td>
-                                                            <td>₹1,20,000</td>
-                                                            <td class="fw-semibold">₹10.00</td>
-                                                            <td class="fw-semibold">₹30.00</td>
-                                                            <td class="fw-bold text-dark">₹40.00</td>
-                                                            <td class="pe-2"><span class="badge bg-light-success text-success">Filed</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP002</td>
-                                                            <td class="fw-bold">Sneha Iyer</td>
-                                                            <td>West Bengal</td>
-                                                            <td>₹95,000</td>
-                                                            <td class="fw-semibold">₹10.00</td>
-                                                            <td class="fw-semibold">₹30.00</td>
-                                                            <td class="fw-bold text-dark">₹40.00</td>
-                                                            <td class="pe-2"><span class="badge bg-light-success text-success">Filed</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP003</td>
-                                                            <td class="fw-bold">David Miller</td>
-                                                            <td>West Bengal</td>
-                                                            <td>₹85,000</td>
-                                                            <td class="fw-semibold">₹10.00</td>
-                                                            <td class="fw-semibold">₹30.00</td>
-                                                            <td class="fw-bold text-dark">₹40.00</td>
-                                                            <td class="pe-2"><span class="badge bg-light-success text-success">Filed</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP004</td>
-                                                            <td class="fw-bold">Ananya Sen</td>
-                                                            <td>West Bengal</td>
-                                                            <td>₹80,000</td>
-                                                            <td class="fw-semibold">₹10.00</td>
-                                                            <td class="fw-semibold">₹30.00</td>
-                                                            <td class="fw-bold text-dark">₹40.00</td>
-                                                            <td class="pe-2"><span class="badge bg-light-success text-success">Filed</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP005</td>
-                                                            <td class="fw-bold">Vikram Rathore</td>
-                                                            <td>West Bengal</td>
-                                                            <td>₹1,50,000</td>
-                                                            <td class="fw-semibold">₹10.00</td>
-                                                            <td class="fw-semibold">₹30.00</td>
-                                                            <td class="fw-bold text-dark">₹40.00</td>
-                                                            <td class="pe-2"><span class="badge bg-light-success text-success">Filed</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP006</td>
-                                                            <td class="fw-bold">Priya Sharma</td>
-                                                            <td>West Bengal</td>
-                                                            <td>₹72,000</td>
-                                                            <td class="fw-semibold">₹10.00</td>
-                                                            <td class="fw-semibold">₹30.00</td>
-                                                            <td class="fw-bold text-dark">₹40.00</td>
-                                                            <td class="pe-2"><span class="badge bg-light-success text-success">Filed</span></td>
-                                                        </tr>
+                                                    <tbody id="lwfTableBody">
+                                                        <tr><td colspan="8" class="text-center text-muted py-4">Select filters and click Load</td></tr>
                                                     </tbody>
                                                 </table>
                                             </div>
-
                                             <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
-                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                    <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
-                                                </button>
-                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                    <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
-                                                </button>
-                                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
-                                                </button>
+                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF</button>
+                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-file-xls fs-4"></i> Export Excel</button>
+                                                {{-- <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-printer fs-4"></i> Print Report</button> --}}
                                             </div>
                                         </div>
 
                                         {{-- Sub-table 6: Gratuity Payment --}}
                                         <div id="summary_gratuity_summary" class="summary-table-section d-none">
-                                            <h6 class="fw-bold text-dark mb-3">Gratuity Liability & Accrual Statement</h6>
+                                            <div class="d-flex align-items-center gap-2 mb-3">
+                                                <h6 class="fw-bold text-dark mb-0">Gratuity Liability & Accrual Statement</h6>
+                                                <button type="button" class="btn btn-sm btn-light border-0 p-1 lh-1" onclick="document.getElementById('gratuityInfoModal').style.display='flex'" title="About Gratuity">
+                                                    <i class="ph-duotone ph-eye fs-5 text-primary"></i>
+                                                </button>
+                                            </div>
                                             <div class="table-responsive border rounded-3 mb-4">
                                                 <table class="table tbl-product m-0 custom-list-table align-middle table-sm" id="gratuityTable">
                                                     <thead class="bg-light">
@@ -1226,81 +805,15 @@
                                                             <th class="pe-3 py-2.5">Status</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP001</td>
-                                                            <td class="fw-bold">Rahul Verma</td>
-                                                            <td>12-04-2019</td>
-                                                            <td>7 Years</td>
-                                                            <td>₹60,000</td>
-                                                            <td class="fw-semibold text-danger">₹34,615</td>
-                                                            <td class="fw-bold text-dark">₹2,42,307</td>
-                                                            <td class="pe-2"><span class="badge bg-light-success text-success">Provisioned</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP002</td>
-                                                            <td class="fw-bold">Sneha Iyer</td>
-                                                            <td>15-08-2020</td>
-                                                            <td>5 Years</td>
-                                                            <td>₹48,000</td>
-                                                            <td class="fw-semibold text-danger">₹27,692</td>
-                                                            <td class="fw-bold text-dark">₹1,38,461</td>
-                                                            <td class="pe-2"><span class="badge bg-light-success text-success">Provisioned</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP003</td>
-                                                            <td class="fw-bold">David Miller</td>
-                                                            <td>10-10-2021</td>
-                                                            <td>4 Years</td>
-                                                            <td>₹42,000</td>
-                                                            <td class="fw-semibold text-secondary">N/A <span class="small text-muted">(<5 Yrs)</span></td>
-                                                            <td class="fw-bold text-muted">₹0.00</td>
-                                                            <td class="pe-2"><span class="badge bg-light-warning text-warning">Not Eligible</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP004</td>
-                                                            <td class="fw-bold">Ananya Sen</td>
-                                                            <td>01-02-2022</td>
-                                                            <td>4 Years</td>
-                                                            <td>₹40,000</td>
-                                                            <td class="fw-semibold text-secondary">N/A <span class="small text-muted">(<5 Yrs)</span></td>
-                                                            <td class="fw-bold text-muted">₹0.00</td>
-                                                            <td class="pe-2"><span class="badge bg-light-warning text-warning">Not Eligible</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP005</td>
-                                                            <td class="fw-bold">Vikram Rathore</td>
-                                                            <td>12-04-2018</td>
-                                                            <td>8 Years</td>
-                                                            <td>₹75,000</td>
-                                                            <td class="fw-semibold text-danger">₹43,269</td>
-                                                            <td class="fw-bold text-dark">₹3,46,153</td>
-                                                            <td class="pe-2"><span class="badge bg-light-success text-success">Provisioned</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="ps-2 fw-bold">EMP006</td>
-                                                            <td class="fw-bold">Priya Sharma</td>
-                                                            <td>15-05-2025</td>
-                                                            <td>1 Year</td>
-                                                            <td>₹36,000</td>
-                                                            <td class="fw-semibold text-secondary">N/A <span class="small text-muted">(<5 Yrs)</span></td>
-                                                            <td class="fw-bold text-muted">₹0.00</td>
-                                                            <td class="pe-2"><span class="badge bg-light-warning text-warning">Not Eligible</span></td>
-                                                        </tr>
+                                                    <tbody id="gratuityTableBody">
+                                                        <tr><td colspan="8" class="text-center text-muted py-4">Loading...</td></tr>
                                                     </tbody>
                                                 </table>
                                             </div>
-
                                             <div class="d-flex justify-content-end gap-3 align-items-center mt-4 pt-3 border-top no-print">
-                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                    <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
-                                                </button>
-                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                    <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
-                                                </button>
-                                                <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
-                                                    <i class="ph-duotone ph-printer fs-4"></i> Print Report
-                                                </button>
+                                                <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF</button>
+                                                <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-file-xls fs-4"></i> Export Excel</button>
+                                                {{-- <button onclick="printReport()" class="btn custom-action-btn-print px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm"><i class="ph-duotone ph-printer fs-4"></i> Print Report</button> --}}
                                             </div>
                                         </div>
                                     </div>
@@ -1311,6 +824,49 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+{{-- LWF Info Modal --}}
+<div id="lwfInfoModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.45); align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; max-width:480px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.18); overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#3b82f6,#1d4ed8); padding:18px 22px; display:flex; align-items:center; justify-content:space-between;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="ph-duotone ph-umbrella fs-4 text-white"></i>
+                <span class="fw-bold text-white fs-6">Labour Welfare Fund (LWF)</span>
+            </div>
+            <button type="button" onclick="document.getElementById('lwfInfoModal').style.display='none'" style="background:none;border:none;color:#fff;font-size:1.4rem;line-height:1;cursor:pointer;">&times;</button>
+        </div>
+        <div style="padding:24px 22px;">
+            <p class="text-dark mb-0" style="line-height:1.7;">
+                Labour Welfare Fund (LWF) is a statutory employee welfare contribution collected by the <strong>State Labour Welfare Board</strong>. It is governed under each state's respective LWF Act and provides benefits such as housing, education, medical aid, and social security to workers and their families.
+            </p>
+        </div>
+        <div style="padding:0 22px 18px; text-align:right;">
+            <button type="button" onclick="document.getElementById('lwfInfoModal').style.display='none'" class="btn btn-primary btn-sm px-4">Close</button>
+        </div>
+    </div>
+</div>
+
+{{-- Gratuity Info Modal --}}
+<div id="gratuityInfoModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.45); align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; max-width:480px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.18); overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#f59e0b,#d97706); padding:18px 22px; display:flex; align-items:center; justify-content:space-between;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="ph-duotone ph-hand-coins fs-4 text-white"></i>
+                <span class="fw-bold text-white fs-6">Gratuity</span>
+            </div>
+            <button type="button" onclick="document.getElementById('gratuityInfoModal').style.display='none'" style="background:none;border:none;color:#fff;font-size:1.4rem;line-height:1;cursor:pointer;">&times;</button>
+        </div>
+        <div style="padding:24px 22px;">
+            <ul class="mb-0 ps-3" style="line-height:1.9;">
+                <li class="text-dark">Gratuity is a <strong>retirement / separation benefit</strong> paid by employer to employee.</li>
+                <li class="text-dark">Gratuity becomes applicable after <strong>5 years continuous service</strong> (except death / disability cases).</li>
+            </ul>
+        </div>
+        <div style="padding:0 22px 18px; text-align:right;">
+            <button type="button" onclick="document.getElementById('gratuityInfoModal').style.display='none'" class="btn btn-warning btn-sm px-4 text-white">Close</button>
         </div>
     </div>
 </div>
@@ -1583,7 +1139,496 @@
         // Switch visible table section
         $('.summary-table-section').addClass('d-none');
         $('#summary_' + type).removeClass('d-none');
+
+        // Auto-load data for sections that don't need extra filters
+        if (type === 'gratuity_summary') loadGratuityData();
+        if (type === 'lwf_summary')      { renderLwfFilter(); loadLwfData(); }
+        if (type === 'salary_sheet')     { renderSsFilter();  loadSalarySheet(); }
+        if (type === 'pf_summary')       { renderPfFilter(); }
+        if (type === 'esi_summary')      { renderEsiFilter(); }
+        if (type === 'pt_summary')       { renderPtFilter(); }
+        if (type === 'tds_summary')      { renderTdsFilter(); }
     }
+
+    // ============================================================
+    // Helpers: period dropdown builders
+    // ============================================================
+    const MONTHS = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+
+    function buildPeriodOptions(type, prevMonthIdx) {
+        // prevMonthIdx: 0-based index of previous month (default selection)
+        let html = '';
+        if (type === 'monthly') {
+            MONTHS.forEach((m, i) => {
+                const sel = (i === prevMonthIdx) ? 'selected' : '';
+                html += `<option value="${m}" ${sel}>${m}</option>`;
+            });
+        } else if (type === 'quarterly') {
+            const quarters = [
+                {v:'Q1',l:'Q1 (Apr–Jun)'}, {v:'Q2',l:'Q2 (Jul–Sep)'},
+                {v:'Q3',l:'Q3 (Oct–Dec)'}, {v:'Q4',l:'Q4 (Jan–Mar)'}
+            ];
+            quarters.forEach(q => { html += `<option value="${q.v}">${q.l}</option>`; });
+        } else if (type === 'half-yearly') {
+            html = `<option value="H1">H1 (Apr–Sep)</option><option value="H2">H2 (Oct–Mar)</option>`;
+        } else {
+            html = `<option value="full">Full Year</option>`;
+        }
+        return html;
+    }
+
+    function prevMonthIndex() {
+        const d = new Date();
+        d.setMonth(d.getMonth() - 1);
+        return d.getMonth(); // 0-based
+    }
+
+    // ============================================================
+    // Salary Sheet
+    // ============================================================
+    function renderSsFilter() {
+        const type = $('#ss_type').val();
+        $('#ss_period').html(buildPeriodOptions(type, prevMonthIndex()));
+        $('#ss_period').toggle(type !== 'yearly');
+    }
+
+    // ============================================================
+    // PF Summary
+    // ============================================================
+    function renderPfFilter() {
+        const type = $('#pf_type').val();
+        $('#pf_period').html(buildPeriodOptions(type, prevMonthIndex()));
+        $('#pf_period').toggle(type !== 'yearly');
+    }
+    function loadPfData() {
+        const fy   = $('#payrollFY').val();
+        const type = $('#pf_type').val();
+        const per  = type === 'yearly' ? '' : $('#pf_period').val();
+
+        $('#pfTableBody').html('<tr><td colspan="11" class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>');
+
+        $.get('{{ route("payroll.pf.list") }}', {
+            financial_year: fy,
+            filter_type: type,
+            period: per
+        }, function(data) {
+            if (!data.length) {
+                $('#pfTableBody').html('<tr><td colspan="11" class="text-center text-muted py-4">No EPF applicable records found for selected period.</td></tr>');
+                // Clear ECR text too
+                $('#pfEcrTextOutput').text('No data found.');
+                return;
+            }
+
+            let tableHtml = '';
+            let ecrLines  = [];
+
+            data.forEach(r => {
+                const gross    = parseFloat(r.gross_salary   || 0);
+                const epfWages = parseFloat(r.epf_wages      || 0);
+                const empPf    = parseFloat(r.provident_fund || 0);
+                const empEps   = parseFloat(r.employer_eps   || 0);
+                const empDiff  = parseFloat(r.employer_epf_diff || 0);
+                const ncp      = parseInt(r.ncp_days         || 0);
+                const uan      = r.epf_no || '—';
+
+                tableHtml += `<tr>
+                    <td class="ps-2 fw-bold text-dark">${uan}</td>
+                    <td class="fw-bold text-dark">${r.name || '—'}</td>
+                    <td>₹${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>₹${epfWages.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>₹${epfWages.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>₹${epfWages.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-primary fw-bold">₹${empPf.toFixed(2)}</td>
+                    <td class="text-danger fw-semibold">₹${empEps.toFixed(2)}</td>
+                    <td class="text-success fw-semibold">₹${empDiff.toFixed(2)}</td>
+                    <td>${ncp}</td>
+                    <td class="pe-2">₹0.00</td>
+                </tr>`;
+
+                // ECR format: UAN#~#Name#~#Gross#~#EPFWages#~#EPSWages#~#EDLIWages#~#EmpPF#~#EmpEPS#~#EmpDiff#~#NCP#~#Refund
+                if (uan !== '—') {
+                    ecrLines.push([
+                        uan,
+                        r.name || '',
+                        Math.round(gross),
+                        Math.round(epfWages),
+                        Math.round(epfWages),
+                        Math.round(epfWages),
+                        Math.round(empPf),
+                        Math.round(empEps),
+                        Math.round(empDiff),
+                        ncp,
+                        0
+                    ].join('#~#'));
+                }
+            });
+
+            $('#pfTableBody').html(tableHtml);
+            $('#pfEcrTextOutput').text(ecrLines.length ? ecrLines.join('\n') : 'No UAN numbers found for ECR generation.');
+        }).fail(() => {
+            $('#pfTableBody').html('<tr><td colspan="11" class="text-center text-danger py-4">Failed to load PF data.</td></tr>');
+        });
+    }
+
+    function loadSalarySheet() {
+        const fy   = $('#payrollFY').val();
+        const type = $('#ss_type').val();
+        const per  = type === 'yearly' ? '' : $('#ss_period').val();
+
+        $('#salarySheetBody').html('<tr><td colspan="10" class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>');
+
+        $.get('{{ route("payroll.salary.sheet") }}', {
+            financial_year: fy,
+            filter_type: type,
+            period: per
+        }, function(data) {
+            if (!data.length) {
+                $('#salarySheetBody').html('<tr><td colspan="10" class="text-center text-muted py-4">No records found for selected period.</td></tr>');
+                $('#ssTotalCount').text('0 records');
+                $('#ssTotalSalary').text('₹0.00');
+                return;
+            }
+            let html = '', total = 0;
+            data.forEach(r => {
+                const net = parseFloat(r.net_salary || 0);
+                total += net;
+                const statusBadge = (r.payment_status === 'Done')
+                    ? `<span class="badge bg-light-success text-success">Paid</span>`
+                    : `<span class="badge bg-light-warning text-warning">Pending</span>`;
+                html += `<tr>
+                    <td class="ps-2 fw-bold">${r.employee_id || '—'}</td>
+                    <td class="fw-bold">${r.name || '—'}</td>
+                    <td>${r.bank_name || '—'}</td>
+                    <td>${r.account_number || '—'}</td>
+                    <td>${r.ifsc || '—'}</td>
+                    <td class="fw-bold text-dark">₹${net.toFixed(2)}</td>
+                    <td>${r.month_name || '—'}</td>
+                    <td>${r.payment_date || '—'}</td>
+                    <td>${r.payment_trans_id || 'N/A'}</td>
+                    <td class="pe-2">${statusBadge}</td>
+                </tr>`;
+            });
+            $('#salarySheetBody').html(html);
+            $('#ssTotalCount').text(data.length + ' record' + (data.length !== 1 ? 's' : ''));
+            $('#ssTotalSalary').text('₹' + total.toLocaleString('en-IN', {minimumFractionDigits:2}));
+        }).fail(() => {
+            $('#salarySheetBody').html('<tr><td colspan="10" class="text-center text-danger py-4">Failed to load data.</td></tr>');
+        });
+    }
+
+    // ============================================================
+    // ESI Summary
+    // ============================================================
+    function renderEsiFilter() {
+        const type = $('#esi_type').val();
+        $('#esi_period').html(buildPeriodOptions(type, prevMonthIndex()));
+        $('#esi_period').toggle(type !== 'yearly');
+    }
+
+    function loadEsiData() {
+        const fy   = $('#payrollFY').val();
+        const type = $('#esi_type').val();
+        const per  = type === 'yearly' ? '' : $('#esi_period').val();
+
+        const loadingRow8 = '<tr><td colspan="8" class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>';
+        const loadingRow6 = '<tr><td colspan="6" class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>';
+        $('#esiTableBody').html(loadingRow8);
+        $('#esiUploadTableBody').html(loadingRow6);
+
+        $.get('{{ route("payroll.esi.list") }}', {
+            financial_year: fy,
+            filter_type: type,
+            period: per
+        }, function(data) {
+            if (!data.length) {
+                $('#esiTableBody').html('<tr><td colspan="8" class="text-center text-muted py-4">No ESIC applicable records found for selected period.</td></tr>');
+                $('#esiUploadTableBody').html('<tr><td colspan="6" class="text-center text-muted py-4">No data.</td></tr>');
+                return;
+            }
+
+            let summaryHtml = '';
+            let uploadHtml  = '';
+
+            data.forEach(r => {
+                const gross       = parseFloat(r.gross_wages    || 0);
+                const esiWages    = parseFloat(r.esi_wages      || 0);
+                const empEsi      = parseFloat(r.employee_esi   || 0);
+                const emplEsi     = parseFloat(r.employer_esi   || 0);
+                const totalEsi    = parseFloat(r.total_esi      || 0);
+                const presentDays = parseInt(r.present_days     || 0);
+                const workingDays = parseInt(r.total_working_days || 0);
+                const esicNo      = r.esic_no || '—';
+
+                summaryHtml += `<tr>
+                    <td class="ps-2 fw-bold text-dark">${r.employee_id || '—'}</td>
+                    <td class="fw-bold text-dark">${r.name || '—'}</td>
+                    <td>${esicNo}</td>
+                    <td>₹${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>₹${esiWages.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-primary fw-semibold">₹${empEsi.toFixed(2)}</td>
+                    <td class="text-success fw-semibold">₹${emplEsi.toFixed(2)}</td>
+                    <td class="pe-2 fw-bold text-dark">₹${totalEsi.toFixed(2)}</td>
+                </tr>`;
+
+                // ESIC upload sheet: IP Number, Name, Days paid, Monthly Wages, Reason Code (0), Last Working Day (N/A)
+                const reasonCode = presentDays === 0 ? 1 : 0;
+                uploadHtml += `<tr>
+                    <td class="ps-2 fw-bold text-dark">${esicNo !== '—' ? esicNo.replace(/\D/g,'').substring(0,10) : '—'}</td>
+                    <td class="fw-bold text-dark">${r.name || '—'}</td>
+                    <td>${presentDays}</td>
+                    <td class="fw-semibold">₹${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>${reasonCode}</td>
+                    <td class="pe-2 text-muted">N/A</td>
+                </tr>`;
+            });
+
+            $('#esiTableBody').html(summaryHtml);
+            $('#esiUploadTableBody').html(uploadHtml);
+        }).fail(() => {
+            $('#esiTableBody').html('<tr><td colspan="8" class="text-center text-danger py-4">Failed to load ESI data.</td></tr>');
+        });
+    }
+
+    // ============================================================
+    // PT (Professional Tax)
+    // ============================================================
+    function renderPtFilter() {
+        const type = $('#pt_type').val();
+        $('#pt_period').html(buildPeriodOptions(type, prevMonthIndex()));
+        $('#pt_period').toggle(type !== 'yearly');
+    }
+
+    function loadPtData() {
+        const fy   = $('#payrollFY').val();
+        const type = $('#pt_type').val();
+        const per  = type === 'yearly' ? '' : $('#pt_period').val();
+
+        $('#ptTableBody').html('<tr><td colspan="7" class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>');
+
+        $.get('{{ route("payroll.ptax.summary") }}', {
+            financial_year: fy,
+            filter_type: type,
+            period: per
+        }, function(data) {
+            if (!data.length) {
+                $('#ptTableBody').html('<tr><td colspan="7" class="text-center text-muted py-4">No P-Tax applicable records found for selected period.</td></tr>');
+                return;
+            }
+
+            let html        = '';
+            let totalEmp    = 0;
+            let totalGross  = 0;
+            let totalPtax   = 0;
+
+            data.forEach(r => {
+                const empCount = parseInt(r.employee_count   || 0);
+                const gross    = parseFloat(r.total_gross_salary || 0);
+                const ptax     = parseFloat(r.total_ptax     || 0);
+
+                totalEmp   += empCount;
+                totalGross += gross;
+                totalPtax  += ptax;
+
+                html += `<tr>
+                    <td class="ps-2 fw-bold text-dark">${r.reg_no || '—'}</td>
+                    <td class="fw-bold text-dark">${r.employer_name || '—'}</td>
+                    <td>${empCount} Employee${empCount !== 1 ? 's' : ''}</td>
+                    <td class="fw-semibold">₹${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="fw-bold text-danger">₹${ptax.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="fw-bold text-success">₹${ptax.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="pe-2 text-muted">${r.month_name} ${r.financial_year || ''}</td>
+                </tr>`;
+            });
+
+            // Totals footer row (only if more than one period row)
+            if (data.length > 1) {
+                html += `<tr class="table-light fw-bold border-top">
+                    <td class="ps-2" colspan="2">Total</td>
+                    <td>${totalEmp} Employees</td>
+                    <td>₹${totalGross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-danger">₹${totalPtax.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-success">₹${totalPtax.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="pe-2">—</td>
+                </tr>`;
+            }
+
+            $('#ptTableBody').html(html);
+        }).fail(() => {
+            $('#ptTableBody').html('<tr><td colspan="7" class="text-center text-danger py-4">Failed to load P-Tax data.</td></tr>');
+        });
+    }
+
+    // ============================================================
+    // TDS
+    // ============================================================
+    function renderTdsFilter() {
+        const type = $('#tds_type').val();
+        $('#tds_period').html(buildPeriodOptions(type, prevMonthIndex()));
+        $('#tds_period').toggle(type !== 'yearly');
+    }
+
+    function loadTdsData() {
+        const fy   = $('#payrollFY').val();
+        const type = $('#tds_type').val();
+        const per  = type === 'yearly' ? '' : $('#tds_period').val();
+
+        $('#tdsTableBody').html('<tr><td colspan="12" class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>');
+
+        $.get('{{ route("payroll.tds.list") }}', {
+            financial_year: fy,
+            filter_type: type,
+            period: per
+        }, function(data) {
+            if (!data.length) {
+                $('#tdsTableBody').html('<tr><td colspan="12" class="text-center text-muted py-4">No TDS applicable records found for selected period.</td></tr>');
+                return;
+            }
+
+            let html = '';
+
+            data.forEach(r => {
+                const gross      = parseFloat(r.gross_salary  || 0);
+                const tdsAmt     = parseFloat(r.tds_amount    || 0);
+                const tan        = r.comp_tan                 || '—';
+                const pan        = r.pan_number               || '—';
+                const challanNo  = r.tds_challan_no           || 'N/A';
+                const bsrCode    = r.tds_bsr_code             || 'N/A';
+                const depositDt  = r.tds_deposit_date         || 'N/A';
+                const tenderDt   = r.tds_tender_date          || 'N/A';
+                const cin        = r.tds_cin                  || 'N/A';
+                const nature     = r.tds_nature_of_payment    || 'Section 192';
+                const status     = r.tds_deposit_status;
+
+                let statusBadge = '—';
+                if (status == 1 || status === 'paid' || status === 'Paid') {
+                    statusBadge = '<span class="badge bg-light-success text-success">Paid</span>';
+                } else if (status == 0 || status === 'pending' || status === 'Pending') {
+                    statusBadge = '<span class="badge bg-light-warning text-warning">Pending</span>';
+                } else if (status) {
+                    statusBadge = `<span class="badge bg-light-secondary text-secondary">${status}</span>`;
+                }
+
+                html += `<tr>
+                    <td class="ps-2 fw-bold text-dark">${tan}</td>
+                    <td>${pan}</td>
+                    <td class="fw-bold text-dark">${r.name || '—'}</td>
+                    <td class="fw-semibold">₹${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="fw-bold text-danger">₹${tdsAmt.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>${nature}</td>
+                    <td>${challanNo}</td>
+                    <td>${bsrCode}</td>
+                    <td class="text-muted">${depositDt}</td>
+                    <td class="text-muted">${tenderDt}</td>
+                    <td>${cin}</td>
+                    <td class="pe-2">${statusBadge}</td>
+                </tr>`;
+            });
+
+            $('#tdsTableBody').html(html);
+        }).fail(() => {
+            $('#tdsTableBody').html('<tr><td colspan="12" class="text-center text-danger py-4">Failed to load TDS data.</td></tr>');
+        });
+    }
+
+    // ============================================================
+    // LWF
+    // ============================================================
+    function renderLwfFilter() {
+        const type = $('#lwf_type').val();
+        $('#lwf_period').html(buildPeriodOptions(type, prevMonthIndex()));
+        $('#lwf_period').toggle(type !== 'yearly');
+    }
+
+    function loadLwfData() {
+        const fy   = $('#payrollFY').val();
+        const type = $('#lwf_type').val();
+        const per  = type === 'yearly' ? '' : $('#lwf_period').val();
+
+        $('#lwfTableBody').html('<tr><td colspan="8" class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>');
+
+        $.get('{{ route("payroll.lwf.list") }}', {
+            financial_year: fy,
+            filter_type: type,
+            period: per
+        }, function(data) {
+            if (!data.length) {
+                $('#lwfTableBody').html('<tr><td colspan="8" class="text-center text-muted py-4">No LWF applicable employees found for selected period.</td></tr>');
+                return;
+            }
+            let html = '';
+            data.forEach(r => {
+                const emp  = parseFloat(r.lwf_employee || 0);
+                const empr = parseFloat(r.lwf_employer || 0);
+                const tot  = parseFloat(r.lwf_total || 0);
+                html += `<tr>
+                    <td class="ps-2 fw-bold">${r.employee_id || '—'}</td>
+                    <td class="fw-bold">${r.name || '—'}</td>
+                    <td>${r.state_name || '—'}</td>
+                    <td>₹${parseFloat(r.gross_wages || 0).toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="fw-semibold">₹${emp.toFixed(2)}</td>
+                    <td class="fw-semibold">₹${empr.toFixed(2)}</td>
+                    <td class="fw-bold text-dark">₹${tot.toFixed(2)}</td>
+                    <td class="pe-2"><span class="badge bg-light-success text-success">${r.status}</span></td>
+                </tr>`;
+            });
+            $('#lwfTableBody').html(html);
+        }).fail(() => {
+            $('#lwfTableBody').html('<tr><td colspan="8" class="text-center text-danger py-4">Failed to load data.</td></tr>');
+        });
+    }
+
+    // ============================================================
+    // Gratuity (no period filter — always full list)
+    // ============================================================
+    function loadGratuityData() {
+        const fy = $('#payrollFY').val();
+
+        $('#gratuityTableBody').html('<tr><td colspan="8" class="text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>');
+
+        $.get('{{ route("payroll.gratuity.list") }}', {
+            financial_year: fy
+        }, function(data) {
+            if (!data.length) {
+                $('#gratuityTableBody').html('<tr><td colspan="8" class="text-center text-muted py-4">No employees found.</td></tr>');
+                return;
+            }
+            let html = '';
+            data.forEach(r => {
+                const eligible    = r.status === 'Provisioned';
+                const fyGratCell  = eligible
+                    ? `<span class="fw-semibold text-danger">₹${parseFloat(r.current_fy_gratuity).toLocaleString('en-IN',{minimumFractionDigits:2})}</span>`
+                    : `<span class="fw-semibold text-secondary">N/A <span class="small text-muted">(&lt;5 Yrs)</span></span>`;
+                const totalCell   = eligible
+                    ? `<span class="fw-bold text-dark">₹${parseFloat(r.total_gratuity).toLocaleString('en-IN',{minimumFractionDigits:2})}</span>`
+                    : `<span class="fw-bold text-muted">₹0.00</span>`;
+                const badge       = eligible
+                    ? `<span class="badge bg-light-success text-success">Provisioned</span>`
+                    : `<span class="badge bg-light-warning text-warning">Not Eligible</span>`;
+
+                html += `<tr>
+                    <td class="ps-2 fw-bold">${r.employee_id || '—'}</td>
+                    <td class="fw-bold">${r.employee_name || '—'}</td>
+                    <td>${r.joining_date}</td>
+                    <td>${r.years_completed}</td>
+                    <td>₹${parseFloat(r.basic_salary).toLocaleString('en-IN',{minimumFractionDigits:2})}</td>
+                    <td>${fyGratCell}</td>
+                    <td>${totalCell}</td>
+                    <td class="pe-2">${badge}</td>
+                </tr>`;
+            });
+            $('#gratuityTableBody').html(html);
+        }).fail(() => {
+            $('#gratuityTableBody').html('<tr><td colspan="8" class="text-center text-danger py-4">Failed to load data.</td></tr>');
+        });
+    }
+
+    // Init filters on page load
+    $(document).ready(function () {
+        renderSsFilter();
+        renderLwfFilter();
+        renderPfFilter();
+    });
 
     // Print Handler
     function printReport() {
@@ -1592,12 +1637,115 @@
 
     // Export PDF Handler
     function exportToPDF() {
-        window.print();
+        // Find the currently visible summary section
+        const section = document.querySelector('.summary-table-section:not(.d-none)');
+        if (!section) { alert('No report visible to export.'); return; }
+
+        const table = section.querySelector('table');
+        if (!table) { alert('No table found in this report.'); return; }
+
+        // Report title from the badge
+        const reportTitle = document.getElementById('summaryBadge')?.textContent?.trim() || 'Payroll Report';
+        const monthText   = document.querySelector('.active-month-text')?.textContent?.trim() || '';
+        const companyName = document.getElementById('reportCompanyHeader')?.textContent?.trim() || '';
+
+        // Collect headers
+        const headers = [];
+        table.querySelectorAll('thead tr').forEach(tr => {
+            const row = [];
+            tr.querySelectorAll('th').forEach(th => row.push(th.innerText.trim()));
+            headers.push(row);
+        });
+
+        // Collect body rows
+        const body = [];
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const row = [];
+            tr.querySelectorAll('td').forEach(td => row.push(td.innerText.trim()));
+            if (row.some(c => c !== '')) body.push(row);
+        });
+
+        if (!body.length) { alert('No data rows to export.'); return; }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+        // Header block
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.text(companyName, 14, 14);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(reportTitle + (monthText ? '  ·  ' + monthText : ''), 14, 21);
+        doc.text('Generated on: ' + new Date().toLocaleDateString('en-IN'), 14, 27);
+
+        doc.autoTable({
+            head: headers,
+            body: body,
+            startY: 32,
+            styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+            headStyles: { fillColor: [66, 47, 144], textColor: 255, fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: [245, 245, 250] },
+            margin: { left: 14, right: 14 },
+        });
+
+        const fileName = reportTitle.replace(/\s+/g, '_') + (monthText ? '_' + monthText.replace(/\s+/g, '_') : '') + '.pdf';
+        doc.save(fileName);
     }
 
     // Export Excel Handler
     function exportToExcel() {
-        alert('Exporting report as Excel spreadsheet...');
+        const section = document.querySelector('.summary-table-section:not(.d-none)');
+        if (!section) { alert('No report visible to export.'); return; }
+
+        const table = section.querySelector('table');
+        if (!table) { alert('No table found in this report.'); return; }
+
+        const reportTitle = document.getElementById('summaryBadge')?.textContent?.trim() || 'Payroll Report';
+        const monthText   = document.querySelector('.active-month-text')?.textContent?.trim() || '';
+        const companyName = document.getElementById('reportCompanyHeader')?.textContent?.trim() || '';
+
+        // Build worksheet data: company/title rows then table rows
+        const wsData = [];
+        wsData.push([companyName]);
+        wsData.push([reportTitle + (monthText ? ' — ' + monthText : '')]);
+        wsData.push(['Generated on: ' + new Date().toLocaleDateString('en-IN')]);
+        wsData.push([]);   // blank row
+
+        // Headers
+        table.querySelectorAll('thead tr').forEach(tr => {
+            const row = [];
+            tr.querySelectorAll('th').forEach(th => row.push(th.innerText.trim()));
+            wsData.push(row);
+        });
+
+        // Body
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const row = [];
+            tr.querySelectorAll('td').forEach(td => row.push(td.innerText.trim()));
+            if (row.some(c => c !== '')) wsData.push(row);
+        });
+
+        if (wsData.length <= 5) { alert('No data rows to export.'); return; }
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+        // Auto column widths
+        const colWidths = wsData.reduce((acc, row) => {
+            row.forEach((cell, i) => {
+                const len = (cell || '').toString().length;
+                acc[i] = Math.max(acc[i] || 10, Math.min(len + 2, 40));
+            });
+            return acc;
+        }, {});
+        ws['!cols'] = Object.values(colWidths).map(w => ({ wch: w }));
+
+        const sheetName = reportTitle.substring(0, 31);   // Excel sheet name max 31 chars
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+        const fileName = reportTitle.replace(/\s+/g, '_') + (monthText ? '_' + monthText.replace(/\s+/g, '_') : '') + '.xlsx';
+        XLSX.writeFile(wb, fileName);
     }
 
     // Download ECR Text file return
@@ -1886,8 +2034,6 @@
 
     });
 
-    
-    
     $(document).ready(function () {
         $('#register-tab').on('shown.bs.tab', function () {
             loadPayrollRegister();

@@ -1135,7 +1135,12 @@ class EmployeeManagemnet extends Controller
 			// IDs
 			'pan_number' => $request->input('pan_number'),
 			'aadhaar_number' => $request->input('aadhaar_number'),
-		]); // [attached_file:1] status_date
+
+			//LWF 
+			'lwfapplicable' => $request->boolean('lwf_applicable'),
+			'lwf_deduct' => $request->input('lwf_deduct'),
+		]); 
+		// [attached_file:1] status_date
 
 		// 1) Basic pre-checks (Access tab)
 		// $emp_permission = (array) $request->input('emppermission', []);
@@ -1219,6 +1224,8 @@ class EmployeeManagemnet extends Controller
 			'tdsapplicable' => ['nullable', 'boolean'],
 			'epfno' => ['nullable', 'string', 'max:60'],
 			'esicno' => ['nullable', 'string', 'max:60'],
+			'lwfapplicable' => ['nullable', 'boolean'],
+			'lwf_deduct' => ['nullable', 'numeric', 'min:0'],
 
 			// Earnings
 			'totaladdition' => ['required', 'numeric', 'min:0'],
@@ -1276,6 +1283,7 @@ class EmployeeManagemnet extends Controller
 		$esicApplicable = $request->boolean('esicapplicable');
 		$ptaxApplicable = $request->boolean('ptaxapplicable');
 		$tdsApplicable  = $request->boolean('tdsapplicable');
+		$lwfApplicable = $request->boolean('lwfapplicable');
 
 		if ($epfApplicable) {
 			$request->validate([
@@ -1298,6 +1306,9 @@ class EmployeeManagemnet extends Controller
 		}
 		if (!$tdsApplicable) {
 			$request->merge(['tds' => 0]);
+		}
+		if (!$lwfApplicable) {
+			$request->merge(['lwf_deduct' => 0]);
 		} // [attached_file:1]
 
 		try {
@@ -1453,12 +1464,15 @@ class EmployeeManagemnet extends Controller
 			$emp->tds_applicable  = $tdsApplicable ? 1 : 0;
 			$emp->epf_no = $request->epfno;
 			$emp->esic_no = $request->esicno;
+			$emp->lwf_applicable = $lwfApplicable ? 1 : 0;
+			$emp->lwf_company_contribution = $lwfApplicable ? 30.00 : 0;
 
 			// Deductions and loan
 			$emp->provident_fund = $request->providentfund ?? 0;
 			$emp->esi = $request->esi ?? 0;
 			$emp->ptax = $request->ptax ?? 0;
 			$emp->tds = $request->tds ?? 0;
+			$emp->lwf_deduct = $request->lwf_deduct ?? 0;
 			$emp->loan = $request->loan ?? 0;
 			$emp->loan_tenure = $request->loantenure ?? 0;
 			$emp->loan_deduction = $request->loandeduction ?? 0;
@@ -1519,416 +1533,6 @@ class EmployeeManagemnet extends Controller
 			], 422);
 		}
 	}
-
-
-
-
-	// public function add_user_employee(Request $request)
-	// {
-	// 	// 0) Normalize Blade snake_case → controller keys (run BEFORE validation)
-	// 	$request->merge([
-	// 		// Personal details
-	// 		'altphone' => $request->input('alt_phone'),
-	// 		'maritalstatus' => $request->input('marital_status'),
-	// 		'proqualification' => $request->input('pro_qualification'),
-	// 		'lastemployer' => $request->input('last_employer'),
-	// 		'experienceyears' => $request->input('experience_years'),
-
-	// 		// Address & reference
-	// 		'caddrlineone' => $request->input('c_addr_lineone'),
-	// 		'caddrlinetwo' => $request->input('c_addr_linetwo'),
-	// 		'cempstate' => $request->input('c_emp_state'),
-	// 		'cempcity' => $request->input('c_emp_city'),
-	// 		'cemppincode' => $request->input('c_emp_pincode'),
-
-	// 		'paddrlineone' => $request->input('p_addr_lineone'),
-	// 		'paddrlinetwo' => $request->input('p_addr_linetwo'),
-	// 		'pempstate' => $request->input('p_emp_state'),
-	// 		'pempcity' => $request->input('p_emp_city'),
-	// 		'pemppincode' => $request->input('p_emp_pincode'),
-
-	// 		'ref1name' => $request->input('ref1_name'),
-	// 		'ref1mobile' => $request->input('ref1_mobile'),
-	// 		'ref2name' => $request->input('ref2_name'),
-	// 		'ref2mobile' => $request->input('ref2_mobile'),
-	// 		'emergencyname' => $request->input('emergency_name'),
-	// 		'emergencymobile' => $request->input('emergency_mobile'),
-
-	// 		// Official
-	// 		'deptid' => $request->input('dept_id'),
-	// 		'designationid' => $request->input('designation_id'),
-	// 		'locationid' => $request->input('location_id'),
-	// 		'empjoiningdate' => $request->input('emp_joining_date'),
-	// 		'worklocation' => $request->input('work_location'), // UI posts this
-	// 		'empstatus' => $request->input('emp_status'),
-	// 		'statusdate' => $request->input('status_date'),
-	// 		'emptype' => $request->input('emp_type'),
-
-	// 		// Statutory
-	// 		'epfapplicable' => $request->boolean('epf_applicable'),
-	// 		'esicapplicable' => $request->boolean('esic_applicable'),
-	// 		'ptaxapplicable' => $request->boolean('ptax_applicable'),
-	// 		'tdsapplicable' => $request->boolean('tdsapplicable'),
-	// 		'epfno' => $request->input('epf_no'),
-	// 		'esicno' => $request->input('esic_no'),
-
-	// 		// Earnings
-	// 		'totaladdition' => $request->input('total_addition'),
-	// 		'basicsal' => $request->input('basic_sal'),
-	// 		'medicalallowance' => $request->input('medical_allowance'),
-	// 		'specialbonus' => $request->input('special_bonus'),
-
-	// 		// Deductions
-	// 		'providentfund' => $request->input('provident_fund'),
-	// 		'totaldeduction' => $request->input('total_deduction'),
-	// 		'netsal' => $request->input('net_sal'),
-	// 		'netsalword' => $request->input('net_sal_word'),
-	// 		'loantenure' => $request->input('tenure_months') ?? $request->input('loantenure'),
-	// 		'loandeduction' => $request->input('loan_deduction') ?? $request->input('loandeduction'),
-
-	// 		// Bank
-	// 		'bankname' => $request->input('bank_name'),
-	// 		'bankbranch' => $request->input('bank_branch'),
-	// 		'swiftcode' => $request->input('swift_code'),
-	// 		'accountholdername' => $request->input('account_holder_name'),
-	// 		'accountnumber' => $request->input('account_number'),
-	// 		'confirmaccountno' => $request->input('confirm_account_number') ?? $request->input('account_number'),
-	// 		'upiid' => $request->input('upi_id'),
-
-	// 		// Access
-	// 		'emppermission' => $request->input('emp_permission'),
-	// 		// confirm password aliases
-	// 		'confirmpwd' => $request->input('confirm_pwd'),
-	// 		'pan_number' => $request->input('pan_number'),
-	// 		'aadhaar_number' => $request->input('aadhaar_number'),
-	// 	]);
-
-	// 	// 1) Basic pre-checks (Access tab)
-	// 	$emp_permission = (array) $request->input('emppermission', []);
-	// 	if (empty($emp_permission)) {
-	// 		return response()->json([
-	// 			'status' => 'error',
-	// 			'class' => 'err',
-	// 			'redirect' => url('/'),
-	// 			'message' => 'Please set employee permission'
-	// 		]);
-	// 	}
-	// 	if (empty($request->locationid)) {
-	// 		return response()->json([
-	// 			'status' => 'error',
-	// 			'class' => 'err',
-	// 			'redirect' => url('/'),
-	// 			'message' => 'Please select company location'
-	// 		]);
-	// 	}
-
-	// 	// 2) Validation (all five tabs)
-	// 	// Accept either label or value for worklocation by mapping to allowed set
-	// 	$wl = strtolower((string)$request->worklocation);
-	// 	$worklocationValue = match ($wl) {
-	// 		'workfromhome', 'wfh', 'home' => 'workfromhome',
-	// 		'workfromoffice', 'wfo', 'office' => 'workfromoffice',
-	// 		'hybrid' => 'hybrid',
-	// 		default => $request->worklocation,
-	// 	};
-	// 	$request->merge(['worklocation' => $worklocationValue]);
-
-	// 	$request->validate([
-	// 		// Personal details
-	// 		'name' => ['required', 'string', 'max:150'],
-	// 		'phone' => ['required', 'regex:/^[0-9]{10}$/'],
-	// 		'email' => ['required', 'email'],
-	// 		'dob' => ['required', 'date'],
-	// 		'gender' => ['required', 'in:Male,Female,Other'],
-	// 		'qualification' => ['required', 'string', 'max:150'],
-
-	// 		'altphone' => ['nullable', 'regex:/^[0-9]{10}$/'],
-	// 		'maritalstatus' => ['nullable', 'in:Single,Married,Divorced,Widowed'],
-	// 		'proqualification' => ['nullable', 'string', 'max:150'],
-	// 		'lastemployer' => ['nullable', 'string', 'max:150'],
-	// 		'experienceyears' => ['nullable', 'numeric', 'min:0'],
-
-	// 		// Address and reference
-	// 		'caddrlineone' => ['required', 'string', 'max:255'],
-	// 		'caddrlinetwo' => ['nullable', 'string', 'max:255'],
-	// 		'cempstate' => ['required', 'integer'],
-	// 		'cempcity' => ['required', 'integer'],
-	// 		'cemppincode' => ['required', 'string', 'max:10'],
-
-	// 		'paddrlineone' => ['required', 'string', 'max:255'],
-	// 		'paddrlinetwo' => ['nullable', 'string', 'max:255'],
-	// 		'pempstate' => ['required', 'integer'],
-	// 		'pempcity' => ['required', 'integer'],
-	// 		'pemppincode' => ['required', 'string', 'max:10'],
-
-	// 		'ref1name' => ['nullable', 'string', 'max:150'],
-	// 		'ref1mobile' => ['nullable', 'regex:/^[0-9]{10}$/'],
-	// 		'ref2name' => ['nullable', 'string', 'max:150'],
-	// 		'ref2mobile' => ['nullable', 'regex:/^[0-9]{10}$/'],
-	// 		'emergencyname' => ['nullable', 'string', 'max:150'],
-	// 		'emergencymobile' => ['nullable', 'regex:/^[0-9]{10}$/'],
-
-	// 		// Official details
-	// 		'deptid' => ['required', 'integer'],
-	// 		'designationid' => ['required', 'integer'],
-	// 		'locationid' => ['required', 'integer'],
-	// 		'empjoiningdate' => ['required', 'date'],
-	// 		'worklocation' => ['required'],
-
-	// 		'empstatus' => ['nullable', 'in:In Probation,Confirmed,Terminated,Resigned'],
-	// 		'statusdate' => ['nullable', 'date'],
-	// 		'emptype' => ['nullable', 'in:Full Time,Part Time,Contract,Temporary'],
-
-	// 		// Statutory applicability
-	// 		'epfapplicable' => ['nullable', 'boolean'],
-	// 		'esicapplicable' => ['nullable', 'boolean'],
-	// 		'ptaxapplicable' => ['nullable', 'boolean'],
-	// 		'tdsapplicable' => ['nullable', 'boolean'],
-	// 		'epfno' => ['nullable', 'string', 'max:60'],
-	// 		'esicno' => ['nullable', 'string', 'max:60'],
-
-	// 		// Earnings
-	// 		'totaladdition' => ['required', 'numeric', 'min:0'],
-	// 		'basicsal' => ['required', 'numeric', 'min:0'],
-	// 		'hra' => ['required', 'numeric', 'min:0'],
-	// 		'convayance' => ['required', 'numeric', 'min:0'],
-	// 		'medicalallowance' => ['required', 'numeric', 'min:0'],
-	// 		'specialbonus' => ['required', 'numeric', 'min:0'],
-
-	// 		// Deductions
-	// 		'providentfund' => ['nullable', 'numeric', 'min:0'],
-	// 		'esi' => ['nullable', 'numeric', 'min:0'],
-	// 		'ptax' => ['nullable', 'numeric', 'min:0'],
-	// 		'tds' => ['nullable', 'numeric', 'min:0'],
-	// 		'loan' => ['nullable', 'numeric', 'min:0'],
-	// 		'loantenure' => ['nullable', 'integer', 'min:0'],
-	// 		'loandeduction' => ['nullable', 'numeric', 'min:0'],
-	// 		'totaldeduction' => ['required', 'numeric', 'min:0'],
-	// 		'netsal' => ['required', 'numeric', 'min:0'],
-	// 		'netsalword' => ['required', 'string', 'max:255'],
-
-	// 		// Bank details
-	// 		'bankname' => ['required', 'string', 'max:150'],
-	// 		'bankbranch' => ['required', 'string', 'max:150'],
-	// 		'ifsc' => ['required', 'string', 'max:20'],
-	// 		'swiftcode' => ['nullable', 'string', 'max:20'],
-	// 		'accountholdername' => ['required', 'string', 'max:150'],
-	// 		'accountnumber' => ['required', 'string', 'max:50'],
-	// 		'confirmaccountno' => ['required', 'same:accountnumber'],
-
-	// 		// Access
-	// 		'password' => ['required', 'string', 'min:6', 'max:64'],
-	// 		'confirmpwd' => ['required', 'same:password'],
-
-	// 		// Profile image
-	// 		'fileUpload' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-	// 		'pan_number' => ['nullable', 'string', 'max:20'],
-	// 		'aadhaar_number' => ['nullable', 'string', 'max:20'],
-	// 	]);
-
-	// 	// 3) Conditional statutory rules
-	// 	$epfApplicable  = $request->boolean('epfapplicable');
-	// 	$esicApplicable = $request->boolean('esicapplicable');
-	// 	$ptaxApplicable = $request->boolean('ptaxapplicable');
-	// 	$tdsApplicable  = $request->boolean('tdsapplicable');
-
-	// 	if ($epfApplicable) {
-	// 		$request->validate([
-	// 			'epfno' => ['required', 'string', 'max:60'],
-	// 			'providentfund' => ['required', 'numeric', 'min:0'],
-	// 		]);
-	// 	} else {
-	// 		$request->merge(['epfno' => null, 'providentfund' => 0]);
-	// 	}
-	// 	if ($esicApplicable) {
-	// 		$request->validate([
-	// 			'esicno' => ['required', 'string', 'max:60'],
-	// 			'esi' => ['required', 'numeric', 'min:0'],
-	// 		]);
-	// 	} else {
-	// 		$request->merge(['esicno' => null, 'esi' => 0]);
-	// 	}
-	// 	if (!$ptaxApplicable) {
-	// 		$request->merge(['ptax' => 0]);
-	// 	}
-	// 	if (!$tdsApplicable) {
-	// 		$request->merge(['tds' => 0]);
-	// 	}
-
-	// 	try {
-	// 		DB::beginTransaction();
-
-	// 		// 4) Create system user (Access tab)
-
-	// 		$user = User::where('email', '=', $request->email)->get();
-	// 		$user = @$user[0];
-	// 		if (!empty($user)) {
-	// 			$msg = array(
-	// 				'status' => 'error',
-	// 				'class' => 'err',
-	// 				'redirect' => url('/'),
-	// 				'message' => 'Email already exists'
-	// 			);
-	// 			return response()->json($msg);
-	// 		}
-	// 		$insertEmployee = $this->createUser($request->all());
-
-	// 		$empUserId = DB::getPdo()->lastInsertId();
-
-
-	// 		// $user = User::create([
-	// 		// 	'name' => $request->name,
-	// 		// 	'email' => $request->email,
-	// 		// 	'password' => bcrypt($request->password),
-	// 		// 	'u_type' => 2,
-	// 		// ]);
-
-	// 		// $empUserId = $user->id;
-	// 		$addedBy = Auth::id();
-
-	// 		// 5) Profile image: store filename only
-	// 		$profileFileName = null;
-	// 		if ($request->hasFile('fileUpload')) {
-	// 			$ext = $request->file('fileUpload')->getClientOriginalExtension();
-	// 			$profileFileName = time() . '.' . $ext;
-	// 			$request->file('fileUpload')->storeAs('public/user_employee', $profileFileName);
-	// 		}
-
-	// 		// 5.1) Employee documents helper (stores under public/employee_document)
-	// 		$storeEmpDoc = function (string $key) use ($request) {
-	// 			if (!$request->hasFile($key)) return null;
-	// 			$file = $request->file($key);
-	// 			$ext = $file->getClientOriginalExtension();
-	// 			$name = time() . '_' . $key . '.' . $ext;
-	// 			$file->storeAs('public/employee_document', $name);
-	// 			return $name;
-	// 		};
-
-	// 		// 6) Save employee row
-	// 		$emp = new Employees();
-	// 		$emp->added_by = $addedBy;
-	// 		$emp->empId = $empUserId;
-	// 		if ($profileFileName) $emp->profile_img = $profileFileName;
-
-	// 		// Employee code
-	// 		$emp->employee_id = $this->getEmployeeId();
-
-	// 		// Personal
-	// 		$emp->gender = $request->gender;
-	// 		$emp->dob = $request->dob;
-	// 		$emp->email_id = $request->email;
-	// 		$emp->qualification = $request->qualification;
-	// 		$emp->pan_number = $request->pan_number ?: null;
-	// 		$emp->aadhaar_number = $request->aadhaar_number ?: null;
-
-	// 		// Extra personal
-	// 		$emp->alt_phone = $request->altphone ?: null;
-	// 		$emp->marital_status = $request->maritalstatus ?: null;
-	// 		$emp->pro_qualification = $request->proqualification ?: null;
-	// 		$emp->last_employer = $request->lastemployer ?: null;
-	// 		$emp->experience_years = $request->experienceyears ?: null;
-
-	// 		// Addresses
-	// 		$emp->c_addr_lineone = $request->caddrlineone;
-	// 		$emp->c_addr_linetwo = $request->caddrlinetwo ?? '';
-	// 		$emp->c_emp_country = 101;
-	// 		$emp->c_emp_state = $request->cempstate;
-	// 		$emp->c_emp_city = $request->cempcity;
-	// 		$emp->c_emp_pincode = $request->cemppincode;
-
-	// 		$emp->p_addr_lineone = $request->paddrlineone;
-	// 		$emp->p_addr_linetwo = $request->paddrlinetwo ?? '';
-	// 		$emp->p_emp_country = 101;
-	// 		$emp->p_emp_state = $request->pempstate;
-	// 		$emp->p_emp_city = $request->pempcity;
-	// 		$emp->p_emp_pincode = $request->pemppincode;
-
-	// 		// References
-	// 		$emp->ref1_name = $request->ref1name ?: null;
-	// 		$emp->ref1_mobile = $request->ref1mobile ?: null;
-	// 		$emp->ref2_name = $request->ref2name ?: null;
-	// 		$emp->ref2_mobile = $request->ref2mobile ?: null;
-	// 		$emp->emergency_name = $request->emergencyname ?: null;
-	// 		$emp->emergency_mobile = $request->emergencymobile ?: null;
-
-	// 		// Official
-	// 		$emp->dept_id = $request->deptid;
-	// 		$emp->desig_id = $request->designationid;
-	// 		$emp->location_id = $request->locationid;
-	// 		$emp->joining_date = $request->empjoiningdate;
-	// 		$emp->work_location = $request->worklocation;
-
-	// 		// Status and type
-	// 		$emp->emp_status = $request->empstatus ?: 'In Probation';
-	// 		$emp->regine_date = $request->statusdate ?: null;
-	// 		$emp->emp_type = $request->emptype ?: 'Full Time';
-
-	// 		// Earnings
-	// 		$emp->basic_sal = $request->basicsal;
-	// 		$emp->hra = $request->hra;
-	// 		$emp->convayance = $request->convayance;
-	// 		$emp->medical_allowance = $request->medicalallowance;
-	// 		$emp->special_bonus = $request->specialbonus;
-	// 		$emp->total_addition = $request->totaladdition;
-
-	// 		// Statutory
-	// 		$emp->epf_applicable = $epfApplicable ? 1 : 0;
-	// 		$emp->esic_applicable = $esicApplicable ? 1 : 0;
-	// 		$emp->ptax_applicable = $ptaxApplicable ? 1 : 0;
-	// 		$emp->tds_applicable  = $tdsApplicable ? 1 : 0;
-	// 		$emp->epf_no = $request->epfno;
-	// 		$emp->esic_no = $request->esicno;
-
-	// 		// Deductions and loan
-	// 		$emp->provident_fund = $request->providentfund ?? 0;
-	// 		$emp->esi = $request->esi ?? 0;
-	// 		$emp->ptax = $request->ptax ?? 0;
-	// 		$emp->tds = $request->tds ?? 0;
-	// 		$emp->loan = $request->loan ?? 0;
-	// 		$emp->loan_tenure = $request->loantenure ?? 0;
-	// 		$emp->loan_deduction = $request->loandeduction ?? 0;
-	// 		$emp->total_deduction = $request->totaldeduction;
-	// 		$emp->net_sal = $request->netsal;
-	// 		$emp->net_sal_word = $request->netsalword;
-
-	// 		// Bank
-	// 		$emp->bank_name = $request->bankname;
-	// 		$emp->bank_branch = $request->bankbranch;
-	// 		$emp->ifsc = $request->ifsc;
-	// 		$emp->swift_code = $request->swiftcode ?? null;
-	// 		$emp->account_holder_name = $request->accountholdername;
-	// 		$emp->account_number = $request->accountnumber;
-	// 		$emp->upi_id = $request->upiid ?? null;
-
-	// 		// Attachments: store filenames into columns
-	// 		$emp->pan_doc                     = $storeEmpDoc('pan_doc');
-	// 		$emp->aadhar_doc                  = $storeEmpDoc('aadhar_doc');
-	// 		$emp->last_qualification_doc      = $storeEmpDoc('last_qualifaction_doc');
-	// 		$emp->signed_appointment_letter   = $storeEmpDoc('sign_appoinment_doc');
-	// 		$emp->cancelled_cheque_doc        = $storeEmpDoc('cancell_cheque_doc');
-	// 		$emp->last_company_release_letter = $storeEmpDoc('relese_letter_doc');
-
-	// 		$emp->save();
-
-	// 		DB::commit();
-
-	// 		$userType = Auth::user()->u_type;
-	// 		$routeLink = $userType == 2 ? route('user.EmployeeList') : route('CA.EmployeeList');
-
-	// 		return response()->json([
-	// 			'status' => 'success',
-	// 			'message' => 'Employee added successfully',
-	// 			'redirect' => $routeLink
-	// 		]);
-	// 	} catch (\Throwable $e) {
-	// 		DB::rollBack();
-	// 		return response()->json([
-	// 			'status' => 'error',
-	// 			'message' => 'Failed to add employee: ' . $e->getMessage(),
-	// 			'redirect' => url('/')
-	// 		], 422);
-	// 	}
-	// }
 
 
 
@@ -2210,171 +1814,171 @@ class EmployeeManagemnet extends Controller
 	// }
 
 	public function view_user_employee($encodedId)
-{
-    $id = base64_decode($encodedId);
-    $userId = currentOwnerId();
+	{
+		$id = base64_decode($encodedId);
+		$userId = currentOwnerId();
 
-    // Fetch employee and basic info
-    $employee = DB::table('users')
-        ->select('users.*', 'employees.*')
-        ->leftJoin('employees', 'users.id', '=', 'employees.empId')
-        ->where('users.id', '=', $id)
-        ->first();
+		// Fetch employee and basic info
+		$employee = DB::table('users')
+			->select('users.*', 'employees.*')
+			->leftJoin('employees', 'users.id', '=', 'employees.empId')
+			->where('users.id', '=', $id)
+			->first();
 
-    // Prevent error if employee not found
-    if (!$employee) {
-        return redirect()->back()->with('error', 'Employee not found');
-    }
+		// Prevent error if employee not found
+		if (!$employee) {
+			return redirect()->back()->with('error', 'Employee not found');
+		}
 
-    $stateName = DB::table('states')->where('id', $employee->state_id)->value('name');
-    $cityName = DB::table('cities')->where('id', $employee->city_id)->value('name');
-    $departmentName = DB::table('depertments')->where('id', $employee->dept_id)->value('dept_name');
-    $designationName = DB::table('designations')->where('id', $employee->desig_id)->value('designation_name');
+		$stateName = DB::table('states')->where('id', $employee->state_id)->value('name');
+		$cityName = DB::table('cities')->where('id', $employee->city_id)->value('name');
+		$departmentName = DB::table('depertments')->where('id', $employee->dept_id)->value('dept_name');
+		$designationName = DB::table('designations')->where('id', $employee->desig_id)->value('designation_name');
 
-    $states = State::where('country_id', 101)->get();
-    $locations = Location::where('added_by', $userId)->orderBy('created_at', 'desc')->get();
+		$states = State::where('country_id', 101)->get();
+		$locations = Location::where('added_by', $userId)->orderBy('created_at', 'desc')->get();
 
-    // Dates
-    $today = Carbon::now()->toDateString();
-    $monthStart = Carbon::now()->startOfMonth();
+		// Dates
+		$today = Carbon::now()->toDateString();
+		$monthStart = Carbon::now()->startOfMonth();
 
-    // ✅ Joining date logic (FIXED)
-    if (!empty($employee->joining_date)) {
-        $joiningDateCarbon = Carbon::parse($employee->joining_date);
+		// ✅ Joining date logic (FIXED)
+		if (!empty($employee->joining_date)) {
+			$joiningDateCarbon = Carbon::parse($employee->joining_date);
 
-        $startOfMonth = $joiningDateCarbon->greaterThan($monthStart)
-            ? $joiningDateCarbon->toDateString()
-            : $monthStart->toDateString();
-    } else {
-        $startOfMonth = $monthStart->toDateString();
-    }
+			$startOfMonth = $joiningDateCarbon->greaterThan($monthStart)
+				? $joiningDateCarbon->toDateString()
+				: $monthStart->toDateString();
+		} else {
+			$startOfMonth = $monthStart->toDateString();
+		}
 
-    // Attendance this month up to today
-    $attendance = DB::table('attendance')
-        ->where('userId', $id)
-        ->whereBetween('present_date', [$startOfMonth, $today])
-        ->get();
+		// Attendance this month up to today
+		$attendance = DB::table('attendance')
+			->where('userId', $id)
+			->whereBetween('present_date', [$startOfMonth, $today])
+			->get();
 
-    $presentDates = $attendance->pluck('present_date')->toArray();
+		$presentDates = $attendance->pluck('present_date')->toArray();
 
-    // Weekly schedule (open days)
-    $weeklySchedule = DB::table('weekly_schedules')
-        ->where('added_by', $userId)
-        ->where('status', 'open')
-        ->get()
-        ->keyBy(function ($item) {
-            return strtolower($item->day);
-        });
+		// Weekly schedule (open days)
+		$weeklySchedule = DB::table('weekly_schedules')
+			->where('added_by', $userId)
+			->where('status', 'open')
+			->get()
+			->keyBy(function ($item) {
+				return strtolower($item->day);
+			});
 
-    // Holidays
-    $holidays = DB::table('holidays')
-        ->where('added_by', $userId)
-        ->whereBetween('holidayDate', [$startOfMonth, $today])
-        ->pluck('holidayDate')
-        ->toArray();
+		// Holidays
+		$holidays = DB::table('holidays')
+			->where('added_by', $userId)
+			->whereBetween('holidayDate', [$startOfMonth, $today])
+			->pluck('holidayDate')
+			->toArray();
 
-    // Approved leaves
-    $leavePeriods = DB::table('leaves')
-        ->where('emp_id', $id)
-        ->where('status', 'approved')
-        ->where(function ($q) use ($startOfMonth, $today) {
-            $q->whereBetween('start_date', [$startOfMonth, $today])
-                ->orWhereBetween('end_date', [$startOfMonth, $today])
-                ->orWhere(function ($q2) use ($startOfMonth, $today) {
-                    $q2->where('start_date', '<=', $startOfMonth)
-                        ->where('end_date', '>=', $today);
-                });
-        })
-        ->get();
+		// Approved leaves
+		$leavePeriods = DB::table('leaves')
+			->where('emp_id', $id)
+			->where('status', 'approved')
+			->where(function ($q) use ($startOfMonth, $today) {
+				$q->whereBetween('start_date', [$startOfMonth, $today])
+					->orWhereBetween('end_date', [$startOfMonth, $today])
+					->orWhere(function ($q2) use ($startOfMonth, $today) {
+						$q2->where('start_date', '<=', $startOfMonth)
+							->where('end_date', '>=', $today);
+					});
+			})
+			->get();
 
-    // Expand leave dates
-    $leaveDates = [];
-    foreach ($leavePeriods as $leave) {
-        $leaveStart = Carbon::parse($leave->start_date)->lessThan(Carbon::parse($startOfMonth))
-            ? Carbon::parse($startOfMonth)
-            : Carbon::parse($leave->start_date);
+		// Expand leave dates
+		$leaveDates = [];
+		foreach ($leavePeriods as $leave) {
+			$leaveStart = Carbon::parse($leave->start_date)->lessThan(Carbon::parse($startOfMonth))
+				? Carbon::parse($startOfMonth)
+				: Carbon::parse($leave->start_date);
 
-        $leaveEnd = Carbon::parse($leave->end_date)->greaterThan(Carbon::parse($today))
-            ? Carbon::parse($today)
-            : Carbon::parse($leave->end_date);
+			$leaveEnd = Carbon::parse($leave->end_date)->greaterThan(Carbon::parse($today))
+				? Carbon::parse($today)
+				: Carbon::parse($leave->end_date);
 
-        foreach (CarbonPeriod::create($leaveStart, $leaveEnd) as $lDay) {
-            $leaveDates[] = $lDay->toDateString();
-        }
-    }
-    $leaveDates = array_unique($leaveDates);
+			foreach (CarbonPeriod::create($leaveStart, $leaveEnd) as $lDay) {
+				$leaveDates[] = $lDay->toDateString();
+			}
+		}
+		$leaveDates = array_unique($leaveDates);
 
-    // ✅ Working days & absent calculation (corrected with joining date)
-    $period = CarbonPeriod::create($startOfMonth, $today);
+		// ✅ Working days & absent calculation (corrected with joining date)
+		$period = CarbonPeriod::create($startOfMonth, $today);
 
-    $totalWorkingDays = 0;
-    $absentDays = [];
+		$totalWorkingDays = 0;
+		$absentDays = [];
 
-    foreach ($period as $date) {
-        $dateString = $date->toDateString();
-        $dayName = strtolower($date->format('l'));
+		foreach ($period as $date) {
+			$dateString = $date->toDateString();
+			$dayName = strtolower($date->format('l'));
 
-        if (isset($weeklySchedule[$dayName]) && !in_array($dateString, $holidays)) {
-            $totalWorkingDays++;
+			if (isset($weeklySchedule[$dayName]) && !in_array($dateString, $holidays)) {
+				$totalWorkingDays++;
 
-            if (
-                !in_array($dateString, $presentDates) &&
-                !in_array($dateString, $leaveDates)
-            ) {
-                $absentDays[] = $dateString;
-            }
-        }
-    }
-	
-    $totalAbsentDays = count($absentDays);
+				if (
+					!in_array($dateString, $presentDates) &&
+					!in_array($dateString, $leaveDates)
+				) {
+					$absentDays[] = $dateString;
+				}
+			}
+		}
+		
+		$totalAbsentDays = count($absentDays);
 
-    // Late / On-time
-    $lateCount = 0;
-    $onTimeCount = 0;
+		// Late / On-time
+		$lateCount = 0;
+		$onTimeCount = 0;
 
-    foreach ($attendance as $record) {
-        $dayName = strtolower(Carbon::parse($record->present_date)->format('l'));
+		foreach ($attendance as $record) {
+			$dayName = strtolower(Carbon::parse($record->present_date)->format('l'));
 
-        if (isset($weeklySchedule[$dayName])) {
-            $openingTime = $weeklySchedule[$dayName]->opening_time;
+			if (isset($weeklySchedule[$dayName])) {
+				$openingTime = $weeklySchedule[$dayName]->opening_time;
 
-            if ($record->in_time > $openingTime) {
-                $lateCount++;
-            } else {
-                $onTimeCount++;
-            }
-        }
-    }
+				if ($record->in_time > $openingTime) {
+					$lateCount++;
+				} else {
+					$onTimeCount++;
+				}
+			}
+		}
 
-    // Total leave days
-    $totalLeaveDaysThisMonth = count($leaveDates);
+		// Total leave days
+		$totalLeaveDaysThisMonth = count($leaveDates);
 
-    // Pending leaves
-    $pendingLeaves = DB::table('leaves')
-        ->where('emp_id', $id)
-        ->where('status', 'pending')
-        ->get();
+		// Pending leaves
+		$pendingLeaves = DB::table('leaves')
+			->where('emp_id', $id)
+			->where('status', 'pending')
+			->get();
 
-    return view('User.viewUserEmployee')->with([
-        'states'                   => $states,
-        'locations'                => $locations,
-        'employee'                 => $employee,
-        'stateName'                => $stateName,
-        'cityName'                 => $cityName,
-        'departmentName'           => $departmentName,
-        'designationName'          => $designationName,
-        'attendance'               => $attendance,
-        'currentMonth'             => Carbon::now()->format('Y-m'),
-        'presentThisMonth'         => count($presentDates),
-        'lateCountThisMonth'       => $lateCount,
-        'onTimeCountThisMonth'     => $onTimeCount,
-        'totalWorkingDays'         => $totalWorkingDays,
-        'totalLeaveDaysThisMonth'  => $totalLeaveDaysThisMonth,
-        'totalAbsentDays'          => $totalAbsentDays,
-        'absentDates'              => $absentDays,
-        'pendingLeaves'            => $pendingLeaves,
-    ]);
-}
+		return view('User.viewUserEmployee')->with([
+			'states'                   => $states,
+			'locations'                => $locations,
+			'employee'                 => $employee,
+			'stateName'                => $stateName,
+			'cityName'                 => $cityName,
+			'departmentName'           => $departmentName,
+			'designationName'          => $designationName,
+			'attendance'               => $attendance,
+			'currentMonth'             => Carbon::now()->format('Y-m'),
+			'presentThisMonth'         => count($presentDates),
+			'lateCountThisMonth'       => $lateCount,
+			'onTimeCountThisMonth'     => $onTimeCount,
+			'totalWorkingDays'         => $totalWorkingDays,
+			'totalLeaveDaysThisMonth'  => $totalLeaveDaysThisMonth,
+			'totalAbsentDays'          => $totalAbsentDays,
+			'absentDates'              => $absentDays,
+			'pendingLeaves'            => $pendingLeaves,
+		]);
+	}
 
 	
 
@@ -2904,6 +2508,8 @@ class EmployeeManagemnet extends Controller
 			'experience_letter' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
 			'offer_letter' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
 			'other_doc' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:5120',
+			'lwf_applicable' => 'nullable|boolean',
+			'lwf_deduct' => 'nullable|numeric|min:0',
 		]);
 
 		if ($validation->fails()) {
@@ -2947,6 +2553,11 @@ class EmployeeManagemnet extends Controller
 			? implode(",", $request->emp_permission)
 			: $request->emp_permission;
 		$user->save();
+
+		$lwfApplicable = $request->boolean('lwf_applicable');
+		if (!$lwfApplicable) {
+			$request->merge(['lwf_deduct' => 0]);
+		}
 
 		// ✅ Update Employee
 		$employee->fill([
@@ -2999,6 +2610,8 @@ class EmployeeManagemnet extends Controller
 			'tds_applicable' => $request->has('tds_applicable') ? 1 : 0,
 			'epf_no' => $request->epf_no ?? null,
 			'esic_no' => $request->esic_no ?? null,
+			'lwf_applicable' => $request->boolean('lwf_applicable'),
+			'lwf_company_contribution' => $request->boolean('lwf_applicable') ? 30.00 : 0,
 
 			// Earnings
 			'total_addition' => $request->total_addition,
@@ -3017,6 +2630,7 @@ class EmployeeManagemnet extends Controller
 			'loan_deduction' => $request->loan_deduction ?? 0,
 			'ptax' => $request->ptax ?? 0,
 			'tds' => $request->tds ?? 0,
+			'lwf_deduct' => $request->lwf_deduct ?? 0,
 			'total_deduction' => $request->total_deduction,
 			'net_sal' => $request->net_sal,
 			'net_sal_word' => $request->net_sal_word,
@@ -4027,6 +3641,11 @@ class EmployeeManagemnet extends Controller
 				'e.loan_deduction',
 				'e.ptax',
 				'e.tds',
+				// LWF
+				'e.lwf_applicable',
+				'e.lwf_deduct',
+				'e.lwf_company_contribution',
+
 				'e.bank_name',
 				'e.bank_branch',
 				'e.ifsc',
@@ -4174,6 +3793,15 @@ class EmployeeManagemnet extends Controller
 		// PF number
 		$pfNo = $employee->epf_applicable ? $employee->epf_no : null;
 
+		// LWF Applicable check
+		$lwfDeduct = 0;
+		$lwfCompanyContribution = 0;
+
+		if ($employee->lwf_applicable == 1) {
+			$lwfDeduct = $employee->lwf_deduct;
+			$lwfCompanyContribution = $employee->lwf_company_contribution;
+		}
+
 		// ----- Dynamic Salary Calculation (unchanged) -----
 		$perDaySalary = round($employee->total_addition / 30, 2);
 
@@ -4237,6 +3865,11 @@ class EmployeeManagemnet extends Controller
 				'esi' => $employee->esi,
 				'ptax' => $employee->ptax,
 				'tds' => $employee->tds,
+				//--- LWF Details
+				'lwf_applicable' => $employee->lwf_applicable,
+				'lwf_deduct' => $lwfDeduct,
+				'lwf_company_contribution' => $lwfCompanyContribution,
+				
 				'loan' => $employee->loan,
 				'total_absent_days_for_salary' => $totalAbsentForSalary,
 				'lateDeductionDays' => $lateDeduct,
@@ -4447,7 +4080,7 @@ class EmployeeManagemnet extends Controller
 // 		return $pdf->stream($pdfName);
 // 	}
 
-public function downloadPayslip($id)
+	public function downloadPayslip($id)
 	{
 		$UserId = Auth::user()->id;
 		$UserType = Auth::user()->u_type;

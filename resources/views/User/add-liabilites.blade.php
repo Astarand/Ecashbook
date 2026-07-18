@@ -882,11 +882,11 @@
                                             <div class="row">
                                                 <div class="col-xl-4 mb-3">
                                                     <label class="form-label">TDS Section (e.g., 194A)</label>
-                                                    <input type="text" name="stl_tds_section" id="stl_tds_section" class="form-control" placeholder="e.g., 194A">
+                                                    <input type="text" readonly name="stl_tds_section" id="stl_tds_section" class="form-control" placeholder="e.g., 194A">
                                                 </div>
                                                 <div class="col-xl-4 mb-3">
                                                     <label class="form-label">TDS Rate (%)</label>
-                                                    <input type="number" step="0.01" name="stl_tds_rate" id="stl_tds_rate" class="form-control" placeholder="Enter TDS Rate">
+                                                    <input type="number" readonly step="0.01" name="stl_tds_rate" id="stl_tds_rate" class="form-control" placeholder="Enter TDS Rate">
                                                 </div>
                                                 <div class="col-xl-4 mb-3">
                                                     <label class="form-label">TDS Amount <small class="text-muted">(Auto)</small></label>
@@ -1005,7 +1005,7 @@
                                                 </div>
                                                 <div class="col-xl-4 mb-3">
                                                     <label class="form-label">TDS Rate (%)</label>
-                                                    <input type="number" step="0.01" name="ip_tds_rate" id="ip_tds_rate" class="form-control" placeholder="Enter TDS Rate">
+                                                    <input type="number" readonly step="0.01" name="ip_tds_rate" id="ip_tds_rate" class="form-control" placeholder="Enter TDS Rate">
                                                 </div>
                                                 <div class="col-xl-4 mb-3">
                                                     <label class="form-label">TDS Amount <small class="text-muted">(Auto)</small></label>
@@ -1553,6 +1553,8 @@
             } else if (val === 'short_term_loans') {
 
                 $('#shortTermLoansSection').show();
+				
+				$('#cl_amount_gst_payable').prop('required', false).val('');
 
             } else if (val === 'interest_payable') {
 
@@ -1574,7 +1576,7 @@
 
         // STL: TDS toggle
         $('input[name="stl_tds_applicable"]').on('change', function () {
-            $('#stlTdsFields').toggle($(this).val() === 'yes');
+           // $('#stlTdsFields').toggle($(this).val() === 'yes');
         });
 
         // STL: Auto-calculate TDS Amount from interest amount × rate
@@ -1644,7 +1646,7 @@
 
         // IP: TDS toggle
         $('input[name="ip_tds_applicable"]').on('change', function () {
-            $('#ipTdsFields').toggle($(this).val() === 'yes');
+            //$('#ipTdsFields').toggle($(this).val() === 'yes');
         });
 
         // IP: Auto-calculate TDS Amount
@@ -1788,6 +1790,70 @@
         premiumAmount.addEventListener("input", calculateTotal);
 
     });
+	
+	//Start TDS calculate
+	function checkTdsRule(module, category, amount, prefix)
+	{
+		$.ajax({
+			url: "{{ route('get.tds.rule') }}",
+			type: "POST",
+			data: {
+				_token: $('meta[name="csrf-token"]').attr('content'),
+				module: module,
+				category: category
+			},
+			success: function(res){
+
+				if(!res.status || !res.rule){
+					return;
+				}
+
+				let rule = res.rule;
+				let threshold = parseFloat(rule.threshold_limit);
+				amount = parseFloat(amount) || 0;
+
+				if(amount >= threshold){
+
+					$("input[name='"+prefix+"_tds_applicable'][value='yes']")
+						.prop("checked", true);
+
+					$("#"+prefix+"_tds_section")
+						.val(rule.tds_section);
+
+					$("#"+prefix+"_tds_rate")
+						.val(rule.tds_rate);
+
+					let tdsAmount = (amount * parseFloat(rule.tds_rate))/100;
+
+					$("#"+prefix+"_tds_amount")
+						.val(tdsAmount.toFixed(2));
+
+					$("#"+prefix+"TdsFields").show();
+
+				}else{
+
+					$("input[name='"+prefix+"_tds_applicable'][value='no']")
+						.prop("checked", true);
+
+					$("#"+prefix+"_tds_section").val('');
+					$("#"+prefix+"_tds_rate").val('');
+					$("#"+prefix+"_tds_amount").val('');
+
+					$("#"+prefix+"TdsFields").hide();
+				}
+
+			}
+		});
+	}
+	
+	$("#stl_interest_amount").on("input change", function(){
+		checkTdsRule('Liability','short_term_loans',$(this).val(),'stl');
+	});
+	
+	$("#ip_interest_amount").on("input change", function(){
+		checkTdsRule('Liability','interest_payable',$(this).val(),'ip');
+	});
+	//End TDS calculate
 
     function startAddLiabilitiesTour() {
         if (typeof introJs !== 'function') return;

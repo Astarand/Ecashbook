@@ -34,12 +34,7 @@
     <!-- [ breadcrumb ] end -->
 
     <div class="row mb-4">
-        <h3>Edit Liabilities</h3>
-        <?php
-        // echo "<pre>";print_r($liability);        
-        // echo "<pre>";print_r($subDetails);        
-
-        ?>
+       
     </div>
     <div class="card">
         <div class="card-body">
@@ -921,11 +916,11 @@
                                     <div class="row">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">TDS Section (e.g., 194A)</label>
-                                            <input type="text" value="{{ $subDetails->stl_tds_section ?? '' }}" name="stl_tds_section" id="stl_tds_section" class="form-control" placeholder="e.g., 194A">
+                                            <input type="text" readonly value="{{ $subDetails->stl_tds_section ?? '' }}" name="stl_tds_section" id="stl_tds_section" class="form-control" placeholder="e.g., 194A">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">TDS Rate (%)</label>
-                                            <input type="number" step="0.01" value="{{ $subDetails->stl_tds_rate ?? '' }}" name="stl_tds_rate" id="stl_tds_rate" class="form-control" placeholder="Enter TDS Rate">
+                                            <input type="number" readonly step="0.01" value="{{ $subDetails->stl_tds_rate ?? '' }}" name="stl_tds_rate" id="stl_tds_rate" class="form-control" placeholder="Enter TDS Rate">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">TDS Amount <small class="text-muted">(Auto)</small></label>
@@ -1050,11 +1045,11 @@
                                     <div class="row">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">TDS Section (e.g., 194A)</label>
-                                            <input type="text" value="{{ $subDetails->ip_tds_section ?? '' }}" name="ip_tds_section" id="ip_tds_section" class="form-control" placeholder="e.g., 194A">
+                                            <input type="text" readonly value="{{ $subDetails->ip_tds_section ?? '' }}" name="ip_tds_section" id="ip_tds_section" class="form-control" placeholder="e.g., 194A">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">TDS Rate (%)</label>
-                                            <input type="number" step="0.01" value="{{ $subDetails->ip_tds_rate ?? '' }}" name="ip_tds_rate" id="ip_tds_rate" class="form-control" placeholder="Enter TDS Rate">
+                                            <input type="number" readonly step="0.01" value="{{ $subDetails->ip_tds_rate ?? '' }}" name="ip_tds_rate" id="ip_tds_rate" class="form-control" placeholder="Enter TDS Rate">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">TDS Amount <small class="text-muted">(Auto)</small></label>
@@ -1400,6 +1395,19 @@
 
         // Run on page load
         handleClSpecialTypes($('#CurrentLiabilitiesType').val());
+		
+		// STL: TDS toggle
+		function toggleSTLTdsFields() {
+			$('#stlTdsFields').toggle(
+				//$('input[name="stl_tds_applicable"]:checked').val() === 'yes'
+			);
+		}
+
+		$('input[name="stl_tds_applicable"]').on('change', function () {
+			toggleSTLTdsFields();
+		});
+
+		toggleSTLTdsFields();
 
 
     // Handler for Reserves Surplus Type dropdown
@@ -1528,66 +1536,6 @@
                 else if (v === 'reserves_surplus') $('#reservesSurplusSection').show();
             });
 
-            // non-current sub-type
-            // $("#non_current_liabilities_type").off('change').on('change', function() {
-            //     var selectedValue = $(this).val();
-
-            //     // reset all non-current-specific functional sections
-            //     $("#long_term_borrowings_type, #deferred_tax_liabilities, #other_long_term_liabilities, #long_term_provisions").hide();
-            //     $("#otherNonCurrentLiabilitiesTextContainer").hide();
-
-            //     if (selectedValue === "deferred_tax_liabilities") {
-            //         $("#deferred_tax_liabilities").show();
-            //     } else if (selectedValue === "provision") {
-            //         $("#long_term_provisions").show();
-            //     } else if (selectedValue === "other_non_current_liabilities") {
-            //         $("#otherNonCurrentLiabilitiesTextContainer").show();
-            //     }
-            // });
-
-            // current liabilities main sub-type
-            // $('#CurrentLiabilitiesType').off('change').on('change', function () {
-            //     var selectedValue = $(this).val();
-            //     // hide all current sub-sections
-            //     $('#short_term_borrowings_section').hide();
-            //     $('#tradePayables_section').hide();
-            //     $('#advances_from_customers').hide();
-            //     $('#statutory_dues_payable').hide();
-            //     $('#TDS_payable').hide();
-            //     $('#EMI_payables').hide();
-            //     $('#accrued_expenses_income').hide();
-            //     $('#royalty_payables').hide();
-            //     $('#GST_payable').hide();
-            //     $('#unearned_revenue').hide();
-
-            //     if (selectedValue === 'Short-term Borrowings') {
-            //         $('#short_term_borrowings_section').show();
-            //     } else if (selectedValue === 'Trade Payables') {
-            //         $('#tradePayables_section').show();
-            //         // ensure radio state honored
-            //         $('input[name="trade_nature"]:checked').trigger('change');
-            //     } else if (selectedValue === 'Advances from Customers') {
-            //         $('#advances_from_customers').show();
-            //     } else if (selectedValue === 'Statutory Dues Payable') {
-            //         $('#statutory_dues_payable').show();
-            //     } else if (selectedValue === 'TDS Payable') {
-            //         $('#TDS_payable').show();
-            //     } else if (selectedValue === 'EMI Payables') {
-            //         $('#EMI_payables').show();
-            //     } else if (selectedValue === 'Accrued Expenses / Income') {
-            //         $('#accrued_expenses_income').show();
-            //         $('input[name="accrued_nature"]:checked').trigger('change');
-            //     } else if (selectedValue === 'Royalty Payables') {
-            //         $('#royalty_payables').show();
-            //     } else if (selectedValue === 'GST Payable') {
-            //         $('#GST_payable').show();
-            //     } else if (selectedValue === 'Unearned Revenue') {
-            //         $('#unearned_revenue').show();
-            //     } else if (selectedValue === 'Other Current Liability') {
-            //         $('#otherCurrentLiabilityTextContainer').show();
-            //     }
-            // });
-
             // trade_nature radio
             $('input[name="trade_nature"]').off('change').on('change', function () {
                 $('.select-box').hide();
@@ -1698,16 +1646,16 @@
             // --- Interest Payable: show TDS fields on page load if applicable ---
             // If the radio 'ipTdsYes' exists and is checked, show the TDS fields
             if ($('#ipTdsYes').length && $('#ipTdsYes').is(':checked')) {
-                $('#ipTdsFields').show();
+               //$('#ipTdsFields').show();
             } else {
-                $('#ipTdsFields').hide();
+                //$('#ipTdsFields').hide();
             }
             // Bind change handler so toggling at runtime shows/hides fields
             $('input[name="ip_tds_applicable"]').off('change.ipTds').on('change.ipTds', function() {
                 if ($(this).val() === 'yes') {
-                    $('#ipTdsFields').show();
+                    //$('#ipTdsFields').show();
                 } else {
-                    $('#ipTdsFields').hide();
+                    //$('#ipTdsFields').hide();
                 }
             });
         });
@@ -1795,6 +1743,73 @@ $(document).ready(function () {
         premiumAmount.addEventListener("input", calculateTotal);
 
     });
+	
+	//Start TDS calculate
+	function checkTdsRule(module, category, amount, prefix)
+	{
+		$.ajax({
+			url: "{{ route('get.tds.rule') }}",
+			type: "POST",
+			data: {
+				_token: $('meta[name="csrf-token"]').attr('content'),
+				module: module,
+				category: category
+			},
+			success: function(res){
+
+				if(!res.status || !res.rule){
+					return;
+				}
+
+				let rule = res.rule;
+				let threshold = parseFloat(rule.threshold_limit);
+				amount = parseFloat(amount) || 0;
+
+				if(amount >= threshold){
+
+					$("input[name='"+prefix+"_tds_applicable'][value='yes']")
+						.prop("checked", true);
+
+					$("#"+prefix+"_tds_section")
+						.val(rule.tds_section);
+
+					$("#"+prefix+"_tds_rate")
+						.val(rule.tds_rate);
+
+					let tdsAmount = (amount * parseFloat(rule.tds_rate))/100;
+
+					$("#"+prefix+"_tds_amount")
+						.val(tdsAmount.toFixed(2));
+
+					$("#"+prefix+"TdsFields").show();
+
+				}else{
+
+					$("input[name='"+prefix+"_tds_applicable'][value='no']")
+						.prop("checked", true);
+
+					$("#"+prefix+"_tds_section").val('');
+					$("#"+prefix+"_tds_rate").val('');
+					$("#"+prefix+"_tds_amount").val('');
+
+					$("#"+prefix+"TdsFields").hide();
+				}
+
+			}
+		});
+	}
+	
+	$("#stl_interest_amount").on("input change", function(){
+		checkTdsRule('Liability','short_term_loans',$(this).val(),'stl');
+	});
+	
+	$("#ip_interest_amount").on("input change", function(){
+		checkTdsRule('Liability','interest_payable',$(this).val(),'ip');
+	});
+	
+	$("#stl_interest_amount").trigger("change");
+	$("#ip_interest_amount").trigger("change");
+	//End TDS calculate
 
     function startEditLiabilitiesTour() {
         if (typeof introJs !== 'function') return;

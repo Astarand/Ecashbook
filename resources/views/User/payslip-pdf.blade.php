@@ -372,6 +372,14 @@
                 <td>Advance</td>
                 <td>Rs. {{ number_format($salary['advance_amount'] ?? 0, 2) }}</td>
             </tr>
+            @if(!empty($final['lwf_applicable']) && $final['lwf_applicable'] == 1)
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Labour Welfare Fund (LWF)</td>
+                <td>Rs. {{ number_format($final['lwf_deduct'] ?? 0, 2) }}</td>
+            </tr>
+            @endif
 
             <tr class="net-pay-row">
                 <td><strong>Total Earnings</strong></td>

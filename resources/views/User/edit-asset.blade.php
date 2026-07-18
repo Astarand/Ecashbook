@@ -85,6 +85,7 @@
                                                     <option value="">Select</option>
                                                     <option value="current" <?= ($asset->assetType == 'current')?'selected':'' ?> >Current Assets</option>
                                                     <option value="non-current" <?= ($asset->assetType == 'non-current')?'selected':'' ?>>Non Current Assets</option>
+                                                    <option value="capex" <?= ($asset->assetType == 'capex')?'selected':'' ?>>Capital Expenditure (CapEx)</option>
                                                 </select>
                                             </div>
                                             <!-- Current Assets Section -->
@@ -113,9 +114,9 @@
 											<!-- Non-Current Assets Section -->
                                             <div id="nonCurrentAssetsSection" class="row" style="display: none;">
 												<div class="col-sm-12 mb-3">
-													<label class="form-label">Non-Current Assets Type <span class="text-danger">*</span></label>
+													<label class="form-label" id="assetTypeLabel">Non-Current Assets Type <span class="text-danger">*</span></label>
 													<select id="nonCurrentAssetsType" class="form-select" name="nonCurrentAssetType">
-														<option value="">Select</option>
+														<!--<option value="">Select</option>
 														<option value="Property Plant Equipment" {{ $asset->nonCurrentAssetType == 'Property Plant Equipment' ? 'selected' : '' }}>Property, Plant & Equipment (PPE)</option>
 														<option value="Furniture Fixtures" {{ $asset->nonCurrentAssetType == 'Furniture Fixtures' ? 'selected' : '' }}>Furniture & Fixtures</option>
 														<option value="Computer IT Equipment" {{ $asset->nonCurrentAssetType == 'Computer IT Equipment' ? 'selected' : '' }}>Computer & IT Equipment</option>
@@ -123,7 +124,7 @@
 														<option value="Vehicles" {{ $asset->nonCurrentAssetType == 'Vehicles' ? 'selected' : '' }}>Vehicles</option>
 														<option value="Intangible Assets" {{ $asset->nonCurrentAssetType == 'Intangible Assets' ? 'selected' : '' }}>Intangible / Non-physical Assets</option>
 														<option value="Capital Work in Progress" {{ $asset->nonCurrentAssetType == 'Capital Work in Progress' ? 'selected' : '' }}>Capital Work-in-Progress</option>
-														<option value="Other Non-Current Assets" {{ $asset->nonCurrentAssetType == 'Other Non-Current Assets' ? 'selected' : '' }}>Other Non-Current Assets</option>
+														<option value="Other Non-Current Assets" {{ $asset->nonCurrentAssetType == 'Other Non-Current Assets' ? 'selected' : '' }}>Other Non-Current Assets</option>-->
 													</select>
 												</div>
 											</div>
@@ -156,8 +157,8 @@
 												</div>
 
 												<div class="col-xl-4 mb-3">
-													<label class="form-label">Asset Code / ID <span class="text-danger">*</span></label>
-													<input type="text" name="asset_code" value="{{ $asset->asset_code ?? '' }}" class="form-control">
+													<label class="form-label" id="assetCodeLabel">Asset Code / ID <span class="text-danger">*</span></label>
+													<input type="text" name="asset_code" id="asset_code" value="{{ $asset->asset_code ?? '' }}" class="form-control">
 												</div>
 
 												<div class="col-xl-4 mb-3">
@@ -261,10 +262,10 @@
 												</div>
 
 												<div class="col-xl-4 mb-3">
-													<label class="form-label">Asset Status</label>
-													<select name="asset_status" class="form-select">
-														<option value="Active" {{ $asset->asset_status == 'Active' ? 'selected' : '' }}>Active</option>
-														<option value="Under Construction" {{ $asset->asset_status == 'Under Construction' ? 'selected' : '' }}>Under Construction</option>
+													<label class="form-label" id="assetStatusLabel">Asset Status</label>
+													<select name="asset_status" id="asset_status" class="form-select">
+														<!--<option value="Active" {{ $asset->asset_status == 'Active' ? 'selected' : '' }}>Active</option>
+														<option value="Under Construction" {{ $asset->asset_status == 'Under Construction' ? 'selected' : '' }}>Under Construction</option>-->
 													</select>
 												</div>
 
@@ -975,7 +976,7 @@
 		}
 
 		// ================= NON-CURRENT ASSET LOGIC =================
-		if (assetType === 'non-current') {
+		if (assetType === 'non-current' || assetType === 'capex') {
 
 			// ❌ Clear ALL current sections
 			Object.values(sectionMap).forEach(function(section) {
@@ -985,6 +986,76 @@
 			});
 		}
 	}
+	
+	//Start on change asset type
+	$('#assetType').on('change', function () {
+
+		var assetType = $(this).val();
+
+		// Save current selected values (Edit page)
+		var selectedType = "{{ $asset->nonCurrentAssetType ?? '' }}";
+		var selectedStatus = "{{ $asset->asset_status ?? '' }}";
+
+		$('#nonCurrentAssetsSection').hide();
+		$('#nonCurrentAssetsType').empty();
+
+		if (assetType == 'non-current') {
+
+			$('#assetTypeLabel').html('Non-Current Assets Type <span class="text-danger">*</span>');
+			$('#assetCodeLabel').html('Asset Code / ID <span class="text-danger">*</span>');
+			$('#assetStatusLabel').html('Asset Status');
+
+			$('#asset_status').html(`
+				<option value="Active">Active</option>
+				<option value="Under Construction">Under Construction</option>
+			`).val(selectedStatus);
+
+			$('#nonCurrentAssetsType').append(`
+				<option value="">Select</option>
+				<option value="Property Plant Equipment">Property, Plant & Equipment (PPE)</option>
+				<option value="Furniture Fixtures">Furniture & Fixtures</option>
+				<option value="Computer IT Equipment">Computer & IT Equipment</option>
+				<option value="Machinery">Machinery</option>
+				<option value="Vehicles">Vehicles</option>
+				<option value="Intangible Assets">Intangible / Non-physical Assets</option>
+				<option value="Capital Work in Progress">Capital Work-in-Progress</option>
+				<option value="Other Non-Current Assets">Other Non-Current Assets</option>
+			`);
+
+			$('#nonCurrentAssetsType').val(selectedType);
+
+			$('#nonCurrentAssetsSection').show();
+
+		} else if (assetType == 'capex') {
+
+			$('#assetTypeLabel').html('CapEx Type <span class="text-danger">*</span>');
+			$('#assetCodeLabel').html('CapEx ID <span class="text-danger">*</span>');
+			$('#assetStatusLabel').html('Capitalisation Status');
+
+			$('#asset_status').html(`
+				<option value="Pending">Pending</option>
+				<option value="Capitalised">Capitalised</option>
+				<option value="CWIP">CWIP</option>
+				<option value="Disposed">Disposed</option>
+			`).val(selectedStatus);
+
+			$('#nonCurrentAssetsType').append(`
+				<option value="">Select</option>
+				<option value="New Purchase">New Purchase</option>
+				<option value="Replacement">Replacement</option>
+				<option value="Improvement">Improvement</option>
+				<option value="Expansion">Expansion</option>
+				<option value="Renovation">Renovation</option>
+				<option value="Capital Repair">Capital Repair</option>
+			`);
+
+			$('#nonCurrentAssetsType').val(selectedType);
+
+			$('#nonCurrentAssetsSection').show();
+		}
+
+	}).trigger('change');
+	//End on change asset type
 
    
     document.addEventListener("DOMContentLoaded", function() {
@@ -1022,7 +1093,7 @@
 		let assetType = document.getElementById("assetType").value;
 
 		document.getElementById("currentAssetsSection").style.display = (assetType === "current") ? "block" : "none";
-		document.getElementById("nonCurrentAssetsSection").style.display = (assetType === "non-current") ? "block" : "none";
+		document.getElementById("nonCurrentAssetsSection").style.display = (assetType === "non-current" || assetType === "capex") ? "block" : "none";
 		if (assetType == "current") {
 			$('#commonSection').hide();
 			$('#WorkinProgressSection').hide();
@@ -1063,7 +1134,7 @@
 
 		// Show/Hide sections
 		$('#currentAssetsSection').toggle(assetType === "current");
-		$('#nonCurrentAssetsSection').toggle(assetType === "non-current");
+		$('#nonCurrentAssetsSection').toggle(assetType === "non-current" || assetType === "capex");
 
 		// RESET DROPDOWNS
 		if (assetType === "current") {
@@ -1076,7 +1147,7 @@
 				'pointer-events': 'none',
 				'opacity': '0.5'
 			});
-		} else if (assetType === "non-current") {
+		} else if (assetType === "non-current" || assetType === "capex") {
 			$('#currentAssetsType').val('').trigger('change');
 			$('#nextBtn1').html('Next <i class="ti ti-arrow-up-right-circle ms-2"></i>');
 			// Enable tabs
@@ -1117,8 +1188,9 @@
 
     document.getElementById("currentAssetsType").addEventListener("change", function() {
         document.getElementById("otherCurrentAssetsDiv").style.display = (this.value === "other_current_assets") ? "block" : "none";
-         document.getElementById("nonCurrentAssetsSection").style.display = (this.value === "non-current") ? "block" : "none";
-        //ocument.getElementById("investmentSection").style.display = (this.value === "investment") ? "block" : "none";
+        document.getElementById("nonCurrentAssetsSection").style.display = (this.value === "non-current") ? "block" : "none";
+        document.getElementById("nonCurrentAssetsSection").style.display = (this.value === "capex") ? "block" : "none";
+		//ocument.getElementById("investmentSection").style.display = (this.value === "investment") ? "block" : "none";
     });
 
     document.getElementById("nonCurrentAssetsType").addEventListener("change", function() {
@@ -1523,7 +1595,13 @@
 			'Machinery',
 			'Vehicles',
 			'Intangible Assets',
-			'Other Non-Current Assets'
+			'Other Non-Current Assets',
+			'New Purchase',
+			'Replacement',
+			'Improvement',
+			'Expansion',
+			'Renovation',
+			'Capital Repair'
 		];
 
 		if (showSectionValues.includes(selectedValue)) {

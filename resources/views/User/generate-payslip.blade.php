@@ -480,6 +480,11 @@ $(document).ready(function() {
             tdsFinal = parseNumber($('#tds_input').val() || salary.tds);
         }
 
+        // LWF — only include if applicable
+        const lwfApplicable = parseInt(salary.lwf_applicable || 0) === 1;
+        const lwfDeduct = lwfApplicable ? parseNumber(salary.lwf_deduct || 0) : 0;
+        const lwfCompanyContribution = lwfApplicable ? parseNumber(salary.lwf_company_contribution || 0) : 0;
+
         // Loss of Pay (LOP)
         const diduct = per_day_salary * (total_absent_days_for_salary + lateDeductionDays + totalEarlyLogoutDeductionDays);
 
@@ -528,7 +533,7 @@ $(document).ready(function() {
 
         // Totals
         const totalEarnings = basicSalary + hra + conveyance + medicalAllowance + specialAllowance + manualBonus + manualOvertime;
-        const totalDeductions_show = pf + esi + ptax + tdsFinal + loan + advanceAmount;
+        const totalDeductions_show = pf + esi + ptax + tdsFinal + loan + advanceAmount + lwfDeduct;
         const totalDeductions = totalDeductions_show + diduct;
 
         const netSalary = diduct + (totalEarnings - totalDeductions);
@@ -624,12 +629,15 @@ $(document).ready(function() {
                                     <span class="text-muted small">Advance Deduction:</span>
                                     <span class="fw-semibold text-danger">₹${advanceAmount.toFixed(2)}</span>
                                 </div>
-                                <div class="d-flex justify-content-between mb-3">
+                                <div class="d-flex justify-content-between ${lwfApplicable ? 'mb-2' : 'mb-3'}">
                                     <span class="text-muted small">Loss of Pay (LOP):</span>
                                     <span class="fw-semibold text-danger">₹${diduct.toFixed(2)}</span>
                                 </div>
-                                
-                                
+                                ${lwfApplicable ? `
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted small">LWF (Employee Deduct):</span>
+                                    <span class="fw-semibold text-danger">₹${lwfDeduct.toFixed(2)}</span>
+                                </div>` : ''}
 
                                 <hr class="my-2">
 
@@ -748,6 +756,10 @@ $(document).ready(function() {
         const tds = parseNumber($('#tds_input').val());
         const loan = parseNumber($('#loan_input').val());
         const lop = getCardValue('Loss of Pay');
+        // LWF
+        const lwfApplicable = parseInt((fullResponse.salaryDetails || {}).lwf_applicable || 0) === 1;
+        const lwf_deduct_val = lwfApplicable ? parseNumber((fullResponse.salaryDetails || {}).lwf_deduct || 0) : 0;
+        const lwf_company_val = lwfApplicable ? parseNumber((fullResponse.salaryDetails || {}).lwf_company_contribution || 0) : 0;
         // Total Deductions
         const total_deductions = finalSalarySection.find('.border-top span.fw-bold.text-danger:last').text() ? parseNumber(finalSalarySection.find('.border-top span.fw-bold.text-danger:last').text()) : 0;
 
@@ -776,6 +788,9 @@ $(document).ready(function() {
             tds: tds,
             loan: loan,
             lop: lop,
+            lwf_applicable: lwfApplicable ? 1 : 0,
+            lwf_deduct: lwf_deduct_val,
+            lwf_company_contribution: lwf_company_val,
             total_deductions: total_deductions,
 
             // Final values

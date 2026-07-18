@@ -694,28 +694,57 @@ class PayrollReportController extends Controller
         $tds = $query->select(
                 'user_payslip.id',
                 'user_payslip.user_emp_id',
-                'employees.employee_id',
-                'users.name',
-                'user_payslip.financial_year',
                 'user_payslip.month',
+                'user_payslip.financial_year',
+                'employees.employee_id',
+                'employees.pan_number',
+                'users.name',
                 'user_payslip.tds_challan_no',
                 'user_payslip.tds_bsr_code',
                 'user_payslip.tds_deposit_date',
+                'user_payslip.tds_tender_date',
                 'user_payslip.tds_deposit_status',
-
+                'user_payslip.tds_tan',
+                'user_payslip.tds_financial_year',
+                'user_payslip.tds_nature_of_payment',
+                'user_payslip.tds_cin',
+                // TDS amount from the dedicated column (falls back to JSON extraction)
+                DB::raw("
+                    COALESCE(
+                        NULLIF(user_payslip.tds_amount, 0),
+                        CAST(
+                            JSON_UNQUOTE(JSON_EXTRACT(
+                                user_payslip.emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.tds'))
+                            AS DECIMAL(15,2)
+                        )
+                    ) as tds_amount
+                "),
+                // Gross salary (salary amount for FVU)
                 DB::raw("
                     CAST(
-                        JSON_UNQUOTE(
-                            JSON_EXTRACT(
-                                user_payslip.emp_salary_slip_response,
-                                '$.visible_data.final_salary_calculation.tds'
-                            )
-                        ) AS DECIMAL(15,2)
-                    ) as tds_amount
+                        JSON_UNQUOTE(JSON_EXTRACT(
+                            user_payslip.emp_salary_slip_response,
+                            '$.visible_data.salary_details.gross_salary'))
+                        AS DECIMAL(15,2)
+                    ) as gross_salary
                 ")
             )
             ->orderBy('users.name')
             ->get();
+
+        // Fetch company TAN for the owner
+        $company = \DB::table('company_profiles')
+            ->where('userId', $ownerId)
+            ->value('comp_tan');
+
+        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
+                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+
+        foreach ($tds as $row) {
+            $row->comp_tan    = $company ?? '—';
+            $row->month_name  = $monthNames[$row->month] ?? $row->month;
+        }
 
         return response()->json($tds);
     }
@@ -737,96 +766,114 @@ class PayrollReportController extends Controller
 
         // Monthly
         if ($filterType == 'monthly' && !empty($period)) {
-
             $month = Carbon::parse('1 '.$period)->month;
-
             $query->where('user_payslip.month', $month);
-
         }
-
         // Quarterly
         elseif ($filterType == 'quarterly' && !empty($period)) {
-
             switch ($period) {
-                case 'Q1':
-                    $months = [4,5,6];
-                    break;
-                case 'Q2':
-                    $months = [7,8,9];
-                    break;
-                case 'Q3':
-                    $months = [10,11,12];
-                    break;
-                case 'Q4':
-                    $months = [1,2,3];
-                    break;
-                default:
-                    $months = [];
+                case 'Q1': $months = [4,5,6]; break;
+                case 'Q2': $months = [7,8,9]; break;
+                case 'Q3': $months = [10,11,12]; break;
+                case 'Q4': $months = [1,2,3]; break;
+                default:   $months = [];
             }
-
-            if ($months) {
-                $query->whereIn('user_payslip.month', $months);
-            }
-
+            if ($months) $query->whereIn('user_payslip.month', $months);
         }
-
         // Half Yearly
         elseif ($filterType == 'half-yearly' && !empty($period)) {
-
             switch ($period) {
-                case 'H1':
-                    $months = [4,5,6,7,8,9];
-                    break;
-                case 'H2':
-                    $months = [10,11,12,1,2,3];
-                    break;
-                default:
-                    $months = [];
+                case 'H1': $months = [4,5,6,7,8,9]; break;
+                case 'H2': $months = [10,11,12,1,2,3]; break;
+                default:   $months = [];
             }
-
-            if ($months) {
-                $query->whereIn('user_payslip.month', $months);
-            }
-
+            if ($months) $query->whereIn('user_payslip.month', $months);
         }
 
-        // Only employees having PF > 0
+        // Only employees having PF > 0 in the JSON
         $query->whereRaw("
             CAST(
                 JSON_UNQUOTE(
                     JSON_EXTRACT(
                         emp_salary_slip_response,
-                        '$.visible_data.final_salary_calculation.provident_fund'
+                        '$.visible_data.salary_details.provident_fund'
                     )
                 ) AS DECIMAL(12,2)
             ) > 0
         ");
 
-        $pf = $query->select(
+        $records = $query->select(
                 'user_payslip.id',
                 'user_payslip.user_emp_id',
+                'user_payslip.month',
+                'user_payslip.financial_year',
                 'employees.employee_id',
                 'users.name',
-                'user_payslip.financial_year',
-                'user_payslip.month',
+                'employees.epf_no',
                 'user_payslip.pf_trrn',
                 'user_payslip.pf_crn',
                 'user_payslip.pf_challan_generated_on',
                 'user_payslip.pf_payment_confirmation_date',
                 'user_payslip.pf_payment_status',
+                // Gross wages from JSON
                 DB::raw("
-                    JSON_UNQUOTE(
-                        JSON_EXTRACT(
-                            emp_salary_slip_response,
-                            '$.visible_data.final_salary_calculation.provident_fund'
-                        )
+                    CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.salary_details.gross_salary'))
+                        AS DECIMAL(15,2)
+                    ) as gross_salary
+                "),
+                // Basic salary = EPF wages (capped at 15000 as per EPFO rules)
+                DB::raw("
+                    LEAST(
+                        CAST(
+                            JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.basic_salary'))
+                            AS DECIMAL(15,2)
+                        ),
+                        15000
+                    ) as epf_wages
+                "),
+                // Employee PF contribution (12%)
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.salary_details.provident_fund'))
+                        AS DECIMAL(12,2)
                     ) as provident_fund
+                "),
+                // Absent days for NCP
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.attendance_details.total_absent'))
+                        AS UNSIGNED
+                    ) as ncp_days
                 ")
             )
             ->orderBy('users.name')
             ->get();
 
-        return response()->json($pf);
+        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
+                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+
+        foreach ($records as $row) {
+            $epfWages = (float)($row->epf_wages ?? 0);
+            $empPf    = (float)($row->provident_fund ?? 0);
+
+            // Employer EPS = 8.33% of EPF wages (max ₹1250)
+            $empEps   = min(round($epfWages * 0.0833, 2), 1250.00);
+            // Employer EPF difference = employee PF - EPS
+            $empEpfDiff = max(round($empPf - $empEps, 2), 0);
+
+            $row->eps_wages          = $epfWages;   // EPS wages = EPF wages
+            $row->edli_wages         = $epfWages;   // EDLI wages = EPF wages
+            $row->employer_eps       = $empEps;
+            $row->employer_epf_diff  = $empEpfDiff;
+            $row->month_name         = $monthNames[$row->month] ?? $row->month;
+        }
+
+        return response()->json($records);
     }
 
     //------- Update PF -------//
@@ -949,13 +996,11 @@ class PayrollReportController extends Controller
         $records = $query->select(
                 'user_payslip.id',
                 'user_payslip.user_emp_id',
-
-                'employees.employee_id',
-                'users.name',
-
-                'user_payslip.financial_year',
                 'user_payslip.month',
-
+                'user_payslip.financial_year',
+                'employees.employee_id',
+                'employees.esic_no',
+                'users.name',
                 'user_payslip.esi_employer_code',
                 'user_payslip.esi_employer_name',
                 'user_payslip.esi_contribution_period',
@@ -965,18 +1010,60 @@ class PayrollReportController extends Controller
                 'user_payslip.esi_amount_paid',
                 'user_payslip.esi_transaction_no',
                 'user_payslip.esi_payment_status',
-
+                // Gross wages from JSON
                 DB::raw("
-                    JSON_UNQUOTE(
-                        JSON_EXTRACT(
-                            emp_salary_slip_response,
-                            '$.visible_data.final_salary_calculation.esi'
-                        )
-                    ) as esi
+                    CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.salary_details.gross_salary'))
+                        AS DECIMAL(15,2)
+                    ) as gross_wages
+                "),
+                // Employee ESI (0.75%) from final_salary_calculation
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.final_salary_calculation.esi'))
+                        AS DECIMAL(12,2)
+                    ) as employee_esi
+                "),
+                // Attendance present days for ESIC upload sheet
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.attendance_details.total_present'))
+                        AS UNSIGNED
+                    ) as present_days
+                "),
+                // Total working days
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.month_details.total_working_days'))
+                        AS UNSIGNED
+                    ) as total_working_days
                 ")
             )
             ->orderBy('users.name')
             ->get();
+
+        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
+                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+
+        foreach ($records as $row) {
+            $empEsi  = (float)($row->employee_esi ?? 0);
+            $gross   = (float)($row->gross_wages ?? 0);
+
+            // ESI wages = gross (only applicable if gross <= 21000)
+            $esiWages = $gross <= 21000 ? $gross : 0;
+
+            // Employer ESI = 3.25% of gross (if applicable)
+            $employerEsi = $esiWages > 0 ? round($esiWages * 0.0325, 2) : 0;
+
+            $row->esi_wages     = $esiWages;
+            $row->employer_esi  = $employerEsi;
+            $row->total_esi     = round($empEsi + $employerEsi, 2);
+            $row->month_name    = $monthNames[$row->month] ?? $row->month;
+        }
 
         return response()->json($records);
     }
@@ -1104,16 +1191,12 @@ class PayrollReportController extends Controller
         ");
 
         $records = $query->select(
-
                 'user_payslip.id',
                 'user_payslip.user_emp_id',
-
-                'employees.employee_id',
-                'users.name',
-
                 'user_payslip.financial_year',
                 'user_payslip.month',
-
+                'employees.employee_id',
+                'users.name',
                 'user_payslip.ptax_grips_payment_id',
                 'user_payslip.ptax_payment_initiated_date',
                 'user_payslip.ptax_brn',
@@ -1123,23 +1206,139 @@ class PayrollReportController extends Controller
                 'user_payslip.ptax_payment_ref_no',
                 'user_payslip.ptax_amount_paid',
                 'user_payslip.ptax_payment_status',
-
+                // PT deduction from final_salary_calculation
                 DB::raw("
-                    JSON_UNQUOTE(
-                        JSON_EXTRACT(
-                            emp_salary_slip_response,
-                            '$.visible_data.final_salary_calculation.ptax'
-                        )
+                    CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.final_salary_calculation.ptax'))
+                        AS DECIMAL(12,2)
                     ) AS ptax
+                "),
+                // Gross salary for slab display
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.salary_details.gross_salary'))
+                        AS DECIMAL(15,2)
+                    ) AS gross_salary
                 ")
-
             )
             ->orderBy('users.name')
             ->get();
 
+        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
+                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+
+        foreach ($records as $row) {
+            $gross = (float)($row->gross_salary ?? 0);
+            $ptax  = (float)($row->ptax ?? 0);
+
+            // Derive PT slab label from gross
+            if ($gross <= 10000)       $slab = 'Up to ₹10,000 — Nil';
+            elseif ($gross <= 15000)   $slab = '₹10,001–₹15,000 — ₹110';
+            elseif ($gross <= 25000)   $slab = '₹15,001–₹25,000 — ₹130';
+            elseif ($gross <= 40000)   $slab = '₹25,001–₹40,000 — ₹150';
+            else                        $slab = 'Above ₹40,000 — ₹200';
+
+            $row->pt_slab    = $slab;
+            $row->month_name = $monthNames[$row->month] ?? $row->month;
+        }
+
         return response()->json($records);
     }
     
+    //------- PTAX Summary (grouped by period) -------//
+    public function getPtaxSummary(Request $request)
+    {
+        $ownerId       = currentOwnerId();
+        $financialYear = $request->financial_year;
+        $filterType    = $request->filter_type;
+        $period        = $request->period;
+
+        // Fetch company registration details
+        $company = DB::table('company_profiles')
+            ->where('userId', $ownerId)
+            ->select('comp_name', 'comp_ptax')
+            ->first();
+
+        $compName  = $company->comp_name  ?? '—';
+        $compPtax  = $company->comp_ptax  ?? '—';
+
+        $query = DB::table('user_payslip')
+            ->leftJoin('employees', 'employees.empId', '=', 'user_payslip.user_emp_id')
+            ->leftJoin('users', 'users.id', '=', 'user_payslip.user_emp_id')
+            ->where('user_payslip.added_by', $ownerId)
+            ->where('user_payslip.financial_year', $financialYear);
+
+        // Period filters
+        if ($filterType == 'monthly' && !empty($period)) {
+            $month = Carbon::parse('1 ' . $period)->month;
+            $query->where('user_payslip.month', $month);
+        } elseif ($filterType == 'quarterly' && !empty($period)) {
+            switch ($period) {
+                case 'Q1': $months = [4, 5, 6]; break;
+                case 'Q2': $months = [7, 8, 9]; break;
+                case 'Q3': $months = [10, 11, 12]; break;
+                case 'Q4': $months = [1, 2, 3]; break;
+                default:   $months = [];
+            }
+            if (!empty($months)) $query->whereIn('user_payslip.month', $months);
+        } elseif ($filterType == 'half-yearly' && !empty($period)) {
+            switch ($period) {
+                case 'H1': $months = [4, 5, 6, 7, 8, 9]; break;
+                case 'H2': $months = [10, 11, 12, 1, 2, 3]; break;
+                default:   $months = [];
+            }
+            if (!empty($months)) $query->whereIn('user_payslip.month', $months);
+        }
+
+        // Only employees having ptax > 0
+        $query->whereRaw("
+            CAST(
+                JSON_UNQUOTE(
+                    JSON_EXTRACT(
+                        emp_salary_slip_response,
+                        '$.visible_data.final_salary_calculation.ptax'
+                    )
+                ) AS DECIMAL(12,2)
+            ) > 0
+        ");
+
+        $records = $query->select(
+                'user_payslip.month',
+                'user_payslip.financial_year',
+                DB::raw("COUNT(DISTINCT user_payslip.user_emp_id) as employee_count"),
+                DB::raw("
+                    SUM(CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.salary_details.gross_salary'))
+                        AS DECIMAL(15,2)
+                    )) as total_gross_salary
+                "),
+                DB::raw("
+                    SUM(CAST(
+                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
+                            '$.visible_data.final_salary_calculation.ptax'))
+                        AS DECIMAL(12,2)
+                    )) as total_ptax
+                ")
+            )
+            ->groupBy('user_payslip.month', 'user_payslip.financial_year')
+            ->orderBy('user_payslip.month')
+            ->get();
+
+        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
+                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+
+        foreach ($records as $row) {
+            $row->reg_no        = $compPtax;
+            $row->employer_name = $compName;
+            $row->month_name    = $monthNames[$row->month] ?? $row->month;
+        }
+
+        return response()->json($records);
+    }
+
     public function updatePtax(Request $request)
     {
         $request->validate([
@@ -1168,6 +1367,207 @@ class PayrollReportController extends Controller
             'status'  => true,
             'message' => 'Selected PTax records updated successfully.'
         ]);
+    }
+
+    // ------- Salary Sheet (Bank Transfer Sheet) -------//
+    public function getSalarySheetData(Request $request)
+    {
+        $ownerId       = currentOwnerId();
+        $financialYear = $request->financial_year;
+        $filterType    = $request->filter_type; // monthly | quarterly | half-yearly | yearly
+        $period        = $request->period;       // month name | Q1-Q4 | H1-H2 | null
+
+        $months = $this->resolveMonths($filterType, $period);
+
+        $query = DB::table('user_payslip as up')
+            ->leftJoin('users as u', 'u.id', '=', 'up.user_emp_id')
+            ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+            ->where('up.added_by', $ownerId)
+            ->where('up.financial_year', $financialYear);
+
+        if (!empty($months)) {
+            $query->whereIn('up.month', $months);
+        }
+
+        $records = $query->select(
+                'up.id',
+                'up.user_emp_id',
+                'up.month',
+                'up.financial_year',
+                'up.date',
+                'up.payment_date',
+                'up.payment_trans_id',
+                'up.payment_status',
+                'e.employee_id',
+                'u.name',
+                'e.bank_name',
+                'e.account_number',
+                'e.ifsc',
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(
+                            JSON_EXTRACT(up.emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.net_salary')
+                        ) AS DECIMAL(15,2)
+                    ) as net_salary
+                ")
+            )
+            ->orderBy('up.month')
+            ->orderBy('u.name')
+            ->get();
+
+        // Month number → name map
+        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
+                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+
+        foreach ($records as $row) {
+            $row->month_name = $monthNames[$row->month] ?? $row->month;
+        }
+
+        return response()->json($records);
+    }
+
+    // ------- LWF List -------//
+    public function getLwfList(Request $request)
+    {
+        $ownerId       = currentOwnerId();
+        $financialYear = $request->financial_year;
+        $filterType    = $request->filter_type;
+        $period        = $request->period;
+
+        $months = $this->resolveMonths($filterType, $period);
+
+        $query = DB::table('user_payslip as up')
+            ->leftJoin('users as u', 'u.id', '=', 'up.user_emp_id')
+            ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+            ->leftJoin('states as s', 's.id', '=', 'e.c_emp_state')
+            ->where('up.added_by', $ownerId)
+            ->where('up.financial_year', $financialYear)
+            ->where('e.lwf_applicable', 1);
+
+        if (!empty($months)) {
+            $query->whereIn('up.month', $months);
+        }
+
+        $records = $query->select(
+                'up.id',
+                'up.user_emp_id',
+                'up.month',
+                'e.employee_id',
+                'u.name',
+                's.name as state_name',
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(
+                            JSON_EXTRACT(up.emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.total_earnings')
+                        ) AS DECIMAL(15,2)
+                    ) as gross_wages
+                "),
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(
+                            JSON_EXTRACT(up.emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.lwf_deduct')
+                        ) AS DECIMAL(15,2)
+                    ) as lwf_employee
+                "),
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(
+                            JSON_EXTRACT(up.emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.lwf_company_contribution')
+                        ) AS DECIMAL(15,2)
+                    ) as lwf_employer
+                ")
+            )
+            ->orderBy('u.name')
+            ->get();
+
+        foreach ($records as $row) {
+            $row->lwf_total = ($row->lwf_employee ?? 0) + ($row->lwf_employer ?? 0);
+            $row->status    = 'Filed';
+        }
+
+        return response()->json($records);
+    }
+
+    // ------- Gratuity List -------//
+    public function getGratuityList(Request $request)
+    {
+        $ownerId       = currentOwnerId();
+        $financialYear = $request->financial_year;
+
+        $employees = DB::table('employees as e')
+            ->leftJoin('users as u', 'u.id', '=', 'e.empId')
+            ->where('e.added_by', $ownerId)
+            ->select(
+                'e.empId',
+                'e.employee_id',
+                'u.name',
+                'e.joining_date',
+                'e.basic_sal'
+            )
+            ->get();
+
+        $data = [];
+
+        foreach ($employees as $emp) {
+            if (empty($emp->joining_date)) continue;
+
+            $joiningDate   = Carbon::parse($emp->joining_date);
+            $today         = Carbon::now();
+            $yearsCompleted = $joiningDate->diffInYears($today);
+
+            // Gratuity formula: (Basic / 26) * 15 * years
+            $basicSalary = (float)($emp->basic_sal ?? 0);
+            $currentFYGratuity  = $yearsCompleted > 0 ? round(($basicSalary / 26) * 15, 2) : 0;
+            $totalGratuity      = $yearsCompleted >= 5 ? round(($basicSalary / 26) * 15 * $yearsCompleted, 2) : 0;
+
+            $status = $yearsCompleted >= 5 ? 'Provisioned' : 'Not Eligible';
+
+            $data[] = [
+                'employee_id'         => $emp->employee_id,
+                'employee_name'       => $emp->name ?? '',
+                'joining_date'        => $joiningDate->format('d-m-Y'),
+                'years_completed'     => $yearsCompleted . ' Year' . ($yearsCompleted !== 1 ? 's' : ''),
+                'basic_salary'        => $basicSalary,
+                'current_fy_gratuity' => $currentFYGratuity,
+                'total_gratuity'      => $totalGratuity,
+                'status'              => $status,
+            ];
+        }
+
+        return response()->json($data);
+    }
+
+    // ------- Helper: resolve month numbers from filter type -------//
+    private function resolveMonths(string $filterType, ?string $period): array
+    {
+        if ($filterType === 'monthly' && !empty($period)) {
+            return [Carbon::parse('1 ' . $period)->month];
+        }
+
+        if ($filterType === 'quarterly' && !empty($period)) {
+            return match($period) {
+                'Q1'    => [4, 5, 6],
+                'Q2'    => [7, 8, 9],
+                'Q3'    => [10, 11, 12],
+                'Q4'    => [1, 2, 3],
+                default => [],
+            };
+        }
+
+        if ($filterType === 'half-yearly' && !empty($period)) {
+            return match($period) {
+                'H1'    => [4, 5, 6, 7, 8, 9],
+                'H2'    => [10, 11, 12, 1, 2, 3],
+                default => [],
+            };
+        }
+
+        // yearly — no month filter
+        return [];
     }
 
 }

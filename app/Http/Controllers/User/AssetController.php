@@ -257,7 +257,7 @@ class AssetController extends Controller
 	{
 		$rules = [
 			'date' => 'required|date',
-			'assetType' => 'required|in:current,non-current',
+			'assetType' => 'required|in:current,non-current,capex',
 		];
 
 		$assetType = $data['assetType'] ?? '';
@@ -337,7 +337,7 @@ class AssetController extends Controller
 			'date' => $data['date'],			
 			'assetType' => $data['assetType'] ?? null,
 			'currentAssetType' => ($data['assetType'] === 'current')? ($data['currentAssetType'] ?? null): null,
-			'nonCurrentAssetType' => ($data['assetType'] === 'non-current')? ($data['nonCurrentAssetType'] ?? null): null,
+			'nonCurrentAssetType' => ($data['assetType'] === 'non-current' || $data['assetType'] === 'capex')? ($data['nonCurrentAssetType'] ?? null): null,
 
 			// ================= FIXED ASSET =================
 			'asset_name' => !$isWip ? ($data['asset_name'] ?? null) : null,
@@ -948,7 +948,7 @@ class AssetController extends Controller
 					'date'          => $data['date'],
 					'assetType'     => $data['assetType'],
 					'currentAssetType' => ($data['assetType'] === 'current')? ($data['currentAssetType'] ?? null): null,
-					'nonCurrentAssetType' => ($data['assetType'] === 'non-current')? ($data['nonCurrentAssetType'] ?? null): null,
+					'nonCurrentAssetType' => ($data['assetType'] === 'non-current' || $data['assetType'] === 'capex')? ($data['nonCurrentAssetType'] ?? null): null,
 
 					'asset_name' => !$isWip ? ($data['asset_name'] ?? null) : null,
 					'asset_category' => !$isWip ? ($data['asset_category'] ?? null) : null,

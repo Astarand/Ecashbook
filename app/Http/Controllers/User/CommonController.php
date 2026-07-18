@@ -565,6 +565,20 @@ class CommonController extends Controller
 		return response()->json($banks);
 	}
 	
+	public function getTdsRuleLiability(Request $request)
+	{
+		$rule = DB::table('tds_rules')
+			->where('module', $request->module)
+			->where('category', $request->category)
+			->where('status', 1)
+			->first();
+
+		return response()->json([
+			'status' => true,
+			'rule' => $rule
+		]);
+	}
+	
 	//end new
 
 }

@@ -182,9 +182,6 @@
                                                 <input type="number" class="form-control" name="experience_years" id="experience_years"
                                                         value="{{ $employee->experience_years ?? '' }}" min="0" step="0.5" placeholder="Enter years of experience">
                                                 </div>
-
-
-
                                             </div>
 
                                         </div>
@@ -532,12 +529,19 @@
                                                 <label class="form-check-label" for="tds_check">TDS Applicable</label>
                                             </div>
                                         </div>
+                                        <div class="col-md-3">
+                                            <div class="form-check mb-3">
+                                                <input class="form-check-input" type="checkbox" id="lwf_check" name="lwf_applicable" value="1"
+                                                    {{ ($employee->lwf_applicable ?? 0) == 1 ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="lwf_check">LWF Applicable</label>
+                                            </div>
+                                        </div>
                                         <!-- Conditional EPF & ESIC Fields -->
                                         <div class="col-md-6" id="epf_no_field" style="display: {{ ($employee->epf_applicable ?? 0) == 1 ? 'block' : 'none' }};">
                                             <div class="mb-3">
-                                                <label class="form-label" for="epf_no">Employee EPF No <span class="text-danger">*</span></label>
+                                                <label class="form-label" for="epf_no">Employee UAN No <span class="text-danger">*</span></label>
                                                 <input type="text" name="epf_no" id="epf_no" class="form-control"
-                                                    value="{{ $employee->epf_no ?? '' }}" placeholder="Enter EPF Number">
+                                                    value="{{ $employee->epf_no ?? '' }}" placeholder="Enter UAN Number">
                                             </div>
                                         </div>
                                         <div class="col-md-6" id="esic_no_field" style="display: {{ ($employee->esic_applicable ?? 0) == 1 ? 'block' : 'none' }};">
@@ -652,6 +656,12 @@
                                             <div class="mb-3">
                                                 <label class="form-label" for="tds">Tax Deducted at Source (TDS)</label>
                                                 <input type="text" required class="form-control" name="tds" id="tds" value="{{ $employee->tds ?? '0' }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4" id="lwf_deduct_field" style="display: {{ ($employee->lwf_applicable ?? 0) == 1 ? 'block' : 'none' }};">
+                                            <div class="mb-3">
+                                                <label class="form-label" for="lwf_deduct">LWF Deduct</label>
+                                                <input type="text" class="form-control" name="lwf_deduct" id="lwf_deduct" value="{{ $employee->lwf_deduct ?? '3' }}" readonly>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -1335,6 +1345,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const esiInput = document.getElementById("esi");
     const ptaxInput = document.getElementById("ptax");
     const tdsInput = document.getElementById("tds");
+    const lwfDeductInput = document.getElementById("lwf_deduct");
+    const lwfDeductField = document.getElementById("lwf_deduct_field");
     const loanInput = document.getElementById("loan");
 
     const totalDeductionInput = document.getElementById("total_deduction");
@@ -1361,7 +1373,7 @@ document.addEventListener("DOMContentLoaded", function () {
         specialInput.value = special.toFixed(2);
 
         // Deductions
-        let pf = 0, esi = 0, ptax = 0, tds = 0;
+        let pf = 0, esi = 0, ptax = 0, tds = 0, lwfDeduct = 0;
         let loan = parseFloat(loanInput.value) || 0;
 
         // PF Calculation (match AddEmployee logic)
@@ -1411,8 +1423,20 @@ document.addEventListener("DOMContentLoaded", function () {
 			tdsInput.value = "00.00";
 		}
 
+        if (document.getElementById('lwf_check').checked && lwfDeductInput) {
+            if (lwfDeductField) lwfDeductField.style.display = 'block';
+            // Restore default value of 3 if empty or zero
+            if (lwfDeductInput.value === '' || lwfDeductInput.value === '0') {
+                lwfDeductInput.value = '3';
+            }
+            lwfDeduct = parseFloat(lwfDeductInput.value) || 0;
+        } else {
+            if (lwfDeductInput) lwfDeductInput.value = '0';
+            if (lwfDeductField) lwfDeductField.style.display = 'none';
+        }
+
         // Total Deduction
-        const totalDeduction = pf + esi + ptax + tds + loan;
+        const totalDeduction = pf + esi + ptax + tds + lwfDeduct + loan;
         totalDeductionInput.value = totalDeduction.toFixed(2);
 
         // Net Salary
@@ -1427,12 +1451,12 @@ document.addEventListener("DOMContentLoaded", function () {
     calculateAll();
 
     // Listen for checkbox changes
-    ['epf_check', 'esic_check', 'ptax_check', 'tds_check'].forEach(id => {
+    ['epf_check', 'esic_check', 'ptax_check', 'tds_check', 'lwf_check'].forEach(id => {
         document.getElementById(id).addEventListener("change", calculateAll);
     });
 
     // Listen for field changes
-    [grossInput, basicPercentageInput, loanInput, tdsInput].forEach(input => {
+    [grossInput, basicPercentageInput, loanInput, tdsInput, lwfDeductInput].forEach(input => {
         input.addEventListener("input", calculateAll);
     });
 });

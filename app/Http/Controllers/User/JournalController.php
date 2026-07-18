@@ -236,29 +236,48 @@ class JournalController extends Controller
 							->where('tds_section', '!=', '192')
 							->get();
 		$journalNo = $this->generateJournalNo($userId);
+		
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name')
+					->where('added_by', $userId)
+					->where('status', 1)
+					->get();
 		return view('User.Reports.add-journal')->with([
 				'purposes_of_tds' => $purposes_of_tds,
-				'journalNo' => $journalNo
+				'journalNo' => $journalNo,
+				'bankDetails' => $bankDetails
 		]);
     }
 	
 	public function editJournal($id)
 	{
 		$id = base64_decode($id);
+		$userId = currentOwnerId();
 		$journal = Journals::with('attachments')->findOrFail($id);
 		$purposes_of_tds = DB::table('tds_rules')
 							->where('tds_section', '!=', '192')
 							->get();
-		return view('User.Reports.edit-journal', compact('journal','purposes_of_tds'));
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name')
+					->where('added_by', $userId)
+					->where('status', 1)
+					->get();
+		return view('User.Reports.edit-journal', compact('journal','purposes_of_tds','bankDetails'));
 	}
     public function viewJournal($id)
     {
 		$id = base64_decode($id);
+		$userId = currentOwnerId();
 		$journal = Journals::with('attachments')->findOrFail($id);
 		$purposes_of_tds = DB::table('tds_rules')
 							->where('tds_section', '!=', '192')
 							->get();
-		return view('User.Reports.view-journal', compact('journal','purposes_of_tds'));
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name')
+					->where('added_by', $userId)
+					->where('status', 1)
+					->get();					
+		return view('User.Reports.view-journal', compact('journal','purposes_of_tds','bankDetails'));
     }
 	
 	public function generateJournalNo($userId)
@@ -402,7 +421,12 @@ class JournalController extends Controller
 			}
 			
 			$amount = $request->amount ?? 0;
-			$this->paymentVoucherService->storePaymentVoucherEntries($journal->id,'Journal',$amount);
+			$data = [
+						'payment_mode' => $request->payment_mode ?? null,
+						'bank_id' => $request->bank_id ?? null,
+						'addFlag' => 1
+					];
+			$this->paymentVoucherService->storePaymentVoucherEntries($journal->id,'Journal',$amount,$data);
 
 			DB::commit();
 

@@ -947,7 +947,7 @@ class ReportsController extends Controller
 		$balance = $openingDC === 'Dr' ? -$opening : $opening;
 
 		$rows = $this->journalLedgerRows($propId,$userId,$from,$to,$ledger,$ledgerGroup,$partyName,$custId,$vendId);
-
+		//echo "<pre>";print_r($rows);exit;
 		/* -------- SORT DATE WISE -------- */
 		usort($rows, function ($a, $b) {
 			return strtotime($b['date']) <=> strtotime($a['date']);
@@ -965,7 +965,7 @@ class ReportsController extends Controller
 			// Core accounting formula
 			$balance += ($row['credit'] - $row['debit']);
 
-			$row['dc'] = $row['dc'];
+			$row['dc'] = $row['debit'];
 			$row['balance'] = ($balance);
 		}
 		unset($row);
@@ -1106,57 +1106,77 @@ class ReportsController extends Controller
 		}
 
 		$journals = $query->orderBy('journal_date', 'desc')->get();
+		$grouped = $journals->groupBy(function ($item) {
+			return $item->reference_no.'_'.$item->entry_type.'_'.$item->autoId;
+		});
+		
+		foreach ($grouped as $entries) {
 
-		// ================= LOOP =================
-		foreach ($journals as $j) {
+			$first = $entries->first();
 
-			$amount  = (float) ($j->amount ?? 0);
-			$gstRate = (float) ($j->gst_rate ?? 0);
-			$gstType = $j->gst_trans ?? '';
-			$dcType  = strtolower(trim($j->debit_credit ?? ''));
+			$debitLedger = '';
+			$creditLedger = '';
 
-			// ================= GST CALC =================
-			$cgst = $sgst = $igst = 0;
+			$debit = 0;
+			$credit = 0;
 
-			if ($gstRate > 0 && $amount > 0) {
-				if ($gstType === 'intrastate' || $gstType === 'union') {
-					$cgst = ($amount * ($gstRate / 2)) / 100;
-					$sgst = ($amount * ($gstRate / 2)) / 100;
-				} elseif ($gstType === 'interstate') {
-					$igst = ($amount * $gstRate) / 100;
+			$cgst = 0;
+			$sgst = 0;
+			$igst = 0;
+
+			foreach ($entries as $j) {
+
+				$amount  = (float)$j->amount;
+				$gstRate = (float)$j->gst_rate;
+
+				if($gstRate>0){
+
+					if($j->gst_trans=='intrastate' || $j->gst_trans=='union'){
+
+						$cgst += ($amount*($gstRate/2))/100;
+						$sgst += ($amount*($gstRate/2))/100;
+
+					}elseif($j->gst_trans=='interstate'){
+
+						$igst += ($amount*$gstRate)/100;
+
+					}
 				}
+
+				if(strtolower($j->debit_credit)=='debit'){
+
+					$debitLedger = $j->party_name ?: $j->ledger;
+					$debit += $amount;
+
+				}else{
+
+					$creditLedger = $j->party_name ?: $j->ledger;
+					$credit += $amount;
+
+				}
+
 			}
 
-			// ================= DR / CR =================
-			$debit  = ($dcType === 'debit') ? $amount : 0;
-			$credit = ($dcType === 'credit') ? $amount : 0;
-
 			$rows[] = [
-				'date'       => $j->journal_date,
-				'voucher'    => $j->reference_no ?? '-',
-				'source'     => $j->source ?? '',
-				'type'       => $j->entry_type ?? '',
-				'counter'    => $j->party_name ?? $j->ledger ?? '-',
-				'narration'  => $j->notes ?? '',
-
-				'cgst' => round($cgst, 2),
-				'sgst' => round($sgst, 2),
-				'igst' => round($igst, 2),
-
-				'bank'       => '',
-				'group'      => $j->entry_type ?? '',
-				'sub_group'  => $j->ledger ?? '',
-
-				'debit'  => $debit,
-				'credit' => $credit,
-
-				'balance'    => 0,
-				'dc'         => ($dcType === 'credit') ? 'Cr' : 'Dr',
-				'ledgername' => $j->ledger ?? '',
-				'payment_status' => $j->payment_status ?? ''
+				'date'=>$first->journal_date,
+				'voucher'=>$first->reference_no ?? '-',
+				'type'=>$first->entry_type ?? '',
+				'source'=>$first->source ?? '-',
+				'ledgername' => $first->ledger ?? '',
+				'counter' => $first->party_name ?? $first->ledger ?? '-',
+				'debit_ledger'=>$debitLedger,
+				'credit_ledger'=>$creditLedger,
+				'narration'=>$first->notes,
+				'cgst'=>round($cgst,2),
+				'sgst'=>round($sgst,2),
+				'igst'=>round($igst,2),
+				'debit'=>$debit,
+				'credit'=>$credit,
+				'balance'=>0,
+				'payment_status'=>$first->payment_status ?? ''
 			];
 		}
-
+		
 		return $rows;
 	}	
 	//End Ledger Report

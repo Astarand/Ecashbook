@@ -838,9 +838,10 @@ class PaymentVoucherService
 				$amount             = $journals->amount;
 				$transactionDetails = $journals->reference_type;
 				$creditDebit        = $journals->debit_credit;
-				$paymentMode        = 'Bank';
+				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? null);
 				$referenceId        = $journals->reference_no;
 				$narration          = $journals->notes;
+				$bankId 			= $data['bank_id'] ?? null;
 
 				if ($paymentVoucher) {
 

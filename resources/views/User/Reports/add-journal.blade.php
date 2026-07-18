@@ -156,6 +156,30 @@
                             <label class="form-label">Amount <span class="text-danger">*</span></label>
                             <input type="number" min="0" step="0.01" name="amount" id="amount" class="form-control" placeholder="Enter amount" required>
                         </div>
+						
+						<div class="col-md-3 mb-3">
+							<label class="form-label">Payment Mode<span class="text-danger">*</span></label>
+							<select name="payment_mode" id="payment_mode" required class="form-select">
+								<option value="">Select</option>
+								<option value="Cash">Cash</option>
+								<option value="Bank">Bank</option>														
+								<option value="UPI">UPI</option>														
+							</select>
+						</div>
+						
+						<div class="col-xl-4 mb-3">
+							<div class="form-group">
+								<label class="form-label">Select Bank</label>
+								<select name="bank_id" id="bank_id" class="form-control">
+									<option value="">-- Select Bank --</option>
+									@foreach($bankDetails as $bank)
+										<option value="{{ $bank->id }}">
+											{{ $bank->bank_name }}
+										</option>
+									@endforeach
+								</select>
+							</div>
+						</div>
 
                         <div class="col-sm-6 mb-3">
                             <label class="form-label">Narration / Notes <span class="text-danger">*</span></label>

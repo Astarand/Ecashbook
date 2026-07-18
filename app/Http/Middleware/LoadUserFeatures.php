@@ -72,7 +72,7 @@ class LoadUserFeatures
 			elseif ($trialUser) {  //31st May 2026 (Fixed trial end date), later removed
 
 				//$trialEnd = Carbon::parse($trialUser->trial_start_at)->addDays($trialUser->trial_days); //later open
-				  $trialEnd = Carbon::create(2026, 7, 31); // 31st July 2026 (Fixed trial end date), later removed
+				  $trialEnd = Carbon::create(2026, 8, 31); // 31st August 2026 (Fixed trial end date), later removed
 
 				if (now()->lte($trialEnd)) {
 					$features = ['ALL'];

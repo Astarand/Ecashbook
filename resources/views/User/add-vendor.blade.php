@@ -756,15 +756,16 @@
                 return false;
             }
         }
+		
+		// PAN Number validation (only if entered)
+		const panNo = $("#vendor_pan").val().trim();
+		const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
 
-        // PAN Number validation
-        const panNo = $("#vendor_pan").val().trim();
-        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-        if (!panRegex.test(panNo)) {
-            showToast("Invalid PAN Number. Format should be: AAAAA9999A", "error");
-            $("#vendor_pan").focus();
-            return false;
-        }
+		if (panNo !== "" && !panRegex.test(panNo.toUpperCase())) {
+			showToast("Invalid PAN Number. Format should be: AAAAA9999A", "error");
+			$("#vendor_pan").focus();
+			return false;
+		}
 
         // Additional GST validation
         const gstReg = $("#gst_reg").val();

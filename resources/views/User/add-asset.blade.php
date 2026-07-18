@@ -85,6 +85,7 @@
                                                     <option value="">Select</option>
                                                     <option value="current">Current Assets</option>
                                                     <option value="non-current">Non Current Assets</option>
+													<option value="capex">Capital Expenditure (CapEx)</option>
                                                    {{-- <option value="investment">Investment</option> --}}
                                                 </select>
                                             </div>
@@ -114,9 +115,9 @@
 											<!-- Non-Current Assets Section -->
                                             <div id="nonCurrentAssetsSection" class="row" style="display: none;">
 												<div class="col-sm-12 mb-3">
-													<label class="form-label">Non-Current Assets Type <span class="text-danger">*</span></label>
+													<label class="form-label" id="assetTypeLabel">Non-Current Assets Type <span class="text-danger">*</span></label>
 													<select id="nonCurrentAssetsType" class="form-select" name="nonCurrentAssetType">
-														<option value="">Select</option>
+														<!--<option value="">Select</option>
 														<option value="Property Plant Equipment">Property, Plant & Equipment (PPE)</option>
 														<option value="Furniture Fixtures">Furniture & Fixtures</option>
 														<option value="Computer IT Equipment">Computer & IT Equipment</option>
@@ -124,7 +125,7 @@
 														<option value="Vehicles">Vehicles</option>
 														<option value="Intangible Assets">Intangible / Non-physical Assets</option>
 														<option value="Capital Work in Progress">Capital Work-in-Progress</option>
-														<option value="Other Non-Current Assets">Other Non-Current Assets</option>
+														<option value="Other Non-Current Assets">Other Non-Current Assets</option>-->
 													</select>
 												</div>
 											</div>
@@ -157,8 +158,8 @@
 												</div>
 
 												<div class="col-xl-4 mb-3">
-													<label class="form-label">Asset Code / ID <span class="text-danger">*</span></label>
-													<input type="text" name="asset_code" class="form-control">
+													<label class="form-label"  id="assetCodeLabel">Asset Code / ID <span class="text-danger">*</span></label>
+													<input type="text" name="asset_code" id="asset_code" class="form-control">
 												</div>
 
 												<div class="col-xl-4 mb-3">
@@ -277,10 +278,10 @@
 												</div>
 
 												<div class="col-xl-4 mb-3">
-													<label class="form-label">Asset Status</label>
-													<select name="asset_status" class="form-select">
-														<option value="Active">Active</option>
-														<option value="Under Construction">Under Construction</option>
+													<label class="form-label" id="assetStatusLabel">Asset Status</label>
+													<select name="asset_status" id="asset_status" class="form-select">
+														<!--<option value="Active">Active</option>
+														<option value="Under Construction">Under Construction</option>-->
 													</select>
 												</div>
 
@@ -839,6 +840,68 @@
 		});
 	}
 	
+	//Start on change asset type
+	$('#assetType').on('change', function () {
+
+		var assetType = $(this).val();
+		// Hide section first
+		$('#nonCurrentAssetsSection').hide();
+		// Clear dropdown
+		$('#nonCurrentAssetsType').empty();
+
+		if (assetType == 'non-current') {
+			// ===== Non Current Asset =====
+			$('#assetTypeLabel').html('Non-Current Assets Type <span class="text-danger">*</span>');
+			$('#assetCodeLabel').html('Asset Code / ID <span class="text-danger">*</span>');
+			$('#assetStatusLabel').html('Asset Status');
+			$('#asset_status').html(`
+				<option value="Active">Active</option>
+				<option value="Under Construction">Under Construction</option>
+			`);
+
+			$('#nonCurrentAssetsType').append(`
+				<option value="">Select</option>
+				<option value="Property Plant Equipment">Property, Plant & Equipment (PPE)</option>
+				<option value="Furniture Fixtures">Furniture & Fixtures</option>
+				<option value="Computer IT Equipment">Computer & IT Equipment</option>
+				<option value="Machinery">Machinery</option>
+				<option value="Vehicles">Vehicles</option>
+				<option value="Intangible Assets">Intangible / Non-physical Assets</option>
+				<option value="Capital Work in Progress">Capital Work-in-Progress</option>
+				<option value="Other Non-Current Assets">Other Non-Current Assets</option>
+			`);
+
+			$('#nonCurrentAssetsSection').show();
+		}
+		else if (assetType == 'capex') 
+		{
+			// ===== CapEx =====
+			$('#assetTypeLabel').html('CapEx Type <span class="text-danger">*</span>');
+			$('#assetCodeLabel').html('CapEx ID <span class="text-danger">*</span>');
+			$('#assetStatusLabel').html('Capitalisation Status');
+			$('#asset_status').html(`
+				<option value="Pending">Pending</option>
+				<option value="Capitalised">Capitalised</option>
+				<option value="CWIP">CWIP</option>
+				<option value="Disposed">Disposed</option>
+			`);
+
+			$('#nonCurrentAssetsType').append(`
+				<option value="">Select</option>
+				<option value="New Purchase">New Purchase</option>
+				<option value="Replacement">Replacement</option>
+				<option value="Improvement">Improvement</option>
+				<option value="Expansion">Expansion</option>
+				<option value="Renovation">Renovation</option>
+				<option value="Capital Repair">Capital Repair</option>
+			`);
+
+			$('#nonCurrentAssetsSection').show();
+		}
+
+	}).trigger('change');
+	//End on change asset type
+	
 
     document.addEventListener("DOMContentLoaded", function() {
         const assetTypeDropdown = document.getElementById("assetType");
@@ -892,41 +955,6 @@
         });
     });
     
-	/*document.getElementById("assetType").addEventListener("change", function () {
-
-		let assetType = this.value;
-
-		// Show/Hide sections
-		$('#currentAssetsSection').toggle(assetType === "current");
-		$('#nonCurrentAssetsSection').toggle(assetType === "non-current");
-
-		// ✅ RESET DROPDOWNS
-		if (assetType === "current") {
-			$('#nonCurrentAssetsType').val('').trigger('change');
-			$('#nextBtn1').text('Submit');
-		} else if (assetType === "non-current") {
-			$('#currentAssetsType').val('').trigger('change');
-			$('#nextBtn1').html('Next <i class="ti ti-arrow-up-right-circle ms-2"></i>');
-		} else {
-			$('#currentAssetsType').val('');
-			$('#nonCurrentAssetsType').val('');
-			$('#nextBtn1').html('Next <i class="ti ti-arrow-up-right-circle ms-2"></i>');
-		}
-
-		//Hide all dependent sections
-		$('#commonSection').hide();
-		$('#WorkinProgressSection').hide();
-		$('#cashInHandSection').hide();
-		$('#bankAccountSection').hide();
-		$('#tradeReceivableSection').hide();
-		$('#advanceVendorSection').hide();
-		$('#employeeAdvanceSection').hide();
-		$('#prepaidExpenseSection').hide();
-		$('#itcSection').hide();
-		$('#tdsReceivableSection').hide();
-		$('#inventorySection').hide();
-
-	});*/
 	
 	document.getElementById("assetType").addEventListener("change", function () {
 
@@ -934,7 +962,7 @@
 
 		// SHOW / HIDE
 		$('#currentAssetsSection').toggle(assetType === "current");
-		$('#nonCurrentAssetsSection').toggle(assetType === "non-current");
+		$('#nonCurrentAssetsSection').toggle(assetType === "non-current" || assetType === "capex");
 
 		// BUTTON TEXT
 		if (assetType === "current") {
@@ -985,7 +1013,8 @@
 
     document.getElementById("currentAssetsType").addEventListener("change", function() {
         document.getElementById("otherCurrentAssetsDiv").style.display = (this.value === "other_current_assets") ? "block" : "none";
-         document.getElementById("nonCurrentAssetsSection").style.display = (this.value === "non-current") ? "block" : "none";
+        document.getElementById("nonCurrentAssetsSection").style.display = (this.value === "non-current") ? "block" : "none";
+        document.getElementById("nonCurrentAssetsSection").style.display = (this.value === "capex") ? "block" : "none";
         //ocument.getElementById("investmentSection").style.display = (this.value === "investment") ? "block" : "none";
     });
 
@@ -1354,7 +1383,13 @@
 			'Machinery',
 			'Vehicles',
 			'Intangible Assets',
-			'Other Non-Current Assets'
+			'Other Non-Current Assets',
+			'New Purchase',
+			'Replacement',
+			'Improvement',
+			'Expansion',
+			'Renovation',
+			'Capital Repair'
 		];
 
 		if (showSectionValues.includes(selectedValue)) {

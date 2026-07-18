@@ -684,13 +684,6 @@
                                                     placeholder="Enter Employee TDS " />
                                             </div>
                                         </div>
-                                        <div class="col-md-4" id="lwf_deduct_field" style="display: none;">
-                                            <div class="mb-3">
-                                                <label class="form-label" for="lwf_deduct">LWF Deduct</label>
-                                                <input type="text" class="form-control" name="lwf_deduct" id="lwf_deduct" value="3"
-                                                    placeholder="Enter LWF Deduct Amount" readonly />
-                                            </div>
-                                        </div>
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label class="form-label" for="schoolName">Total Loan Amount</label>
@@ -1446,8 +1439,6 @@
         const esicNoField = document.getElementById("esic_no");
         const ptaxInput = document.getElementById("ptax");
         const tdsInput = document.getElementById("tds");
-        const lwfDeductInput = document.getElementById("lwf_deduct");
-        const lwfDeductField = document.getElementById("lwf_deduct_field");
         const loanInput = document.getElementById("loan");
         const totalDeductionInput = document.getElementById("total_deduction");
         const netSalaryInput = document.getElementById("net_sal");
@@ -1457,7 +1448,6 @@
         const esicCheck = document.getElementById("esic_check");
         const ptaxCheck = document.getElementById("ptax_check");
         const tdsCheck = document.getElementById("tds_check");
-        const lwfCheck = document.getElementById("lwf_check");
 
         function updateDeductionFields() {
             pfInput.disabled = !epfCheck.checked;
@@ -1476,19 +1466,6 @@
 
             ptaxInput.disabled = !ptaxCheck.checked;
             if (!ptaxCheck.checked) ptaxInput.value = "00.00";
-
-            if (lwfCheck && lwfDeductField) {
-                const showLwf = lwfCheck.checked;
-                lwfDeductField.style.display = showLwf ? "block" : "none";
-                if (showLwf) {
-                    // Restore default value of 3 if empty or zero
-                    if (lwfDeductInput && (lwfDeductInput.value === "" || lwfDeductInput.value === "0")) {
-                        lwfDeductInput.value = "3";
-                    }
-                } else {
-                    if (lwfDeductInput) lwfDeductInput.value = "0";
-                }
-            }
 
             /*tdsInput.disabled = !tdsCheck.checked;
             if (!tdsCheck.checked) tdsInput.value = "00.00";*/
@@ -1514,7 +1491,7 @@
             specialInput.value = special.toFixed(2);
 
             // Deductions
-            let pf = 0, esi = 0, ptax = 0, tds = 0, lwfDeduct = 0;
+            let pf = 0, esi = 0, ptax = 0, tds = 0;
             let loan = parseFloat(loanInput.value) || 0;
 
             // PF Calculation
@@ -1570,12 +1547,8 @@
                 tdsInput.value = "00.00";
             }
 
-            if (lwfCheck && lwfCheck.checked && lwfDeductInput) {
-                lwfDeduct = parseFloat(lwfDeductInput.value) || 0;
-            }
-
             // Total Deduction
-            const totalDeduction = pf + esi + ptax + tds + lwfDeduct + loan;
+            const totalDeduction = pf + esi + ptax + tds + loan;
             totalDeductionInput.value = totalDeduction.toFixed(2);
 
             // Net Salary
@@ -1591,7 +1564,7 @@
         calculateAll();
 
         // Listen for checkbox changes
-        [epfCheck, esicCheck, ptaxCheck, tdsCheck, lwfCheck].forEach(chk => {
+        [epfCheck, esicCheck, ptaxCheck, tdsCheck].forEach(chk => {
             chk.addEventListener("change", function () {
                 updateDeductionFields();
                 calculateAll();
@@ -1599,7 +1572,7 @@
         });
 
         // Listen for field changes
-        [grossInput, basicPercentageInput, loanInput, tdsInput, lwfDeductInput].forEach(input => {
+        [grossInput, basicPercentageInput, loanInput, tdsInput].forEach(input => {
             input.addEventListener("input", function () {
                 calculateAll();
             });

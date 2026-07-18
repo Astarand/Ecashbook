@@ -31,12 +31,7 @@
     <!-- [ breadcrumb ] end -->
 
     <div class="row mb-4">
-        <h3>View Liabilities</h3>
-        <?php
-        // echo "<pre>";print_r($liability);        
-        // echo "<pre>";print_r($subDetails);        
 
-        ?>
     </div>
     <div class="card">
         <div class="card-body">
@@ -1397,6 +1392,15 @@
 
         // Run on page load
         handleClSpecialTypes($('#CurrentLiabilitiesType').val());
+		
+		// STL: TDS toggle
+		function toggleSTLTdsFields() {
+			$('#stlTdsFields').toggle(
+				$('input[name="stl_tds_applicable"]:checked').val() === 'yes'
+			);
+		}
+
+		toggleSTLTdsFields();
 
 
     // Handler for Reserves Surplus Type dropdown
@@ -1792,6 +1796,73 @@ $(document).ready(function () {
         premiumAmount.addEventListener("input", calculateTotal);
 
     });
+	
+	//Start TDS calculate
+	function checkTdsRule(module, category, amount, prefix)
+	{
+		$.ajax({
+			url: "{{ route('get.tds.rule') }}",
+			type: "POST",
+			data: {
+				_token: $('meta[name="csrf-token"]').attr('content'),
+				module: module,
+				category: category
+			},
+			success: function(res){
+
+				if(!res.status || !res.rule){
+					return;
+				}
+
+				let rule = res.rule;
+				let threshold = parseFloat(rule.threshold_limit);
+				amount = parseFloat(amount) || 0;
+
+				if(amount >= threshold){
+
+					$("input[name='"+prefix+"_tds_applicable'][value='yes']")
+						.prop("checked", true);
+
+					$("#"+prefix+"_tds_section")
+						.val(rule.tds_section);
+
+					$("#"+prefix+"_tds_rate")
+						.val(rule.tds_rate);
+
+					let tdsAmount = (amount * parseFloat(rule.tds_rate))/100;
+
+					$("#"+prefix+"_tds_amount")
+						.val(tdsAmount.toFixed(2));
+
+					$("#"+prefix+"TdsFields").show();
+
+				}else{
+
+					$("input[name='"+prefix+"_tds_applicable'][value='no']")
+						.prop("checked", true);
+
+					$("#"+prefix+"_tds_section").val('');
+					$("#"+prefix+"_tds_rate").val('');
+					$("#"+prefix+"_tds_amount").val('');
+
+					$("#"+prefix+"TdsFields").hide();
+				}
+
+			}
+		});
+	}
+	
+	$("#stl_interest_amount").on("input change", function(){
+		checkTdsRule('Liability','short_term_loans',$(this).val(),'stl');
+	});
+	
+	$("#ip_interest_amount").on("input change", function(){
+		checkTdsRule('Liability','interest_payable',$(this).val(),'ip');
+	});
+	
+	$("#stl_interest_amount").trigger("change");
+	$("#ip_interest_amount").trigger("change");
+	//End TDS calculate
 
     
 </script>

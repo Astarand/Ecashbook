@@ -71,6 +71,7 @@
 								<option value="">All</option>
 								<option value="current">Current</option>
 								<option value="non-current">Non-Current</option>
+								<option value="capex">Capital Expenditure</option>
 							</select>
 						</div>
 
