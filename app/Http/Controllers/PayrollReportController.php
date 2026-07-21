@@ -7,11 +7,193 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
+use DateInterval;
+use DatePeriod;
+
+
 
 
 class PayrollReportController extends Controller
 {
     public function summary(Request $request)
+    {
+        $ownerId = currentOwnerId();
+        $authUserId = auth()->id();
+
+        $month = $request->month;
+        $fy = $request->fy;
+
+        // Month Name => Month Number
+        $months = [
+            'January'   => 1,
+            'February'  => 2,
+            'March'     => 3,
+            'April'     => 4,
+            'May'       => 5,
+            'June'      => 6,
+            'July'      => 7,
+            'August'    => 8,
+            'September' => 9,
+            'October'   => 10,
+            'November'  => 11,
+            'December'  => 12,
+        ];
+
+        $currentMonth = $months[$month] ?? date('n');
+
+        [$fyStart, $fyEnd] = explode('-', $fy);
+
+        // Previous Month & FY
+        $previousMonth = $currentMonth - 1;
+        $previousFY = $fy;
+
+        if ($previousMonth == 0) {
+            $previousMonth = 12;
+            $previousFY = ($fyStart - 1) . '-' . ($fyEnd - 1);
+        }
+
+        // Employee Summary
+        $grossSalary = 0;
+        $netSalary = 0;
+        $pfLiability = 0;
+        $esiLiability = 0;
+        $ptLiability = 0;
+        $tdsLiability = 0;
+        $lwfLiability = 0;
+        $lopTotal = 0;
+        $paid = 0;
+        $unpaid = 0;
+        $totalActiveEmployees = 0;
+        // Active employees are those who have a payslip generated for the selected month and FY
+        $selectedMonthStart = Carbon::createFromDate($fyStart, $currentMonth, 1)->startOfMonth();
+
+        // January, February, March belong to next FY
+        if ($currentMonth <= 3) {
+            $selectedMonthStart->year = $fyEnd;
+        }
+        $selectedMonthEnd = $selectedMonthStart->copy()->endOfMonth();
+
+        $totalActiveEmployees = DB::table('employees')
+            ->where('added_by', $ownerId)
+            ->where(function ($q) use ($selectedMonthEnd) {
+
+                // Active Employees
+                $q->whereIn('emp_status', ['Confirmed', 'In Probation'])
+
+                // Resigned / Terminated
+                ->orWhere(function ($qq) use ($selectedMonthEnd) {
+                    $qq->whereIn('emp_status', ['Resigned', 'Terminated'])
+                    ->whereNotNull('regine_date')
+                    // Employee is counted if resigned/terminated on or after
+                    // the selected month's last date.
+                    ->whereDate('regine_date', '>=', $selectedMonthEnd);
+                });
+            })
+            ->get();
+
+        // Check if payslips exist for the selected month and FY
+
+        $payslipExists = DB::table('user_payslip')
+            ->where('added_by', $ownerId)
+            ->where('month', $currentMonth)
+            ->where('financial_year', $fy)
+            ->exists();
+        
+
+        if ($payslipExists) {
+
+            $payslips = DB::table('user_payslip')
+                ->where('added_by', $ownerId)
+                ->where('month', $currentMonth)
+                ->where('financial_year', $fy)
+                ->select('emp_salary_slip_response')
+                ->get();
+
+            foreach ($payslips as $row) {
+
+                $response = json_decode($row->emp_salary_slip_response, true);
+
+                if (empty($response['visible_data']['final_salary_calculation'])) {
+                    continue;
+                }
+
+                $salary = $response['visible_data']['final_salary_calculation'];
+
+                $grossSalary += (float)($salary['basic_salary'] ?? 0);
+                $netSalary += (float)($salary['net_salary'] ?? 0);
+                $pfLiability += (float)($salary['provident_fund'] ?? 0);
+                $esiLiability += (float)($salary['esi'] ?? 0);
+                $ptLiability += (float)($salary['ptax'] ?? 0);
+                $tdsLiability += (float)($salary['tds'] ?? 0);
+                $lwfLiability += (float)($salary['lwf'] ?? 0);
+                $lopTotal += (float)($salary['lop'] ?? 0);
+
+                $paid++;
+            }
+
+        } else {
+
+            /*
+            ==========================================================
+            Write your "Payslip Not Generated" calculation here
+            ==========================================================
+            */
+
+            $employees = $totalActiveEmployees;
+
+            foreach ($employees as $employee) {
+
+                $salary = $this->calculateEmployeeSalary(
+                    $employee,
+                    $currentMonth,
+                    $fy
+                );
+
+                $grossSalary += $salary['gross_salary'];
+                $netSalary += $salary['net_salary'];
+                $pfLiability += $salary['pf'];
+                $esiLiability += $salary['esi'];
+                $ptLiability += $salary['pt'];
+                $tdsLiability += $salary['tds'];
+                $lwfLiability += $salary['lwf'];
+                $lopTotal += $salary['lop'];
+
+                $unpaid++;
+            }
+
+        }
+
+        $totalActiveEmployees = count($totalActiveEmployees);
+        $totalGrossSalary = round($grossSalary, 2);
+        $totalNetSalary = round($netSalary, 2);
+        $totalPfLiability = round($pfLiability, 2);
+        $totalEsiLiability = round($esiLiability, 2);
+        $ptLiability = round($ptLiability, 2);
+        $totalLwfLiability = round($lwfLiability, 2);
+        $tdsLiability = round($tdsLiability, 2);
+
+
+        return response()->json([
+            'success' => true,
+
+            'total_active_employees' => $totalActiveEmployees,
+            'gross_salary'           => $totalGrossSalary,
+            'net_salary'             => $totalNetSalary,
+            'pf_liability'           => $totalPfLiability,
+            'esi_liability'          => $totalEsiLiability,
+            'pt_liability'           => $ptLiability,
+            'tds_liability'          => $tdsLiability,
+            'lwf_liability'          => $totalLwfLiability,
+            'lop_total'              => $lopTotal,
+            'paid'                   => $paid,
+            'unpaid'                 => $unpaid,
+
+            'previous_month'         => $previousMonth,
+            'previous_financial_year'=> $previousFY,
+        ]);
+    }
+
+    public function summary_bpk(Request $request)
     {
         $ownerId = currentOwnerId();
         $authUserId = auth()->id();
@@ -140,6 +322,308 @@ class PayrollReportController extends Controller
             'previous_month'        => $previousMonth,
             'previous_financial_year' => $previousFY,
         ]);
+    }
+
+    private function calculateEmployeeSalary($employee, $month, $financialYear)
+    {
+        $ownerId = currentOwnerId();
+
+        [$fyStart, $fyEnd] = explode('-', $financialYear);
+        $year = ($month >= 4) ? $fyStart : $fyEnd;
+
+        $firstDay = Carbon::create($year, $month, 1)->startOfMonth();
+        $lastDay  = $firstDay->copy()->endOfMonth();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Weekly Schedule
+        |--------------------------------------------------------------------------
+        */
+
+        $weeklySchedule = DB::table('weekly_schedules')
+            ->where('added_by', $ownerId)
+            ->get()
+            ->keyBy(function ($row) {
+                return strtolower($row->day);
+            });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Holidays
+        |--------------------------------------------------------------------------
+        */
+
+        $holidayDates = DB::table('holidays')
+            ->where('added_by', $ownerId)
+            ->whereBetween('holidayDate', [$firstDay, $lastDay])
+            ->pluck('holidayDate')
+            ->map(function ($d) {
+                return Carbon::parse($d)->format('Y-m-d');
+            })
+            ->toArray();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Attendance
+        |--------------------------------------------------------------------------
+        */
+
+        $attendance = DB::table('attendance')
+            ->where('userId', $employee->empId)
+            ->whereBetween('present_date', [$firstDay, $lastDay])
+            ->get();
+
+        $attendanceDates = [];
+        $lateCount = 0;
+        $earlyLogoutCount = 0;
+        $overtimeHours = 0;
+
+        foreach ($attendance as $record) {
+
+            $attendanceDates[] = Carbon::parse($record->present_date)->format('Y-m-d');
+
+            $dayName = strtolower(Carbon::parse($record->present_date)->format('l'));
+
+            $schedule = $weeklySchedule[$dayName] ?? null;
+
+            if (!$schedule || strtolower($schedule->status) != 'open') {
+                continue;
+            }
+
+            // Late
+            if (!empty($record->in_time)) {
+
+                $opening = Carbon::parse($record->present_date . ' ' . $schedule->opening_time);
+                $login   = Carbon::parse($record->present_date . ' ' . $record->in_time);
+
+                if ($login->gt($opening->copy()->addMinutes(5))) {
+                    $lateCount++;
+                }
+            }
+
+            // Early Logout
+            if (!empty($record->out_time)) {
+
+                $closing = Carbon::parse($record->present_date . ' ' . $schedule->closing_time);
+                $logout  = Carbon::parse($record->present_date . ' ' . $record->out_time);
+
+                if ($logout->lt($closing)) {
+                    $earlyLogoutCount++;
+                }
+
+                if ($logout->gt($closing)) {
+                    $overtimeHours += $closing->diffInMinutes($logout) / 60;
+                }
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Leave
+        |--------------------------------------------------------------------------
+        */
+
+        $approvedLeaves = DB::table('leaves')
+            ->where('employee_id', $employee->employee_id)
+            ->where('status', 'approved')
+            ->where(function ($q) use ($firstDay, $lastDay) {
+
+                $q->whereBetween('start_date', [$firstDay, $lastDay])
+                    ->orWhereBetween('end_date', [$firstDay, $lastDay])
+                    ->orWhere(function ($qq) use ($firstDay, $lastDay) {
+
+                        $qq->where('start_date', '<=', $firstDay)
+                            ->where('end_date', '>=', $lastDay);
+                    });
+            })
+            ->get();
+
+        $leaveDates = [];
+
+        foreach ($approvedLeaves as $leave) {
+
+            $period = new DatePeriod(
+                Carbon::parse($leave->start_date),
+                new DateInterval('P1D'),
+                Carbon::parse($leave->end_date)->addDay()
+            );
+
+            foreach ($period as $day) {
+                $leaveDates[] = $day->format('Y-m-d');
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Absent Days
+        |--------------------------------------------------------------------------
+        */
+
+        $absentDays = 0;
+
+        for ($date = $firstDay->copy(); $date->lte($lastDay); $date->addDay()) {
+
+            $currentDate = $date->format('Y-m-d');
+            $dayName = strtolower($date->format('l'));
+
+            if (!isset($weeklySchedule[$dayName]) || strtolower($weeklySchedule[$dayName]->status) != 'open') {
+                continue;
+            }
+
+            if (in_array($currentDate, $holidayDates)) {
+                continue;
+            }
+
+            if (in_array($currentDate, $leaveDates)) {
+                continue;
+            }
+
+            if (in_array($currentDate, $attendanceDates)) {
+                continue;
+            }
+
+            $absentDays++;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Salary Calculation
+        |--------------------------------------------------------------------------
+        */
+
+        $grossSalary = (float)$employee->total_addition;
+
+        $perDaySalary = round($grossSalary / 30, 2);
+
+        $lateDeductionDays = intdiv($lateCount, 3);
+
+        $earlyLogoutDeductionDays = intdiv($earlyLogoutCount, 3);
+
+        $lopDays = $absentDays + $lateDeductionDays + $earlyLogoutDeductionDays;
+
+        $lop = $perDaySalary * $lopDays;
+
+        $baseGross = $grossSalary - $lop;
+
+        $medicalAllowance = 1250;
+        $conveyance = 1600;
+
+        $basicSalary = $baseGross * 0.50;
+
+        $hra = $basicSalary * 0.50;
+
+        $specialAllowance = $baseGross - ($basicSalary + $hra + $medicalAllowance + $conveyance);
+
+        if ($specialAllowance < 0) {
+            $specialAllowance = 0;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PF
+        |--------------------------------------------------------------------------
+        */
+
+        $pf = 0;
+
+        if ($employee->epf_applicable) {
+            $pf = $basicSalary * 0.12;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | ESI
+        |--------------------------------------------------------------------------
+        */
+
+        $esi = 0;
+
+        if ($employee->esic_applicable && $baseGross <= 21000) {
+            $esi = $baseGross * 0.0075;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PT
+        |--------------------------------------------------------------------------
+        */
+
+        $pt = 0;
+
+        if ($employee->ptax_applicable) {
+
+            if ($baseGross > 10000 && $baseGross <= 15000)
+                $pt = 110;
+            elseif ($baseGross <= 25000)
+                $pt = 130;
+            elseif ($baseGross <= 40000)
+                $pt = 150;
+            elseif ($baseGross > 40000)
+                $pt = 200;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | TDS
+        |--------------------------------------------------------------------------
+        */
+
+        $tds = $employee->tds_applicable ? (float)$employee->tds : 0;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Loan
+        |--------------------------------------------------------------------------
+        */
+
+        $loan = (float)($employee->loan_deduction ?? 0);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Advance
+        |--------------------------------------------------------------------------
+        */
+
+        $advance = DB::table('expenses')
+            ->where('employee_id', $employee->empId)
+            ->whereYear('expense_date', $year)
+            ->whereMonth('expense_date', $month)
+            ->sum('expense_amt');
+
+        /*
+        |--------------------------------------------------------------------------
+        | LWF
+        |--------------------------------------------------------------------------
+        */
+
+        $lwf = $employee->lwf_applicable ? (float)$employee->lwf_deduct : 0;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Totals
+        |--------------------------------------------------------------------------
+        */
+
+        $totalEarnings = $basicSalary + $hra + $conveyance + $medicalAllowance + $specialAllowance;
+
+        $totalDeductions = $pf + $esi + $pt + $tds + $loan + $advance + $lwf + $lop;
+
+        $netSalary = $totalEarnings - ($pf + $esi + $pt + $tds + $loan + $advance + $lwf);
+
+        return [
+            'gross_salary' => round($basicSalary, 2), // Same as your stored payslip
+            'basic_salary' => round($basicSalary, 2),
+            'net_salary'   => round($netSalary, 2),
+            'pf'           => round($pf, 2),
+            'esi'          => round($esi, 2),
+            'pt'           => round($pt, 2),
+            'tds'          => round($tds, 2),
+            'lwf'          => round($lwf, 2),
+            'lop'          => round($lop, 2),
+            'total_deductions' => round($totalDeductions, 2),
+            'overtime_hours' => round($overtimeHours, 2),
+            'absent_days' => $absentDays,
+        ];
     }
 
     //------- Payroll Register Report -------//

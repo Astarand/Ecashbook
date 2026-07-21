@@ -1985,6 +1985,8 @@
         const today = new Date();
         const currentYear = today.getFullYear();
         const currentMonth = today.getMonth(); // 0=Jan
+        const previousMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const previousMonthName = previousMonthDate.toLocaleString('default', { month: 'long' });
 
         // Current FY
         let fyStartYear = (currentMonth >= 3) ? currentYear : currentYear - 1;
@@ -2002,26 +2004,27 @@
 
         // Populate months
         function loadMonths(selectedFY) {
-
             monthSelect.innerHTML = "";
+
+            const defaultMonth = selectedFY === `${fyStartYear}-${fyStartYear + 1}`
+                ? previousMonthName
+                : previousMonthName;
 
             fyMonths.forEach(month => {
                 let option = document.createElement("option");
                 option.value = month;
                 option.text = month;
 
-                // Default current month only for current FY
-                const currentMonthName = today.toLocaleString('default', { month: 'long' });
-
-                if (
-                    selectedFY === `${fyStartYear}-${fyStartYear + 1}` &&
-                    month === currentMonthName
-                ) {
+                if (month === defaultMonth) {
                     option.selected = true;
                 }
 
                 monthSelect.appendChild(option);
             });
+
+            if (monthSelect.querySelector(`option[value="${defaultMonth}"]`)) {
+                monthSelect.value = defaultMonth;
+            }
         }
 
         // Initial load
