@@ -43,6 +43,16 @@
                 </div>
 
                 <div class="card-body p-4">
+					<div class="alert alert-info mb-3" style="font-size:13px;">
+						<h6 class="mb-2">
+							<i class="ti ti-alert-circle me-1"></i>
+							Opening Balance Update Required
+						</h6>
+						<p class="mb-0">
+							Please update the <strong>Opening Balance</strong> in <strong>(Organization profile → Business details)</strong> before generating the report. An incorrect or missing opening balance may result in inaccurate financial reports.
+						</p>
+					</div>
+					
                     <form method="POST" name="frmTrialBalance" id="frmTrialBalance" action="javascript:void(0);">
                         <div class="row g-3">
 
@@ -71,7 +81,7 @@
                             </div>
 
                             <!-- LEDGER NAME (7 TYPES) -->
-                            <div class="col-md-3">
+                            <!--<div class="col-md-3">
                                 <label class="form-label fw-semibold text-muted">Ledger Name <span class="text-danger">*</span></label>
                                 <select class="form-select" name="ledger_name" id="ledger_name" required>
                                     <option value="all">All</option>
@@ -83,17 +93,29 @@
                                     <option value="gst_output">GST Output Ledger</option>
                                     <option value="gst_input">GST Input Ledger</option>
                                 </select>
-                            </div>
+                            </div>-->
+							<div class="col-md-3">
+								<label class="form-label fw-semibold text-muted">
+									Ledger Name
+								</label>
+
+								<input type="text"
+									   class="form-control"
+									   id="ledger_name"
+									   name="ledger_name"
+									   placeholder="Type Ledger Name...">
+							</div>
 							
 							<!-- LEDGER GROUP -->
                             <div class="col-md-3">
                                 <label class="form-label fw-semibold text-muted">Ledger Group</label>
                                 <select class="form-select" name="ledger_group" id="ledgerGroup">
                                     <option value="">Select Group</option>
-                                    <option value="assets">Assets</option>
-                                    <option value="liabilities">Liabilities</option>
-                                    <option value="income">Income</option>
-                                    <option value="expenses">Expenses</option>
+                                    <option value="Asset">Assets</option>
+									<option value="Liability">Liabilities</option>
+									<option value="Equity">Equity</option>
+									<option value="Income">Income</option>
+									<option value="Expense">Expenses</option>
                                 </select>
                             </div>
 
@@ -105,24 +127,22 @@
                                 </select>
                             </div>-->
 							
-							<!-- OPENING BALANCE -->
-							<div class="col-md-3">
-								<label class="form-label fw-semibold text-muted">Opening Balance (Dr.)</label>
-								<input type="number" step="0.01" value="{{ $openingDr }}" class="form-control" name="opening_balance_dr" id="opening_balance_dr">
-							</div>
-							<div class="col-md-3">
-								<label class="form-label fw-semibold text-muted">Opening Balance (Cr.)</label>
-								<input type="number" step="0.01" value="{{ $openingCr }}" class="form-control" name="opening_balance_cr" id="opening_balance_cr">
-							</div>
                         </div>
                         <div class="row g-3 mt-1">
-                            <!-- GENERATE BUTTON -->
-                            <div class="col-md-12 text-end">
+                            <div class="col-md-10 text-end">
                                 <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2" style="height: 41px;">
-                                    <i class="ti ti-settings f-18"></i> Generate Trial Balance Report
+                                    <i class="ti ti-settings f-18"></i> Generate Report
                                 </button>
                             </div>
+							<div class="col-md-2 text-end">
+								<button type="reset"
+										class="btn btn-outline-secondary flex-fill">
+									<i class="ti ti-refresh"></i>
+									Clear Filters
+								</button>
+							</div>
                         </div>
+						
                     </form>
                 </div>
             </div>
@@ -156,7 +176,7 @@
                             <!-- GROUP HEADERS -->
                             <thead>
                                 <tr style="text-align:center; font-weight:700; font-size: 0.9rem;">
-                                    <th colspan="3"
+                                    <th colspan="2"
                                         style="background: #eef2ff; color: #4f46e5; border: 1px solid #cbd5e1; padding: 10px;">
                                         Ledger Details
                                     </th>
@@ -180,8 +200,7 @@
                                 <!-- COLUMN HEADERS -->
                                 <tr style="text-align:center; font-weight:600; background: #fafafa; font-size: 0.85rem;">
                                     <th style="border: 1px solid #e2e8f0; color: #475569;">Ledger Group</th>
-                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Ledger Name</th>
-                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Sub Group</th>
+                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Ledger Name</th>                                    
 
                                     <th style="border: 1px solid #e2e8f0; color: #475569;">Opening Dr (₹)</th>
                                     <th style="border: 1px solid #e2e8f0; color: #475569;">Opening Cr (₹)</th>
@@ -190,7 +209,6 @@
                                     <th style="border: 1px solid #e2e8f0; color: #475569;">Closing Cr (₹)</th>
 
                                     <th style="border: 1px solid #e2e8f0; color: #475569;">Schedule III Head</th>
-                                    <th style="border: 1px solid #e2e8f0; color: #475569;">Report Type (BS / P&amp;L)</th>
                                 </tr>
                             </thead>
 
@@ -207,7 +225,7 @@
                             <!-- TOTAL FOOTER -->
                             <tfoot id="trialFooterData">
                                 <tr style="font-weight:700; background:#f8f9fa;">
-                                    <td colspan="5"
+                                    <td colspan="4"
                                         style="text-align:right; border: 1px solid #e2e8f0;">
                                         Total Closing Balance
                                     </td>
@@ -315,9 +333,25 @@
 }
 
 </style>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <!-- JAVASCRIPT -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
+
+	var ledgerList = @json($ledgers);
+
+	$("#ledger_name").autocomplete({
+		source: function(request, response) {
+
+			var results = $.ui.autocomplete.filter(ledgerList, request.term);
+
+			response(results.slice(0, 10)); // show max 10 items
+		},
+		minLength: 1
+	});
+
     function handleLedgerGroup() {
         const group = document.getElementById('ledgerGroup').value;
         const sub = document.getElementById('ledgerSubGroup');
@@ -372,14 +406,10 @@
 		let msg = '';
 
 		//let financial_year = $('#financial_year option:selected').val();
-		let opening_balance_dr = $('#opening_balance_dr').val();
-		let opening_balance_cr = $('#opening_balance_cr').val();
 		let fromDate = $('#from_date').val();
 		let toDate   = $('#to_date').val();
 		let ledgerName = $('#ledger_name option:selected').val();
 
-		opening_balance_dr = parseFloat(opening_balance_dr || 0);
-		opening_balance_cr = parseFloat(opening_balance_cr || 0);
 		if (ledgerName == "") {
 			msg = 'Please select ledger name';
 			isValid = false;
@@ -395,14 +425,6 @@
 		else if (fromDate > toDate) {
 			msg = 'From Date cannot be greater than To Date';
 			isValid = false;
-		}else if (opening_balance_dr < 0 || opening_balance_cr < 0) {
-			msg = 'Opening balance cannot be negative';
-			isValid = false;
-		}
-		else if (opening_balance_dr === 0 || opening_balance_cr === 0) {
-			// show modal & block submit
-			$('#openingBalanceModal').modal('show');
-			return false;
 		}
 
 		if (!isValid) {
@@ -472,15 +494,11 @@
 								<tr class="group-row group-${groupId}">
 									<td></td>
 									<td>${v.ledgername}</td>
-									<td>${formatText(subGroup)}</td>
-
 									<td class="text-end">${format(v.opening_dr)}</td>
 									<td class="text-end">${format(v.opening_cr)}</td>
 									<td class="text-end">${format(v.closing_dr)}</td>
 									<td class="text-end">${format(v.closing_cr)}</td>
-
 									<td>${formatText(subGroup)}</td>
-									<td>${getReportingType(group) }</td>
 								</tr>
 							`;
 						});

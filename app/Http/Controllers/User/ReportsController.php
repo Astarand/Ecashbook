@@ -65,6 +65,13 @@ class ReportsController extends Controller
 			$openingCr = $opening['opening_cr'];
 		}
 		//echo "<pre>";print_r($opening);exit;
+		
+		$ledgers = DB::table('journals')
+			->where('added_by', $userId)
+			->whereNotNull('ledger')
+			->distinct()
+			->pluck('ledger');
+			
 		$proprietorships = DB::table('proprietorship_profiles')
 						->select('id','comp_name')
 						->where('userId',$userId)
@@ -73,6 +80,7 @@ class ReportsController extends Controller
 				'openingDr' => $openingDr,
 				'openingCr' => $openingCr,
 				'proprietorships' => $proprietorships,
+				'ledgers' => $ledgers,
 				'req_type' => $req_type
 			]);
     }
@@ -135,12 +143,10 @@ class ReportsController extends Controller
 				->where('added_by', $userId)
 				->when($propId, fn($q) => $q->where('propId', $propId))
 				->whereBetween('journal_date', [$from, $to])
-				//->where('status','Posted')
 				->orderBy('journal_date')
 				->orderBy('id')
 				->where(function($q) {
 					$q->whereNull('rev_amend_status')
-					  //->orWhere('rev_amend_status', '!=', 'reverse');
 					  ->orWhere('rev_amend_status', '');
 				})
 				->get();
@@ -224,34 +230,59 @@ class ReportsController extends Controller
 	
 	private function getOpeningBalanceFromJournal($ledger, $userId, $fromDate, $propId)
 	{
-		// Step 1: Previous FY dates
-		//[$prevFrom, $prevTo] = $this->getPreviousFYRange($fromDate);
-		$rows = DB::table('journals')
-					->where('added_by',$userId)
-					->where('ledger',$ledger)
-					//->where('status','Posted')
-					->whereDate('journal_date','<',$fromDate)
-					->when($propId,function($q) use($propId){
-						$q->where('propId',$propId);
-					})
-					->where(function($q){
-						$q->whereNull('rev_amend_status')
-						  ->orWhere('rev_amend_status','');
-					})
-					->get();
+		//Company Opening Balance
+		$table = !empty($propId) ? 'proprietorship_profiles' : 'company_profiles';
 
-		$dr = 0;
-		$cr = 0;
+		$company = DB::table($table)
+			->when(!empty($propId), function ($q) use ($propId) {
+				$q->where('id', $propId);
+			}, function ($q) use ($userId) {
+				$q->where('userId', $userId);
+			})
+			->select(
+				'openingbalancecr',
+				'openingbalancedr'
+			)
+			->first();
+
+		$dr = (float)($company->openingbalancedr ?? 0);
+		$cr = (float)($company->openingbalancecr ?? 0);
+
+		//Journal Opening
+		$rows = DB::table('journals')
+			->where('added_by', $userId)
+			//->where('ledger', $ledger)
+			->whereDate('journal_date', '<', $fromDate)
+			->when($propId, function ($q) use ($propId) {
+				$q->where('propId', $propId);
+			})
+			->where(function ($q) {
+				$q->whereNull('rev_amend_status')
+				  ->orWhere('rev_amend_status', '');
+			})
+			->get();
+
 		foreach ($rows as $r) {
 			$value = $this->getTrialAmount($r);
-			if (strtolower($r->debit_credit) === 'debit') {
+			if (strtolower($r->debit_credit) == 'debit') {
 				$dr += $value;
 			} else {
 				$cr += $value;
 			}
 		}
 
-		return ['dr' => $dr, 'cr' => $cr];
+		//Return Net Opening
+		if ($dr > $cr) {
+			return [
+				'dr' => round($dr - $cr, 2),
+				'cr' => 0
+			];
+		}
+
+		return [
+			'dr' => 0,
+			'cr' => round($cr - $dr, 2)
+		];
 	}
 	
 	private function getLedgerGroup($row)
@@ -260,46 +291,57 @@ class ReportsController extends Controller
 		$source = strtolower(trim($row->source));
 		$entry  = strtolower(trim($row->entry_type));
 
-		// ================= GST =================
+		// GST
 		if (
 			str_contains($ledger, 'gst') ||
 			str_contains($ledger, 'cgst') ||
 			str_contains($ledger, 'sgst') ||
 			str_contains($ledger, 'igst')
 		) {
-			return 'Duties & Taxes';
+			return 'Liability';   // GST Payable
 		}
 
-		// ================= ASSETS =================
+		// Asset
 		if (
 			$source == 'asset' ||
 			str_contains($ledger, 'cash') ||
 			str_contains($ledger, 'bank')
 		) {
-			return 'Assets';
+			return 'Asset';
 		}
 
-		// ================= LIABILITIES =================
+		// Liability
 		if ($source == 'liability') {
-			return 'Liabilities';
+			return 'Liability';
 		}
 
-		// ================= SALES =================
+		// Equity
 		if (
-			str_contains($entry,'sales')
-			|| str_contains($ledger,'sales')
-			|| $source=='sales' || $source == 'income'
-		){
+			str_contains($ledger, 'capital') ||
+			str_contains($ledger, 'reserve') ||
+			str_contains($ledger, 'equity')
+		) {
+			return 'Equity';
+		}
+
+		// Income
+		if (
+			str_contains($entry, 'sales') ||
+			str_contains($ledger, 'sales') ||
+			$source == 'sales' ||
+			$source == 'income'
+		) {
 			return 'Income';
 		}
 
-		// ================= PURCHASE =================
+		// Expense
 		if (
-			str_contains($entry,'purchase')
-			|| str_contains($ledger,'purchase')
-			|| $source=='purchase' || $source == 'expense'
-		){
-			return 'Expenses';
+			str_contains($entry, 'purchase') ||
+			str_contains($ledger, 'purchase') ||
+			$source == 'purchase' ||
+			$source == 'expense'
+		) {
+			return 'Expense';
 		}
 
 		return 'Others';
@@ -876,14 +918,6 @@ class ReportsController extends Controller
 		$currentDate = Carbon::now()->toDateString(); // YYYY-MM-DD	
 		$propId = null;
 		$ledger = "";
-		$opening = $this->getOpeningBalanceFromJournal($ledger, $userId, $currentDate, $propId);
-		//echo "<pre>";print_r($opening);exit;
-		$openingDr = $opening['dr'];
-		$openingCr = $opening['cr'];
-		$openingBalance = $openingCr - $openingDr;
-		if($openingBalance == 0){
-			$openingBalance = $this->getOpeningBalance($userId);
-		}
 		$proprietorships = DB::table('proprietorship_profiles')
 						->select('id','comp_name')
 						->where('userId',$userId)
@@ -912,7 +946,6 @@ class ReportsController extends Controller
 			->pluck('party_name');
 			
 		return view('User.Reports.ledger')->with([
-				'openingBalance' => $openingBalance,
 				'proprietorships' => $proprietorships,
 				'customers' => $customers,
 				'vendors' => $vendors,
@@ -921,6 +954,49 @@ class ReportsController extends Controller
 				'req_type' => $req_type
 			]);
     }
+	
+	private function getLedgerOpeningBalance($propId, $userId, $from, $ledger, $ledgerGroup, $partyName, $custId, $vendId)
+	{
+		$previousDate = Carbon::parse($from)->subDay()->toDateString();
+
+		//Company Opening Balance
+		$company = DB::table(!empty($propId) ? 'proprietorship_profiles' : 'company_profiles')
+					->when(
+						!empty($propId),
+						fn($q) => $q->where('id', $propId),
+						fn($q) => $q->where('userId', $userId)
+					)
+					->select(
+						'opening_balance',
+						'openingbalancecr',
+						'openingbalancedr'
+					)
+					->first();
+
+		$openingBalance = (float)($company->opening_balance ?? 0);
+		$balance = $openingBalance;
+		//Journal Balance till Previous Date
+		$rows = $this->journalLedgerRows(
+			$propId,
+			$userId,
+			'1900-01-01',
+			$previousDate,
+			$ledger,
+			$ledgerGroup,
+			$partyName,
+			$custId,
+			$vendId
+		);
+
+		foreach ($rows as $row) {
+			$balance += ($row['credit'] - $row['debit']);
+		}
+
+		return [
+			'opening_balance' => abs(round($balance, 2)),
+			'dc' => $balance >= 0 ? 'Cr' : 'Dr'
+		];
+	}
 
 	public function ajaxLedgerData(Request $r)
 	{
@@ -940,12 +1016,13 @@ class ReportsController extends Controller
 		$partyName  = $r->party_name;
 		$ledger  	= $r->ledger_name;
 		$ledgerGroup  = $r->ledger_group;
-		$opening = (float)($r->opening_balance ?? 0);
-		$openingDC = $r->opening_dc ?? 'Cr';
 
-		// Opening signed balance
-		$balance = $openingDC === 'Dr' ? -$opening : $opening;
+		$openingData = $this->getLedgerOpeningBalance($propId, $userId, $from, $ledger, $ledgerGroup, $partyName, $custId, $vendId);
 
+		$opening   = $openingData['opening_balance'];
+		$openingDC = $openingData['dc'];
+
+		$balance = ($openingDC == 'Dr') ? -$opening : $opening;
 		$rows = $this->journalLedgerRows($propId,$userId,$from,$to,$ledger,$ledgerGroup,$partyName,$custId,$vendId);
 		//echo "<pre>";print_r($rows);exit;
 		/* -------- SORT DATE WISE -------- */
@@ -958,41 +1035,51 @@ class ReportsController extends Controller
 		$totalCr = 0;
 
 		foreach ($rows as &$row) {
-
 			$totalDr += $row['debit'];
 			$totalCr += $row['credit'];
-
-			// Core accounting formula
 			$balance += ($row['credit'] - $row['debit']);
-
-			$row['dc'] = $row['debit'];
 			$row['balance'] = ($balance);
 		}
 		unset($row);
 
 		return response()->json([
 			'rows'            => $rows,
-			'opening_balance' => round($opening, 2),
-			'closing'         => round($balance, 2),
-			'total_debit'     => round($totalDr, 2),
-			'total_credit'    => round($totalCr, 2),
-			'dc'              => $balance >= 0 ? 'Cr' : 'Dr'
+			'opening_balance' => round(abs($opening),2),
+			'opening_dc'      => $openingDC,
+			'closing'         => round(abs($balance),2),
+			'closing_dc'      => $balance >= 0 ? 'Cr' : 'Dr',
+			'total_debit'     => round($totalDr,2),
+			'total_credit'    => round($totalCr,2),
 		]);
 	}
 	
 	private function journalLedgerRows($propId, $userId, $from, $to, $ledger = null, $ledgerGroup = null, $partyName = null,$custId = null,$vendId = null)
 	{
 		$rows = [];
-
-		$query = DB::table('journals')
-			//->where('status', 'Posted')
-			->whereBetween('journal_date', [$from, $to]);
+			
+		$query = DB::table('journals as j')
+					->leftJoin('payment_vouchers as pv', function ($join) {
+						$join->on('pv.f_id', '=', 'j.autoId')
+							 ->on('pv.source', '=', 'j.entry_type')
+							 ->whereRaw('pv.id = (
+								 SELECT MAX(id)
+								 FROM payment_vouchers p2
+								 WHERE p2.f_id = j.autoId
+								 AND p2.source = j.entry_type
+							 )');
+					})
+					->whereBetween('j.journal_date', [$from, $to])
+					->select(
+						'j.*',
+						'pv.transaction_details',
+						'pv.voucher_type'
+					);
 
 		// ================= FILTER: PROP OR USER =================
 		if (!empty($propId)) {
-			$query->where('propId', $propId);
+			$query->where('j.propId', $propId);
 		} else {
-			$query->where('added_by', $userId);
+			$query->where('j.added_by', $userId);
 		}
 		// ================= FILTER: cutomer and vendor =================
 		if (!empty($custId)) {
@@ -1001,7 +1088,7 @@ class ReportsController extends Controller
 				->pluck('id')
 				->toArray();
 
-			$query->where('entry_type', 'Sales')
+			$query->where('j.entry_type', 'Sales')
 				  ->whereIn('autoId', $ids);
 		}
 
@@ -1029,11 +1116,11 @@ class ReportsController extends Controller
 			$allIds = array_merge($purchaseIds, $expenseIds, $assetIds);
 
 			$query->where(function ($q) {
-				$q->where('entry_type', 'Purchase')
-				  ->orWhere('entry_type', 'Expense')
-				  ->orWhere('entry_type', 'Asset');
+				$q->where('j.entry_type', 'Purchase')
+				  ->orWhere('j.entry_type', 'Expense')
+				  ->orWhere('j.entry_type', 'Asset');
 			})
-			->whereIn('autoId', $allIds);
+			->whereIn('j.autoId', $allIds);
 		}
 		
 		/*
@@ -1043,69 +1130,23 @@ class ReportsController extends Controller
 		*/
 
 		if (!empty($partyName)) {
-			$query->where('party_name', $partyName);
+			$query->where('j.party_name', $partyName);
 		}
 
 		// ================= FILTER: LEDGER TYPE =================
-		if (!empty($ledger) && $ledger != 'all') {
-
-			switch ($ledger) {
-
-				case 'Sales':
-					$query->where('ledger', 'Sales');
-					break;
-
-				case 'Purchase':
-					$query->where('ledger', 'Purchase');
-					break;
-
-				case 'Customer':
-					$query->where('party_name', 'Customer');
-					break;
-
-				case 'Vendor':
-					$query->where('party_name', 'Vendor');
-					break;
-
-				case 'Bank':
-					$query->where(function ($q) {
-						$q->where('party_name', 'Bank')
-						  ->orWhere('ledger', 'LIKE', '%Bank%');
-					});
-					break;
-
-				case 'gst_output':
-					$query->whereIn('ledger', [
-						'Output CGST',
-						'Output SGST',
-						'Output IGST'
-					]);
-					break;
-
-				case 'gst_input':
-					$query->whereIn('ledger', [
-						'Input CGST',
-						'Input SGST',
-						'Input IGST'
-					]);
-					break;
-			}
+		if (!empty($ledger)) {
+			$query->where(function ($q) use ($ledger) {
+				$q->where('j.ledger', $ledger)
+				  ->orWhere('j.party_name', $ledger);
+			});
 		}
 
 		// ================= FILTER: LEDGER GROUP =================
 		if (!empty($ledgerGroup)) {
-			if ($ledgerGroup === 'assets') {
-				$query->where('entry_type', 'Asset');
-			} elseif ($ledgerGroup === 'liabilities') {
-				$query->where('entry_type', 'Liability');
-			} elseif ($ledgerGroup === 'income') {
-				$query->where('entry_type', 'Income');
-			} elseif ($ledgerGroup === 'expenses') {
-				$query->where('entry_type', 'Expense');
-			}
+			$query->where('j.entry_type', $ledgerGroup);
 		}
 
-		$journals = $query->orderBy('journal_date', 'desc')->get();
+		$journals = $query->orderBy('j.journal_date', 'desc')->get();
 		$grouped = $journals->groupBy(function ($item) {
 			return $item->reference_no.'_'.$item->entry_type.'_'.$item->autoId;
 		});
@@ -1159,9 +1200,11 @@ class ReportsController extends Controller
 
 			$rows[] = [
 				'date'=>$first->journal_date,
+				'journal_no'=>$first->journal_no ?? '-',
 				'voucher'=>$first->reference_no ?? '-',
-				'type'=>$first->entry_type ?? '',
+				'type'=>$first->voucher_type ?? '',
 				'source'=>$first->source ?? '-',
+				'transaction_details'=>$first->transaction_details ?? '-',
 				'ledgername' => $first->ledger ?? '',
 				'counter' => $first->party_name ?? $first->ledger ?? '-',
 				'debit_ledger'=>$debitLedger,
@@ -1173,7 +1216,8 @@ class ReportsController extends Controller
 				'debit'=>$debit,
 				'credit'=>$credit,
 				'balance'=>0,
-				'payment_status'=>$first->payment_status ?? ''
+				'payment_status'=>$first->payment_status ?? '',
+				'status'=>$first->status ?? ''
 			];
 		}
 		
@@ -1365,8 +1409,8 @@ class ReportsController extends Controller
 	
 	public function getPreviousFYOpeningBalance_cashflow($propId, $userId, $fromDate, $paymentMode = 'all',$bankId = null)
 	{
-		//$openingDate = Carbon::parse($fromDate)->subDay()->toDateString();
-		$openingDate = $fromDate;
+		$openingDate = Carbon::parse($fromDate)->subDay()->toDateString();
+		//$openingDate = $fromDate;
 
 		/*
 		|--------------------------------------------------------------------------
@@ -1451,7 +1495,7 @@ class ReportsController extends Controller
 			];
 		}
 		// Bank selected -> Bank only
-		if (!empty($bankId)) {
+		if ($paymentMode == 'bank' || !empty($bankId)) {
 
 			$bankVoucher = clone $voucherQuery;
 
@@ -1544,11 +1588,6 @@ class ReportsController extends Controller
 		$previousDate = Carbon::now()->subDay()->toDateString();
 		$paymentMode = 'all';
 		$bankId = null;
-		$openingBalance = $this->getPreviousFYOpeningBalance_cashflow($propId, $userId, $previousDate,$paymentMode,$bankId);
-		$openingCash  = $openingBalance['cash'];
-		$openingBank  = $openingBalance['bank'];
-		$openingTotal = $openingBalance['total'];
-		//echo "<pre>";print_r($opening);exit;
 		$bankDetails = DB::table('banks')
 					->select('id', 'bank_name')
 					->where('added_by', $userId)
@@ -1559,8 +1598,6 @@ class ReportsController extends Controller
 						->where('userId',$userId)
 						->get();
 		return view('User.Reports.cashflow')->with([
-				'openingCash' => $openingCash,
-				'openingBank' => $openingBank,
 				'bankDetails' => $bankDetails,
 				'proprietorships' => $proprietorships
 			]);
@@ -1583,7 +1620,7 @@ class ReportsController extends Controller
 		$cashflowType = strtolower($r->cashflow_type ?? 'all');
 		$voucherType  = strtolower($r->voucher_type ?? 'all');
 		$paymentMode  = strtolower($r->payment_mode ?? 'all');
-		$bankId = $r->bank_id;
+		$bankId = $r->bank_id ?? '';
 
 		$openingData = $this->getPreviousFYOpeningBalance_cashflow(
 			$propId,
@@ -1596,6 +1633,9 @@ class ReportsController extends Controller
 		$openingCash = $openingData['cash'];
 		$openingBank = $openingData['bank'];
 		$opening = $openingCash + $openingBank;
+		// Initialize closing balances
+		$closingCash = $openingCash;
+		$closingBank = $openingBank;
 
 		$query = DB::table('payment_vouchers as pv')
 					->leftJoin('banks as b', 'b.id', '=', 'pv.bank_id')
@@ -1616,23 +1656,15 @@ class ReportsController extends Controller
 				$query->where('pv.voucher_type','Receipt Voucher');
 			}
 		}
-		
-		if ($paymentMode == 'Cash') {
-			$query->where('pv.payment_mode', 'Cash');
-		}
-		elseif (!empty($bankId)) {
-			$query->where('pv.bank_id', $bankId);
-		}
-		
+
 		if (!empty($bankId)) {
-			// Selected bank only
-			$query->whereIn('pv.payment_mode',['Bank','UPI'])
-				  ->where('pv.bank_id',$bankId);
+			$query->whereIn('pv.payment_mode', ['Bank', 'UPI'])
+				  ->where('pv.bank_id', $bankId);
+		} elseif ($paymentMode == 'cash') {
+			$query->where('pv.payment_mode', 'Cash');
+		} elseif ($paymentMode == 'bank') {
+			$query->whereIn('pv.payment_mode', ['Bank', 'UPI']);
 		}
-		elseif ($paymentMode == 'cash') {
-			// Cash only
-			$query->where('pv.payment_mode','Cash');
-		}		
 
 		$transactions = $query
 			->orderBy('date')
@@ -1673,15 +1705,30 @@ class ReportsController extends Controller
 			}else{
 				$outflow=$amount;
 			}
+			// Calculate closing Cash / Bank separately
+			if (strtolower($t->voucher_type) == 'receipt voucher') {
+				if (strtolower($t->payment_mode) == 'cash') {
+					$closingCash += $amount;
+				} else {
+					$closingBank += $amount;
+				}
+			} else {
+				if (strtolower($t->payment_mode) == 'cash') {
+					$closingCash -= $amount;
+				} else {
+					$closingBank -= $amount;
+				}
+			}
 
 			$rows[]=[
 				'date'=>$t->date,
 				'voucher_no'=>$t->voucher_no,
 				'voucher_type'=>$t->voucher_type,
+				'transaction_details'=>$t->transaction_details ?? '',
 				'activity'=>$activity,
 				'source'=>$t->source,
 				'party'=>$t->party_name,
-				'ledger'=> $t->payment_mode == 'Cash'? 'Cash': ($t->bank_name ?? 'Bank'),
+				'ledger'=> $t->payment_mode == 'Cash'? 'Cash': ($t->bank_name ?? 'UPI'),
 				'mode'=>$t->payment_mode,
 				'narration'=>$t->narration,
 				'inflow'=>$inflow,
@@ -1691,13 +1738,11 @@ class ReportsController extends Controller
 			];
 		}
 
-		usort($rows,function($a,$b){
-
-			if($a['date']==$b['date']){
-				return strcmp($b['voucher_no'],$a['voucher_no']);
+		usort($rows, function ($a, $b) {
+			if ($a['date'] == $b['date']) {
+				return strcmp($a['voucher_no'], $b['voucher_no']);
 			}
-
-			return strtotime($b['date']) <=> strtotime($a['date']);
+			return strtotime($a['date']) <=> strtotime($b['date']);
 		});
 
 		$balance=$opening;
@@ -1715,14 +1760,19 @@ class ReportsController extends Controller
 		}
 		unset($row);
 		$closingBalance = $opening + $totalIn - $totalOut;
-
+		
 		return response()->json([
-			'rows'		=>$rows,
-			'opening'	=>round($opening,2),
-			'closing'   => round($closingBalance, 2),
-			'total_in'	=>round($totalIn,2),
-			'total_out'	=>round($totalOut,2)
+			'rows'           => $rows,
+			'opening'        => round($opening, 2),
+			'opening_cash'   => round($openingCash, 2),
+			'opening_bank'   => round($openingBank, 2),
+			'closing'        => round($closingBalance, 2),
+			'closing_cash'   => round($closingCash, 2),
+			'closing_bank'   => round($closingBank, 2),
+			'total_in'       => round($totalIn, 2),
+			'total_out'      => round($totalOut, 2)
 		]);
+
 	}
 	
 	private function resolveLedgerType($mode)

@@ -115,7 +115,7 @@
 								<option value="UPI">UPI</option>														
 							</select>
 						</div>
-						<div class="col-md-3 mb-3">
+						<div class="col-md-3 mb-3" id="bank_div">
 							<div class="form-group">
 								<label class="form-label">Select Bank</label>
 								<select name="bank_id" id="bank_id" class="form-control">

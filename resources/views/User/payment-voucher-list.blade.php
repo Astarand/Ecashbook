@@ -485,19 +485,23 @@
 						</div>
 
                         <div class="col-md-6 mb-2">
-                            <label class="form-label">Purpose of Transaction <span class="text-danger">*</span></label>
+                            <label class="form-label">Transaction Type <span class="text-danger">*</span></label>
                             <select name="transaction_details" id="transaction_details" class="form-select">
-                                <option value="" selected>Please Select</option>
-                                <option value="Against Invoice">Against Invoice</option>
-                                <option value="Advance">Advance</option>
-                                <option value="Adjustment">Payment Adjustment</option>
-                                <option value="Direct Expense">Direct Expense</option>
-                                <option value="Salary Payment">Salary Payment</option>
-                                <option value="Loan Payment">Loan Payment</option>
-                                <option value="Tax Payment">Tax Payment</option>
-                                <option value="Contra Transfer">Contra Transfer</option>
-                                <option value="Opening Balance">Opening Balance</option>
-                                <option value="Other">Other</option>
+								<option value="" selected>Please Select</option>
+								<option value="Against Invoice">Against Invoice</option>
+								<option value="Advance Payment">Advance Payment</option>
+								<option value="Expense Payment">Expense Payment</option>
+								<option value="Income Receipt">Income Receipt</option>
+								<option value="Salary Payment">Salary Payment</option>
+								<option value="Loan Transaction">Loan Transaction</option>
+								<option value="Tax Payment">Tax Payment</option>
+								<option value="Contra Transfer">Contra Transfer</option>
+								<option value="Asset Transaction">Asset Transaction</option>
+								<option value="Opening Balance">Opening Balance</option>
+								<option value="Adjustment Entry">Adjustment Entry</option>
+								<option value="Refund Amount">Refund Amount</option>
+								<option value="Investment">Investment</option>
+								<option value="Other">Other</option>
                             </select>
                         </div>
 

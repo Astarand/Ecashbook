@@ -138,11 +138,11 @@ class PaymentVoucherService
 					$transactionDetails = '';
 					if (($sales->due_amount ?? 0) <= 0)
 					{
-						$transactionDetails = 'Adjustment';
+						$transactionDetails = 'Against Invoice';
 					}
 					else
 					{
-						$transactionDetails = 'Advance';
+						$transactionDetails = 'Advance Payment';
 					}
 					$creditDebit = 'Credit';
 					$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $sales->mode_of_pay ?? null);
@@ -208,11 +208,11 @@ class PaymentVoucherService
 					$transactionDetails = '';
 					if (($sales->due_amount ?? 0) <= 0)
 					{
-						$transactionDetails = 'Adjustment';
+						$transactionDetails = 'Against Invoice';
 					}
 					else
 					{
-						$transactionDetails = 'Advance';
+						$transactionDetails = 'Advance Payment';
 					}
 					$creditDebit = 'Credit';
 					$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $sales->mode_of_pay ?? null);
@@ -276,11 +276,11 @@ class PaymentVoucherService
 				$transactionDetails = '';
 				if (($purchase->due_amount ?? 0) <= 0)
 				{
-					$transactionDetails = 'Adjustment';
+					$transactionDetails = 'Against Invoice';
 				}
 				else
 				{
-					$transactionDetails = 'Advance';
+					$transactionDetails = 'Advance Payment';
 				}
 				$creditDebit = 'Debit';
 				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $purchase->mode_of_pay ?? null);
@@ -358,11 +358,11 @@ class PaymentVoucherService
 				$amount = $currentPayment;
 				$transactionDetails = '';
 				if (strtolower($expense->payment_status) == 'full') {
-					$transactionDetails = 'Adjustment';
+					$transactionDetails = 'Expense Payment';
 				} else if (strtolower($expense->payment_status) == 'advance') {
-					$transactionDetails = 'Advance';
+					$transactionDetails = 'Advance Payment';
 				}else{	
-					$transactionDetails = 'Due';
+					$transactionDetails = 'Against Invoice';
 				}
 				
 				if ($expense->payment_status == 'due') {
@@ -432,6 +432,13 @@ class PaymentVoucherService
 				// ==========================================
 				$amount = $currentPayment;
 				$transactionDetails = '';
+				if (strtolower($income->pay_status) == 'full') {
+					$transactionDetails = 'Income Receipt';
+				} elseif (strtolower($income->pay_status) == 'advance') {
+					$transactionDetails = 'Advance Payment';
+				} else {
+					$transactionDetails = 'Against Invoice';
+				}
 				
 				$addFlag = $data['addFlag'] ?? 0;
 				if ($addFlag == 1 && $income->pay_status == 'Due') {
@@ -542,6 +549,13 @@ class PaymentVoucherService
 				}
 
 				$transactionDetails = '';
+				if ($paymentStatus == 'full') {
+					$transactionDetails = 'Asset Transaction';
+				} elseif ($paymentStatus == 'advance') {
+					$transactionDetails = 'Advance Payment';
+				} else {
+					$transactionDetails = 'Against Invoice';
+				}
 
 				$creditDebit = 'Debit';
 				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? null);
@@ -641,7 +655,7 @@ class PaymentVoucherService
 
 				$partyName = 'Liability Entry';
 
-				$transactionDetails = 'Adjustment';
+				$transactionDetails = 'Adjustment Entry';
 
 				$creditDebit = 'Credit';
 
@@ -681,15 +695,39 @@ class PaymentVoucherService
 					// TRANSACTION DETAILS
 					// ----------------------------------------
 
-					if (
-						!empty($liability->advamorecd)
-						||
-						!empty($liability->stl_amount_received)
-					) {
-						$transactionDetails = 'Advance';
-					}
-					else {
-						$transactionDetails = 'Adjustment';
+					switch ($currentType) {
+
+						case 'trade_payables':
+							$transactionDetails = 'Against Invoice';
+							break;
+
+						case 'advance_from_customer':
+							$transactionDetails = 'Advance Payment';
+							break;
+
+						case 'outstanding_expenses':
+							$transactionDetails = 'Expense Payment';
+							break;
+
+						case 'salary_payable':
+							$transactionDetails = 'Salary Payment';
+							break;
+
+						case 'gst_payable':
+						case 'tds_payable':
+						case 'pf_payable':
+						case 'esi_payable':
+							$transactionDetails = 'Tax Payment';
+							break;
+
+						case 'short_term_loans':
+						case 'interest_payable':
+							$transactionDetails = 'Loan Transaction';
+							break;
+
+						default:
+							$transactionDetails = 'Other';
+							break;
 					}
 
 					// ----------------------------------------
@@ -720,7 +758,33 @@ class PaymentVoucherService
 
 					$narration = $liability->liability_category ?? 'Non Current Liability';
 
-					$transactionDetails = 'Adjustment';
+					$currentType = strtolower($liability->liability_category ?? '');
+					switch ($currentType) {
+
+						case 'long_term_borrowings':
+							$transactionDetails = 'Loan Transaction';
+							break;
+
+						case 'deferred_tax_liabilities':
+							$transactionDetails = 'Tax Payment';
+							break;
+
+						case 'other_financial_liabilities':
+							$transactionDetails = 'Loan Transaction';
+							break;
+
+						case 'long_term_provisions':
+							$transactionDetails = 'Other';
+							break;
+
+						case 'other_non_current_liabilities':
+							$transactionDetails = 'Other';
+							break;
+
+						default:
+							$transactionDetails = 'Other';
+							break;
+					}
 
 					$paymentMode = 'Bank';
 				}
@@ -737,7 +801,7 @@ class PaymentVoucherService
 
 					$narration = 'Share Application Money';
 
-					$transactionDetails = 'Advance';
+					$transactionDetails = 'Investment';
 
 					$paymentMode = $this->getPaymentMode($liability->payment_mode ?? '');
 
@@ -758,18 +822,7 @@ class PaymentVoucherService
 						$liability->reserves_surplus_type ?? ''
 					);
 
-					if ($reserveType == 'dividend_declared') {
-
-						$transactionDetails = 'Dividend';
-					}
-					else if ($reserveType == 'transfer_to_reserve') {
-
-						$transactionDetails = 'Transfer';
-					}
-					else {
-
-						$transactionDetails = 'Capital';
-					}
+					$transactionDetails = 'Investment';
 
 					$paymentMode = 'Bank';
 
@@ -836,7 +889,7 @@ class PaymentVoucherService
 				$partyId            = null;
 				$partyName          = $journals->ledger;
 				$amount             = $journals->amount;
-				$transactionDetails = $journals->reference_type;
+				$transactionDetails = 'Adjustment Entry';
 				$creditDebit        = $journals->debit_credit;
 				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? null);
 				$referenceId        = $journals->reference_no;

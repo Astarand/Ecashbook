@@ -42,6 +42,16 @@
                 </div>
 
                 <div class="card-body">
+					<div class="alert alert-info mb-3" style="font-size:13px;">
+						<h6 class="mb-2">
+							<i class="ti ti-alert-circle me-1"></i>
+							Opening Balance Update Required
+						</h6>
+						<p class="mb-0">
+							Please update the <strong>Opening Balance</strong> in <strong>(Cash &amp; Banking → Bank Account Master)</strong> before generating the report. An incorrect or missing opening balance may result in inaccurate Cash Flow Statements and other financial reports.
+						</p>
+					</div>
+					
                     <form method="POST" name="frmCashFlow" id="frmCashFlow" action="javascript:void(0);">
                         <div class="row g-3">
 
@@ -120,17 +130,6 @@
                                 </select>
                             </div>                            
 
-                            <!-- OPENING CASH & BANK BALANCE -->                           
-							<div class="col-md-3">
-                                <label class="form-label">Opening Cash (₹)</label>
-                                <input type="number" step="0.01" readonly value="{{ $openingCash }}" class="form-control" name="opening_cash" id="opening_cash">
-                            </div>
-							
-							<div class="col-md-3">
-                                <label class="form-label">Opening Bank Balance (₹)</label>
-                                <input type="number" step="0.01" readonly value="{{ $openingBank }}" class="form-control" name="opening_bank" id="opening_bank">
-                            </div>
-
                             <!-- GENERATE BUTTON -->
                             <div class="col-md-12 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary w-100">
@@ -157,8 +156,8 @@
                                     <th style="border:1px solid #000;">Particulars</th>
                                     <th style="border:1px solid #000;">Voucher / Invoice No</th>
                                     <th style="border:1px solid #000;">Voucher Type</th>
-                                    <th style="border:1px solid #000;">Cashflow Type</th>
-                                    <th style="border:1px solid #000;">Mode of Payment</th>
+                                    <th style="border:1px solid #000;">Transaction Type</th>
+                                    <th style="border:1px solid #000;">Cash Flow Activity</th>
                                     <th style="border:1px solid #000;">Cash / Bank Ledger</th>
                                     <th style="border:1px solid #000;">Cash Inflow (₹)</th>
                                     <th style="border:1px solid #000;">Cash Outflow (₹)</th>
@@ -215,6 +214,44 @@
 							<button class="btn btn-sm btn-secondary ms-2" id="nextPage">Next</button>
 						</div>
 					</div>
+					
+					<div class="row mt-4" id="cashSummary" style="display:none;">
+						<div class="col-md-4 offset-md-8">
+							<table id="cashFlowSummary" class="table table-bordered">
+								<tbody>
+									<tr>
+										<th width="55%">Opening Cash</th>
+										<td class="text-end" id="sumOpeningCash">₹ 0.00</td>
+									</tr>
+									<tr>
+										<th>Opening Bank Balance</th>
+										<td class="text-end" id="sumOpeningBank">₹ 0.00</td>
+									</tr>
+									<tr>
+										<th>Total Cash Inflow</th>
+										<td class="text-end text-success fw-bold" id="sumCashIn">₹ 0.00</td>
+									</tr>
+									<tr>
+										<th>Total Cash Outflow</th>
+										<td class="text-end text-danger fw-bold" id="sumCashOut">₹ 0.00</td>
+									</tr>
+									<tr class="table-warning fw-bold">
+										<th>Net Cash Flow</th>
+										<td class="text-end" id="sumNetCash">₹ 0.00</td>
+									</tr>
+									<tr>
+										<th>Closing Cash</th>
+										<td class="text-end" id="sumClosingCash">₹ 0.00</td>
+									</tr>
+									<tr class="table-primary fw-bold">
+										<th>Closing Bank Balance</th>
+										<td class="text-end" id="sumClosingBank">₹ 0.00</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
                     <!-- ACTION BUTTONS -->
                     <div style="text-align:right; margin-top:12px;">
                         <button class="btn btn-primary btn-sm" onclick="exportCashFlowToExcel()">Download</button>
@@ -362,11 +399,6 @@
 		let voucher_type = $('#voucher_type option:selected').val();
 		let payment_mode = $('#payment_mode option:selected').val();
 		
-		let openingCash = parseFloat($('#opening_cash').val() || 0);
-		let openingBank = parseFloat($('#opening_bank').val() || 0);
-		let openingBalance = openingCash + openingBank;
-
-		openingBalance = parseFloat(openingBalance || 0);
 		if (cashflow_type == "") {
 			msg = 'Please select cashflow type';
 			isValid = false;
@@ -382,11 +414,6 @@
 		else if (fromDate > toDate) {
 			msg = 'From Date cannot be greater than To Date';
 			isValid = false;
-		}
-		else if (openingBalance === 0) {
-			// show modal & block submit
-			$('#openingBalanceModal').modal('show');
-			return false;
 		}
 
 		if (!isValid) {
@@ -421,8 +448,8 @@
 				<td>${formatText(r.party || '-')}</td>
 				<td>${r.voucher_no || '-'}</td>
 				<td>${r.voucher_type || '-'}</td>
+				<td>${r.transaction_details || '-'}</td>
 				<td>${r.activity || '-'}</td>
-				<td>${r.mode || '-'}</td>
 				<td>${r.ledger || '-'}</td>
 
 				<td class="text-success fw-bold text-end">
@@ -503,11 +530,45 @@
 				$('.cashOutFlow').text("₹ " + formatINR(res.total_out));
 
 				let net = res.closing;
+				$('.netCashFlow').text("₹ " + formatINR(net)).toggleClass('text-danger', net < 0).toggleClass('text-black', net >= 0);
+				
+				
+				// Opening balances
+				let openingCash = parseFloat(res.opening_cash) || 0;
+				let openingBank = parseFloat(res.opening_bank) || 0;
 
-				$('.netCashFlow')
-					.text("₹ " + formatINR(net))
-					.toggleClass('text-danger', net < 0)
-					.toggleClass('text-black', net >= 0);
+				// Totals
+				let totalIn  = parseFloat(res.total_in) || 0;
+				let totalOut = parseFloat(res.total_out) || 0;
+
+				// Net Cash Flow
+				let netCashFlow = totalIn - totalOut;
+
+				// Closing balances
+				let closingCash = openingCash;
+				let closingBank = openingBank;
+
+				if ($("#payment_mode").val() === "Cash") {
+					closingCash = openingCash + totalIn - totalOut;
+				}
+				else if ($("#payment_mode").val() === "Bank" || $("#payment_mode").val() === "UPI") {
+					closingBank = openingBank + totalIn - totalOut;
+				}
+				else {
+					// All
+					closingCash = openingCash;
+					closingBank = openingBank + netCashFlow;
+				}
+				
+				$("#sumOpeningCash").text("₹ " + formatINR(res.opening_cash));
+				$("#sumOpeningBank").text("₹ " + formatINR(res.opening_bank));
+				$("#sumCashIn").text("₹ " + formatINR(res.total_in));
+				$("#sumCashOut").text("₹ " + formatINR(res.total_out));
+				$("#sumNetCash").text("₹ " + formatINR(res.total_in - res.total_out));
+				$("#sumClosingCash").text("₹ " + formatINR(res.closing_cash));
+				$("#sumClosingBank").text("₹ " + formatINR(res.closing_bank));
+
+				$("#cashSummary").show();
 				
 			}
 		});

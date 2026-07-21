@@ -1,4 +1,38 @@
 "use strict";
+
+// Start bank show based on mode
+function toggleBank(select) {
+    const bankDiv = document.getElementById("bank_div");
+    const bankId = document.getElementById("bank_id");
+
+    if (!bankDiv) return;
+
+    // Hide by default
+    bankDiv.style.display = "none";
+
+    if (!select) return;
+
+    if (select.value === "Bank" || select.value === "UPI") {
+        bankDiv.style.display = "";
+    } else {
+        if (bankId) bankId.value = "";
+    }
+}
+
+function initBankToggle() {
+    const select = document.querySelector("#mode_of_pay, #mode_of_expense, #pay_mode");
+    toggleBank(select);
+}
+
+document.addEventListener("DOMContentLoaded", initBankToggle);
+
+document.addEventListener("change", function (e) {
+    if (["mode_of_pay", "mode_of_expense", "pay_mode"].includes(e.target.id)) {
+        toggleBank(e.target);
+    }
+});
+// End bank show based on mode
+
 // Password Show
 document.addEventListener("DOMContentLoaded", function () {
     const togglePasswordElements = document.querySelectorAll("#togglePassword");

@@ -232,7 +232,7 @@
 													</select>
 												</div>
 												
-												<div class="col-xl-4 mb-3">
+												<div class="col-xl-4 mb-3" id="bank_div">
 													<div class="form-group">
 														<label class="form-label">Select Bank</label>
 														<select name="bank_id" id="bank_id" class="form-control">

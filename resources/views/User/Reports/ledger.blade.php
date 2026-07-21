@@ -43,121 +43,16 @@
                 </div>
 
                 <div class="card-body p-4">
-                    {{-- <form method="POST" name="frmLedger" id="frmLedger" action="javascript:void(0);">
-                        <div class="row g-3">
-
-                            <div class="col-md-3">
-								<label class="form-label fw-semibold text-muted">Proprietorship Company</label>
-								<select name="propId" id="propId" class="form-select">
-									<option value="">{{ parentCompanyName() }}</option>
-									@foreach($proprietorships as $company)
-										<option value="{{ $company->id }}">
-											{{ $company->comp_name }}
-										</option>
-									@endforeach
-								</select>
-							</div>
-
-							<div class="col-md-3">
-								<label class="form-label fw-semibold text-muted">Customers <span class="text-danger">*</span></label>
-								<select class="form-select" name="custId" id="custId">
-									<option value="">All</option>
-									@foreach($customers as $c)
-										<option value="{{ $c->id }}">
-											{{ $c->cust_name }}
-										</option>
-									@endforeach
-								</select>
-							</div>
-							
-							<div class="col-md-3">
-								<label class="form-label fw-semibold text-muted">Vendors <span class="text-danger">*</span></label>
-								<select class="form-select" name="vendId" id="vendId">
-									<option value="">All</option>
-									@foreach($vendors as $v)
-										<option value="{{ $v->id }}">
-											{{ $v->vendor_name }}
-										</option>
-									@endforeach
-								</select>
-							</div>
-							
-							<div class="col-md-3">
-								<label class="form-label fw-semibold text-muted">Party Name <span class="text-danger">*</span></label>
-								<select class="form-select" name="party_name" id="party_name">
-									<option value="">All</option>
-
-									@foreach($parties as $party)
-										<option value="{{ $party }}">
-											{{ $party }}
-										</option>
-									@endforeach
-								</select>
-							</div>
-
-                            <!-- LEDGER NAME (7 TYPES) -->
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Ledger Name <span class="text-danger">*</span></label>
-                                <select class="form-select" name="ledger_name" id="ledger_name" required>
-                                    <option value="">Select Ledger</option>
-                                    <option value="all">General Entries</option>
-									<option value="sales">Sales Ledger</option>
-                                    <option value="purchase">Purchase Ledger</option>
-                                    <option value="customer">Customer Ledger</option>
-                                    <option value="supplier">Supplier Ledger</option>                                    
-                                    <option value="bank">Bank Ledger</option>
-                                    <option value="gst_output">GST Output Ledger</option>
-                                    <option value="gst_input">GST Input Ledger</option>
-                                </select>
-                            </div>
-
-                            <!-- LEDGER GROUP -->
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Ledger Group</label>
-                                <select class="form-select" name="ledger_group" id="ledgerGroup" onchange="handleLedgerGroup()" >
-                                    <option value="">Select Group</option>
-                                    <option value="assets">Assets</option>
-                                    <option value="liabilities">Liabilities</option>
-                                    <option value="income">Income</option>
-                                    <option value="expenses">Expenses</option>
-                                </select>
-                            </div>
-
-                            <!-- LEDGER SUB GROUP -->
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Ledger Sub Group</label>
-                                <select class="form-select" name="ledger_sub_group" id="ledgerSubGroup" disabled>
-                                    <option value="">Select Sub Group</option>
-                                </select>
-                            </div>
-
-                            <!-- OPENING BALANCE -->
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">Opening Balance (₹)</label>
-                                <input type="number" step="0.01" value="{{ $openingBalance }}" class="form-control" name="opening_balance"  id="opening_balance">
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mt-1">
-                            <!-- FROM DATE -->
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">From Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="from_date" id="from_date" required>
-                            </div>
-
-                            <!-- TO DATE -->
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold text-muted">To Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="to_date" id="to_date" required>
-                            </div>
-
-                            <div class="col-md-6 d-flex align-items-end justify-content-end gap-2">
-                                <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center gap-2" style="height: 41px; min-width: 200px;">
-                                    <i class="ti ti-settings f-18"></i> Generate Ledger Report
-                                </button>
-                            </div>
-                        </div>
-                    </form>--}}
+				
+					<div class="alert alert-info mb-3" style="font-size:13px;">
+						<h6 class="mb-2">
+							<i class="ti ti-alert-circle me-1"></i>
+							Opening Balance Update Required
+						</h6>
+						<p class="mb-0">
+							Please update the <strong>Opening Balance</strong> in <strong>(Organization profile → Business details)</strong> before generating the report. An incorrect or missing opening balance may result in inaccurate financial reports.
+						</p>
+					</div>
 					
 					<form method="POST" id="frmLedger" action="javascript:void(0);">
 						<div class="row g-3">
@@ -198,40 +93,19 @@
 									   required>
 							</div>
 
-							<!-- Ledger -->
+							<!-- Ledger -->							
 							<div class="col-md-3">
 								<label class="form-label fw-semibold text-muted">
-									Ledger Name <span class="text-danger">*</span>
+									Ledger Name
 								</label>
 
-								<select class="form-select"
-										name="ledger_name"
-										id="ledger_name"
-										required>
-
-									<option value="all">General Entries</option>
-									<option value="Sales">Sales Ledger</option>
-                                    <option value="Purchase">Purchase Ledger</option>
-                                    <option value="Customer">Customer Ledger</option>
-                                    <option value="Vendor">Supplier Ledger</option>                                    
-                                    <option value="Bank">Bank Ledger</option>
-                                    <option value="gst_output">GST Output Ledger</option>
-                                    <option value="gst_input">GST Input Ledger</option>
-
-								</select>
+								<input type="text"
+									   class="form-control"
+									   id="ledger_name"
+									   name="ledger_name"
+									   placeholder="Type Ledger Name...">
 							</div>
 							
-							<!-- Opening Balance -->
-							<div class="col-md-3">
-								<label class="form-label">Opening Balance (₹)</label>
-
-								<input type="number"
-									   step="0.01"
-									   class="form-control"
-									   name="opening_balance"
-									   id="opening_balance"
-									   value="{{ $openingBalance }}">
-							</div>
 						</div>
 
 						<!-- ================= Advanced Filters ================= -->
@@ -293,19 +167,19 @@
 									<label class="form-label">Ledger Group</label>
 									<select class="form-select"
 											name="ledger_group"
-											id="ledgerGroup"
-											onchange="handleLedgerGroup()">
+											id="ledgerGroup">
 
 										<option value="">Select Group</option>
-										<option value="assets">Assets</option>
-										<option value="liabilities">Liabilities</option>
-										<option value="income">Income</option>
-										<option value="expenses">Expenses</option>
+										<option value="Asset">Assets</option>
+										<option value="Liability">Liabilities</option>
+										<option value="Equity">Equity</option>
+										<option value="Income">Income</option>
+										<option value="Expense">Expenses</option>
 									</select>
 								</div>
 
 								<!-- Ledger Sub Group -->
-								<div class="col-md-3">
+								<!--<div class="col-md-3">
 									<label class="form-label">Ledger Sub Group</label>
 									<select class="form-select"
 											name="ledger_sub_group"
@@ -313,7 +187,7 @@
 											disabled>
 										<option value="">Select Sub Group</option>
 									</select>
-								</div>
+								</div>-->
 							</div>
 						</div>
 
@@ -361,10 +235,13 @@
                             <thead class="table-warning text-center">
                                 <tr>
                                     <th>Date</th>
-                                    <th>Voucher / Invoice No</th>
+                                    <th>Journal No</th>
+                                    <th>Voucher No</th>
                                     <th>Source</th>
                                     <th>Voucher Type</th>
+                                    <th>Transaction Type</th>
 									<th>Narration / Description</th>
+                                    <th>Ledger Name</th>
                                     <th>Counter Ledger</th>
                                     <!--<th>CGST (₹)</th>
                                     <th>SGST (₹)</th>
@@ -376,6 +253,7 @@
                                     <th>Credit (₹)</th>                                    
                                     <th>Running Balance (₹)</th>
 									<th>Payment Status</th>
+									<th>Posted By</th>
                                 </tr>
                             </thead>
 
@@ -467,9 +345,24 @@
 
 </div>
 
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
 <!-- JAVASCRIPT -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
+
+	var ledgerList = @json($ledgers);
+
+	$("#ledger_name").autocomplete({
+		source: function(request, response) {
+
+			var results = $.ui.autocomplete.filter(ledgerList, request.term);
+
+			response(results.slice(0, 10)); // show max 10 items
+		},
+		minLength: 1
+	});
 
 	function exportLedgerToExcel() {
 
@@ -625,12 +518,10 @@
 		let msg = '';
 
 		//let financial_year = $('#financial_year option:selected').val();
-		let opening_balance = $('#opening_balance').val();
 		let fromDate = $('#from_date').val();
 		let toDate   = $('#to_date').val();
 		let ledgerName = $('#ledger_name option:selected').val();
 
-		opening_balance = parseFloat(opening_balance || 0);
 		if (ledgerName == "") {
 			msg = 'Please select ledger name';
 			isValid = false;
@@ -646,11 +537,6 @@
 		else if (fromDate > toDate) {
 			msg = 'From Date cannot be greater than To Date';
 			isValid = false;
-		}
-		else if (opening_balance === 0) {
-			// show modal & block submit
-			$('#openingBalanceModal').modal('show');
-			return false;
 		}
 
 		if (!isValid) {
@@ -701,10 +587,13 @@
 			html += `
 			<tr>
 				<td>${formatDateDMY(r.date)}</td>
+				<td>${r.journal_no}</td>
 				<td>${r.voucher}</td>
 				<td>${r.source}</td>
 				<td>${r.type}</td>
+				<td>${r.transaction_details}</td>
 				<td>${r.narration}</td>
+				<td>${r.ledgername}</td>
 				<td>${r.counter}</td>
 				<!--<td>${formatINR(r.cgst)}</td>
 				<td>${formatINR(r.sgst)}</td>
@@ -716,6 +605,7 @@
 				<td>${formatINR(r.credit)}</td>				
 				<td>${formatINR(r.balance)}</td>
 				<td>${statusBadge}</td>
+				<td>${r.status}</td>
 			</tr>`;
 		});
 

@@ -740,7 +740,7 @@
                                     </div> --}}
 
 
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-6 mb-3" id="bank_div">
                                         <div class="form-group">
                                             <label>Select Bank <span class="text-danger">*</span></label>
                                             <select name="bank_id" id="bank_id" class="form-control">

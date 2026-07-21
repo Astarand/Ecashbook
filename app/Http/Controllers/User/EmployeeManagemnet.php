@@ -5014,7 +5014,7 @@ class EmployeeManagemnet extends Controller
 	public function getTdsSlabs()
 	{
 		$slabs = DB::table('tds_salary_slabs')
-					->where('tds_rule_id', 3)
+					->where('tds_rule_id', 67)
 					->orderBy('from_amount')
 					->get(['from_amount', 'to_amount', 'tax_rate']);
 
