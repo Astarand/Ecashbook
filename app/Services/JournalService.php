@@ -1788,5 +1788,199 @@ class JournalService
 			return false;
 		}
 	}
+	
+	// Settlement Journal
+	public function storeSettlementJournalEntries(array $data)
+	{
+		DB::beginTransaction();
+
+		try {
+
+			$userId = $data['added_by'];
+			$autoId = $data['autoId'];
+			$propId = $data['propId'] ?? null;
+			$date = $data['date'];
+			$refNo = $data['reference_no'];
+			$source = $data['source'] ?? 'Settlement';
+			$entryType = $data['entry_type'] ?? 'Settlement';
+			$moduleType = $data['module_type'] ?? '';
+			$amount = $data['amount'] ?? 0;
+			// Original Customer / Vendor
+			$party = $data['party_name'] ?? '';
+			// Third Party Settlement Ledger
+			$settlementLedger = $data['settlement_ledger'] ?? '';
+			// Settlement Reason
+			$reason = $data['settlement_reason'] ?? '';
+
+			// ================= JOURNAL NUMBER =================
+			$journalNo = $this->getJournalNo($autoId,$userId,$source);
+
+			// ================= COMMON DATA =================
+
+			$common = [
+
+				'journal_no' => $journalNo,
+				'added_by' => $userId,
+				'autoId' => $autoId,
+				'propId' => $propId,
+				'journal_date' => $date,
+				'reference_type' => 'New Ref',
+				'reference_no' => $refNo,
+				'entry_type' => $entryType,
+				'source' => $source,
+				'payment_status' => 'Full',
+				'tds_applicable' => 'no',
+				'tds_percent' => 0,
+				'tds_amt' => 0,
+				'tds_id' => null,
+				'hsn_sac_code' => null,
+				'status' => 'Posted',
+				'rev_amend_status' => null,
+			];
+
+			$entries = [];
+
+			if ($moduleType === 'Sales') {
+
+				// -------------------------------
+				// DEBIT
+				// Settlement Ledger
+				// -------------------------------
+
+				$entries[] = array_merge($common, [
+					'ledger' => $settlementLedger,
+					'party_name' => $party,
+					'debit_credit' => 'Debit',
+					'amount' => $amount,
+					'tot_amt' => $amount,
+					'notes' => $reason,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+
+
+				// -------------------------------
+				// CREDIT
+				// Trade Receivable
+				// -------------------------------
+
+				$entries[] = array_merge($common, [
+					'ledger' => 'Trade Receivable',
+					'party_name' => $party,
+					'debit_credit' => 'Credit',
+					'amount' => $amount,
+					'tot_amt' => $amount,
+					'notes' => $reason,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+			}
+			elseif ($moduleType === 'Purchase') {
+
+				// -------------------------------
+				// DEBIT
+				// Trade Payable
+				// -------------------------------
+
+				$entries[] = array_merge($common, [
+					'ledger' => 'Trade Payable',
+					'party_name' => $party,
+					'debit_credit' => 'Debit',
+					'amount' => $amount,
+					'tot_amt' => $amount,
+					'notes' => $reason,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+
+
+				// -------------------------------
+				// CREDIT
+				// Settlement Ledger
+				// -------------------------------
+
+				$entries[] = array_merge($common, [
+
+					'ledger' => $settlementLedger,
+					'party_name' => $party,
+					'debit_credit' => 'Credit',
+					'amount' => $amount,
+					'tot_amt' => $amount,
+					'notes' => $reason,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+			}
+			elseif ($moduleType === 'Expense') {
+
+				// -------------------------------
+				// DEBIT
+				// Expense Payable
+				// -------------------------------
+
+				$entries[] = array_merge($common, [
+
+					'ledger' => 'Expense Payable',
+					'party_name' => $party,
+					'debit_credit' => 'Debit',
+					'amount' => $amount,
+					'tot_amt' => $amount,
+					'notes' => $reason,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+
+
+				// -------------------------------
+				// CREDIT
+				// Settlement Ledger
+				// -------------------------------
+
+				$entries[] = array_merge($common, [
+
+					'ledger' => $settlementLedger,
+					'party_name' => $party,
+					'debit_credit' => 'Credit',
+					'amount' => $amount,
+					'tot_amt' => $amount,
+					'notes' => $reason,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+			}
+
+
+			// =====================================================
+			// INSERT JOURNAL
+			// =====================================================
+
+			if (!empty($entries)) {
+
+				$journalId = Journals::insert($entries);
+			}
+
+			DB::commit();
+
+			return true;
+
+
+		} catch (\Exception $e) {
+
+			DB::rollback();
+
+			\Log::error(
+				'Settlement Journal Error: ' .
+				$e->getMessage()
+			);
+
+			return false;
+		}
+	}
 
 }

@@ -555,7 +555,8 @@
                                 <option value="tds_payable" {{ ($subDetails->CurrentLiabilitiesType ?? '') == 'tds_payable' ? 'selected' : '' }}>TDS Payable</option>
                                 <option value="pf_payable" {{ ($subDetails->CurrentLiabilitiesType ?? '') == 'pf_payable' ? 'selected' : '' }}>PF Payable</option>
                                 <option value="esi_payable" {{ ($subDetails->CurrentLiabilitiesType ?? '') == 'esi_payable' ? 'selected' : '' }}>ESI Payable</option>
-                                <option value="short_term_loans" {{ ($subDetails->CurrentLiabilitiesType ?? '') == 'short_term_loans' ? 'selected' : '' }}>Short-term Loans</option>
+                                <option value="lwf_payable" {{ ($subDetails->CurrentLiabilitiesType ?? '') == 'lwf_payable' ? 'selected' : '' }}>LWF Payable</option>
+								<option value="short_term_loans" {{ ($subDetails->CurrentLiabilitiesType ?? '') == 'short_term_loans' ? 'selected' : '' }}>Short-term Loans</option>
                                 <option value="interest_payable" {{ ($subDetails->CurrentLiabilitiesType ?? '') == 'interest_payable' ? 'selected' : '' }}>Interest Payable</option>
                             </select>
                         </div>
@@ -681,6 +682,21 @@
                                 </div>
                             </div>
                         </div>
+						
+						{{-- LWF Payable --}}
+						<div id="clSection_lwf_payable" style="display:none;" class="col-xl-12">
+							<div class="row align-items-end">
+								<div class="col-xl-4 mb-3">
+									<label class="form-label">Amount <span class="text-danger">*</span></label>
+									<input type="number" value="{{ $subDetails->amount ?? '' }}" name="cl_amount_lwf_payable" id="cl_amount_lwf_payable" class="form-control" placeholder="Enter Amount">
+								</div>
+								<div class="col-xl-4 mb-3">
+									<a href="{{ url('/payroll-reports') }}" target="_blank" class="btn btn-outline-primary w-100">
+										<i class="ti ti-external-link me-1"></i> View Payroll Reports
+									</a>
+								</div>
+							</div>
+						</div>
 
                         {{-- Generic fields (for remaining types) --}}
                         <div id="genericClFields">
@@ -1300,7 +1316,7 @@
         // Simple payable types that only need amount + link button
         var simpleClTypes = [
             'trade_payables', 'advance_from_customer', 'outstanding_expenses',
-            'salary_payable', 'gst_payable', 'tds_payable', 'pf_payable', 'esi_payable'
+            'salary_payable', 'gst_payable', 'tds_payable', 'pf_payable', 'esi_payable', 'lwf_payable'
         ];
 
         function hideAllClSections() {
@@ -1364,6 +1380,11 @@
                         // TDS Payable
                         if (type == 'tds_payable') {
                             $('#cl_amount_tds_payable').val(response.amount);
+                        }
+						
+						// LWF Payable
+                        if (type == 'lwf_payable') {
+                            $('#cl_amount_lwf_payable').val(response.amount);
                         }
                     }
                 }

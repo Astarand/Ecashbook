@@ -132,11 +132,19 @@
                                             </li>
 											@endif
 											@if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
+											<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Third Party Settlement">
+												<a href="javascript:void(0);" title="Third Party Settlement"
+														class="btn btn-sm btn-warning settlement-btn"
+														data-module="Purchase"
+														data-id="{{ $sale->id }}">
+													<i class="ti ti-replace"></i>
+												</a>
+											</li>
                                             <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
                                                 <a href="javascript:void(0);" data-id="{{$sale->id}}" class="avtar avtar-xs btn-link-danger btn-pc-default delete-btn" data-bs-toggle="modal" data-bs-target="#delete_modal">
                                                     <i class="ti ti-trash f-18"></i>
                                                 </a>
-                                            </li>
+                                            </li>											
 											@endif
                                         </ul>
                                     </div>
@@ -182,6 +190,8 @@
         </div>
     </div>
 </div>
+
+	
 @endsection
 
 @section('page-script')

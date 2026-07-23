@@ -41,12 +41,56 @@
                                 <label class="form-label">Entity Type <span class="text-danger">*</span></label>
                                 <select class="form-control" name="entity_type" required>
                                     <option value="">-- Select Entity Type --</option>
-                                    <option value="Proprietorship" {{ isset($slab) && $slab->entity_type === 'Proprietorship' ? 'selected' : '' }}>Proprietorship</option>
+                                    <!--<option value="Proprietorship" {{ isset($slab) && $slab->entity_type === 'Proprietorship' ? 'selected' : '' }}>Proprietorship</option>
                                     <option value="LLP" {{ isset($slab) && $slab->entity_type === 'LLP' ? 'selected' : '' }}>LLP</option>
                                     <option value="Pvt Ltd" {{ isset($slab) && $slab->entity_type === 'Pvt Ltd' ? 'selected' : '' }}>Pvt Ltd</option>
                                     <option value="Public Ltd" {{ isset($slab) && $slab->entity_type === 'Public Ltd' ? 'selected' : '' }}>Public Ltd</option>
                                     <option value="HUF" {{ isset($slab) && $slab->entity_type === 'HUF' ? 'selected' : '' }}>HUF</option>
-                                    <option value="Partnership" {{ isset($slab) && $slab->entity_type === 'Partnership' ? 'selected' : '' }}>Partnership</option>
+                                    <option value="Partnership" {{ isset($slab) && $slab->entity_type === 'Partnership' ? 'selected' : '' }}>Partnership</option>-->
+									<option value="Proprietorship"
+										{{ isset($slab) && $slab->entity_type === 'Proprietorship' ? 'selected' : '' }}>
+										Proprietorship
+									</option>
+
+									<option value="Partnership"
+										{{ isset($slab) && $slab->entity_type === 'Partnership' ? 'selected' : '' }}>
+										Partnership
+									</option>
+
+									<option value="One person Company (OPC)"
+										{{ isset($slab) && $slab->entity_type === 'One person Company (OPC)' ? 'selected' : '' }}>
+										One person Company (OPC)
+									</option>
+
+									<option value="LLP Company"
+										{{ isset($slab) && $slab->entity_type === 'LLP Company' ? 'selected' : '' }}>
+										LLP Company
+									</option>
+
+									<option value="PVT Ltd Company"
+										{{ isset($slab) && $slab->entity_type === 'PVT Ltd Company' ? 'selected' : '' }}>
+										PVT Ltd Company
+									</option>
+
+									<option value="LTD Company"
+										{{ isset($slab) && $slab->entity_type === 'LTD Company' ? 'selected' : '' }}>
+										LTD Company
+									</option>
+
+									<option value="Section-8 Company"
+										{{ isset($slab) && $slab->entity_type === 'Section-8 Company' ? 'selected' : '' }}>
+										Section-8 Company
+									</option>
+
+									<option value="Society/Trust"
+										{{ isset($slab) && $slab->entity_type === 'Society/Trust' ? 'selected' : '' }}>
+										Society/Trust
+									</option>
+
+									<option value="Other"
+										{{ isset($slab) && $slab->entity_type === 'Other' ? 'selected' : '' }}>
+										Other
+									</option>
                                 </select>
                                 @error('entity_type') <small class="text-danger">{{ $message }}</small> @enderror
                             </div>
@@ -95,10 +139,44 @@
                                 <label class="form-label">Taxpayer Category <span class="text-danger">*</span></label>
                                 <select class="form-control" name="taxpayer_category" required>
                                     <option value="">-- Select Taxpayer Category --</option>
-                                    <option value="Individual" {{ isset($slab) && $slab->taxpayer_category === 'Individual' ? 'selected' : '' }}>Individual</option>
+                                    <!--<option value="Individual" {{ isset($slab) && $slab->taxpayer_category === 'Individual' ? 'selected' : '' }}>Individual</option>
                                     <option value="Firm" {{ isset($slab) && $slab->taxpayer_category === 'Firm' ? 'selected' : '' }}>Firm</option>
                                     <option value="Company" {{ isset($slab) && $slab->taxpayer_category === 'Company' ? 'selected' : '' }}>Company</option>
-                                    <option value="Others" {{ isset($slab) && $slab->taxpayer_category === 'Others' ? 'selected' : '' }}>Others</option>
+                                    <option value="Others" {{ isset($slab) && $slab->taxpayer_category === 'Others' ? 'selected' : '' }}>Others</option>-->
+									<option value="Individual"
+										{{ isset($slab) && $slab->taxpayer_category === 'Individual' ? 'selected' : '' }}>
+										Individual
+									</option>
+
+									<option value="HUF"
+										{{ isset($slab) && $slab->taxpayer_category === 'HUF' ? 'selected' : '' }}>
+										HUF
+									</option>
+
+									<option value="Partnership Firm"
+										{{ isset($slab) && $slab->taxpayer_category === 'Partnership Firm' ? 'selected' : '' }}>
+										Partnership Firm
+									</option>
+
+									<option value="LLP"
+										{{ isset($slab) && $slab->taxpayer_category === 'LLP' ? 'selected' : '' }}>
+										LLP
+									</option>
+
+									<option value="Domestic Company"
+										{{ isset($slab) && $slab->taxpayer_category === 'Domestic Company' ? 'selected' : '' }}>
+										Domestic Company
+									</option>
+
+									<option value="Trust / AOP"
+										{{ isset($slab) && $slab->taxpayer_category === 'Trust / AOP' ? 'selected' : '' }}>
+										Trust / AOP
+									</option>
+
+									<option value="Foreign Company"
+										{{ isset($slab) && $slab->taxpayer_category === 'Foreign Company' ? 'selected' : '' }}>
+										Foreign Company
+									</option>
                                 </select>
                                 @error('taxpayer_category') <small class="text-danger">{{ $message }}</small> @enderror
                             </div>
@@ -114,12 +192,38 @@
                             </div>
 
                             <!-- Income Slab To -->
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Income Slab To (₹) <span class="text-danger">*</span></label>
-                                <input type="number" step="0.01" class="form-control" name="income_slab_to" placeholder="Ending income" 
-                                    value="{{ isset($slab) ? $slab->income_slab_to : '' }}" required>
-                                @error('income_slab_to') <small class="text-danger">{{ $message }}</small> @enderror
-                            </div>
+							<div class="col-md-6 mb-3">
+								<label class="form-label">
+									Income Slab To (₹)
+								</label>
+
+								<div class="input-group">
+									<input type="number"
+										   step="0.01"
+										   class="form-control"
+										   name="income_slab_to"
+										   id="income_slab_to"
+										   placeholder="Ending income"
+										   value="{{ isset($slab) && $slab->income_slab_to !== null ? $slab->income_slab_to : '' }}">
+
+									<div class="input-group-text">
+										<input type="checkbox"
+											   class="form-check-input me-1"
+											   name="is_unlimited"
+											   id="is_unlimited"
+											   value="1"
+											   {{ isset($slab) && $slab->income_slab_to === null ? 'checked' : '' }}>
+
+										<label for="is_unlimited" class="mb-0">
+											Unlimited
+										</label>
+									</div>
+								</div>
+
+								@error('income_slab_to')
+									<small class="text-danger">{{ $message }}</small>
+								@enderror
+							</div>
 
                             <!-- Tax Rate -->
                             <div class="col-md-4 mb-3">
@@ -249,6 +353,20 @@
 </div>
 
 <script>
+
+$('#is_unlimited').on('change', function () {
+
+    if ($(this).is(':checked')) {
+        $('#income_slab_to')
+            .val('')
+            .prop('disabled', true);
+    } else {
+        $('#income_slab_to')
+            .prop('disabled', false);
+    }
+
+});
+
 const slabId = "{{ isset($slab) ? $slab->id : '' }}";
 const isEdit = slabId ? true : false;
 
@@ -378,6 +496,8 @@ document.getElementById('submitBtn').addEventListener('click', function() {
 
 // Client-side validation
 function validateForm() {
+    const isUnlimited = $('#is_unlimited').is(':checked');
+
     const requiredFields = {
         entity_type: 'Entity Type',
         company_type: 'Company Type',
@@ -386,26 +506,48 @@ function validateForm() {
         tax_regime: 'Tax Regime',
         taxpayer_category: 'Taxpayer Category',
         income_slab_from: 'Income Slab From',
-        income_slab_to: 'Income Slab To',
         tax_rate: 'Tax Rate'
     };
 
+    // Add Income Slab To only if Unlimited is NOT checked
+    if (!isUnlimited) {
+        requiredFields.income_slab_to = 'Income Slab To';
+    }
+
+    // Validate required fields
     for (let [field, label] of Object.entries(requiredFields)) {
         const element = document.querySelector(`[name="${field}"]`);
-        if (!element || !element.value) {
+
+        if (!element || !element.value.trim()) {
             showToast(`${label} is required`, 'error');
             element?.focus();
             return false;
         }
     }
 
-    // Validate numeric fields
-    const incomeSo = parseFloat(document.querySelector('[name="income_slab_from"]').value);
-    const incomeEnd = parseFloat(document.querySelector('[name="income_slab_to"]').value);
-    
-    if (incomeSo >= incomeEnd) {
-        showToast('Income Slab To must be greater than Income Slab From', 'error');
-        return false;
+    // Validate Income Slab To only when not unlimited
+    if (!isUnlimited) {
+
+        const incomeFrom = parseFloat(
+            document.querySelector('[name="income_slab_from"]').value
+        );
+
+        const incomeTo = parseFloat(
+            document.querySelector('[name="income_slab_to"]').value
+        );
+
+        if (isNaN(incomeFrom) || isNaN(incomeTo)) {
+            showToast('Please enter valid income slab values', 'error');
+            return false;
+        }
+
+        if (incomeTo <= incomeFrom) {
+            showToast(
+                'Income Slab To must be greater than Income Slab From',
+                'error'
+            );
+            return false;
+        }
     }
 
     return true;

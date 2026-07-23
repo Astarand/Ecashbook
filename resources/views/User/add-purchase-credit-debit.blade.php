@@ -61,7 +61,7 @@
 							<label class="form-label" for="InvoiceaddressType">Note Type<span class="text-danger">*</span></label>
 							<select class="form-control error" name="note_type" id="note_type" required>
 								<option>Select</option>
-								<option value="Credit">Credit</option>
+								<!--<option value="Credit">Credit</option>-->
 								<option value="Debit">Debit</option>
 							</select>
                     </div>

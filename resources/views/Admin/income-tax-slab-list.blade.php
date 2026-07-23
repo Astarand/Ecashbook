@@ -63,9 +63,14 @@
                                     <td>
                                         <small>{{ $slab->applicable_fy }} / {{ $slab->assessment_year }}</small>
                                     </td>
-                                    <td>
-                                        ₹{{ number_format($slab->income_slab_from, 0) }} - ₹{{ number_format($slab->income_slab_to, 0) }}
-                                    </td>
+									<td>
+										₹{{ number_format($slab->income_slab_from, 0) }}
+										-
+										{{ is_null($slab->income_slab_to) 
+											? 'Unlimited' 
+											: '₹' . number_format($slab->income_slab_to, 0) 
+										}}
+									</td>
                                     <td>
                                         <strong>{{ $slab->tax_rate }}%</strong>
                                         @if($slab->surcharge_rate > 0 || $slab->cess_rate > 0)

@@ -54,6 +54,7 @@ use App\Http\Controllers\User\CommonController;
 use App\Http\Controllers\User\PaymentVoucherController;
 use App\Http\Controllers\User\ChatController;
 use App\Http\Controllers\User\PayController;
+use App\Http\Controllers\User\SettlementController;
 use App\Http\Controllers\User\Reports\ProfitLossController;
 use App\Http\Controllers\User\Reports\BalanceSheetController;
 use App\Http\Controllers\User\DigitalSignedController;
@@ -1290,5 +1291,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/payroll/gratuity/list', [PayrollReportController::class, 'getGratuityList'])->name('payroll.gratuity.list');
 	
 	Route::post('/get-tds-rule-liab', [CommonController::class, 'getTdsRuleLiability'])->name('get.tds.rule');
+	Route::post('/settlement/store',[SettlementController::class, 'store'])->name('settlement.store');
+	Route::get('/settlement/ledgers',[SettlementController::class, 'getSettlementLedgers'])->name('settlement.ledgers');
 
 });

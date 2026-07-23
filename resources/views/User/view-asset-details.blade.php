@@ -82,7 +82,7 @@
                                                     <option value="">Select</option>
                                                     <option value="current" <?= ($asset->assetType == 'current')?'selected':'' ?> >Current Assets</option>
                                                     <option value="non-current" <?= ($asset->assetType == 'non-current')?'selected':'' ?>>Non Current Assets</option>
-													<option value="capex" <?= ($asset->assetType == 'capex')?'selected':'' ?>>Capital Expenditure (CapEx)</option>
+													
 												</select>
                                             </div>
                                             <!-- Current Assets Section -->

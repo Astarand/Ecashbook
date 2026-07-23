@@ -74,7 +74,7 @@
 						<select class="form-control" name="note_type" id="note_type" required>
 							<option value="">Select</option>
 							<option value="Credit">Credit</option>
-							<option value="Debit">Debit</option>
+							<!--<option value="Debit">Debit</option>-->
 						</select>
 					</div>
                 </div>

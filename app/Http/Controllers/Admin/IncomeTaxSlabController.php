@@ -42,7 +42,8 @@ class IncomeTaxSlabController extends Controller
             'tax_regime' => 'required|string|max:255',
             'taxpayer_category' => 'required|string|max:255',
             'income_slab_from' => 'required|numeric|min:0',
-            'income_slab_to' => 'required|numeric|min:0',
+            'income_slab_to' => 'required_unless:is_unlimited,1|nullable|numeric|min:0',
+			'is_unlimited'   => 'nullable|boolean',
             'tax_rate' => 'required|numeric|min:0|max:100',
             'surcharge_rate' => 'nullable|numeric|min:0|max:100',
             'cess_rate' => 'nullable|numeric|min:0|max:100',
@@ -66,7 +67,7 @@ class IncomeTaxSlabController extends Controller
 
         try {
             DB::beginTransaction();
-
+			$incomeSlabTo = $request->boolean('is_unlimited') ? null : $request->input('income_slab_to');
             IncomeTaxSlab::create([
                 'entity_type' => $request->entity_type,
                 'company_type' => $request->company_type,
@@ -75,7 +76,7 @@ class IncomeTaxSlabController extends Controller
                 'tax_regime' => $request->tax_regime,
                 'taxpayer_category' => $request->taxpayer_category,
                 'income_slab_from' => $request->income_slab_from,
-                'income_slab_to' => $request->income_slab_to,
+                'income_slab_to' => $incomeSlabTo,
                 'tax_rate' => $request->tax_rate,
                 'surcharge_rate' => $request->surcharge_rate ?? 0,
                 'cess_rate' => $request->cess_rate ?? 0,
@@ -127,7 +128,8 @@ class IncomeTaxSlabController extends Controller
             'tax_regime' => 'required|string|max:255',
             'taxpayer_category' => 'required|string|max:255',
             'income_slab_from' => 'required|numeric|min:0',
-            'income_slab_to' => 'required|numeric|min:0',
+            'income_slab_to' => 'required_unless:is_unlimited,1|nullable|numeric|min:0',
+			'is_unlimited'   => 'nullable|boolean',
             'tax_rate' => 'required|numeric|min:0|max:100',
             'surcharge_rate' => 'nullable|numeric|min:0|max:100',
             'cess_rate' => 'nullable|numeric|min:0|max:100',
@@ -153,6 +155,7 @@ class IncomeTaxSlabController extends Controller
             DB::beginTransaction();
 
             $slab = IncomeTaxSlab::findOrFail($id);
+			$incomeSlabTo = $request->boolean('is_unlimited') ? null : $request->input('income_slab_to');
             $slab->update([
                 'entity_type' => $request->entity_type,
                 'company_type' => $request->company_type,
@@ -161,7 +164,7 @@ class IncomeTaxSlabController extends Controller
                 'tax_regime' => $request->tax_regime,
                 'taxpayer_category' => $request->taxpayer_category,
                 'income_slab_from' => $request->income_slab_from,
-                'income_slab_to' => $request->income_slab_to,
+                'income_slab_to' => $incomeSlabTo,
                 'tax_rate' => $request->tax_rate,
                 'surcharge_rate' => $request->surcharge_rate ?? 0,
                 'cess_rate' => $request->cess_rate ?? 0,

@@ -85,8 +85,8 @@
                                                     <option value="">Select</option>
                                                     <option value="current">Current Assets</option>
                                                     <option value="non-current">Non Current Assets</option>
-													<option value="capex">Capital Expenditure (CapEx)</option>
-                                                   {{-- <option value="investment">Investment</option> --}}
+													{{--<option value="capex">Capital Expenditure (CapEx)</option> --}}
+                                                    {{-- <option value="investment">Investment</option> --}}
                                                 </select>
                                             </div>
                                             <!-- Current Assets Section -->

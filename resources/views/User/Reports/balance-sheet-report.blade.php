@@ -471,12 +471,12 @@
 							let labelMap = {
 								trade_payables: "Trade Payables",
 								advance_from_customer: "Advance from Customer",
-								outstanding_expenses: "Outstanding Expenses",
 								salary_payable: "Salary Payable",
 								gst_payable: "GST Payable",
 								tds_payable: "TDS Payable",
 								pf_payable: "PF Payable",
 								esi_payable: "ESI Payable",
+								lwf_payable: "LWF Payable",
 								short_term_loans: "Short-term Loans",
 								interest_payable: "Interest Payable",
 							};

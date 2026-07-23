@@ -521,6 +521,7 @@
                                         <option value="tds_payable">TDS Payable</option>
                                         <option value="pf_payable">PF Payable</option>
                                         <option value="esi_payable">ESI Payable</option>
+                                        <option value="lwf_payable">LWF Payable</option>
                                         <option value="short_term_loans">Short-term Loans</option>
                                         <option value="interest_payable">Interest Payable</option>
                                     </select>
@@ -643,6 +644,21 @@
                                         <div class="col-xl-4 mb-3">
                                             <a href="{{ url('/esi-management-list') }}" target="_blank" class="btn btn-outline-primary w-100">
                                                 <i class="ti ti-external-link me-1"></i> View ESI Management
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+								
+								{{-- LWF Payable --}}
+                                <div id="clSection_lwf_payable" style="display:none;" class="col-xl-12">
+                                    <div class="row align-items-end">
+                                        <div class="col-xl-4 mb-3">
+                                            <label class="form-label">Amount <span class="text-danger">*</span></label>
+                                            <input type="number" name="cl_amount_lwf_payable" id="cl_amount_lwf_payable" class="form-control" placeholder="Enter Amount">
+                                        </div>
+                                        <div class="col-xl-4 mb-3">
+                                            <a href="{{ url('/payroll-reports') }}" target="_blank" class="btn btn-outline-primary w-100">
+                                                <i class="ti ti-external-link me-1"></i> View Payroll Reports
                                             </a>
                                         </div>
                                     </div>
@@ -1470,7 +1486,7 @@
         // Simple payable types that only need amount + link button
         var simpleClTypes = [
             'trade_payables', 'advance_from_customer', 'outstanding_expenses',
-            'salary_payable', 'gst_payable', 'tds_payable', 'pf_payable', 'esi_payable'
+            'salary_payable', 'gst_payable', 'tds_payable', 'pf_payable', 'esi_payable', 'lwf_payable'
         ];
 
         function hideAllClSections() {
@@ -1533,6 +1549,11 @@
                         // TDS Payable
                         if (type == 'tds_payable') {
                             $('#cl_amount_tds_payable').val(response.amount);
+                        }
+						
+						// LWF Payable
+                        if (type == 'lwf_payable') {
+                            $('#cl_amount_lwf_payable').val(response.amount);
                         }
                     }
                 }

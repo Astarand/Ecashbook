@@ -3997,4 +3997,3 @@ function changeRatePo(el) {
 	});
 	//end upload pdf
 	
-	

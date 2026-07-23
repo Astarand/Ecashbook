@@ -19,63 +19,6 @@ class ProfitLossService
         
     }
 	
-		
-	public function getCurrentTax_old($userId, $startDate, $endDate, $pbt)
-	{
-		
-		//$fy = date('Y', strtotime($startDate)) . '-' . date('Y', strtotime($endDate));
-		$taxpayerCategory = 'HUF';
-		$taxRegime = 'New';
-		// 1. Profit Before Tax
-		$profitBeforeTax = $pbt;
-
-		// 2. Add disallowed expenses
-		$disallowedAmount = DB::table('expenses as e')
-			->join('tax_deduction_masters as t', function ($join) {
-				$join->on('e.expense_type', '=', 't.expense_head')
-					 ->where('t.tax_treatment', 'Disallowed')
-					 ->where('t.is_active', 1);
-			})
-			->sum('e.expense_amt');
-
-		// 3. Less allowable deductions
-		$allowableAmount = DB::table('expenses as e')
-			->join('tax_deduction_masters as t', function ($join) {
-				$join->on('e.expense_type', '=', 't.expense_head')
-					 ->where('t.tax_treatment', 'Fully Allowed')
-					 ->where('t.is_active', 1);
-			})
-			->sum('e.expense_amt');
-			
-		//echo "<pre>";print_r($allowableAmount); exit;
-
-		// 4. Taxable Income
-		$taxableIncome = ($profitBeforeTax + $disallowedAmount - $allowableAmount);
-
-		// 5. Get applicable slab
-		$slab = DB::table('income_tax_slabs')
-			->where('status', 1)
-			//->where('applicable_fy', $fy)
-			->where('taxpayer_category', $taxpayerCategory)
-			->where('tax_regime', $taxRegime)
-			->where('income_slab_from', '<=', $taxableIncome)
-			->where('income_slab_to', '>=', $taxableIncome)
-			->first();
-		//echo "<pre>";print_r($slab); exit;
-		if (!$slab) {
-			return 0;
-		}
-
-		// 6. Income Tax
-		$incomeTax = ($taxableIncome * $slab->tax_rate) / 100;
-		// Surcharge
-		$surcharge = ($incomeTax * $slab->surcharge_rate) / 100;
-		// Cess
-		$cess = (($incomeTax + $surcharge) * $slab->cess_rate) / 100;
-
-		return round($incomeTax + $surcharge + $cess, 2);
-	}
-	
 	public function getCurrentTax($userId, $startDate, $endDate, $pbt = 0)
 	{
 		$result = DB::table('expenses')
@@ -355,5 +298,472 @@ class ProfitLossService
 		
 		return $annual;
 	}
+	
+	public function calculatePL($startDate, $endDate, $userId, $period_type)
+	{
+		/* ================================
+		 | REVENUE – SALES & SERVICES
+		 ================================*/
+		$totalReseller = DB::table('sales as s')
+						->join('sales_values as sv', 'sv.sid', '=', 's.id')
+						->join('products as p', 'p.id', '=', 'sv.prod_id')
+						->where('s.status', 1)
+						->where('p.item_type', 'product')
+						->where('s.added_by', $userId)
+						->whereBetween('s.inv_date', [$startDate, $endDate])
+						->sum('sv.amount');
+		$totalService = DB::table('sales as s')
+						->join('sales_values as sv', 'sv.sid', '=', 's.id')
+						->join('products as p', 'p.id', '=', 'sv.prod_id')
+						->where('s.status', 1)
+						->where('p.item_type', 'service')
+						->where('s.added_by', $userId)
+						->whereBetween('s.inv_date', [$startDate, $endDate])
+						->sum('sv.amount');
+		
+		//Start Sales credit/debit
+		$invoiceType = DB::table('sales as s')
+						->join('sales_values as sv', 'sv.sid', '=', 's.id')
+						->join('products as p', 'p.id', '=', 'sv.prod_id')
+						->select(
+							's.inv_num',
+							DB::raw('MAX(p.item_type) as item_type')
+						)
+						->where('s.added_by', $userId)
+						->whereBetween('s.inv_date', [$startDate, $endDate])
+						->groupBy('s.inv_num');
+						
+		$voucherAdjustments = DB::table('vouchers as v')
+								->joinSub($invoiceType, 't', function ($join) {
+									$join->on('t.inv_num', '=', 'v.invoice_number');
+								})
+								->selectRaw("
+									t.item_type,
+
+									SUM(
+										CASE
+											WHEN v.note_type = 'Credit'
+											THEN COALESCE(v.total_amt, 0)
+												 - COALESCE(v.cgst_amount, 0)
+												 - COALESCE(v.sgst_amount, 0)
+												 - COALESCE(v.igst_amount, 0)
+											ELSE 0
+										END
+									) AS credit
+								")
+								->where('v.added_by', $userId)
+								->whereBetween('v.inv_date', [$startDate, $endDate])
+								->groupBy('t.item_type')
+								->get();
+		//End Sales credit/debit
+		$productCr = $serviceCr = 0;
+		foreach ($voucherAdjustments as $row) {
+			if ($row->item_type == 'product') {
+				$productCr = $row->credit;
+			} else {
+				$serviceCr = $row->credit;
+			}
+		}
+
+		$totalReseller = ($totalReseller - $productCr);
+		$totalService  = ($totalService - $serviceCr);
+		$profit_sale = $totalReseller + $totalService;
+
+		/* ================================
+		 | OTHER INCOME - TDS amount
+		 ================================*/			
+		$operatingIncomeDetails = DB::table('income')
+						->whereBetween('dateInput', [$startDate, $endDate])
+						->where('addBy', $userId)
+						->where('status', 1)
+						->where('incomeType', 'Revenue')
+						->select(
+							'categoryIncome',
+							DB::raw("SUM(amount) as total")
+						)
+						->groupBy('categoryIncome')
+						->get();
+
+		$nonOperatingIncomeDetails = DB::table('income')
+			->whereBetween('dateInput', [$startDate, $endDate])
+			->where('addBy', $userId)
+			->where('status', 1)
+			->where('incomeType', 'Other')
+			->select(
+				'categoryIncome',
+				DB::raw("SUM(amount) as total")
+			)
+			->groupBy('categoryIncome')
+			->get();
+						
+		/* ================================
+		| COST OF GOODS SOLD (COGS)
+		================================ */
+
+		/*
+		|--------------------------------------------------------------------------
+		| Opening Stock
+		|--------------------------------------------------------------------------
+		| Product Opening Qty × Purchase Price
+		*/
+		$openingStock = DB::table('products as p')
+					->leftJoinSub(
+						DB::table('purchase_values as pv')
+							->join('purchases as pur', 'pur.id', '=', 'pv.sid')
+							->where('pur.added_by', $userId)
+							->where('pur.status', 1)
+							->whereDate('pur.inv_date', '<', $startDate)
+							->groupBy('pv.prod_id')
+							->selectRaw('pv.prod_id, SUM(pv.quantity) as purchase_qty'),
+						'purchase_stock',
+						function ($join) {
+							$join->on('purchase_stock.prod_id', '=', 'p.id');
+						}
+					)
+					->leftJoinSub(
+						DB::table('sales_values as sv')
+							->join('sales as s', 's.id', '=', 'sv.sid')
+							->where('s.added_by', $userId)
+							->where('s.status', 1)
+							->whereDate('s.inv_date', '<', $startDate)
+							->groupBy('sv.prod_id')
+							->selectRaw('sv.prod_id, SUM(sv.quantity) as sold_qty'),
+						'sales_stock',
+						function ($join) {
+							$join->on('sales_stock.prod_id', '=', 'p.id');
+						}
+					)
+					->where('p.added_by', $userId)
+					->where('p.item_type', 'product')
+					->selectRaw("
+						SUM(
+							(
+								COALESCE(p.opening_stock_bal,0)
+								+ COALESCE(purchase_stock.purchase_qty,0)
+								- COALESCE(sales_stock.sold_qty,0)
+							) * COALESCE(p.purchase_price,0)
+						) as stock_value
+					")
+					->value('stock_value') ?? 0;
+
+		/*
+		|--------------------------------------------------------------------------
+		| Purchases
+		|--------------------------------------------------------------------------
+		*/
+		$itemTotal = DB::table('purchase_values as pv')
+						->join('purchases as p', 'p.id', '=', 'pv.sid')
+						->where('p.added_by', $userId)
+						->where('p.status', 1)
+						->whereBetween('p.inv_date', [$startDate, $endDate])
+						->sum('pv.amount');
+
+		$shippingTotal = DB::table('purchases')
+						->where('added_by', $userId)
+						->where('status', 1)
+						->whereBetween('inv_date', [$startDate, $endDate])
+						->sum('shipping_cost');
+		
+		//Start Purchase credit/debit
+		$purchaseInvoiceType = DB::table('purchases as p')
+						->join('purchase_values as pv', 'pv.sid', '=', 'p.id')
+						->join('products as pr', 'pr.id', '=', 'pv.prod_id')
+						->selectRaw('
+							p.inv_num,
+							MAX(pr.item_type) as item_type
+						')
+						->where('p.added_by', $userId)
+						->whereBetween('p.inv_date', [$startDate, $endDate])
+						->groupBy('p.id', 'p.inv_num');
+			
+		$purchaseVoucherAdjustments = DB::table('voucher_purchases as vp')
+								->joinSub($purchaseInvoiceType, 't', function ($join) {
+									$join->on('t.inv_num', '=', 'vp.inv_number');
+								})
+								->selectRaw("
+									t.item_type,
+
+									SUM(
+										CASE
+											WHEN vp.note_type = 'Debit'
+											THEN COALESCE(vp.total_amt, 0)
+												 - COALESCE(vp.cgst_amount, 0)
+												 - COALESCE(vp.sgst_amount, 0)
+												 - COALESCE(vp.igst_amount, 0)
+											ELSE 0
+										END
+									) AS debit
+								")
+								->where('vp.added_by', $userId)
+								->whereBetween('vp.inv_date', [$startDate, $endDate])
+								->groupBy('t.item_type')
+								->get();
+
+		$productPurchaseDr = 0;
+		$servicePurchaseDr = 0;
+		foreach ($purchaseVoucherAdjustments as $row) {
+			if ($row->item_type == 'product') {
+				$productPurchaseDr = $row->debit;
+			} elseif ($row->item_type == 'service') {
+				$servicePurchaseDr = $row->debit;
+			}
+		}
+		
+		$totalPurchaseVoucherDr = $productPurchaseDr + $servicePurchaseDr;
+		$purchases = (($itemTotal ?? 0) - $totalPurchaseVoucherDr); 
+		$totalPurchases = (($itemTotal ?? 0) - $totalPurchaseVoucherDr);
+		//End Purchase credit/debit
+		
+		/*
+		|--------------------------------------------------------------------------
+		| Direct Expenses
+		|--------------------------------------------------------------------------
+		*/
+		$directExpenseHeads = DB::table('dropdown_values')
+								->where('module', 'Expense')
+								->where('dropdown_name', 'direct')
+								->where('status', 1)
+								->orderBy('sort_order')
+								->get();
+
+		$directExpenseLabels = $directExpenseHeads->pluck('option_text', 'option_value')->toArray();
+		$allowedDirectExpenseTypes = $directExpenseHeads->pluck('option_value')->toArray();
+
+		$directExpenseDetails = DB::table('expenses')
+								->where('added_by', $userId)
+								->where('status', 1)
+								->where('expense_cat', 'direct')
+								->whereBetween('expense_date', [$startDate, $endDate])
+								->whereIn('expense_type', $allowedDirectExpenseTypes)
+								->select(
+									'expense_type',
+									DB::raw("SUM(COALESCE(expense_amt,0)) as total")
+								)
+								->groupBy('expense_type')
+								->get();
+								
+		$directExpenseArray = [];
+		// Initialize all heads
+		foreach ($directExpenseHeads as $head) {
+			$directExpenseArray[$head->option_text] = 0;
+		}
+		// Fill actual values
+		foreach ($directExpenseDetails as $expense) {
+			$label = $directExpenseLabels[$expense->expense_type]?? $expense->expense_type;
+			$directExpenseArray[$label] += $expense->total;
+		}
+		$directExpenseArray = array_filter($directExpenseArray,fn($value) => $value > 0);
+
+		/*
+		|--------------------------------------------------------------------------
+		| Closing Stock
+		|--------------------------------------------------------------------------
+		| Current Stock Qty × Purchase Price
+		|--------------------------------------------------------------------------
+		|
+		| Formula:
+		| Opening Qty
+		| + Purchase Qty
+		| - Sold Qty
+		|
+		*/
+		$closingStock = DB::table('products as p')
+							->leftJoinSub(
+								DB::table('purchase_values as pv')
+									->join('purchases as pur', 'pur.id', '=', 'pv.sid')
+									->where('pur.added_by', $userId)
+									->where('pur.status', 1)
+									->whereDate('pur.inv_date', '<=', $endDate)
+									->groupBy('pv.prod_id')
+									->selectRaw('pv.prod_id, SUM(pv.quantity) as purchase_qty'),
+								'purchase_stock',
+								function ($join) {
+									$join->on('purchase_stock.prod_id', '=', 'p.id');
+								}
+							)
+							->leftJoinSub(
+								DB::table('sales_values as sv')
+									->join('sales as s', 's.id', '=', 'sv.sid')
+									->where('s.added_by', $userId)
+									->where('s.status', 1)
+									->whereDate('s.inv_date', '<=', $endDate)
+									->groupBy('sv.prod_id')
+									->selectRaw('sv.prod_id, SUM(sv.quantity) as sold_qty'),
+								'sales_stock',
+								function ($join) {
+									$join->on('sales_stock.prod_id', '=', 'p.id');
+								}
+							)
+							->where('p.added_by', $userId)
+							->where('p.item_type', 'product')
+							->selectRaw("
+								SUM(
+									(
+										COALESCE(p.opening_stock_bal,0)
+										+ COALESCE(purchase_stock.purchase_qty,0)
+										- COALESCE(sales_stock.sold_qty,0)
+									) * COALESCE(p.purchase_price,0)
+								) as stock_value
+							")
+							->value('stock_value') ?? 0;
+
+		$closingStock = $closingStock ?? 0;
+		$directExpenseTotal = array_sum($directExpenseArray);
+		$cogsTotal = ($openingStock + $totalPurchases + $directExpenseTotal - $closingStock);
+		$cogs = [
+			'opening_stock'  => $openingStock,
+			'purchases'      => $purchases,
+			'direct_expense' => $directExpenseArray,
+			'directExpenseTotal'=> $directExpenseTotal,
+			'closing_stock'  => $closingStock,
+			'total_cogs'     => $cogsTotal,
+		];
+
+		/* ================================
+		 | INDIRECT EXPENSES
+		 ================================*/			
+		//Indirect Expense Category		
+		$expenseHeads = DB::table('dropdown_values')
+			->where('module', 'Expense')
+			->where('dropdown_name', 'indirect')
+			->where('status', 1)
+			->orderBy('sort_order')
+			->get();
+
+		$allowedExpenseTypes = $expenseHeads->pluck('option_value')->toArray();
+		$expenseLabels = $expenseHeads->pluck('option_text', 'option_value')->toArray();
+
+		$indirectExpenses = DB::table('expenses')
+			->whereBetween('expense_date', [$startDate, $endDate])
+			->where('added_by', $userId)
+			->where('status', 1)
+			->where('expense_cat', 'indirect')
+			->whereIn('expense_type', $allowedExpenseTypes)
+			->select(
+				'expense_type',
+				DB::raw("SUM(COALESCE(expense_amt,0)) as total")
+			)
+			->groupBy('expense_type')
+			->get();
+
+		//Start Asset Depericiation Calculation
+		$inputDate = Carbon::parse($endDate);
+		if ($inputDate->month >= 4) {
+			$fyStart = Carbon::create($inputDate->year, 4, 1)->toDateString();
+			$fyEnd   = Carbon::create($inputDate->year + 1, 3, 31)->toDateString();
+		} else {
+			$fyStart = Carbon::create($inputDate->year - 1, 4, 1)->toDateString();
+			$fyEnd   = Carbon::create($inputDate->year, 3, 31)->toDateString();
+		}
+		$assets = DB::table('assets')
+						->where('added_by', $userId)
+						->where('assetType', 'non-current')
+						->whereBetween('date', [$fyStart, $fyEnd])
+						->where('isActive', 1)
+						->get();
+
+		$depreciationExpense = 0;
+		foreach ($assets as $asset) {
+			$depreciationExpense += $this->calculateDepreciationByPeriod($asset,$fyStart,$fyEnd,$period_type);
+		}
+								
+		$financeCosts = DB::table('expenses')
+							->whereBetween('expense_date', [$startDate, $endDate])
+							->where('added_by', $userId)
+							->where('status', 1)
+							->where('expense_cat', 'indirect')
+							->whereIn('expense_type', [
+								'interest_expense',
+								'bank_charges',
+								'interest_on_business_loan',
+								'Processing Charges'
+							])
+							->select(
+								'expense_type',
+								DB::raw("SUM(COALESCE(expense_amt,0)) as total")
+							)
+							->groupBy('expense_type')
+							->get()
+							->pluck('total', 'expense_type')
+							->toArray();
+							
+		$indirectExpenseArray = [];
+		// Create all heads with zero amount first
+		foreach ($expenseHeads as $head) {
+			$indirectExpenseArray[$head->option_text] = 0;
+		}
+		foreach ($indirectExpenses as $expense) {
+			$label = $expenseLabels[$expense->expense_type] ?? $expense->expense_type;
+			$indirectExpenseArray[$label] += $expense->total;
+		}
+		$indirectExpenseArray = array_filter($indirectExpenseArray,fn($value) => $value > 0);
+		$totalIndirectExpenses = array_sum($indirectExpenseArray);
+		
+		$operatingIncomeTotal = collect($operatingIncomeDetails)->sum('total');
+		$nonOperatingIncomeTotal = collect($nonOperatingIncomeDetails)->sum('total');
+		//$totalRevenue = ($totalReseller + $totalService + $operatingIncomeTotal + $nonOperatingIncomeTotal);
+		$totalRevenue = ($profit_sale + $operatingIncomeTotal + $nonOperatingIncomeTotal);
+		
+		$ebitda = ($totalRevenue - ($cogsTotal + $totalIndirectExpenses));
+		$depreciationExp = $depreciationExpense;
+		$ebit = ($ebitda - $depreciationExp);
+		//Finance Cost
+		$interestOnLoan    = $financeCosts['Interest Expense'] ?? 0;
+		$bankCharges       = $financeCosts['Bank Charges'] ?? 0;
+		$odCcInterest      = $financeCosts['OD / CC Interest'] ?? 0;
+		$processingCharges = $financeCosts['Processing Charges'] ?? 0;
+		$totalFinanceCost = ($interestOnLoan+ $bankCharges+ $odCcInterest+ $processingCharges);
+		//Profit Before Tax
+		$pbt = ($ebit - $totalFinanceCost);
+		//Tax Expense
+		$current_tax = $this->getCurrentTax($userId, $startDate, $endDate, $pbt);
+		$start = \Carbon\Carbon::parse($startDate)->subYear();
+		$end   = \Carbon\Carbon::parse($endDate)->subYear();
+		$current_tax_expenses_prior_years = $this->getCurrentTaxPriorYear($userId, $startDate, $endDate);
+		$deferred_tax = 0;//$this->getDeferredTax($userId, $startDate, $endDate);
+		$totalTax = ($current_tax + $current_tax_expenses_prior_years + $deferred_tax);
+		$tax = [
+				'current_tax' => $current_tax ?? 0,
+				'current_tax_expenses_prior_years' => $current_tax_expenses_prior_years ?? 0,
+				'deferred_tax' => $deferred_tax,
+				'minimum_alternate_tax' => 0,
+				'totalTax' => $totalTax,
+			];
+		//Profit After Tax
+		$pat = ($pbt - $totalTax);		
+		
+		//SHARE CAPITAL FOR EPS
+		$netProfit = ($totalRevenue - $totalIndirectExpenses - $totalTax);
+		$getEPS = $this->getEPS($userId, $startDate, $endDate, $netProfit);
+		
+		return [
+			'revenue' => [
+				'totalReseller' => $totalReseller,
+				'totalService' => $totalService,								
+				'operatingIncomeDetails' => $operatingIncomeDetails,
+				'operatingIncomeTotal' => $operatingIncomeTotal,
+				'nonOperatingIncomeDetails' => $nonOperatingIncomeDetails,
+				'nonOperatingIncomeTotal' => $nonOperatingIncomeTotal,
+				'total_sales_income' => $totalRevenue,
+			],
+			'cogs' => $cogs,
+			'expenses' => $indirectExpenseArray,
+			'ebitda' => $ebitda,
+			'depreciationExp' => $depreciationExp,
+			'ebit' => $ebit,
+			'finance_cost' => [
+				'interest_on_loan' => $interestOnLoan,
+				'bank_charges' => $bankCharges,
+				'od_cc_interest' => $odCcInterest,
+				'processing_charges' => $processingCharges,
+				'total_finance_cost' => $totalFinanceCost,
+			],
+			'pbt' => $pbt,
+			'tax' => $tax,
+			'pat' => $pat,
+			'eps' => $getEPS
+		];
+	}
+	
 
 }

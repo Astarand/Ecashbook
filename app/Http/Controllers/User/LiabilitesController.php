@@ -332,89 +332,23 @@ class LiabilitesController extends Controller
 		// ============================================
 		// CURRENT LIABILITY
 		// ============================================
-
+		$journalCurrentLiabilityTypes = ['short_term_loans','interest_payable',];
 		if ($current) {
+			$clType = strtolower(trim($current->CurrentLiabilitiesType ?? ''));
+			if (!in_array($clType, $journalCurrentLiabilityTypes)) {
+				return true;
+			}
 
-			$clType = strtolower($current->CurrentLiabilitiesType ?? '');
-
-			// -------------------------------
-			// SHORT TERM LOAN
-			// -------------------------------
-
-			if ($clType == 'short_term_loans') {
+			if ($clType === 'short_term_loans') {
 				$amount = $current->stl_sanction_amount ?? 0;
 				$party = $current->stl_lender_name ?? $current->party_name ?? '';
 				$ledgerName = 'Short Term Loans';
 			}
 
-			// -------------------------------
-			// INTEREST PAYABLE
-			// -------------------------------
-
-			else if ($clType == 'interest_payable') {
+			elseif ($clType === 'interest_payable') {
 				$amount = $current->ip_interest_amount ?? 0;
 				$party = $current->ip_lender_name ?? $current->party_name ?? '';
 				$ledgerName = 'Interest Payable';
-			}
-
-			// -------------------------------
-			// GST PAYABLE
-			// -------------------------------
-
-			else if ($clType == 'gst_payable') {
-				$amount = $current->gst_payableamount ?? 0;
-				$party = $current->party_name ?? '';
-				$ledgerName = 'GST Payable';
-			}
-
-			// -------------------------------
-			// TDS PAYABLE
-			// -------------------------------
-
-			else if ($clType == 'tds_payable') {
-				$amount = $current->tds_payableamount ?? 0;
-				$party = $current->party_name ?? '';
-				$ledgerName = 'TDS Payable';
-			}
-
-			// -------------------------------
-			// UNEARNED REVENUE
-			// -------------------------------
-
-			else if ($clType == 'unearned_revenue') {
-				$amount = $current->unrevenueamount ?? 0;
-				$party = $current->party_name ?? '';
-				$ledgerName = 'Unearned Revenue';
-			}
-
-			// -------------------------------
-			// ACCRUED EXPENSE
-			// -------------------------------
-
-			else if ($clType == 'accrued_expenses') {
-				$amount = $current->prorateamount ?? 0;
-				$party = $current->party_name ?? '';
-				$ledgerName = 'Accrued Expenses';
-			}
-
-			// -------------------------------
-			// ADVANCE FROM CUSTOMER
-			// -------------------------------
-
-			else if ($clType == 'advance_from_customers') {
-				$amount = $current->advamorecd ?? 0;
-				$party = $current->party_name ?? '';
-				$ledgerName = 'Advance From Customers';
-			}
-
-			// -------------------------------
-			// DEFAULT CURRENT LIABILITY
-			// -------------------------------
-
-			else {
-				$amount = $current->amount ?? 0;
-				$party = $current->party_name ?? '';
-				$ledgerName = $current->category_of_head ?? 'Current Liability';
 			}
 
 			$dc            = $current->debit_credit ?? 'Credit';
@@ -1862,17 +1796,18 @@ class LiabilitesController extends Controller
 
 			$records = DB::table('user_payslip')
 				->whereBetween('date', [$currentMonthStartDate, $currentMonthEndDate])
+				->where(function ($query) {
+						$query->whereNull('payment_status')
+							  ->orWhere('payment_status', 'Pending');
+					})
 				->get();
 
 			$amount = 0;
 
 			foreach ($records as $row) {
-
 				$data = json_decode($row->emp_salary_slip_response, true);
-
 				// Match created_by from JSON
 				if (($data['created_by'] ?? 0) == $userId) {
-
 					$amount += $data['visible_data']['final_salary_calculation']['net_salary'] ?? 0;
 				}
 			}
@@ -1883,17 +1818,18 @@ class LiabilitesController extends Controller
 
 			$records = DB::table('user_payslip')
 				->whereBetween('date', [$startDate, $endDate])
+				->where(function ($query) {
+						$query->whereNull('pf_payment_status')
+							  ->orWhere('pf_payment_status', 'Pending');
+					})
 				->get();
 
 			$amount = 0;
 
 			foreach ($records as $row) {
-
 				$data = json_decode($row->emp_salary_slip_response, true);
-
 				// Match created_by from JSON
 				if (($data['created_by'] ?? 0) == $userId) {
-
 					$amount += $data['visible_data']['final_salary_calculation']['provident_fund'] ?? 0;
 				}
 			}
@@ -1904,17 +1840,18 @@ class LiabilitesController extends Controller
 
 			$records = DB::table('user_payslip')
 				->whereBetween('date', [$startDate, $endDate])
+				->where(function ($query) {
+						$query->whereNull('esi_payment_status')
+							  ->orWhere('esi_payment_status', 'Pending');
+					})
 				->get();
 
 			$amount = 0;
 
 			foreach ($records as $row) {
-
 				$data = json_decode($row->emp_salary_slip_response, true);
-
 				// Match created_by from JSON
 				if (($data['created_by'] ?? 0) == $userId) {
-
 					$amount += $data['visible_data']['final_salary_calculation']['esi'] ?? 0;
 				}
 			}
@@ -1983,23 +1920,51 @@ class LiabilitesController extends Controller
 			// Salary TDS Amount
 			$salaryData = DB::table('user_payslip')
 				->whereBetween('date', [$currentMonthStartDate, $currentMonthEndDate])
+				->where(function ($query) {
+						$query->whereNull('tds_deposit_status')
+							  ->orWhere('tds_deposit_status', 'Pending');
+					})
 				->get();
 
 			$salaryTdsAmount = 0;
 
 			foreach ($salaryData as $row) {
-
 				$data = json_decode($row->emp_salary_slip_response, true);
-
-				// Match created_by from JSON
 				if (($data['created_by'] ?? 0) == $userId) {
-
 					$salaryTdsAmount += $data['visible_data']['final_salary_calculation']['tds'] ?? 0;
 				}
 			}
 
 			// Final Total
 			$amount = $incomeTdsAmount + $expenseTdsAmount + $assetTdsAmount + $salaryTdsAmount;
+		}
+		// ESI Payable
+		if ($type == 'lwf_payable') {
+
+			$start = Carbon::parse($startDate);
+			$financialYear = $start->year . '-' . ($start->year + 1);
+			$month = $start->month;
+
+			$records = DB::table('user_payslip')
+				->where('added_by', $userId)
+				->where('financial_year', $financialYear)
+				->where('month', $month)
+				->where(function ($query) {
+						$query->whereNull('payment_status')
+							  ->orWhere('payment_status', 'Pending');
+					})
+				->get();
+
+			$amount = 0;
+
+			foreach ($records as $row) {
+				$data = json_decode($row->emp_salary_slip_response, true);		
+				if (($data['created_by'] ?? 0) == $userId) {
+					$lwfEmployee = $data['visible_data']['final_salary_calculation']['lwf_deduct'] ?? 0;
+					$lwfCompany = $data['visible_data']['final_salary_calculation']['lwf_company_contribution'] ?? 0;
+					$amount += (float) $lwfEmployee + (float) $lwfCompany;
+				}
+			}
 		}
 
 		return response()->json([

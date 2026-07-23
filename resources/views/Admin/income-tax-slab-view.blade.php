@@ -41,12 +41,56 @@
                                 <label class="form-label">Entity Type <span class="text-danger">*</span></label>
                                 <select class="form-control" name="entity_type" required>
                                     <option value="">-- Select Entity Type --</option>
-                                    <option value="Proprietorship" {{ isset($slab) && $slab->entity_type === 'Proprietorship' ? 'selected' : '' }}>Proprietorship</option>
+                                    <!--<option value="Proprietorship" {{ isset($slab) && $slab->entity_type === 'Proprietorship' ? 'selected' : '' }}>Proprietorship</option>
                                     <option value="LLP" {{ isset($slab) && $slab->entity_type === 'LLP' ? 'selected' : '' }}>LLP</option>
                                     <option value="Pvt Ltd" {{ isset($slab) && $slab->entity_type === 'Pvt Ltd' ? 'selected' : '' }}>Pvt Ltd</option>
                                     <option value="Public Ltd" {{ isset($slab) && $slab->entity_type === 'Public Ltd' ? 'selected' : '' }}>Public Ltd</option>
                                     <option value="HUF" {{ isset($slab) && $slab->entity_type === 'HUF' ? 'selected' : '' }}>HUF</option>
-                                    <option value="Partnership" {{ isset($slab) && $slab->entity_type === 'Partnership' ? 'selected' : '' }}>Partnership</option>
+                                    <option value="Partnership" {{ isset($slab) && $slab->entity_type === 'Partnership' ? 'selected' : '' }}>Partnership</option>-->
+									<option value="Proprietorship"
+										{{ isset($slab) && $slab->entity_type === 'Proprietorship' ? 'selected' : '' }}>
+										Proprietorship
+									</option>
+
+									<option value="Partnership"
+										{{ isset($slab) && $slab->entity_type === 'Partnership' ? 'selected' : '' }}>
+										Partnership
+									</option>
+
+									<option value="One person Company (OPC)"
+										{{ isset($slab) && $slab->entity_type === 'One person Company (OPC)' ? 'selected' : '' }}>
+										One person Company (OPC)
+									</option>
+
+									<option value="LLP Company"
+										{{ isset($slab) && $slab->entity_type === 'LLP Company' ? 'selected' : '' }}>
+										LLP Company
+									</option>
+
+									<option value="PVT Ltd Company"
+										{{ isset($slab) && $slab->entity_type === 'PVT Ltd Company' ? 'selected' : '' }}>
+										PVT Ltd Company
+									</option>
+
+									<option value="LTD Company"
+										{{ isset($slab) && $slab->entity_type === 'LTD Company' ? 'selected' : '' }}>
+										LTD Company
+									</option>
+
+									<option value="Section-8 Company"
+										{{ isset($slab) && $slab->entity_type === 'Section-8 Company' ? 'selected' : '' }}>
+										Section-8 Company
+									</option>
+
+									<option value="Society/Trust"
+										{{ isset($slab) && $slab->entity_type === 'Society/Trust' ? 'selected' : '' }}>
+										Society/Trust
+									</option>
+
+									<option value="Other"
+										{{ isset($slab) && $slab->entity_type === 'Other' ? 'selected' : '' }}>
+										Other
+									</option>
                                 </select>
                                 @error('entity_type') <small class="text-danger">{{ $message }}</small> @enderror
                             </div>
@@ -95,10 +139,44 @@
                                 <label class="form-label">Taxpayer Category <span class="text-danger">*</span></label>
                                 <select class="form-control" name="taxpayer_category" required>
                                     <option value="">-- Select Taxpayer Category --</option>
-                                    <option value="Individual" {{ isset($slab) && $slab->taxpayer_category === 'Individual' ? 'selected' : '' }}>Individual</option>
+                                    <!--<option value="Individual" {{ isset($slab) && $slab->taxpayer_category === 'Individual' ? 'selected' : '' }}>Individual</option>
                                     <option value="Firm" {{ isset($slab) && $slab->taxpayer_category === 'Firm' ? 'selected' : '' }}>Firm</option>
                                     <option value="Company" {{ isset($slab) && $slab->taxpayer_category === 'Company' ? 'selected' : '' }}>Company</option>
-                                    <option value="Others" {{ isset($slab) && $slab->taxpayer_category === 'Others' ? 'selected' : '' }}>Others</option>
+                                    <option value="Others" {{ isset($slab) && $slab->taxpayer_category === 'Others' ? 'selected' : '' }}>Others</option>-->
+									<option value="Individual"
+										{{ isset($slab) && $slab->taxpayer_category === 'Individual' ? 'selected' : '' }}>
+										Individual
+									</option>
+
+									<option value="HUF"
+										{{ isset($slab) && $slab->taxpayer_category === 'HUF' ? 'selected' : '' }}>
+										HUF
+									</option>
+
+									<option value="Partnership Firm"
+										{{ isset($slab) && $slab->taxpayer_category === 'Partnership Firm' ? 'selected' : '' }}>
+										Partnership Firm
+									</option>
+
+									<option value="LLP"
+										{{ isset($slab) && $slab->taxpayer_category === 'LLP' ? 'selected' : '' }}>
+										LLP
+									</option>
+
+									<option value="Domestic Company"
+										{{ isset($slab) && $slab->taxpayer_category === 'Domestic Company' ? 'selected' : '' }}>
+										Domestic Company
+									</option>
+
+									<option value="Trust / AOP"
+										{{ isset($slab) && $slab->taxpayer_category === 'Trust / AOP' ? 'selected' : '' }}>
+										Trust / AOP
+									</option>
+
+									<option value="Foreign Company"
+										{{ isset($slab) && $slab->taxpayer_category === 'Foreign Company' ? 'selected' : '' }}>
+										Foreign Company
+									</option>
                                 </select>
                                 @error('taxpayer_category') <small class="text-danger">{{ $message }}</small> @enderror
                             </div>

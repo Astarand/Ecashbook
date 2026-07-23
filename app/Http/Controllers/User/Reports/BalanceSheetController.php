@@ -15,27 +15,19 @@ use App\Models\Bank_trans;
 use App\Models\Bank_statements;
 use Carbon\Carbon;
 use PDF;
-use App\Services\ExpensesService;
-use App\Services\AssetsService;
-use App\Services\LiabilitiesService;
-use App\Services\ReportsService;
 use App\Services\BalanceSheetService;
+use App\Services\ProfitLossService;
 
 class BalanceSheetController extends Controller
 {
-	private $expensesService;
-	private $assetsService;
-	private $liabilitiesService;
-	private $reportsService;
-	private $balanceSheetService;
 
-    public function __construct(BalanceSheetService $balanceSheetService,ReportsService $reportsService, ExpensesService $expensesService, AssetsService $assetsService, LiabilitiesService $liabilitiesService)
+	private $balanceSheetService;
+	private $profitLossService;
+
+    public function __construct(BalanceSheetService $balanceSheetService,ProfitLossService $profitLossService)
     {
-        $this->reportsService = $reportsService;
-        $this->expensesService = $expensesService;
-        $this->assetsService = $assetsService;
-        $this->liabilitiesService = $liabilitiesService;
         $this->balanceSheetService = $balanceSheetService;
+		$this->profitLossService = $profitLossService;
 		$this->middleware('auth');
     }
 	
@@ -330,8 +322,8 @@ class BalanceSheetController extends Controller
 					0.00 AS m_r_a_share_warrants
 
 				")->first();
-				
-		$current_year_profit = $this->balanceSheetService->calculatePL($startDate, $endDate, $userId);
+		//PBT		
+		$current_year_profit = $this->profitLossService->calculatePL($startDate, $endDate, $userId, $periodType)['pbt'] ?? 0; 
 							
 		//Non-Current Liabilities
 		$nonCurrLiab = DB::table('non_current_liabilities as ncl')
@@ -380,12 +372,12 @@ class BalanceSheetController extends Controller
 		$liabilityTypes = [
 			'trade_payables',
 			'advance_from_customer',
-			'outstanding_expenses',
 			'salary_payable',
 			'gst_payable',
 			'tds_payable',
 			'pf_payable',
 			'esi_payable',
+			'lwf_payable',
 			'short_term_loans',
 			'interest_payable',
 		];
@@ -748,6 +740,7 @@ class BalanceSheetController extends Controller
 				'tds_payable'           => (float) $request->tds_payable,
 				'pf_payable'            => (float) $request->pf_payable,
 				'esi_payable'           => (float) $request->esi_payable,
+				'lwf_payable'           => 0,
 				'short_term_loans'      => (float) $request->short_term_loans,
 				'interest_payable'      => (float) $request->interest_payable,
 			];
