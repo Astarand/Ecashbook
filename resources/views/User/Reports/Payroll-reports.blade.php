@@ -213,7 +213,21 @@
             </div>
         </div>
 
-        {{-- Card 8: Payment Status Summary --}}
+        {{-- Card 8: LWF Liability --}}
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card border shadow-none rounded-3 h-100">
+                <div class="card-body p-3.5">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-bold uppercase-label">LWF Liability</span>
+                        <i class="ph-duotone ph-receipt text-indigo fs-3" style="color: #6610f2 !important;"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1 text-dark" id="lwfLiability">₹0</h3>
+                    <p class="text-muted small mb-0">Due date : 7th of the next month</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Card 9: Payment Status Summary --}}
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="card border shadow-none rounded-3 h-100">
                 <div class="card-body p-3.5 d-flex flex-column justify-content-between">
@@ -2073,6 +2087,7 @@
                     $('#esiLiability').text('₹' + Number(res.esi_liability).toLocaleString('en-IN'));
                     $('#ptLiability').text('₹' + Number(res.pt_liability).toLocaleString('en-IN'));
                     $('#tdsLiability').text('₹' + Number(res.tds_liability).toLocaleString('en-IN'));
+                    $('#lwfLiability').text('₹' + Number(res.lwf_liability).toLocaleString('en-IN'));
 
                     $('#paymentSummary').text(
                         'Paid: ' + res.paid + ' / ' + res.total_active_employees
@@ -2151,6 +2166,8 @@
                                     <td>₹${Number(row.ptax || 0).toLocaleString('en-IN')}</td>
 
                                     <td>₹${Number(row.tds || 0).toLocaleString('en-IN')}</td>
+
+                                    <td>₹${Number(row.lwf || 0).toLocaleString('en-IN')}</td>
 
                                     <td>₹${Number(row.advance || 0).toLocaleString('en-IN')}</td>
 
