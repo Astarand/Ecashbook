@@ -21,7 +21,7 @@
                 </div>
                 <div class="col-md-9 text-end">
                     <a href="{{ route('payroll.payslip_update') }}#ptax-section" class="btn btn-warning shadow">
-                        PTAX Update
+                        PTAX Challan Update
                     </a>
 
 					<button class="btn btn-outline-primary px-3 py-2 rounded-3 me-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#aboutPTaxModal">

@@ -45,6 +45,112 @@ class SettlementController extends Controller
         $this->paymentVoucherService = $paymentVoucherService;
     }
 	
+	public function getSettlementAmount(Request $request)
+	{
+		$request->validate([
+			'module_type' => 'required|in:Sales,Purchase,Expense',
+			'p_id' => 'required|integer',
+		]);
+
+		$uid = currentOwnerId();
+
+		$amount = 0;
+
+		switch ($request->module_type) {
+
+			case 'Sales':
+
+				$sale = DB::table('sales')
+					->where('id', $request->p_id)
+					->where('added_by', $uid)
+					->where('status', '!=', 2)
+					->first();
+
+				if (!$sale) {
+					return response()->json([
+						'success' => false,
+						'message' => 'Sales invoice not found.'
+					], 404);
+				}
+
+				$total = DB::table('sales_values')
+					->where('sid', $sale->id)
+					->where('uid', $uid)
+					->selectRaw('
+						SUM(
+							COALESCE(amount, 0)
+							+ COALESCE(tax_amt, 0)
+							+ COALESCE(ser_pay, 0)
+							+ COALESCE(gov_pay, 0)
+						) as total
+					')
+					->value('total') ?? 0;
+
+				$advance = $sale->advance_amount ?? 0;
+				$amount = getRoundedAmount($total);
+
+				break;
+
+			case 'Purchase':
+
+				$purchase = DB::table('purchases')
+					->where('id', $request->p_id)
+					->where('added_by', $uid)
+					->where('status', '!=', 2)
+					->first();
+
+				if (!$purchase) {
+					return response()->json([
+						'success' => false,
+						'message' => 'Purchase invoice not found.'
+					], 404);
+				}
+
+				$total = DB::table('purchase_values')
+					->where('sid', $purchase->id)
+					->where('uid', $uid)
+					->selectRaw('
+						SUM(
+							COALESCE(amount, 0)
+							+ COALESCE(tax_amt, 0)
+						) as total
+					')
+					->value('total') ?? 0;
+
+				$advance = $purchase->advance_amount ?? 0;
+				$amount = getRoundedAmount($total);
+
+				break;
+
+			case 'Expense':
+
+				$expense = DB::table('expenses')
+					->where('id', $request->p_id)
+					->where('added_by', $uid)
+					->first();
+
+				if (!$expense) {
+					return response()->json([
+						'success' => false,
+						'message' => 'Expense not found.'
+					], 404);
+				}
+
+				$expenseAmount = $expense->expense_amt ?? 0;
+				$advance = $expense->advance_amount ?? 0;
+				$amount = getRoundedAmount($expenseAmount);
+
+				break;
+		}
+
+		return response()->json([
+			'success' => true,
+			'module_type' => $request->module_type,
+			'p_id' => $request->p_id,
+			'amount' => round($amount, 2),
+		]);
+	}
+	
 	public function getSettlementLedgers(Request $request)
 	{
 		$uid = currentOwnerId();
@@ -88,27 +194,20 @@ class SettlementController extends Controller
 	public function store(Request $request)
 	{
 		$request->validate([
-
 			'module_type' => 'required|in:Sales,Purchase,Expense',
-
 			'p_id' => 'required|integer',
-
 			'settlement_mode' => 'required|in:Self,Third Party',
-
 			'settlement_amount' => 'required|numeric|min:0.01',
-
 			'settlement_ledger_id' => [
 				'nullable',
 				'required_if:settlement_mode,Third Party',
 			],
-
 			'other_settlement_ledger' => [
 				'nullable',
 				'required_if:settlement_ledger_id,other',
 				'string',
 				'max:255',
 			],
-
 			'settlement_reason' => [
 				'nullable',
 				'required_if:settlement_mode,Third Party',
@@ -169,47 +268,19 @@ class SettlementController extends Controller
 						$settlementLedgerName = $this->getSettlementLedgerName($request->module_type,$settlementLedgerId,$uid);
 					}
 				}
-
-
-				/*
-				|--------------------------------------------------------------------------
-				| 3. Create Settlement
-				|--------------------------------------------------------------------------
-				*/
-
+				//Create Settlement
 				$settlementId = DB::table('settlements')->insertGetId([
-
 					'uid' => $uid,
-
-					'module_type' =>
-						$request->module_type,
-
-					'p_id' =>
-						$request->p_id,
-
-					'settlement_mode' =>
-						$request->settlement_mode,
-
-					'settlement_amount' =>
-						$request->settlement_amount,
-
-					'settlement_ledger_id' =>
-						$settlementLedgerId,
-
-					'settlement_ledger_name' =>
-						$settlementLedgerName,
-
-					'settlement_reason' =>
-						$request->settlement_reason,
-
-					'settlement_date' =>
-						now()->toDateString(),
-
-					'created_at' =>
-						now(),
-
-					'updated_at' =>
-						now(),
+					'module_type' =>$request->module_type,
+					'p_id' =>$request->p_id,
+					'settlement_mode' =>$request->settlement_mode,
+					'settlement_amount' =>$request->settlement_amount,
+					'settlement_ledger_id' =>$settlementLedgerId,
+					'settlement_ledger_name' =>$settlementLedgerName,
+					'settlement_reason' =>$request->settlement_reason,
+					'settlement_date' =>now()->toDateString(),
+					'created_at' =>now(),
+					'updated_at' =>now(),
 				]);
 
 				/*
@@ -222,10 +293,15 @@ class SettlementController extends Controller
 								->first();
 
 				$journalId = $this->createSettlementJournal($settlement,$document,$uid);
+				
+				//Create Payment Voucher
+				$payment_mode = $request->payment_mode ?? '';
+				$bank_id = $request->bank_id ?? '';
+				$paymentVoucherId = $this->createSettlementPaymentVoucher($settlement,$uid,$payment_mode,$bank_id);
 
 				return [
-					'journal_id' => $journalId,
-				];
+						'journal_id' => $journalId,
+					];
 			});
 
 
@@ -367,7 +443,7 @@ class SettlementController extends Controller
 					'added_by' => $uid,
 					'propId' => $document->propId ?? null,
 					'date' => $settlement->settlement_date,
-					'reference_no' => 'SET-' . $settlement->id,
+					'reference_no' => '',
 					'entry_type' => $settlement->module_type.' Settlement',
 					'party_name' => $partyName,
 					'amount' => $settlement->settlement_amount,
@@ -379,5 +455,92 @@ class SettlementController extends Controller
 		
 	}
 
+	//Start Payment voucher entry
+	private function createSettlementPaymentVoucher($settlement, $uid, $payment_mode, $bank_id)
+	{
+		$p_id = $settlement->p_id;
+		$module_type = $settlement->module_type;
+		$settlement_amount = $settlement->settlement_amount;
+		
+		DB::table('payment_vouchers')
+			->where('f_id', $p_id)
+			->where('source', $module_type)
+			->delete();
 
+		$data = [
+			'date' => $settlement->settlement_date,
+			'settlement_ledger_id' => $settlement->settlement_ledger_id,
+			'settlement_ledger_name' => $settlement->settlement_ledger_name,
+			'payment_mode' => $payment_mode,
+			'bank_id' =>$bank_id,
+			'addFlag' =>1,
+		];
+		
+		$paymentVoucherId = $this->paymentVoucherService->storePaymentVoucherEntries($p_id,$module_type,$settlement_amount,$data);
+		$updatePaymentStatus = $this->updateSettlementPaymentStatus($p_id,$module_type,$settlement_amount);
+
+		return $paymentVoucherId;
+	}
+	
+	private function updateSettlementPaymentStatus(int $id,string $type,float $settlementAmount)
+	{
+		$currentPaid = DB::table('payment_vouchers')
+			->where('f_id', $id)
+			->where('source', $type)
+			->sum('amount');
+
+		$paid = $settlementAmount;
+
+		if ($type === 'Sales') {
+			$status = 'Full';
+
+			DB::table('sales')
+				->where('id', $id)
+				->update([
+					'pay_status' =>$status,
+					'advance_amount' =>0,
+					'adjusted_amount' => $paid,
+					'due_amount' =>0,
+				]);
+
+			return;
+		}
+		if ($type === 'Purchase') {
+			$status = 'Full';
+
+			DB::table('purchases')
+				->where('id', $id)
+				->update([
+					'pay_status' =>$status,
+					'advance_amount' =>0,
+					'adjusted_amount' => $paid,
+					'due_amount' =>0,
+				]);
+
+			return;
+		}
+		if ($type === 'Expense') {
+			$status = 'full';
+
+			DB::table('expenses')
+				->where('id', $id)
+				->update([
+					'payment_status' =>$status,
+					'advance_amount' =>0,
+					'adjusted_now' =>$paid,
+					'balance_amount' =>0,
+				]);
+		}
+		
+		$payStatus = ucfirst(strtolower($status ?? ''));
+		DB::table('journals')
+			->where('entry_type', $type)
+			->where('autoId', $id)
+			->update([
+				'payment_status' => $payStatus
+			]);
+			
+		return;
+	}
+	//End Payment voucher entry
 }

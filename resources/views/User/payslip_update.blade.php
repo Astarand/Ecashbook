@@ -31,10 +31,11 @@
                         <h4 class="mb-0">Update Center</h4>
                         <div class="btn-group" role="group" aria-label="Update section switcher">
                             <button type="button" class="btn btn-primary" data-target="payslip-section">Payslip</button>
-                            <button type="button" class="btn btn-outline-primary" data-target="tds-section">Update TDS</button>
-                            <button type="button" class="btn btn-outline-primary" data-target="pf-section">Update PF</button>
-                            <button type="button" class="btn btn-outline-primary" data-target="esi-section">Update ESI</button>
-                            <button type="button" class="btn btn-outline-primary" data-target="ptax-section">Update PTAX</button>
+                            <button type="button" class="btn btn-outline-primary" data-target="tds-section">TDS Challan Update</button>
+                            <button type="button" class="btn btn-outline-primary" data-target="pf-section">PF Challan Update </button>
+                            <button type="button" class="btn btn-outline-primary" data-target="esi-section">ESI Challan Update</button>
+                            <button type="button" class="btn btn-outline-primary" data-target="ptax-section">PTAX Challan Update</button>
+                            <button type="button" class="btn btn-outline-primary" data-target="lwf-section">LWF Challan Update</button>
                         </div>
                     </div>
                 </div>
@@ -746,6 +747,185 @@
                         </div>
                     </div>
 
+                    {{-- LWF Section --}}
+
+                    <div id="lwf-section" style="display:none;">
+                        <div class="row g-3 align-items-end mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">Financial Year</label>
+                                @php
+                                    $currentYear = date('Y');
+                                    $currentMonth = date('n');
+
+                                    // Current Financial Year
+                                    $fyStart = ($currentMonth >= 4) ? $currentYear : $currentYear - 1;
+                                @endphp
+
+                                <select class="form-select" id="lwf_financial_year">
+
+                                    @for($i = 0; $i < 5; $i++)
+                                        @php
+                                            $start = $fyStart - $i;
+                                            $end = $start + 1;
+                                        @endphp
+
+                                        <option value="{{ $start }}-{{ $end }}" {{ $i == 0 ? 'selected' : '' }}>
+                                            {{ $start }}-{{ $end }}
+                                        </option>
+                                    @endfor
+
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Filter Type</label>
+                                <select class="form-select" id="lwf-period-type" >
+                                    <option value="monthly" selected>Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="half-yearly">Half Yearly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3" id="lwf-period-wrapper">
+                                <label class="form-label">Period</label>
+                                @php
+                                    $months = [
+                                        'January','February','March','April','May','June',
+                                        'July','August','September','October','November','December'
+                                    ];
+
+                                    $previousMonth = date('F', strtotime('first day of last month'));
+                                @endphp
+
+                                <select class="form-select" id="lwf-period-value">
+
+                                    @foreach($months as $month)
+                                        <option value="{{ $month }}"
+                                            {{ $month == $previousMonth ? 'selected' : '' }}>
+                                            {{ $month }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-primary w-100" id="btnLwfFilter">Apply Filter</button>
+                            </div>
+                        </div>
+
+                        <div class="card border mb-4">
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end">
+
+                                    <!-- GRIPS Payment ID -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">GRIPS Payment ID</label>
+                                        <input type="text" id="lwf_grips_payment_id_input" class="form-control"
+                                            placeholder="Enter GRIPS Payment ID">
+                                    </div>
+
+                                    <!-- Receipt Date -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Receipt Date</label>
+                                        <input type="date" id="lwf_receipt_date_input" class="form-control">
+                                    </div>
+
+                                    <!-- Receipt No -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Receipt No</label>
+                                        <input type="text" id="lwf_receipt_no_input" class="form-control"
+                                            placeholder="Enter Receipt No">
+                                    </div>
+
+                                    <!-- Organization A/C No -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Organization A/C No</label>
+                                        <input type="text" id="lwf_org_account_no_input" class="form-control"
+                                            placeholder="Enter Organization A/C No">
+                                    </div>
+
+                                    <!-- Payment Month -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Payment for the Month</label>
+                                        <input type="month" id="lwf_payment_month_input" class="form-control">
+                                    </div>
+
+                                    <!-- No of Employees -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">No. of Employees</label>
+                                        <input type="number" id="lwf_employee_count_input" class="form-control"
+                                            placeholder="0">
+                                    </div>
+
+                                    <!-- Employees Contribution -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Employees Contribution (₹)</label>
+                                        <input type="number" step="0.01" id="lwf_employee_contribution_input"
+                                            class="form-control" placeholder="0.00">
+                                    </div>
+
+                                    <!-- Employer Contribution -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Employer Contribution (₹)</label>
+                                        <input type="number" step="0.01" id="lwf_employer_contribution_input"
+                                            class="form-control" placeholder="0.00">
+                                    </div>
+
+                                    <!-- Total Payment -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Total Payment (₹)</label>
+                                        <input type="number" step="0.01" id="lwf_total_payment_input"
+                                            class="form-control" placeholder="0.00">
+                                    </div>
+
+                                    <!-- Interest Amount -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Interest Amount (If Any)</label>
+                                        <input type="number" step="0.01" id="lwf_interest_amount_input"
+                                            class="form-control" placeholder="0.00">
+                                    </div>
+
+                                    <!-- Update Button -->
+                                    <div class="col-md-12">
+                                        <div class="d-flex gap-2">
+                                            <button type="button" id="btnLwfMultipleUpdate" class="btn btn-success">
+                                                Update Selected LWF Records
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="40">
+                                            <input type="checkbox" id="select-all-lwf">
+                                        </th>
+                                        <th>Employee ID</th>
+                                        <th>Name</th>
+                                        <th>Financial Year</th>
+                                        <th>Employee Contribution</th>
+                                        <th>Company Contribution</th>
+                                        <th>Receipt Date </th>
+                                        <th>Receipt No</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lwfTable">
+                                    <tr>
+                                        <td colspan="9" class="text-center">
+                                            No Record Found
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -760,7 +940,8 @@
             'tds-section': document.getElementById('tds-section'),
             'pf-section': document.getElementById('pf-section'),
             'esi-section': document.getElementById('esi-section'),
-            'ptax-section': document.getElementById('ptax-section')
+            'ptax-section': document.getElementById('ptax-section'),
+            'lwf-section': document.getElementById('lwf-section')
         };
 
         tabButtons.forEach(function (button) {
@@ -784,6 +965,7 @@
         const selectAllPf = document.getElementById('select-all-pf');
         const selectAllEsi = document.getElementById('select-all-esi');
         const selectAllPtax = document.getElementById('select-all-ptax');
+        const selectAllLwf = document.getElementById('select-all-lwf');
 
         function getPayslipRowCheckboxes() {
             return document.querySelectorAll('.payslip-row-checkbox');
@@ -846,6 +1028,15 @@
                 const checkboxes = getPtaxRowCheckboxes();
                 checkboxes.forEach(function (checkbox) {
                     checkbox.checked = selectAllPtax.checked;
+                });
+            });
+        }
+
+        if (selectAllLwf) {
+            selectAllLwf.addEventListener('change', function () {
+                const checkboxes = getLwfRowCheckboxes();
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = selectAllLwf.checked;
                 });
             });
         }
@@ -947,6 +1138,11 @@
             $('[data-target="esi-section"]').trigger('click');
         }
 
+        if (window.location.hash === '#lwf-section') {
+            $('#lwf-section').show();
+            $('[data-target="lwf-section"]').trigger('click');
+        }
+
         loadPayslipData();
 
         $('#btnFilter').click(function(){
@@ -987,6 +1183,12 @@
 
         $('#btnPtaxFilter').click(function () {
             loadPtaxData();
+        });
+
+        //------ LWF Section ------
+        loadLwfFullData();
+        $('#btnLwfFilter').click(function () {
+            loadLwfFullData();
         });
     });
 
@@ -1795,6 +1997,175 @@
 
             }
 
+        });
+
+    });
+
+    //----- LWF Section -----
+    function loadLwfFullData()
+    {
+        
+        $.ajax({
+
+            url: "{{ route('payroll.lwf.fullList') }}",
+
+            type: "GET",
+
+            data: {
+
+                financial_year: $('#lwf_financial_year').val(),
+
+                filter_type: $('#lwf-period-type').val(),
+
+                period: $('#lwf-period-value').val()
+
+            },
+
+            beforeSend:function(){
+
+                $('#lwfTable').html(`
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            Loading...
+                        </td>
+                    </tr>
+                `);
+
+            },
+
+            success:function(response){
+
+                let html='';
+
+                if(response.length==0){
+
+                    html=`
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                No Record Found
+                            </td>
+                        </tr>
+                    `;
+
+                }else{
+
+                    $.each(response,function(index,row){
+
+                        html += `
+                        <tr>
+
+                            <td>
+                                <input type="checkbox"
+                                    class="lwf-row-checkbox"
+                                    value="${row.id}">
+                            </td>
+
+                            <td>${row.employee_id ?? '-'}</td>
+
+                            <td>${row.name ?? '-'}</td>
+
+                            <td>${row.financial_year ?? '-'}</td>
+
+                            <td>${row.employee_contribution ?? '0.00'}</td>
+
+                            <td>${row.company_contribution ?? '0.00'}</td>
+
+                            <td>${row.lwf_receipt_date ?? '-'}</td>
+
+                            <td>${row.lwf_receipt_no ?? '-'}</td>
+
+                            <td>
+                                ${
+                                    row.lwf_payment_status === 'Done'
+                                    ? '<span class="badge bg-success">Done</span>'
+                                    : '<span class="badge bg-warning text-dark">Pending</span>'
+                                }
+                            </td>
+
+                        </tr>
+                        `;
+
+                    });
+
+                }
+
+                $('#lwfTable').html(html);
+
+                attachLwfCheckboxHandlers();
+
+            }
+
+        });
+
+
+    }
+
+    $('#btnLwfMultipleUpdate').on('click', function () {
+
+        let selectedIds = [];
+
+        $('.lwf-row-checkbox:checked').each(function () {
+            selectedIds.push($(this).val());
+        });
+
+        if (selectedIds.length === 0) {
+            alert('Please select at least one record.');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('payroll.lwf.update') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+
+                ids: selectedIds,
+
+                lwf_grips_payment_id: $('#lwf_grips_payment_id_input').val(),
+                lwf_receipt_date: $('#lwf_receipt_date_input').val(),
+                lwf_receipt_no: $('#lwf_receipt_no_input').val(),
+                lwf_organization_account_no: $('#lwf_org_account_no_input').val(),
+                lwf_payment_month: $('#lwf_payment_month_input').val(),
+                lwf_employee_count: $('#lwf_employee_count_input').val(),
+                lwf_employee_contribution: $('#lwf_employee_contribution_input').val(),
+                lwf_employer_contribution: $('#lwf_employer_contribution_input').val(),
+                lwf_total_payment: $('#lwf_total_payment_input').val(),
+                lwf_interest_amount: $('#lwf_interest_amount_input').val()
+            },
+
+            success: function (response) {
+
+                showToast(response.message, 'success');
+
+                // Uncheck all checkboxes
+                $('#select-all-lwf').prop('checked', false);
+                $('.lwf-row-checkbox').prop('checked', false);
+
+                // Clear all input fields
+                $('#lwf_grips_payment_id_input').val('');
+                $('#lwf_receipt_date_input').val('');
+                $('#lwf_receipt_no_input').val('');
+                $('#lwf_org_account_no_input').val('');
+                $('#lwf_payment_month_input').val('');
+                $('#lwf_employee_count_input').val('');
+                $('#lwf_employee_contribution_input').val('');
+                $('#lwf_employer_contribution_input').val('');
+                $('#lwf_total_payment_input').val('');
+                $('#lwf_interest_amount_input').val('');
+
+                // Reload table
+                loadLwfFullData();
+            },
+            error: function (xhr) {
+
+                let message = 'Something went wrong.';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+
+                showToast(message, 'error');
+            }
         });
 
     });

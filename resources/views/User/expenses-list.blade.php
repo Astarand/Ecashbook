@@ -123,7 +123,6 @@
                                             @endphp
 
                                             @if(in_array($userType, [2,5]))
-
                                                 @if ($expen->status != '0')
                                                 <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
                                                     <a href="{{ url('/edit-expenses/'.base64_encode($expen->id)) }}"
@@ -132,7 +131,7 @@
                                                     </a>
                                                 </li>
                                                 @endif
-
+												@if ($expen->payment_status == 'due')
 												<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Third Party Settlement">
 													<a href="javascript:void(0);" title="Third Party Settlement"
 															class="btn btn-sm btn-warning settlement-btn"
@@ -141,6 +140,7 @@
 														<i class="ti ti-replace"></i>
 													</a>
 												</li>
+												@endif
                                                 <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
                                                     <a href="#"
                                                     class="avtar avtar-xs btn-link-danger btn-pc-default expenses"
@@ -149,8 +149,7 @@
                                                     data-bs-target="#delete_modal">
                                                         <i class="ti ti-trash f-18"></i>
                                                     </a>
-                                                </li>
-												
+                                                </li>												
                                             @endif
                                         </ul>
                                     </div>

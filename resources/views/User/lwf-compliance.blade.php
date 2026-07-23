@@ -18,6 +18,9 @@
                     </ul>
                 </div>
                 <div class="col-md-7 text-end">
+                    <a href="http://127.0.0.1:8000/payslip/update#lwf-section" class="btn btn-warning shadow">
+                        LWF Challan Update 
+                    </a>
                     <button class="btn btn-outline-primary px-3 py-2 rounded-3 me-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#aboutLwfModal">
                         <i class="ti ti-info-circle f-16"></i> About LWF Compliance
                     </button>
@@ -73,107 +76,51 @@
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table tbl-product m-0 custom-list-table align-middle" id="pc-dt-simple">
-                            <thead>
-                                <tr class="bg-light-header">
-                                    <th class="text-end py-3 ps-4" style="width: 60px;">#</th>
-                                    <th class="py-3">Filing Period</th>
-                                    <th class="py-3">Employee Count</th>
-                                    <th class="py-3">Employee Contribution</th>
-                                    <th class="py-3">Employer Contribution</th>
-                                    <th class="py-3">Challan No</th>
-                                    <th class="py-3">Due Date</th>
-                                    <th class="py-3">Payment Status</th>
-                                    <th class="text-center py-3 pe-4" style="width: 100px;">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="text-end ps-4 fw-medium text-muted">1</td>
-                                    <td class="fw-bold text-dark">June 2026</td>
-                                    <td>24 Employees</td>
-                                    <td class="fw-semibold text-dark">₹ 240.00</td>
-                                    <td class="fw-semibold text-dark">₹ 720.00</td>
-                                    <td class="text-muted">CH-LWF-982351</td>
-                                    <td class="text-muted">15-07-2026</td>
-                                    <td>
-                                        <span class="badge-pill-custom badge-pill-resolved">Filed</span>
-                                    </td>
-                                    <td class="text-center pe-4">
-                                        <button class="btn-action-detail view-lwf-details-btn" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#viewDetailsModal"
-                                                data-period="June 2026"
-                                                data-count="24 Employees"
-                                                data-emp-contribution="₹ 240.00"
-                                                data-employer-contribution="₹ 720.00"
-                                                data-total="₹ 960.00"
-                                                data-challan="CH-LWF-982351"
-                                                data-due-date="15-07-2026"
-                                                data-status="Filed"
-                                                data-remarks="Filing successfully submitted through State Welfare Board portal.">
-                                            <i class="ti ti-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-end ps-4 fw-medium text-muted">2</td>
-                                    <td class="fw-bold text-dark">December 2025</td>
-                                    <td>20 Employees</td>
-                                    <td class="fw-semibold text-dark">₹ 200.00</td>
-                                    <td class="fw-semibold text-dark">₹ 600.00</td>
-                                    <td class="text-muted">CH-LWF-874211</td>
-                                    <td class="text-muted">15-01-2026</td>
-                                    <td>
-                                        <span class="badge-pill-custom badge-pill-resolved">Filed</span>
-                                    </td>
-                                    <td class="text-center pe-4">
-                                        <button class="btn-action-detail view-lwf-details-btn" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#viewDetailsModal"
-                                                data-period="December 2025"
-                                                data-count="20 Employees"
-                                                data-emp-contribution="₹ 200.00"
-                                                data-employer-contribution="₹ 600.00"
-                                                data-total="₹ 800.00"
-                                                data-challan="CH-LWF-874211"
-                                                data-due-date="15-01-2026"
-                                                data-status="Filed"
-                                                data-remarks="LWF half yearly payment successfully filed and processed.">
-                                            <i class="ti ti-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-end ps-4 fw-medium text-muted">3</td>
-                                    <td class="fw-bold text-dark">June 2025</td>
-                                    <td>18 Employees</td>
-                                    <td class="fw-semibold text-dark">₹ 180.00</td>
-                                    <td class="fw-semibold text-dark">₹ 540.00</td>
-                                    <td class="text-muted">CH-LWF-763910</td>
-                                    <td class="text-muted">15-07-2025</td>
-                                    <td>
-                                        <span class="badge-pill-custom badge-pill-resolved">Filed</span>
-                                    </td>
-                                    <td class="text-center pe-4">
-                                        <button class="btn-action-detail view-lwf-details-btn" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#viewDetailsModal"
-                                                data-period="June 2025"
-                                                data-count="18 Employees"
-                                                data-emp-contribution="₹ 180.00"
-                                                data-employer-contribution="₹ 540.00"
-                                                data-total="₹ 720.00"
-                                                data-challan="CH-LWF-763910"
-                                                data-due-date="15-07-2025"
-                                                data-status="Filed"
-                                                data-remarks="Annual compliance verified. Receipt archived.">
-                                            <i class="ti ti-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <h6 class="fw-bold text-dark mb-0">Labour Welfare Fund (LWF) Liability Report</h6>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                            <select id="payrollFY" class="form-select form-select-sm" style="width:170px;"></select>
+                            <select id="lwf_type" class="form-select form-select-sm" style="width:140px;">
+                                <option value="monthly">Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                                <option value="half-yearly">Half-Yearly</option>
+                                <option value="yearly">Full Year</option>
+                            </select>
+
+                            
+
+                            <select id="lwf_period" class="form-select form-select-sm" style="width:160px;"></select>
+
+                            <button class="btn btn-primary btn-sm px-3" onclick="loadLwfData()">
+                                Load
+                            </button>
+                        </div>
+
+                        <div class="table-responsive border rounded-3">
+                            <table class="table tbl-product m-0 custom-list-table align-middle table-sm">
+                                <thead class="bg-light">
+                                    <tr class="text-secondary small fw-bold">
+                                        <th>Employee ID</th>
+                                        <th>Employee Name</th>
+                                        <th>State</th>
+                                        <th>Gross Wages</th>
+                                        <th>Employee Share (LWF)</th>
+                                        <th>Employer Share (LWF)</th>
+                                        <th>Total LWF Contribution</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lwfTableBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted py-4">
+                                            Select filters and click Load
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -336,93 +283,93 @@
 </div>
 
 <style>
-/* Premium Alert Styles */
-.premium-warning-alert {
-    background: #fffdf5;
-    border-left: 4px solid #f59e0b !important;
-}
-.alert-icon-box {
-    width: 44px;
-    height: 44px;
-    flex-shrink: 0;
-}
-.step-num-badge-new {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: rgba(245, 158, 11, 0.15);
-    color: #d97706;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-    flex-shrink: 0;
-    margin-top: 1px;
-}
+    /* Premium Alert Styles */
+    .premium-warning-alert {
+        background: #fffdf5;
+        border-left: 4px solid #f59e0b !important;
+    }
+    .alert-icon-box {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+    }
+    .step-num-badge-new {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: rgba(245, 158, 11, 0.15);
+        color: #d97706;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
 
-/* Custom Table Styles */
-.bg-light-header {
-    background-color: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
-}
-.custom-list-table th {
-    font-weight: 600;
-    color: #475569;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-.custom-list-table td {
-    padding: 14px 12px !important;
-}
-.custom-list-table tbody tr {
-    transition: background-color 0.2s ease;
-}
-.custom-list-table tbody tr:hover {
-    background-color: #f8fafc;
-}
-.btn-action-detail {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #4f46e5;
-    background: rgba(79, 70, 229, 0.08);
-    border: none;
-    transition: all 0.2s;
-}
-.btn-action-detail:hover {
-    color: #ffffff;
-    background: #4f46e5;
-}
+    /* Custom Table Styles */
+    .bg-light-header {
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .custom-list-table th {
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    .custom-list-table td {
+        padding: 14px 12px !important;
+    }
+    .custom-list-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+    .custom-list-table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+    .btn-action-detail {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #4f46e5;
+        background: rgba(79, 70, 229, 0.08);
+        border: none;
+        transition: all 0.2s;
+    }
+    .btn-action-detail:hover {
+        color: #ffffff;
+        background: #4f46e5;
+    }
 
-/* Custom Badge Styling */
-.badge-pill-custom {
-    padding: 4px 12px;
-    border-radius: 50rem;
-    font-weight: 600;
-    font-size: 0.75rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-.badge-pill-resolved {
-    background: rgba(16, 185, 129, 0.08);
-    color: #059669;
-    border: 1px solid rgba(16, 185, 129, 0.15);
-}
-.font-12 {
-    font-size: 12px;
-}
-.font-14 {
-    font-size: 14px;
-}
-.w-30 {
-    width: 30%;
-}
+    /* Custom Badge Styling */
+    .badge-pill-custom {
+        padding: 4px 12px;
+        border-radius: 50rem;
+        font-weight: 600;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .badge-pill-resolved {
+        background: rgba(16, 185, 129, 0.08);
+        color: #059669;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+    .font-12 {
+        font-size: 12px;
+    }
+    .font-14 {
+        font-size: 14px;
+    }
+    .w-30 {
+        width: 30%;
+    }
 </style>
 
 <script>
@@ -452,5 +399,250 @@
         $('#detailStatus').text($(this).data('status'));
         $('#detailRemarks').text($(this).data('remarks'));
     });
+
+    function renderLwfFilter() {
+
+    const type = $('#lwf_type').val();
+    let html = '';
+
+    // Financial Year Month Order
+    const fyMonths = [
+        'April', 'May', 'June', 'July', 'August', 'September',
+        'October', 'November', 'December',
+        'January', 'February', 'March'
+    ];
+
+    if (type === 'monthly') {
+
+        fyMonths.forEach(function (month) {
+            html += `<option value="${month}">${month}</option>`;
+        });
+
+        $('#lwf_period').html(html).show();
+
+        // Select Previous Month
+        const previousMonthMap = [
+            'December', // Jan
+            'January',  // Feb
+            'February', // Mar
+            'March',    // Apr
+            'April',    // May
+            'May',      // Jun
+            'June',     // Jul
+            'July',     // Aug
+            'August',   // Sep
+            'September',// Oct
+            'October',  // Nov
+            'November'  // Dec
+        ];
+
+        $('#lwf_period').val(previousMonthMap[new Date().getMonth()]);
+
+    }
+    else if (type === 'quarterly') {
+
+        html = `
+            <option value="Q1">Q1 (Apr-Jun)</option>
+            <option value="Q2">Q2 (Jul-Sep)</option>
+            <option value="Q3">Q3 (Oct-Dec)</option>
+            <option value="Q4">Q4 (Jan-Mar)</option>
+        `;
+
+        $('#lwf_period').html(html).show();
+
+    }
+    else if (type === 'half-yearly') {
+
+        html = `
+            <option value="H1">H1 (Apr-Sep)</option>
+            <option value="H2">H2 (Oct-Mar)</option>
+        `;
+
+        $('#lwf_period').html(html).show();
+
+    }
+    else {
+
+        $('#lwf_period').hide().html('');
+
+    }
+
+}
+
+function getDefaultFinancialYear() {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const fyStartYear = (currentMonth >= 3) ? currentYear : currentYear - 1;
+    return `${fyStartYear}-${fyStartYear + 1}`;
+}
+
+function initializePayrollFY() {
+    const $fySelect = $('#payrollFY');
+    if (!$fySelect.length) {
+        return;
+    }
+
+    const currentFY = getDefaultFinancialYear();
+    const startYear = parseInt(currentFY.split('-')[0], 10);
+    const prevFY = `${startYear - 1}-${startYear}`;
+    const nextFY = `${startYear + 1}-${startYear + 2}`;
+
+    if ($fySelect.find('option').length === 0) {
+        $fySelect.html(`
+            <option value="${prevFY}">${prevFY}</option>
+            <option value="${currentFY}" selected>${currentFY}</option>
+            <option value="${nextFY}">${nextFY}</option>
+        `);
+    }
+
+    if (!$fySelect.val()) {
+        $fySelect.val(currentFY);
+    }
+}
+
+function loadLwfData() {
+
+    const fy = $('#payrollFY').val() || getDefaultFinancialYear();
+
+    if (!fy) {
+        console.log('Financial Year not selected.');
+        return;
+    }
+
+    const type = $('#lwf_type').val();
+    const period = (type === 'yearly') ? '' : $('#lwf_period').val();
+
+    console.log({
+        financial_year: fy,
+        filter_type: type,
+        period: period
+    });
+
+    $('#lwfTableBody').html(`
+        <tr>
+            <td colspan="8" class="text-center py-4">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Loading...
+            </td>
+        </tr>
+    `);
+
+    $.ajax({
+
+        url: "{{ route('payroll.lwf.list') }}",
+        type: "GET",
+
+        data: {
+            financial_year: fy,
+            filter_type: type,
+            period: period
+        },
+
+        success: function (data) {
+
+            let html = '';
+
+            if (!data.length) {
+
+                html = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            No LWF applicable employees found.
+                        </td>
+                    </tr>
+                `;
+
+            } else {
+
+                $.each(data, function (i, row) {
+
+                    const emp = parseFloat(row.lwf_employee || 0);
+                    const employer = parseFloat(row.lwf_employer || 0);
+                    const total = parseFloat(row.lwf_total || (emp + employer));
+
+                    html += `
+                        <tr>
+
+                            <td>${row.employee_id ?? '-'}</td>
+
+                            <td>${row.name ?? '-'}</td>
+
+                            <td>${row.state_name ?? '-'}</td>
+
+                            <td>
+                                ₹${parseFloat(row.gross_wages || 0).toLocaleString('en-IN',{
+                                    minimumFractionDigits:2,
+                                    maximumFractionDigits:2
+                                })}
+                            </td>
+
+                            <td>₹${emp.toFixed(2)}</td>
+
+                            <td>₹${employer.toFixed(2)}</td>
+
+                            <td><strong>₹${total.toFixed(2)}</strong></td>
+
+                            <td>
+                                ${
+                                    row.status === 'Done'
+                                    ? '<span class="badge bg-success">Done</span>'
+                                    : '<span class="badge bg-warning text-dark">Pending</span>'
+                                }
+                            </td>
+
+                        </tr>
+                    `;
+
+                });
+
+            }
+
+            $('#lwfTableBody').html(html);
+
+        },
+
+        error: function () {
+
+            $('#lwfTableBody').html(`
+                <tr>
+                    <td colspan="8" class="text-center text-danger py-4">
+                        Failed to load data.
+                    </td>
+                </tr>
+            `);
+
+        }
+
+    });
+
+}
+
+$(document).ready(function () {
+
+    // Initialize filters
+    initializePayrollFY();
+    renderLwfFilter();
+    loadLwfData();
+
+    // Financial Year Changed
+    $('#payrollFY').on('change', function () {
+        loadLwfData();
+    });
+
+    // Type Changed
+    $('#lwf_type').on('change', function () {
+
+        renderLwfFilter();
+        loadLwfData();
+
+    });
+
+    // Period Changed
+    $('#lwf_period').on('change', function () {
+        loadLwfData();
+    });
+
+});
 </script>
 @endsection

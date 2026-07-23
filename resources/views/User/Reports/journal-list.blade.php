@@ -25,9 +25,9 @@
                     </div>
                 </div>
 				@if($req_type != 1)
-					<div class="col-md-8 text-end">
+					<!--<div class="col-md-8 text-end">
 						<a href="{{ route('user.AddJournal') }}" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Journal</a>
-					</div>
+					</div>-->
 				@endif
             </div>
         </div>

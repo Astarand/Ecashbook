@@ -1730,6 +1730,7 @@ class PayrollReportController extends Controller
 
         return response()->json($records);
     }
+
     
     //------- PTAX Summary (grouped by period) -------//
     public function getPtaxSummary(Request $request)
@@ -1853,6 +1854,144 @@ class PayrollReportController extends Controller
         ]);
     }
 
+    //------- LWF Full List -------//
+    public function getLwfFullList(Request $request)
+    {
+        $ownerId       = currentOwnerId();
+        $financialYear = $request->financial_year;
+        $filterType    = $request->filter_type;
+        $period        = $request->period;
+
+        $query = DB::table('user_payslip')
+            ->leftJoin('employees', 'employees.empId', '=', 'user_payslip.user_emp_id')
+            ->leftJoin('users', 'users.id', '=', 'user_payslip.user_emp_id')
+            ->where('user_payslip.added_by', $ownerId)
+            ->where('user_payslip.financial_year', $financialYear);
+
+        // Period Filter
+        if ($filterType == 'monthly' && !empty($period)) {
+
+            $month = Carbon::parse('1 ' . $period)->month;
+            $query->where('user_payslip.month', $month);
+
+        } elseif ($filterType == 'quarterly' && !empty($period)) {
+
+            switch ($period) {
+                case 'Q1':
+                    $months = [4, 5, 6];
+                    break;
+                case 'Q2':
+                    $months = [7, 8, 9];
+                    break;
+                case 'Q3':
+                    $months = [10, 11, 12];
+                    break;
+                case 'Q4':
+                    $months = [1, 2, 3];
+                    break;
+                default:
+                    $months = [];
+            }
+
+            if (!empty($months)) {
+                $query->whereIn('user_payslip.month', $months);
+            }
+
+        } elseif ($filterType == 'half-yearly' && !empty($period)) {
+
+            switch ($period) {
+                case 'H1':
+                    $months = [4, 5, 6, 7, 8, 9];
+                    break;
+                case 'H2':
+                    $months = [10, 11, 12, 1, 2, 3];
+                    break;
+                default:
+                    $months = [];
+            }
+
+            if (!empty($months)) {
+                $query->whereIn('user_payslip.month', $months);
+            }
+        }
+
+        // Only LWF Applicable Employees
+        $query->whereRaw("
+            CAST(
+                JSON_UNQUOTE(
+                    JSON_EXTRACT(
+                        emp_salary_slip_response,
+                        '$.visible_data.final_salary_calculation.lwf_applicable'
+                    )
+                ) AS UNSIGNED
+            ) = 1
+        ");
+
+        $records = $query->select(
+                'user_payslip.id',
+                'employees.employee_id',
+                DB::raw("COALESCE(users.name) as name"),
+                'user_payslip.financial_year',
+
+                // Employee Contribution
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(
+                            JSON_EXTRACT(
+                                emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.lwf_deduct'
+                            )
+                        ) AS DECIMAL(12,2)
+                    ) AS employee_contribution
+                "),
+
+                // Employer Contribution
+                DB::raw("
+                    CAST(
+                        JSON_UNQUOTE(
+                            JSON_EXTRACT(
+                                emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.lwf_company_contribution'
+                            )
+                        ) AS DECIMAL(12,2)
+                    ) AS company_contribution
+                "),
+
+                'user_payslip.lwf_receipt_date',
+                'user_payslip.lwf_receipt_no',
+                'user_payslip.lwf_payment_status'
+            )
+            ->orderBy('employees.employee_id')
+            ->get();
+
+        return response()->json($records);
+    }
+
+    public function updateLwf(Request $request)
+    {
+        DB::table('user_payslip')
+            ->whereIn('id', $request->ids)
+            ->update([
+                'lwf_grips_payment_id'          => $request->lwf_grips_payment_id,
+                'lwf_receipt_date'              => $request->lwf_receipt_date,
+                'lwf_receipt_no'                => $request->lwf_receipt_no,
+                'lwf_organization_account_no'   => $request->lwf_organization_account_no,
+                'lwf_payment_month'             => $request->lwf_payment_month,
+                'lwf_employee_count'            => $request->lwf_employee_count,
+                'lwf_employee_contribution'     => $request->lwf_employee_contribution,
+                'lwf_employer_contribution'     => $request->lwf_employer_contribution,
+                'lwf_total_payment'             => $request->lwf_total_payment,
+                'lwf_interest_amount'           => $request->lwf_interest_amount,
+                'lwf_payment_status'            => 'Done',
+                'updated_at'                    => now(),
+            ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Selected LWF records updated successfully.'
+        ]);
+    }
+
     // ------- Salary Sheet (Bank Transfer Sheet) -------//
     public function getSalarySheetData(Request $request)
     {
@@ -1912,6 +2051,70 @@ class PayrollReportController extends Controller
     }
 
     // ------- LWF List -------//
+    // public function getLwfList(Request $request)
+    // {
+    //     $ownerId       = currentOwnerId();
+    //     $financialYear = $request->financial_year;
+    //     $filterType    = $request->filter_type;
+    //     $period        = $request->period;
+
+    //     $months = $this->resolveMonths($filterType, $period);
+
+    //     $query = DB::table('user_payslip as up')
+    //         ->leftJoin('users as u', 'u.id', '=', 'up.user_emp_id')
+    //         ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+    //         ->leftJoin('states as s', 's.id', '=', 'e.c_emp_state')
+    //         ->where('up.added_by', $ownerId)
+    //         ->where('up.financial_year', $financialYear)
+    //         ->where('e.lwf_applicable', 1);
+
+    //     if (!empty($months)) {
+    //         $query->whereIn('up.month', $months);
+    //     }
+
+    //     $records = $query->select(
+    //             'up.id',
+    //             'up.user_emp_id',
+    //             'up.month',
+    //             'e.employee_id',
+    //             'u.name',
+    //             's.name as state_name',
+    //             DB::raw("
+    //                 CAST(
+    //                     JSON_UNQUOTE(
+    //                         JSON_EXTRACT(up.emp_salary_slip_response,
+    //                             '$.visible_data.final_salary_calculation.total_earnings')
+    //                     ) AS DECIMAL(15,2)
+    //                 ) as gross_wages
+    //             "),
+    //             DB::raw("
+    //                 CAST(
+    //                     JSON_UNQUOTE(
+    //                         JSON_EXTRACT(up.emp_salary_slip_response,
+    //                             '$.visible_data.final_salary_calculation.lwf_deduct')
+    //                     ) AS DECIMAL(15,2)
+    //                 ) as lwf_employee
+    //             "),
+    //             DB::raw("
+    //                 CAST(
+    //                     JSON_UNQUOTE(
+    //                         JSON_EXTRACT(up.emp_salary_slip_response,
+    //                             '$.visible_data.final_salary_calculation.lwf_company_contribution')
+    //                     ) AS DECIMAL(15,2)
+    //                 ) as lwf_employer
+    //             ")
+    //         )
+    //         ->orderBy('u.name')
+    //         ->get();
+
+    //     foreach ($records as $row) {
+    //         $row->lwf_total = ($row->lwf_employee ?? 0) + ($row->lwf_employer ?? 0);
+    //         $row->status    = 'Filed';
+    //     }
+
+    //     return response()->json($records);
+    // }
+
     public function getLwfList(Request $request)
     {
         $ownerId       = currentOwnerId();
@@ -1920,57 +2123,82 @@ class PayrollReportController extends Controller
         $period        = $request->period;
 
         $months = $this->resolveMonths($filterType, $period);
+        
 
         $query = DB::table('user_payslip as up')
             ->leftJoin('users as u', 'u.id', '=', 'up.user_emp_id')
             ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
             ->leftJoin('states as s', 's.id', '=', 'e.c_emp_state')
             ->where('up.added_by', $ownerId)
-            ->where('up.financial_year', $financialYear)
-            ->where('e.lwf_applicable', 1);
+            ->where('up.financial_year', $financialYear);
 
         if (!empty($months)) {
             $query->whereIn('up.month', $months);
         }
 
+        // Show only payslips where LWF is applicable
+        $query->whereRaw("
+            CAST(
+                JSON_UNQUOTE(
+                    JSON_EXTRACT(
+                        up.emp_salary_slip_response,
+                        '$.visible_data.final_salary_calculation.lwf_applicable'
+                    )
+                ) AS UNSIGNED
+            ) = 1
+        ");
+
         $records = $query->select(
                 'up.id',
                 'up.user_emp_id',
                 'up.month',
+                'up.lwf_payment_status',
                 'e.employee_id',
                 'u.name',
                 's.name as state_name',
+
                 DB::raw("
                     CAST(
                         JSON_UNQUOTE(
-                            JSON_EXTRACT(up.emp_salary_slip_response,
-                                '$.visible_data.final_salary_calculation.total_earnings')
+                            JSON_EXTRACT(
+                                up.emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.total_earnings'
+                            )
                         ) AS DECIMAL(15,2)
-                    ) as gross_wages
+                    ) AS gross_wages
                 "),
+
                 DB::raw("
                     CAST(
                         JSON_UNQUOTE(
-                            JSON_EXTRACT(up.emp_salary_slip_response,
-                                '$.visible_data.final_salary_calculation.lwf_deduct')
+                            JSON_EXTRACT(
+                                up.emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.lwf_deduct'
+                            )
                         ) AS DECIMAL(15,2)
-                    ) as lwf_employee
+                    ) AS lwf_employee
                 "),
+
                 DB::raw("
                     CAST(
                         JSON_UNQUOTE(
-                            JSON_EXTRACT(up.emp_salary_slip_response,
-                                '$.visible_data.final_salary_calculation.lwf_company_contribution')
+                            JSON_EXTRACT(
+                                up.emp_salary_slip_response,
+                                '$.visible_data.final_salary_calculation.lwf_company_contribution'
+                            )
                         ) AS DECIMAL(15,2)
-                    ) as lwf_employer
+                    ) AS lwf_employer
                 ")
             )
             ->orderBy('u.name')
             ->get();
 
         foreach ($records as $row) {
+
             $row->lwf_total = ($row->lwf_employee ?? 0) + ($row->lwf_employer ?? 0);
-            $row->status    = 'Filed';
+
+            // Status from database
+            $row->status = $row->lwf_payment_status ?? 'Pending';
         }
 
         return response()->json($records);

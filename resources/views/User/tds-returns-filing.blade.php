@@ -24,7 +24,7 @@
                 </div>
                 <div class="col-md-8 text-end">
                     <a href="{{ route('payroll.payslip_update') }}#tds-section" class="btn btn-warning shadow">
-                        TDS Update
+                        TDS Challan Update
                     </a>
 
                     <a href="#tdsFilterOffcanvas" class="btn btn-primary shadow" style="font-size: 16px;" data-bs-toggle="offcanvas" data-bs-target="#tdsFilterOffcanvas" aria-controls="tdsFilterOffcanvas">
