@@ -254,7 +254,7 @@
           <div class="row g-2 text-center align-items-center">
             <!-- Platform Usage Credit -->
             <div class="col-3">
-              <div class="py-2 px-1 rounded metric-box" style="background-color: rgba(66, 47, 144, 0.03); border-radius: 8px;">
+              <div class="py-2 px-1 rounded metric-box" style="background-color: rgba(0, 140, 173, 0.03); border-radius: 8px;">
                 <p class="text-muted mb-1" style="font-size: 10px; font-weight: 500; white-space: nowrap;">Platform Usage Credit</p>
                 <h5 class="mb-0 text-primary fw-600" style="font-size: 14px;" id="total-earning">₹0.00</h5>
               </div>
@@ -312,7 +312,7 @@
           <div class="row g-3 text-center mb-4">
             <!-- Total Tasks -->
             <div class="col-6 col-md-3">
-              <div class="py-3 px-2 rounded metric-box" style="background-color: rgba(66, 47, 144, 0.03); border-radius: 12px;">
+              <div class="py-3 px-2 rounded metric-box" style="background-color: rgba(0, 140, 173, 0.03); border-radius: 12px;">
                 <p class="text-muted mb-1 fw-500" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Total Tasks</p>
                 <h3 class="mb-0 text-primary fw-700" id="task-total-count">0</h3>
               </div>
@@ -343,7 +343,7 @@
           <!-- Table with premium header and row styles -->
           <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-              <thead class="bg-light-primary" style="background-color: rgba(66, 47, 144, 0.02); border-radius: 6px;">
+              <thead class="bg-light-primary" style="background-color: rgba(0, 140, 173, 0.02); border-radius: 6px;">
                 <tr>
                   <th class="py-3 text-muted fw-600" style="font-size: 11px; letter-spacing: 0.5px; border-bottom: none;">PLATFORM USAGE NAME</th>
                   <th class="py-3 text-muted fw-600" style="font-size: 11px; letter-spacing: 0.5px; border-bottom: none;">TASK TYPE</th>
@@ -428,7 +428,7 @@
 			steps: [
 				{
 					title: 'CA Admin Dashboard',
-					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-dashboard" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Chartered Accountant Control Center. Manage clients, track cashbook transactions, and oversee assigned staff.</p></div>'
+					intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(0, 140, 173, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #008CAD;"><i class="ti ti-dashboard" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Chartered Accountant Control Center. Manage clients, track cashbook transactions, and oversee assigned staff.</p></div>'
 				},
 				{
 					element: '#sidebarMenuSearch',

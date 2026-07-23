@@ -557,14 +557,14 @@
   .ca-card .card.user-card {
     border: 1px solid #e2e8f0 !important;
     border-radius: 16px !important;
-    box-shadow: 0 4px 20px rgba(66, 47, 144, 0.02) !important;
+    box-shadow: 0 4px 20px rgba(0, 140, 173, 0.02) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     background-color: #ffffff !important;
     overflow: hidden !important;
   }
   .ca-card .card.user-card:hover {
     transform: translateY(-4px) !important;
-    box-shadow: 0 10px 25px rgba(66, 47, 144, 0.06) !important;
+    box-shadow: 0 10px 25px rgba(0, 140, 173, 0.06) !important;
     border-color: #ddd6fe !important;
   }
   .ca-card .card-body {
@@ -703,8 +703,8 @@
     transition: all 0.2s ease !important;
   }
   .user-card .assignCABtn[data-status="0"] {
-    background-color: #422f90 !important;
-    border-color: #422f90 !important;
+    background-color: #008CAD !important;
+    border-color: #008CAD !important;
     color: #ffffff !important;
   }
   .user-card .assignCABtn[data-status="0"]:hover {
@@ -768,7 +768,7 @@
     outline: none !important;
   }
   .ca-side-panel button[type="submit"] {
-    background: #422f90 !important;
+    background: #008CAD !important;
     color: white !important;
     border-radius: 8px !important;
     padding: 12px !important;
@@ -1114,7 +1114,7 @@
                 steps: [
                     {
                         title: 'Assign CA / Accountant Guide',
-                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ph-duotone ph-user-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Connect with professional Chartered Accountants or Accounting Professionals to manage your accounting operations.</p></div>'
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(0, 140, 173, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #008CAD;"><i class="ph-duotone ph-user-circle" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Connect with professional Chartered Accountants or Accounting Professionals to manage your accounting operations.</p></div>'
                     },
                     {
                         element: '.ca-highlight-section',

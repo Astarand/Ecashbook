@@ -961,8 +961,8 @@
     #attendanceTable + .datatable-bottom .datatable-pagination .datatable-active button,
     #attendanceTable + .datatable-bottom .datatable-pagination .active a,
     #attendanceTable + .datatable-bottom .datatable-pagination .active button {
-        background-color: #422f90 !important;
-        border-color: #422f90 !important;
+        background-color: #008CAD !important;
+        border-color: #008CAD !important;
         color: white !important;
     }
     #registerTable + .datatable-bottom, #attendanceTable + .datatable-bottom {
@@ -1010,10 +1010,10 @@
     }
     #summarySelectorList .list-group-item.active {
         background-color: #f2f0fa !important;
-        border-color: #422f90 !important;
-        color: #422f90 !important;
+        border-color: #008CAD !important;
+        color: #008CAD !important;
         font-weight: 700 !important;
-        box-shadow: 0 4px 12px rgba(66, 47, 144, 0.08) !important;
+        box-shadow: 0 4px 12px rgba(0, 140, 173, 0.08) !important;
     }
     #summarySelectorList .list-group-item.active::before {
         content: '';
@@ -1022,7 +1022,7 @@
         top: 0;
         bottom: 0;
         width: 4px;
-        background-color: #422f90;
+        background-color: #008CAD;
     }
 
     /* Print Report Container Styles */
@@ -1053,7 +1053,7 @@
         top: 3px;
         bottom: 3px;
         width: 3px;
-        background-color: #422f90;
+        background-color: #008CAD;
         border-radius: 2px;
     }
     #summarySelectorList .list-group-item i {
@@ -1698,7 +1698,7 @@
             body: body,
             startY: 32,
             styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-            headStyles: { fillColor: [66, 47, 144], textColor: 255, fontStyle: 'bold' },
+            headStyles: { fillColor: [0, 140, 173], textColor: 255, fontStyle: 'bold' },
             alternateRowStyles: { fillColor: [245, 245, 250] },
             margin: { left: 14, right: 14 },
         });

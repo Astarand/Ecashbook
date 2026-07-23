@@ -689,7 +689,7 @@
             steps: [
                 {
                     title: 'Bank Reconciliation Guide',
-                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-report-analytics" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Bank Reconciliation page. This tool helps you match bank statement records with your recorded vouchers to ensure accuracy.</p></div>'
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(0, 140, 173, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #008CAD;"><i class="ti ti-report-analytics" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the Bank Reconciliation page. This tool helps you match bank statement records with your recorded vouchers to ensure accuracy.</p></div>'
                 },
                 {
                     element: '.reconciliation-filter-card',

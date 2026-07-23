@@ -40,7 +40,7 @@
         <div class="ms-auto">
             {{-- Search Options --}}
             <div class="form-search tour-search position-relative" style="width:250px;">
-                <i class="ph-duotone ph-magnifying-glass icon-search" style="color:#422f90;"></i>
+                <i class="ph-duotone ph-magnifying-glass icon-search" style="color:#008CAD;"></i>
                 <input type="search"
                     class="form-control"
                     placeholder="Search..."

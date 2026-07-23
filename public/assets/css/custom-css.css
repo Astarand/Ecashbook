@@ -1523,7 +1523,7 @@ label.error {
 
 .calendar-trigger i {
     font-size: 1.2rem;
-    color: #422f90 !important;
+    color: #008CAD !important;
 }
 
 /* Flatpickr customization */
@@ -1564,12 +1564,12 @@ label.error {
     border: 1px solid #e2e6ee !important;
     border-radius: 12px !important;
     background-color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(66, 47, 144, 0.015) !important;
+    box-shadow: 0 4px 12px rgba(0, 140, 173, 0.015) !important;
     transition: all 0.2s ease-in-out;
 }
 
 .card:hover {
-    box-shadow: 0 6px 18px rgba(66, 47, 144, 0.03) !important;
+    box-shadow: 0 6px 18px rgba(0, 140, 173, 0.03) !important;
 }
 
 .card-header {
@@ -1605,20 +1605,20 @@ p.text-muted {
     border: 1px solid #cbd5e1 !important;
     border-radius: 6px !important;
     font-size: 0.85rem !important;
-    color: #422f90 !important;
+    color: #008CAD !important;
     background-color: #ffffff !important;
     transition: border-color 0.15s ease-in-out;
 }
 
 .form-select:focus {
-    border-color: #422f90 !important;
-    box-shadow: 0 0 0 2px rgba(66, 47, 144, 0.1) !important;
+    border-color: #008CAD !important;
+    box-shadow: 0 0 0 2px rgba(0, 140, 173, 0.1) !important;
 }
 
 /* Buttons styling override to be flat & brand-colored */
 .btn-primary {
-    background-color: #422f90 !important;
-    border-color: #422f90 !important;
+    background-color: #008CAD !important;
+    border-color: #008CAD !important;
     color: #ffffff !important;
     font-weight: 500 !important;
     border-radius: 6px !important;
@@ -1635,7 +1635,7 @@ p.text-muted {
 .btn-secondary {
     background-color: #eae7f7 !important;
     border-color: #eae7f7 !important;
-    color: #422f90 !important;
+    color: #008CAD !important;
     font-weight: 500 !important;
     border-radius: 6px !important;
     transition: all 0.2s ease;
@@ -1657,8 +1657,8 @@ p.text-muted {
 }
 
 #compo-menu-search:focus {
-    border-color: #422f90 !important;
-    box-shadow: 0 0 0 2px rgba(66, 47, 144, 0.1) !important;
+    border-color: #008CAD !important;
+    box-shadow: 0 0 0 2px rgba(0, 140, 173, 0.1) !important;
 }
 
 /* Table design and table headings */
@@ -1713,7 +1713,7 @@ p.text-muted {
 /* Chat Message button relative and custom unread badge */
 .btn-outline-success {
     border-color: #e2e6ee !important;
-    color: #422f90 !important;
+    color: #008CAD !important;
     background-color: #ffffff !important;
 }
 
@@ -1731,7 +1731,7 @@ p.text-muted {
     position: absolute;
     top: -6px;
     right: -6px;
-    background: #422f90 !important; /* Premium brand accent instead of bright red */
+    background: #008CAD !important; /* Premium brand accent instead of bright red */
     color: #ffffff !important;
     font-size: 11px;
     font-weight: 600;
@@ -1788,15 +1788,15 @@ p.text-muted {
 }
 
 .account-pills.nav-pills .nav-link:hover {
-    color: #422f90 !important;
+    color: #008CAD !important;
     background-color: #f5f4fa !important;
     transform: translateX(4px) !important;
 }
 
 .account-pills.nav-pills .nav-link.active {
     color: #ffffff !important;
-    background-color: #422f90 !important; /* Brand accent color for active item */
-    box-shadow: 0 4px 12px rgba(66, 47, 144, 0.2) !important;
+    background-color: #008CAD !important; /* Brand accent color for active item */
+    box-shadow: 0 4px 12px rgba(0, 140, 173, 0.2) !important;
     font-weight: 600 !important;
 }
 
@@ -1826,16 +1826,16 @@ p.text-muted {
 }
 
 .upload-area:hover {
-    border-color: #422f90 !important;
+    border-color: #008CAD !important;
     background-color: #f5f4fa !important;
-    color: #422f90 !important;
+    color: #008CAD !important;
 }
 
 label[for="fileUpload"].btn-primary.btn-icon {
     background-color: #ffffff !important;
     background: #ffffff !important;
     border: 1px solid #e2e6ee !important;
-    color: #422f90 !important;
+    color: #008CAD !important;
     box-shadow:
         0 4px 10px rgba(0, 0, 0, 0.08),
         0 1px 4px rgba(0, 0, 0, 0.04) !important;
@@ -1851,11 +1851,11 @@ label[for="fileUpload"].btn-primary.btn-icon {
 }
 
 label[for="fileUpload"].btn-primary.btn-icon:hover {
-    background-color: #422f90 !important;
-    background: #422f90 !important;
-    border-color: #422f90 !important;
+    background-color: #008CAD !important;
+    background: #008CAD !important;
+    border-color: #008CAD !important;
     color: #ffffff !important;
-    box-shadow: 0 6px 14px rgba(66, 47, 144, 0.25) !important;
+    box-shadow: 0 6px 14px rgba(0, 140, 173, 0.25) !important;
     transform: scale(1.08) !important;
 }
 
@@ -1937,8 +1937,8 @@ label[for="fileUpload"].btn-primary.btn-icon:active {
 }
 .passcode-input:focus,
 .passcode-input-confirm:focus {
-    border-color: #422f90 !important;
-    box-shadow: 0 0 0 3px rgba(66, 47, 144, 0.15) !important;
+    border-color: #008CAD !important;
+    box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15) !important;
     outline: none !important;
 }
 

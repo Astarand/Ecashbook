@@ -33,7 +33,7 @@
             <div class="row align-items-center justify-content-center mb-4">
                 <div class="col-12 mb-4">
                     @if($activeSubscription)
-                    <div style="background: linear-gradient(90deg, #8e54e9 0%, #422f90 100%); border-radius:22px; box-shadow:0 2px 12px #6e4afc33; padding:32px 36px; display:flex; align-items:center; justify-content:space-between; font-size:22px; color:#fff; position:relative;">
+                    <div style="background: linear-gradient(90deg, #8e54e9 0%, #008CAD 100%); border-radius:22px; box-shadow:0 2px 12px #6e4afc33; padding:32px 36px; display:flex; align-items:center; justify-content:space-between; font-size:22px; color:#fff; position:relative;">
                         <div style="display:flex; align-items:center; gap:16px;">
                             <span style="font-size:28px; font-weight:700; margin-left:18px;">{{ $activeSubscription->title ?? 'No Active Plan' }}</span>
                         </div>
@@ -103,11 +103,11 @@
                         @foreach($plans as $plan)
                         <div class="col-md-6 col-xxl-3">
                             <div class="card price-card" @if($activeSubscription && $activeSubscription->pid == $plan->id && $activeSubscription->plan_type == 'monthly') style="border:2px solid #6e4afc; box-shadow:0 0 10px #6e4afc33;" @endif>
-                                <div class="card-body price-head" style="background-color: #422f90;">
+                                <div class="card-body price-head" style="background-color: #008CAD;">
                                     <h5 class="text-white">{{ $plan->title }}</h5>
                                     <h2 class="price-price text-white">₹{{ $plan->monthly_price }} <span>/Month</span></h2>
                                     <div class="price-icon bg-light-primary">
-                                        <i class="{{ $plan->icon ?? 'ph-duotone ph-rocket' }}" style="color:#422f90;"></i>
+                                        <i class="{{ $plan->icon ?? 'ph-duotone ph-rocket' }}" style="color:#008CAD;"></i>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -122,7 +122,7 @@
                                         @endforeach
                                     </ul>
                                     @if($activeSubscription && $activeSubscription->pid == $plan->id && $activeSubscription->plan_type == 'monthly')
-                                    <div class="subscription-info" style="font-weight:bold; color:#422f90; background:#f3f0ff; border-radius:6px; padding:4px 10px; text-align:center; margin-bottom:8px;">
+                                    <div class="subscription-info" style="font-weight:bold; color:#008CAD; background:#f3f0ff; border-radius:6px; padding:4px 10px; text-align:center; margin-bottom:8px;">
                                         <i class="ph-duotone ph-calendar-check me-2"></i>
                                         Active until: {{ \Carbon\Carbon::parse($activeSubscription->end_at)->format('M d, Y') }}
                                     </div>
@@ -152,11 +152,11 @@
                         @foreach($plans as $plan)
                         <div class="col-md-6 col-xxl-3">
                             <div class="card price-card" @if($activeSubscription && $activeSubscription->pid == $plan->id && $activeSubscription->plan_type == 'yearly') style="border:2px solid #6e4afc; box-shadow:0 0 10px #6e4afc33;" @endif>
-                                <div class="card-body price-head" style="background-color: #422f90;">
+                                <div class="card-body price-head" style="background-color: #008CAD;">
                                     <h5 class="text-white">{{ $plan->title }}</h5>
                                     <h2 class="price-price text-white">₹{{ $plan->yearly_price }} <span>/Year</span></h2>
                                     <div class="price-icon bg-light-primary">
-                                        <i class="{{ $plan->icon ?? 'ph-duotone ph-rocket' }}" style="color:#422f90;"></i>
+                                        <i class="{{ $plan->icon ?? 'ph-duotone ph-rocket' }}" style="color:#008CAD;"></i>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -171,7 +171,7 @@
                                         @endforeach
                                     </ul>
                                     @if($activeSubscription && $activeSubscription->pid == $plan->id && $activeSubscription->plan_type == 'yearly')
-                                    <div class="subscription-info" style="font-weight:bold; color:#422f90; background:#f3f0ff; border-radius:6px; padding:4px 10px; text-align:center; margin-bottom:8px;">
+                                    <div class="subscription-info" style="font-weight:bold; color:#008CAD; background:#f3f0ff; border-radius:6px; padding:4px 10px; text-align:center; margin-bottom:8px;">
                                         <i class="ph-duotone ph-calendar-check me-2"></i>
                                         Active until: {{ \Carbon\Carbon::parse($activeSubscription->end_at)->format('M d, Y') }}
                                     </div>
@@ -597,7 +597,7 @@
                 contact: '{{ auth()->user()->phone ?? "" }}'
             },
             theme: {
-                color: '#422f90'
+                color: '#008CAD'
             },
             modal: {
                 ondismiss: function() {
@@ -659,7 +659,7 @@
             steps: [
                 {
                     title: 'Subscription & Billing Guide',
-                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(66, 47, 144, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #422f90;"><i class="ti ti-credit-card" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Choose and manage your E-Cashbook subscription plans, select billing cycles, and review plan features.</p></div>'
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(0, 140, 173, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #008CAD;"><i class="ti ti-credit-card" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Choose and manage your E-Cashbook subscription plans, select billing cycles, and review plan features.</p></div>'
                 },
                 {
                     element: '.pricing-tab-toggle',

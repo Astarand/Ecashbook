@@ -1302,7 +1302,7 @@
 <div class="modal fade" id="gstUserNameModal" tabindex="-1" aria-labelledby="gstUserNameModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg" style="border:none; border-radius:16px; overflow:hidden;">
-          <div class="modal-header text-white" style="background:#422f90;">
+          <div class="modal-header text-white" style="background:#008CAD;">
             <h5 class="modal-title text-white" id="stockInModalLabel"><i class="fas fa-user-shield me-2"></i>GST Portal Username</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
@@ -1328,7 +1328,7 @@
 <div class="modal fade" id="gstAuthenticateModal" tabindex="-1" aria-labelledby="gstAuthenticateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg" style="border:none; border-radius:16px; overflow:hidden;">
-            <div class="modal-header text-white" style="background:#422f90;">
+            <div class="modal-header text-white" style="background:#008CAD;">
                 <h5 class="modal-title text-white" id="gstAuthenticateModalLabel">
                     <i class="fas fa-shield-alt me-2"></i>GST OTP Verification
                 </h5>

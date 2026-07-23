@@ -35,10 +35,9 @@ File: style.css
 27. Lightbox css
 28. Notification css
 29. Modal css
-30. Rangeslider css
+30. Rangeslider c
 31. Daterange css
 32. Tagsinput css
-33. Slider css
 34. Switches css
 35. Data Tables css
 36. Customizer css
@@ -56,7 +55,7 @@ File: style.css
     --pc-sidebar-color: #39465f;
     --pc-sidebar-color-rgb: 57, 70, 95;
     --pc-sidebar-submenu-border-color: var(--bs-gray-300);
-    --pc-sidebar-active-color: #422f90;
+    --pc-sidebar-active-color: #008cad;
     --pc-sidebar-shadow: 0px 0px 24px rgba(27, 46, 94, 0.05);
     --pc-sidebar-caption-color: var(--pc-heading-color);
     --pc-sidebar-border: none;
@@ -127,7 +126,7 @@ h2,
 
 :root,
 [data-bs-theme="light"] {
-    --bs-blue: #422f90;
+    --bs-blue: #008cad;
     --bs-indigo: #6610f2;
     --bs-purple: #673ab7;
     --bs-pink: #e83e8c;
@@ -150,7 +149,7 @@ h2,
     --bs-gray-700: #3e4853;
     --bs-gray-800: #1d2630;
     --bs-gray-900: #131920;
-    --bs-primary: #422f90;
+    --bs-primary: #008cad;
     --bs-secondary: #39465f;
     --bs-success: #1de9b6;
     --bs-info: #3ebfea;
@@ -220,7 +219,7 @@ h2,
     --bs-tertiary-bg: #f8f9fa;
     --bs-tertiary-bg-rgb: 248, 249, 250;
     --bs-heading-color: #29344a;
-    --bs-link-color: #422f90;
+    --bs-link-color: #008cad;
     --bs-link-color-rgb: 4, 169, 245;
     --bs-link-decoration: none;
     --bs-link-hover-color: #0387c4;
@@ -3972,8 +3971,8 @@ fieldset:disabled .introjs-tooltip .introjs-button,
 .btn-primary,
 .introjs-tooltip .introjs-button.introjs-nextbutton {
     --bs-btn-color: #ffffff;
-    --bs-btn-bg: #422f90;
-    --bs-btn-border-color: #422f90;
+    --bs-btn-bg: #008cad;
+    --bs-btn-border-color: #008cad;
     --bs-btn-hover-color: #ffffff;
     --bs-btn-hover-bg: #0390d0;
     --bs-btn-hover-border-color: #0387c4;
@@ -3983,8 +3982,8 @@ fieldset:disabled .introjs-tooltip .introjs-button,
     --bs-btn-active-border-color: #037fb8;
     --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
     --bs-btn-disabled-color: #ffffff;
-    --bs-btn-disabled-bg: #422f90;
-    --bs-btn-disabled-border-color: #422f90;
+    --bs-btn-disabled-bg: #008cad;
+    --bs-btn-disabled-border-color: #008cad;
 }
 
 .btn-secondary,
@@ -4108,19 +4107,19 @@ fieldset:disabled .introjs-tooltip .introjs-button,
 }
 
 .btn-outline-primary {
-    --bs-btn-color: #422f90;
-    --bs-btn-border-color: #422f90;
+    --bs-btn-color: #008cad;
+    --bs-btn-border-color: #008cad;
     --bs-btn-hover-color: #ffffff;
-    --bs-btn-hover-bg: #422f90;
-    --bs-btn-hover-border-color: #422f90;
+    --bs-btn-hover-bg: #008cad;
+    --bs-btn-hover-border-color: #008cad;
     --bs-btn-focus-shadow-rgb: 4, 169, 245;
     --bs-btn-active-color: #ffffff;
-    --bs-btn-active-bg: #422f90;
-    --bs-btn-active-border-color: #422f90;
+    --bs-btn-active-bg: #008cad;
+    --bs-btn-active-border-color: #008cad;
     --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-    --bs-btn-disabled-color: #422f90;
+    --bs-btn-disabled-color: #008cad;
     --bs-btn-disabled-bg: transparent;
-    --bs-btn-disabled-border-color: #422f90;
+    --bs-btn-disabled-border-color: #008cad;
     --bs-gradient: none;
 }
 
@@ -4245,7 +4244,7 @@ fieldset:disabled .introjs-tooltip .introjs-button,
 
 .btn-link {
     --bs-btn-font-weight: 400;
-    --bs-btn-color: #422f90;
+    --bs-btn-color: #008cad;
     --bs-btn-bg: transparent;
     --bs-btn-border-color: transparent;
     --bs-btn-hover-color: #0387c4;
@@ -6161,7 +6160,7 @@ fieldset:disabled .introjs-tooltip .introjs-button,
     --bs-progress-border-radius: 8px;
     --bs-progress-box-shadow: inset 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1);
     --bs-progress-bar-color: #ffffff;
-    --bs-progress-bar-bg: #422f90;
+    --bs-progress-bar-bg: #008cad;
     --bs-progress-bar-transition: width 0.6s ease;
     display: flex;
     height: var(--bs-progress-height);
@@ -15983,7 +15982,7 @@ fieldset:disabled .introjs-tooltip .introjs-button,
 }
 
 [data-pc-direction="rtl"] .border-primary {
-    border-color: #422f90 !important;
+    border-color: #008cad !important;
 }
 
 [data-pc-direction="rtl"] .border-secondary {
@@ -22229,20 +22228,20 @@ fieldset:disabled .introjs-tooltip .introjs-button,
 
 .bg-light-primary {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
 }
 
 .icon-svg-primary {
     fill: #e6f6fe;
-    stroke: #422f90;
+    stroke: #008cad;
 }
 
 .material-icons-two-tone.text-primary {
-    background-color: #422f90;
+    background-color: #008cad;
 }
 
 .text-hover-primary:hover {
-    color: #422f90 !important;
+    color: #008cad !important;
 }
 
 .bg-light-secondary {
@@ -22374,19 +22373,19 @@ fieldset:disabled .introjs-tooltip .introjs-button,
 /*====== background ends ======*/
 /*====== border color css starts ======*/
 .b-primary {
-    border: 1px solid #422f90;
+    border: 1px solid #008cad;
 }
 
 .border-bottom-primary td {
-    border-bottom: 1px solid #422f90;
+    border-bottom: 1px solid #008cad;
 }
 
 .border-bottom-primary th {
-    border-bottom: 1px solid #422f90 !important;
+    border-bottom: 1px solid #008cad !important;
 }
 
 .fill-primary {
-    fill: #422f90;
+    fill: #008cad;
 }
 
 .b-secondary {
@@ -22824,11 +22823,11 @@ fieldset:disabled .introjs-tooltip .introjs-button,
 }
 
 .bg-blue-500 {
-    background: #422f90;
+    background: #008cad;
 }
 
 .text-blue-500 {
-    color: #422f90;
+    color: #008cad;
 }
 
 .bg-blue-600 {
@@ -25073,7 +25072,7 @@ pre[class*="language-"] > code {
     height: 74px;
     display: flex;
     align-items: center;
-    padding: 16px 24px;
+    justify-content: center;
     box-shadow: rgba(0, 0, 0, 0.45) 0px 9px 14px -18px;
 }
 
@@ -25832,25 +25831,25 @@ pre[class*="language-"] > code {
     --pc-sidebar-background: #fff;
     --pc-sidebar-border: none;
     --pc-header-color: #fff;
-    --pc-layout-2-color: #422f90;
+    --pc-layout-2-color: #008cad;
     background: var(--pc-layout-2-color);
     position: relative;
 }
 
 .layout-advance a.preset.preset-1 {
-    background: #422f90;
+    background: #008cad;
 }
 
 .layout-advance a.preset.preset-gradient-1 {
-    background: linear-gradient(to right, #422f90 0%, #30bcfc 100%);
+    background: linear-gradient(to right, #008cad 0%, #30bcfc 100%);
 }
 
 .layout-advance.preset-1 {
-    --pc-layout-2-color: #422f90;
+    --pc-layout-2-color: #008cad;
 }
 
 .layout-advance.preset-gradient-1 {
-    --pc-layout-2-color: linear-gradient(to right, #422f90 0%, #30bcfc 100%);
+    --pc-layout-2-color: linear-gradient(to right, #008cad 0%, #30bcfc 100%);
 }
 
 .layout-advance a.preset.preset-2 {
@@ -27041,7 +27040,7 @@ pre[class*="language-"] > code {
 }
 
 .page-header .breadcrumb .breadcrumb-item a:hover {
-    color: #422f90;
+    color: #008cad;
 }
 
 .page-header .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
@@ -28768,7 +28767,7 @@ pre[class*="language-"] > code {
 
 .badge.bg-light-primary {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
 }
 
 .badge.bg-light-secondary {
@@ -28895,18 +28894,18 @@ pre[class*="language-"] > code {
 
 .btn-light-primary {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
     border-color: #e6f6fe;
 }
 
 .btn-light-primary .material-icons-two-tone {
-    background-color: #422f90;
+    background-color: #008cad;
 }
 
 .btn-light-primary:hover {
-    background: #422f90;
+    background: #008cad;
     color: #fff;
-    border-color: #422f90;
+    border-color: #008cad;
 }
 
 .btn-light-primary:hover .material-icons-two-tone {
@@ -28915,9 +28914,9 @@ pre[class*="language-"] > code {
 
 .btn-light-primary.focus,
 .btn-light-primary:focus {
-    background: #422f90;
+    background: #008cad;
     color: #fff;
-    border-color: #422f90;
+    border-color: #008cad;
 }
 
 .btn-light-primary.focus .material-icons-two-tone,
@@ -28928,9 +28927,9 @@ pre[class*="language-"] > code {
 .btn-light-primary:not(:disabled):not(.disabled).active,
 .btn-light-primary:not(:disabled):not(.disabled):active,
 .show > .btn-light-primary.dropdown-toggle {
-    background: #422f90;
+    background: #008cad;
     color: #fff;
-    border-color: #422f90;
+    border-color: #008cad;
 }
 
 .btn-light-primary:not(:disabled):not(.disabled).active
@@ -28943,9 +28942,9 @@ pre[class*="language-"] > code {
 
 .btn-check:active + .btn-light-primary,
 .btn-check:checked + .btn-light-primary {
-    background: #422f90;
+    background: #008cad;
     color: #fff;
-    border-color: #422f90;
+    border-color: #008cad;
 }
 
 .btn-check:active + .btn-light-primary .material-icons-two-tone,
@@ -28955,24 +28954,24 @@ pre[class*="language-"] > code {
 
 .btn-link-primary {
     background: transparent;
-    color: #422f90;
+    color: #008cad;
     border-color: transparent;
 }
 
 .btn-link-primary .material-icons-two-tone {
-    background-color: #422f90;
+    background-color: #008cad;
 }
 
 .btn-link-primary:hover {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
     border-color: #e6f6fe;
 }
 
 .btn-link-primary.focus,
 .btn-link-primary:focus {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
     border-color: #e6f6fe;
 }
 
@@ -28980,14 +28979,14 @@ pre[class*="language-"] > code {
 .btn-link-primary:not(:disabled):not(.disabled):active,
 .show > .btn-link-primary.dropdown-toggle {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
     border-color: #e6f6fe;
 }
 
 .btn-check:active + .btn-link-primary,
 .btn-check:checked + .btn-link-primary {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
     border-color: #e6f6fe;
 }
 
@@ -29003,14 +29002,14 @@ pre[class*="language-"] > code {
 
 .btn-link-hover-primary:hover {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
     border-color: #e6f6fe;
 }
 
 .btn-link-hover-primary.focus,
 .btn-link-hover-primary:focus {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
     border-color: #e6f6fe;
 }
 
@@ -29018,14 +29017,14 @@ pre[class*="language-"] > code {
 .btn-link-hover-primary:not(:disabled):not(.disabled):active,
 .show > .btn-link-hover-primary.dropdown-toggle {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
     border-color: #e6f6fe;
 }
 
 .btn-check:active + .btn-link-hover-primary,
 .btn-check:checked + .btn-link-hover-primary {
     background: #e6f6fe;
-    color: #422f90;
+    color: #008cad;
     border-color: #e6f6fe;
 }
 
@@ -30878,7 +30877,7 @@ pre[class*="language-"] > code {
 }
 
 .progress.progress-primary .progress-bar {
-    background: #422f90;
+    background: #008cad;
 }
 
 .progress.progress-secondary {
@@ -31016,7 +31015,7 @@ pre[class*="language-"] > code {
 }
 
 .tabs-light.nav-pill .nav-item .nav-link {
-    color: #422f90;
+    color: #008cad;
     background: #e6f6fe;
     border-radius: 4px;
     transition: background 0.3s ease-out;
@@ -31032,7 +31031,7 @@ pre[class*="language-"] > code {
 
 .tabs-light.nav-pill .nav-link.active {
     color: #fff;
-    background: #422f90;
+    background: #008cad;
 }
 
 select.form-control:hover,
@@ -31213,8 +31212,8 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 }
 
 .form-check .form-check-input.input-primary:checked {
-    border-color: #422f90;
-    background-color: #422f90;
+    border-color: #008cad;
+    background-color: #008cad;
 }
 
 .form-check .form-check-input.input-light-primary:checked {
@@ -31235,7 +31234,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .form-check .form-check-input.input-light-primary:focus[type="checkbox"],
 .form-check .form-check-input.input-light-primary:focus[type="radio"] {
     box-shadow: 0 0 0 0.2rem rgba(4, 169, 245, 0.25);
-    border-color: #422f90;
+    border-color: #008cad;
 }
 
 .form-check.form-switch .form-check-input.input-light-primary:checked {
@@ -31612,13 +31611,13 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .datepicker tbody tr > td.day.active:hover,
 .datepicker tbody tr > td.day.selected,
 .datepicker tbody tr > td.day.selected:hover {
-    background: #422f90;
+    background: #008cad;
     color: #fff;
 }
 
 .datepicker tbody tr > td.day.today {
     position: relative;
-    background: #422f90 !important;
+    background: #008cad !important;
     color: #fff !important;
 }
 
@@ -31672,7 +31671,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .datepicker tbody tr > td span.year.active:hover,
 .datepicker tbody tr > td span.year.focused,
 .datepicker tbody tr > td span.year.focused:hover {
-    background: #422f90;
+    background: #008cad;
     color: #fff;
 }
 
@@ -31730,7 +31729,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 }
 
 .tagify__tag.tagify__tag--primary div .tagify__tag-text {
-    color: #422f90;
+    color: #008cad;
 }
 
 .tagify__tag.tagify__tag--secondary {
@@ -31801,7 +31800,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary,
 .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
     color: #fff;
-    background: #422f90;
+    background: #008cad;
 }
 
 .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-secondary,
@@ -31884,7 +31883,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .tt-menu .tt-suggestion:focus,
 .tt-menu .tt-suggestion:hover {
     background: rgba(4, 169, 245, 0.03);
-    color: #422f90;
+    color: #008cad;
 }
 
 .sticky-action {
@@ -31926,7 +31925,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 }
 
 .dropzone.dropzone-primary {
-    border-color: #422f90;
+    border-color: #008cad;
 }
 
 .dropzone.dropzone-secondary {
@@ -32043,7 +32042,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .dropzone-multi .dropzone-item .dropzone-toolbar .dropzone-cancel:hover i,
 .dropzone-multi .dropzone-item .dropzone-toolbar .dropzone-delete:hover i,
 .dropzone-multi .dropzone-item .dropzone-toolbar .dropzone-start:hover i {
-    color: #422f90;
+    color: #008cad;
 }
 
 .dropzone-multi .dropzone-item .dropzone-toolbar .dropzone-start {
@@ -32405,7 +32404,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .is-focused .choices__inner,
 .is-open .choices__inner {
     border-width: 1px;
-    border-color: #422f90;
+    border-color: #008cad;
     box-shadow: 0 0 0 0.2rem rgba(4, 169, 245, 0.25);
 }
 
@@ -34741,16 +34740,16 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 
 .fc-event.event-primary {
     background: #e6f6fe !important;
-    color: #422f90 !important;
+    color: #008cad !important;
 }
 
 .fc-event.event-primary.fc-h-event .fc-event-main {
-    color: #422f90;
+    color: #008cad;
 }
 
 .fc-event.event-primary.fc-h-event:focus,
 .fc-event.event-primary.fc-h-event:hover {
-    background: #422f90;
+    background: #008cad;
     color: #fff;
 }
 
@@ -35492,7 +35491,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .checkout-tabs .nav-link.active {
     border-color: transparent;
     background-color: transparent;
-    color: #422f90;
+    color: #008cad;
 }
 
 .checkout-tabs .nav-item.show .nav-link p,
@@ -35501,7 +35500,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 .checkout-tabs .nav-link.active p,
 .checkout-tabs .nav-link.active h5,
 .checkout-tabs .nav-link.active .h5 {
-    color: #422f90;
+    color: #008cad;
 }
 
 .checkout-tabs .nav-item.show .nav-link .avtar,
@@ -36301,7 +36300,7 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 
 .feed-card h6:hover,
 .feed-card .h6:hover {
-    color: #422f90;
+    color: #008cad;
 }
 
 .feed-card .feed-icon {
@@ -36343,11 +36342,11 @@ select[data-multiselectsplitter-secondselect-selector].dataTable-input {
 }
 
 .feed-card:hover .border-feed.bg-primary i {
-    color: #422f90;
+    color: #008cad;
 }
 
 .feed-card:hover .border-feed.bg-primary i.material-icons-two-tone {
-    background-color: #422f90;
+    background-color: #008cad;
 }
 
 .feed-card:hover .border-feed.bg-secondary {
@@ -36852,7 +36851,7 @@ div:where(.swal2-container) button:where(.swal2-close):focus {
 }
 
 .notifier.primary {
-    border-left-color: #422f90;
+    border-left-color: #008cad;
 }
 
 .notifier.secondary {
@@ -37560,13 +37559,13 @@ body.anim-slip-from-top.modal-open .pc-header {
 
 .daterangepicker td.active,
 .daterangepicker td.active:hover {
-    background-color: #422f90;
+    background-color: #008cad;
     color: #fff;
 }
 
 .daterangepicker td.available:hover,
 .daterangepicker th.available:hover {
-    background-color: #422f90;
+    background-color: #008cad;
     color: #fff;
 }
 
@@ -37600,12 +37599,12 @@ body.anim-slip-from-top.modal-open .pc-header {
 }
 
 .daterangepicker .ranges ul li.active {
-    background-color: #422f90;
+    background-color: #008cad;
 }
 
 .daterangepicker .ranges ul li:hover {
     box-shadow: 0 15px 8px -9px rgba(0, 0, 0, 0.25);
-    background-color: #422f90;
+    background-color: #008cad;
     color: #fff;
 }
 
@@ -37705,7 +37704,7 @@ body.anim-slip-from-top.modal-open .pc-header {
 }
 
 .bootstrap-tagsinput .tag {
-    background: #422f90;
+    background: #008cad;
     padding: 5px 12px;
     color: #fff;
     border-radius: 12px;
@@ -38366,8 +38365,8 @@ div.dt-button-info {
     margin-top: -100px;
     margin-left: -200px;
     background-color: #95dcfd;
-    color: #422f90;
-    border: 2px solid #422f90;
+    color: #008cad;
+    border: 2px solid #008cad;
     box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
     border-radius: 3px;
     text-align: center;
@@ -38380,8 +38379,8 @@ div.dt-button-info .h2 {
     margin: 0;
     font-weight: normal;
     color: #fff;
-    border-bottom: 1px solid #422f90;
-    background-color: #422f90;
+    border-bottom: 1px solid #008cad;
+    background-color: #008cad;
 }
 
 div.dt-button-info > div {
@@ -38398,7 +38397,7 @@ div.dt-button-info > div {
 
 table.dataTable tbody td.focus,
 table.dataTable tbody th.focus {
-    box-shadow: inset 0 0 1px 2px #422f90;
+    box-shadow: inset 0 0 1px 2px #008cad;
 }
 
 div.dtk-focus-alt table.dataTable tbody td.focus,
@@ -38680,7 +38679,7 @@ div.dataTables_wrapper div.dt-row {
 }
 
 .theme-color.preset-color.preset-color > a[data-value="preset-1"] {
-    background: #422f90;
+    background: #008cad;
 }
 
 .theme-color.preset-color.preset-color > a[data-value="preset-2"] {

@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     show: false,
                 },
             },
-            colors: ["#422f90"], // Brand purple accent color
+            colors: ["#008CAD"], // Brand purple accent color
             fill: {
                 type: "solid",
                 opacity: 0, // No area shading under the line, clean and minimal

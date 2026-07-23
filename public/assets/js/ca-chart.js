@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         total: {
                             show: true,
                             label: "Total Earning",
-                            color: "#422f90",
+                            color: "#008CAD",
                             fontSize: "14px",
                             fontFamily: "Inter, sans-serif",
                             fontWeight: 600,

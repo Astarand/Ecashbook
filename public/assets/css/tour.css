@@ -5,10 +5,10 @@
   background: rgba(255, 255, 255, 0.98) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(66, 47, 144, 0.15) !important;
+  border: 1px solid rgba(0, 140, 173, 0.15) !important;
   border-radius: 20px !important;
   box-shadow: 
-    0 10px 30px -5px rgba(66, 47, 144, 0.08), 
+    0 10px 30px -5px rgba(0, 140, 173, 0.08), 
     0 20px 40px -10px rgba(0, 0, 0, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
   padding: 24px 28px !important;
@@ -59,9 +59,9 @@
 .introjs-skipbutton {
   position: static !important;          /* Removed absolute positioning */
   order: 2 !important;                  /* Flex order */
-  color: #422f90 !important;            /* Purple text */
-  background: rgba(66, 47, 144, 0.07) !important; /* Soft purple background highlight */
-  border: 1px solid rgba(66, 47, 144, 0.25) !important; /* Highlight border */
+  color: #008CAD !important;            /* Purple text */
+  background: rgba(0, 140, 173, 0.07) !important; /* Soft purple background highlight */
+  border: 1px solid rgba(0, 140, 173, 0.25) !important; /* Highlight border */
   font-size: 11px !important;
   font-weight: 800 !important;
   text-transform: uppercase !important;
@@ -79,7 +79,7 @@
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  box-shadow: 0 2px 4px rgba(66, 47, 144, 0.05) !important;
+  box-shadow: 0 2px 4px rgba(0, 140, 173, 0.05) !important;
 }
 
 .introjs-skipbutton:hover {
@@ -139,17 +139,17 @@
 
 /* Next / Done Button - Aligned to Right */
 .introjs-nextbutton {
-  background: #422f90 !important;
+  background: #008CAD !important;
   color: #ffffff !important;
-  border-color: #422f90 !important;
-  box-shadow: 0 4px 12px rgba(66, 47, 144, 0.2) !important;
+  border-color: #008CAD !important;
+  box-shadow: 0 4px 12px rgba(0, 140, 173, 0.2) !important;
   margin-left: auto !important; /* Pushes it to the right if Prev is not there */
 }
 
 .introjs-nextbutton:hover {
   background: #2d1f6a !important;
   border-color: #2d1f6a !important;
-  box-shadow: 0 6px 16px rgba(66, 47, 144, 0.35) !important;
+  box-shadow: 0 6px 16px rgba(0, 140, 173, 0.35) !important;
   transform: translateY(-1px);
 }
 
@@ -181,7 +181,7 @@
 }
 
 .introjs-bullets ul li a.active {
-  background: #422f90 !important;
+  background: #008CAD !important;
   width: 20px !important;
   border-radius: 4px !important;
 }
@@ -196,7 +196,7 @@
 }
 
 .introjs-progressbar {
-  background: linear-gradient(90deg, #422f90, #6366f1) !important;
+  background: linear-gradient(90deg, #008CAD, #6366f1) !important;
   border-radius: 10px !important;
 }
 
@@ -220,8 +220,8 @@
 
 /* Focus overlay border highlight layer */
 .introjs-helperLayer {
-  border: 2px dashed #422f90 !important;
-  background-color: rgba(66, 47, 144, 0.03) !important;
+  border: 2px dashed #008CAD !important;
+  background-color: rgba(0, 140, 173, 0.03) !important;
   box-shadow: rgba(0, 0, 0, 0.4) 0px 0px 1px 2px, rgba(0, 0, 0, 0.5) 0px 0px 0px 5000px !important;
   border-radius: 16px !important;
   transition: all 0.2s ease-in-out !important;
@@ -238,9 +238,9 @@
   max-width: 550px !important;
   padding: 40px 45px !important;
   border-radius: 24px !important;
-  border: 1px solid rgba(66, 47, 144, 0.25) !important;
+  border: 1px solid rgba(0, 140, 173, 0.25) !important;
   box-shadow: 
-    0 15px 50px -10px rgba(66, 47, 144, 0.15), 
+    0 15px 50px -10px rgba(0, 140, 173, 0.15), 
     0 25px 60px -15px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
   text-align: center !important;
@@ -257,7 +257,7 @@
 .introjs-tooltip.introjs-floating .introjs-tooltiptitle {
   font-size: 1.6rem !important;
   font-weight: 850 !important;
-  color: #422f90 !important;
+  color: #008CAD !important;
   text-align: center !important;
   width: 100% !important;
 }

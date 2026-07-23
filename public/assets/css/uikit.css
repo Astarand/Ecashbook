@@ -24,7 +24,7 @@ h2 {
     --pc-sidebar-color: #39465f;
     --pc-sidebar-color-rgb: 57, 70, 95;
     --pc-sidebar-submenu-border-color: var(--bs-gray-300);
-    --pc-sidebar-active-color: #422f90;
+    --pc-sidebar-active-color: #008CAD;
     --pc-sidebar-shadow: 0px 0px 24px rgba(27, 46, 94, 0.05);
     --pc-sidebar-caption-color: var(--pc-heading-color);
     --pc-sidebar-border: none;
@@ -145,7 +145,7 @@ section {
     padding: 100px 0 40px;
 }
 .component-page .component-live-link a {
-    color: #422f90;
+    color: #008CAD;
 }
 .component-page .component-live-link a:hover {
     text-decoration: underline;

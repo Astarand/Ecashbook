@@ -88,8 +88,8 @@
 .datatable-pagination .active button,
 .datatable-pagination .active button:focus,
 .datatable-pagination .active button:hover {
-    background-color: #422f90;
-    border-color: #422f90;
+    background-color: #008CAD;
+    border-color: #008CAD;
     color: white;
     cursor: default;
 }
@@ -299,8 +299,8 @@ table.datatable-table:focus {
 #pc-dt-simple+.datatable-bottom .datatable-pagination .datatable-active button,
 #pc-dt-simple+.datatable-bottom .datatable-pagination .active a,
 #pc-dt-simple+.datatable-bottom .datatable-pagination .active button {
-    background-color: #422f90;
-    border-color: #422f90;
+    background-color: #008CAD;
+    border-color: #008CAD;
     color: white;
 }
 
@@ -466,7 +466,7 @@ table.datatable-table:focus {
 .datatable-pagination .datatable-active button,
 .datatable-pagination .active a,
 .datatable-pagination .active button {
-    background-color: #422f90 !important;
-    border-color: #422f90 !important;
+    background-color: #008CAD !important;
+    border-color: #008CAD !important;
     color: white !important;
 }
