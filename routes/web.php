@@ -1288,10 +1288,13 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::post('/payroll/ptax/update', [PayrollReportController::class, 'updatePtax'])->name('payroll.ptax.update');
 	Route::get('/payroll/salary-sheet', [PayrollReportController::class, 'getSalarySheetData'])->name('payroll.salary.sheet');
 	Route::get('/payroll/lwf/list', [PayrollReportController::class, 'getLwfList'])->name('payroll.lwf.list');
+	Route::get('/payroll/lwf/full-list', [PayrollReportController::class, 'getLwfFullList'])->name('payroll.lwf.fullList');
+	Route::post('/payroll/lwf/update', [PayrollReportController::class, 'updateLwf'])->name('payroll.lwf.update');
 	Route::get('/payroll/gratuity/list', [PayrollReportController::class, 'getGratuityList'])->name('payroll.gratuity.list');
 	
 	Route::post('/get-tds-rule-liab', [CommonController::class, 'getTdsRuleLiability'])->name('get.tds.rule');
 	Route::post('/settlement/store',[SettlementController::class, 'store'])->name('settlement.store');
 	Route::get('/settlement/ledgers',[SettlementController::class, 'getSettlementLedgers'])->name('settlement.ledgers');
+	Route::get('/settlement/amount',[SettlementController::class, 'getSettlementAmount'])->name('settlement.amount');
 
 });

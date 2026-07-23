@@ -131,8 +131,10 @@ class PaymentVoucherService
 					$date = $data['date'] ?? $sales->inv_date;
 					$invoiceNo = $id; //$sales->inv_num;
 					$partyType = 'Customer';
-					$partyId = $sales->customer_id ?? null;
-					$partyName = $sales->cust_name ?? '';	
+					//$partyId = $sales->customer_id ?? null;
+					//$partyName = $sales->cust_name ?? '';	
+					$partyId = $data['settlement_ledger_id'] ?? $sales->customer_id ?? null;
+					$partyName = $data['settlement_ledger_name']?? $sales->cust_name ?? '';
 					
 					$amount = $currentPayment;
 					$transactionDetails = '';
@@ -269,8 +271,10 @@ class PaymentVoucherService
 				$date = $data['date'] ?? $purchase->inv_date;
 				$invoiceNo = $id; //$purchase->inv_num;
 				$partyType = 'Vendor';
-				$partyId = $purchase->vendor_id ?? null;
-				$partyName = $purchase->vendor_name ?? '';
+				//$partyId = $purchase->vendor_id ?? null;
+				//$partyName = $purchase->vendor_name ?? '';
+				$partyId = $data['settlement_ledger_id'] ?? $purchase->vendor_id ?? null;
+				$partyName = $data['settlement_ledger_name']?? $purchase->vendor_name ?? '';
 
 				$amount = $currentPayment;
 				$transactionDetails = '';
@@ -324,17 +328,21 @@ class PaymentVoucherService
 					return false;
 				}
 
+				$addFlag = $data['addFlag'] ?? 0;
 				$voucherType = 'Payment Voucher';
 				$propId = $expense->propId;
-				$date = $expense->expense_date;
+				$date = $data['date'] ?? $expense->expense_date;
 				$invoiceNo = $expense->id;
 				$partyType = 'Vendor';
 				// ==========================================
 				// PARTY NAME PRIORITY
 				// Vendor -> Employee -> Other
 				// ==========================================
-
-				if (!empty($expense->employee_id) && $expense->expense_type == 'employee_benefits') {
+				if ($addFlag == 1) {
+					$partyId = $data['settlement_ledger_id'] ?? null;
+					$partyName = $data['settlement_ledger_name'] ?? '';
+				}
+				else if (!empty($expense->employee_id) && $expense->expense_type == 'employee_benefits') {
 					$partyType = 'Employee';
 					$partyId = $expense->employee_id;
 					$partyName = $expense->employee_name ?? '';
@@ -348,7 +356,6 @@ class PaymentVoucherService
 					$partyId = null;
 					$partyName = 'Expense Entry';
 				}
-
 				// ==========================================
 				// AMOUNT LOGIC
 				// Full -> Expense + GST
@@ -365,12 +372,12 @@ class PaymentVoucherService
 					$transactionDetails = 'Against Invoice';
 				}
 				
-				if ($expense->payment_status == 'due') {
+				if ($addFlag == 0 && $expense->payment_status == 'due') {
 					return true; // don't create voucher
 				}
 				$creditDebit = 'Debit';
 				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $expense->mode_of_pay ?? null);
-				$bankId = $data['bank_id'] ?? null;
+				$bankId = $data['bank_id'] ?: null;
 				$referenceId = $expense->exp_invno ?? null;
 				$narration = 'Expense Entry';
 				$approved_by = $expense->approved_by ?? null;
@@ -924,7 +931,7 @@ class PaymentVoucherService
 
 			// GET VOUCHER NO
 			$voucherNo = $this->getVoucherNo($userId,$voucherType);
-
+			
 			// Insert record
 			PaymentVoucher::create([
 
@@ -949,7 +956,7 @@ class PaymentVoucherService
 				'approved_by'    => auth()->user()->name ?? null,
 				'record_type'    => 'Posted',
 			]);
-
+			
 			DB::commit();
 
 			return true;

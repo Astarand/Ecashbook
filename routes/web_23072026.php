@@ -54,6 +54,7 @@ use App\Http\Controllers\User\CommonController;
 use App\Http\Controllers\User\PaymentVoucherController;
 use App\Http\Controllers\User\ChatController;
 use App\Http\Controllers\User\PayController;
+use App\Http\Controllers\User\SettlementController;
 use App\Http\Controllers\User\Reports\ProfitLossController;
 use App\Http\Controllers\User\Reports\BalanceSheetController;
 use App\Http\Controllers\User\DigitalSignedController;
@@ -459,6 +460,9 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::post('/check-payslip', [EmployeeManagemnet::class, 'checkPayslip'])->name('check.payslip');
 	Route::post('/save-payslip', [EmployeeManagemnet::class, 'savePayslip']);
 	Route::get('/download-payslip/{id}', [EmployeeManagemnet::class, 'downloadPayslip']);
+
+	
+
 
 	/* Employee Policies */
 	Route::get('/employee-policy/create/{subject}', [EmployeePolicy::class, 'create'])->name('employee.policy.create');
@@ -927,7 +931,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/subscriber-stats/{range}', [BusinessEarningController::class, 'getSubscriberStats']);
 	Route::get('/tds-returns-download', [TdsPfEsiController::class, 'download_tds_returns'])->name('user.tds_returns_download');
 	Route::post('/download-pf-filing', [TdsPfEsiController::class, 'download_pf_filing'])->name('download.pf.filing');
-	Route::get('/esi-management-list', [TdsPfEsiController::class, 'esi_management_list'])->name('user.esi_management_list');
+	// Route::get('/esi-management-list', [TdsPfEsiController::class, 'esi_management_list'])->name('user.esi_management_list');
     Route::post('/download-esi-filing', [TdsPfEsiController::class, 'download_esi_filing'])->name('download.esi.filing');
     Route::get('/ptax_management_list', [TdsPfEsiController::class, 'ptax_management_list'])->name('user.ptax_management_list');
     Route::post('/download-ptax-filing', [TdsPfEsiController::class, 'download_ptax_filing'])->name('download.ptax.filing');
@@ -1260,10 +1264,38 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::delete('/dropdown-values/delete/{id}', [DropdownValueController::class, 'destroy'])->name('dropdown.delete');
 
 	Route::post('/purchase_shipping_cost',[PurchaseController::class,'purchaseShippingCost']);
+	
+	Route::get('/payment-voucher/export',[PaymentVoucherController::class, 'exportPaymentVoucher'])->name('paymentVoucher.export');
+	
+	Route::get('/get-banks', [CommonController::class, 'getBankList']);
 
 	//-------- payroll report routes --------//
+	Route::get('/payslip/update', [EmployeeManagemnet::class, 'updatePayslip'])->name('payroll.payslip_update');
+
 	Route::get('/payroll-report/summary', [PayrollReportController::class, 'summary'])->name('payroll.report.summary');
 	Route::get('/payroll-report/register', [PayrollReportController::class, 'payrollRegister'])->name('payroll.report.register');
 	Route::get('/payroll/report/attendance', [PayrollReportController::class, 'attendanceRegister'])->name('payroll.report.attendance');
+	Route::get('/payroll/payslip/list', [PayrollReportController::class, 'getPayslipList'])->name('payroll.payslip.list');
+	Route::post('/payroll/payslip/update', [PayrollReportController::class, 'updatePayslips'])->name('payroll.payslip.update');
+	Route::get('/payroll/tds/list', [PayrollReportController::class, 'getTdsList'])->name('payroll.tds.list');
+	Route::post('/payroll/tds/update', [PayrollReportController::class, 'updateTds'])->name('payroll.tds.update');
+	Route::get('/payroll/pf/list', [PayrollReportController::class, 'getPfList'])->name('payroll.pf.list');
+	Route::post('/payroll/pf/update', [PayrollReportController::class, 'updatePf'])->name('payroll.pf.update');
+	Route::get('/payroll/esi/list', [PayrollReportController::class, 'getEsiList'])->name('payroll.esi.list');
+	Route::post('/payroll/esi/update', [PayrollReportController::class, 'updateEsi'])->name('payroll.esi.update');
+	Route::get('/payroll/ptax/list', [PayrollReportController::class, 'getPtaxList'])->name('payroll.ptax.list');
+	Route::get('/payroll/ptax/summary', [PayrollReportController::class, 'getPtaxSummary'])->name('payroll.ptax.summary');
+	Route::post('/payroll/ptax/update', [PayrollReportController::class, 'updatePtax'])->name('payroll.ptax.update');
+	Route::get('/payroll/salary-sheet', [PayrollReportController::class, 'getSalarySheetData'])->name('payroll.salary.sheet');
+	Route::get('/payroll/lwf/list', [PayrollReportController::class, 'getLwfList'])->name('payroll.lwf.list');
+	Route::get('/payroll/lwf/full-list', [PayrollReportController::class, 'getLwfFullList'])->name('payroll.lwf.fullList');
+	Route::post('/payroll/lwf/update', [PayrollReportController::class, 'updateLwf'])->name('payroll.lwf.update');
+
+	Route::get('/payroll/gratuity/list', [PayrollReportController::class, 'getGratuityList'])->name('payroll.gratuity.list');
 	
+	
+	Route::post('/get-tds-rule-liab', [CommonController::class, 'getTdsRuleLiability'])->name('get.tds.rule');
+	Route::post('/settlement/store',[SettlementController::class, 'store'])->name('settlement.store');
+	Route::get('/settlement/ledgers',[SettlementController::class, 'getSettlementLedgers'])->name('settlement.ledgers');
+
 });

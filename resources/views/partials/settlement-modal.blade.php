@@ -71,23 +71,50 @@
 
 
                         <!-- Settlement Amount -->
-
                         <div class="col-md-6 mb-3">
-
                             <label class="form-label">
                                 Settlement Amount
                             </label>
-
                             <input type="number"
                                    step="0.01"
                                    min="0"
                                    name="settlement_amount"
                                    id="settlement_amount"
                                    class="form-control"
+								   readonly
                                    required>
-
                         </div>
+						
+						<!-- Payment Mode -->
+						<div class="col-md-6 mb-3">
+							<label class="form-label">
+								Payment Mode <span class="text-danger">*</span>
+							</label>
+							<select name="payment_mode"
+									id="settlement_payment_mode"
+									class="form-select"
+									required>
+								<option value="">-- Select Payment Mode --</option>
+								<option value="Cash">Cash</option>
+								<option value="Bank">Bank</option>
+								<option value="UPI">UPI</option>
+							</select>
+						</div>
 
+						<!-- Bank -->
+						<div class="col-md-6 mb-3"
+							 id="settlementBankBox"
+							 style="display:none;">
+
+							<label class="form-label">
+								Bank <span class="text-danger">*</span>
+							</label>
+							<select name="bank_id"
+									id="settlement_bank_id"
+									class="form-select">
+								<option value="">-- Select Bank --</option>
+							</select>
+						</div>
                     </div>
 
 
@@ -135,13 +162,10 @@
 
 
                             <!-- Settlement Reason -->
-
                             <div class="col-md-6 mb-3">
-
                                 <label class="form-label">
                                     Settlement Reason
                                 </label>
-
                                 <input type="text"
                                        name="settlement_reason"
                                        class="form-control"
@@ -185,6 +209,30 @@
 
 		$('#settlement_module_type').val(moduleType);
 		$('#settlement_p_id').val(p_id);
+		
+		// FETCH OUTSTANDING INVOICE AMOUNT
+		$('#settlement_amount').val('');
+		$.ajax({
+			url: '/settlement/amount',
+			type: 'GET',
+			data: {
+				module_type: moduleType,
+				p_id: p_id
+			},
+			success: function (response) {
+				if (response.success) {
+					$('#settlement_amount').val(
+						parseFloat(response.amount || 0).toFixed(2)
+					);
+
+				} else {
+					$('#settlement_amount').val('');
+				}
+			},
+			error: function () {
+				$('#settlement_amount').val('');
+			}
+		});
 
 
 		// ==========================================
@@ -326,29 +374,81 @@
 
 	});
 	
-	$('#settlementForm').submit(function(e) {
+	// ==========================================
+	// PAYMENT MODE CHANGE
+	// ==========================================
 
+	$(document).on('change', '#settlement_payment_mode', function () {
+
+		const paymentMode = $(this).val();
+
+		const $bankBox = $('#settlementBankBox');
+		const $bank = $('#settlement_bank_id');
+
+		if (paymentMode === 'Bank' || paymentMode === 'UPI') {
+			// Show Bank
+			$bankBox.slideDown();
+			$bank.prop('required', true);
+			$bank.html('<option value="">Loading...</option>');
+
+			$.ajax({
+				url: '/get-banks',
+				type: 'GET',
+				success: function (response) {
+					$bank.empty();
+					$bank.append('<option value="">-- Select Bank --</option>');
+
+					$.each(response, function (index, item) {
+						$bank.append(
+							$('<option>', {
+								value: item.id,
+								text: item.bank_name
+							})
+						);
+
+					});
+
+				},
+
+				error: function () {
+					$bank.html('<option value="">Unable to load banks</option>');
+				}
+
+			});
+
+		} else {
+			// Cash
+			$bankBox.slideUp();
+			$bank.val('').prop('required', false);
+		}
+
+	});
+	
+	$('#settlementForm').submit(function(e) {
 		e.preventDefault();
+		
+		const settlementMode = $('input[name="settlement_mode"]:checked').val();
+		// Self settlement is not allowed
+		if (settlementMode === 'Self') {
+			showToast(
+				'Please select Third Party Settlement before submitting.',
+				'error'
+			);
+			return false;
+		}
 
 		$.ajax({
-
 			url: '/settlement/store',
-
 			type: "POST",
-
 			data: $(this).serialize(),
-
 			success: function(response) {
 
 				if (response.success) {
-
 					$('#settlementModal').modal('hide');
-
 					showToast(
 						'Settlement saved successfully',
 						'success'
 					);
-
 					location.reload();
 				}
 
