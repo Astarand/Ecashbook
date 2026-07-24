@@ -210,6 +210,11 @@ class GSTController extends Controller
 		}
     }
 
+    public function GstDashboard()
+    {
+        return view('User.gst-dashboard');
+    }
+
 	public function generate_GSTReports(Request $request)
     {
 		$userId = currentOwnerId();

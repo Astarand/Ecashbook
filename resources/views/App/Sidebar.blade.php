@@ -439,18 +439,19 @@
 									<span class="pc-micon">
 										<i class="ph-duotone ph-receipt fs-6"></i>
 									</span>
-									<span class="pc-mtext">GST Returns & Reports</span>
+									<span class="pc-mtext">GST Management</span>
 									<span class="pc-arrow">
 										<i data-feather="chevron-right"></i>
 									</span>
 								</a>
 
 								<ul class="pc-submenu">
-									<li class="pc-item"><a class="pc-link" href="{{ route('User.GSTProfile') }}">GST Profile & Registration</a></li>
+									<li class="pc-item"><a class="pc-link" href="{{ route('User.GSTProfile') }}">GST Profile</a></li>
+									<li class="pc-item"><a class="pc-link" href="{{ route('User.GstDashboard') }}">GST Dashboard</a></li>
 									<li class="pc-item"><a class="pc-link" href="{{ route('User.OtherGSTProfile') }}">GSTIN Verification</a></li>
-									<li class="pc-item"><a class="pc-link" href="{{ route('User.GSTReturns') }}">GST Returns & Filing</a></li>
-									<li class="pc-item"><a class="pc-link" href="{{ route('User.GSTReports') }}">GST Insights & Reports</a></li>
-									<li class="pc-item"><a class="pc-link" href="{{ route('User.GSTComplianceSupport') }}">GST Compliance Support</a></li>
+									<li class="pc-item"><a class="pc-link" href="{{ route('User.GSTReturns') }}">GST Filing</a></li>
+									<li class="pc-item"><a class="pc-link" href="{{ route('User.GSTReports') }}">GST Reports</a></li>
+									<li class="pc-item"><a class="pc-link" href="{{ route('User.GSTComplianceSupport') }}">Compliance Support</a></li>
 								</ul>
 							</li>
 							@endif

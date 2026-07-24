@@ -461,7 +461,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::post('/save-payslip', [EmployeeManagemnet::class, 'savePayslip']);
 	Route::get('/download-payslip/{id}', [EmployeeManagemnet::class, 'downloadPayslip']);
 
-	
+
 
 
 	/* Employee Policies */
@@ -555,6 +555,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/gst-reports', [GSTController::class, 'GSTReports'])->name('User.GSTReports');
 	Route::post('/generate_GSTReports', [GSTController::class, 'generate_GSTReports'])->name('generate_GSTReports');
 	//Route::get('/gst-compliance-support', [GSTController::class, 'GSTComplianceSupport'])->name('User.GSTComplianceSupport');
+	Route::get('/gst-dashboard', [GSTController::class, 'GstDashboard'])->name('User.GstDashboard');
 
 	/* Reports Management */
 	Route::get('/ledger', [ReportsController::class, 'Ledger'])->name('user.Ledger');
@@ -919,7 +920,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/tds-returns-filing', [TdsPfEsiController::class, 'tds_returns_filing'])->name('user.tds_returns_filing');
 	Route::get('/pf-management-list', [TdsPfEsiController::class, 'pf_management_list'])->name('user.pf_management_list');
 	Route::get('/esi-management-list', [TdsPfEsiController::class, 'esi_management_list'])->name('user.esi_management_list');
-	
+
 	Route::get('/shop-registration', [TdsPfEsiController::class, 'shop_registration'])->name('user.shop_registration');
 	Route::get('/lwf-compliance', [TdsPfEsiController::class, 'lwf_compliance'])->name('user.lwf_compliance');
 	Route::get('/gratuity-compliance', [TdsPfEsiController::class, 'gratuity_compliance'])->name('user.gratuity_compliance');
@@ -1264,9 +1265,9 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::delete('/dropdown-values/delete/{id}', [DropdownValueController::class, 'destroy'])->name('dropdown.delete');
 
 	Route::post('/purchase_shipping_cost',[PurchaseController::class,'purchaseShippingCost']);
-	
+
 	Route::get('/payment-voucher/export',[PaymentVoucherController::class, 'exportPaymentVoucher'])->name('paymentVoucher.export');
-	
+
 	Route::get('/get-banks', [CommonController::class, 'getBankList']);
 
 	//-------- payroll report routes --------//
@@ -1291,7 +1292,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/payroll/lwf/full-list', [PayrollReportController::class, 'getLwfFullList'])->name('payroll.lwf.fullList');
 	Route::post('/payroll/lwf/update', [PayrollReportController::class, 'updateLwf'])->name('payroll.lwf.update');
 	Route::get('/payroll/gratuity/list', [PayrollReportController::class, 'getGratuityList'])->name('payroll.gratuity.list');
-	
+
 	Route::post('/get-tds-rule-liab', [CommonController::class, 'getTdsRuleLiability'])->name('get.tds.rule');
 	Route::post('/settlement/store',[SettlementController::class, 'store'])->name('settlement.store');
 	Route::get('/settlement/ledgers',[SettlementController::class, 'getSettlementLedgers'])->name('settlement.ledgers');
