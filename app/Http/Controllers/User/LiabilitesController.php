@@ -1950,8 +1950,8 @@ class LiabilitesController extends Controller
 				->where('financial_year', $financialYear)
 				->where('month', $month)
 				->where(function ($query) {
-						$query->whereNull('payment_status')
-							  ->orWhere('payment_status', 'Pending');
+						$query->whereNull('lwf_payment_status')
+							  ->orWhere('lwf_payment_status', 'Pending');
 					})
 				->get();
 
