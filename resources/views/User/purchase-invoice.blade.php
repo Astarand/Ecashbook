@@ -42,17 +42,22 @@
         <!-- 1. Total Purchase Invoice -->
         <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
-                <div class="card-body p-3.5">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted fw-bold small text-uppercase">Total Purchase Invoice</span>
-                        <div class="avtar avtar-s rounded-circle bg-light-primary text-primary">
-                            <i class="ph-duotone ph-file-text fs-5"></i>
+                <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted fw-bold small text-uppercase tracking-wider">Total Purchase Invoice</span>
+                            <div class="avtar avtar-s rounded-circle bg-light-primary text-primary d-inline-flex align-items-center justify-content-center">
+                                <i class="ph-duotone ph-file-text fs-5 lh-1"></i>
+                            </div>
                         </div>
+                        <h3 class="mb-3 fw-bold text-dark">98</h3>
                     </div>
-                    <h3 class="mb-1 fw-bold text-dark">98</h3>
-                    <div class="small text-muted d-flex align-items-center gap-1">
-                        <span class="badge bg-light-info text-info font-11"><i class="ph-duotone ph-shopping-cart me-0.5"></i> Inward</span>
-                        <span>Total received invoices</span>
+                    <!-- Segregated Breakdown Pills (Square Design) -->
+                    <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
+                        <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(0, 140, 173, 0.08); border: 1px solid rgba(0, 140, 173, 0.2);">
+                            <span class="text-primary fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-shopping-cart me-1 lh-1 fs-6"></i>Purchase Order</span>
+                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">64</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -61,17 +66,22 @@
         <!-- 2. Total Purchase Value -->
         <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
-                <div class="card-body p-3.5">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted fw-bold small text-uppercase">Total Purchase Value</span>
-                        <div class="avtar avtar-s rounded-circle bg-light-info text-info">
-                            <i class="ph-duotone ph-shopping-bag fs-5"></i>
+                <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted fw-bold small text-uppercase tracking-wider">Total Purchase Value</span>
+                            <div class="avtar avtar-s rounded-circle bg-light-info text-info d-inline-flex align-items-center justify-content-center">
+                                <i class="ph-duotone ph-shopping-bag fs-5 lh-1"></i>
+                            </div>
                         </div>
+                        <h3 class="mb-3 fw-bold text-dark">₹8,75,400.00</h3>
                     </div>
-                    <h3 class="mb-1 fw-bold text-dark">₹8,75,400.00</h3>
-                    <div class="small text-muted d-flex align-items-center gap-1">
-                        <span class="badge bg-light-info text-info font-11"><i class="ph-duotone ph-arrow-down-left me-0.5"></i> Expenses</span>
-                        <span>Gross purchase amount</span>
+                    <!-- Segregated Breakdown Pills (Square Design) -->
+                    <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
+                        <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.2);">
+                            <span class="text-info fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-receipt me-1 lh-1 fs-6"></i>Purchase Order</span>
+                            <span class="badge bg-info text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">₹5.80L</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -80,17 +90,21 @@
         <!-- 3. Purchase Debit Note -->
         <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
-                <div class="card-body p-3.5">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted fw-bold small text-uppercase">Purchase Debit Note</span>
-                        <div class="avtar avtar-s rounded-circle bg-light-warning text-warning">
-                            <i class="ph-duotone ph-file-arrow-up fs-5"></i>
+                <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted fw-bold small text-uppercase tracking-wider">Purchase Debit Note</span>
+                            <div class="avtar avtar-s rounded-circle bg-light-warning text-warning d-inline-flex align-items-center justify-content-center">
+                                <i class="ph-duotone ph-file-arrow-up fs-5 lh-1"></i>
+                            </div>
                         </div>
+                        <h3 class="mb-3 fw-bold text-warning">₹32,100.00</h3>
                     </div>
-                    <h3 class="mb-1 fw-bold text-warning">₹32,100.00</h3>
-                    <div class="small text-muted d-flex align-items-center gap-1">
-                        <span class="badge bg-light-warning text-warning font-11"><i class="ph-duotone ph-arrow-up-right me-0.5"></i> Return</span>
-                        <span>Total debit notes issued</span>
+                    <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
+                        <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2);">
+                            <span class="text-danger fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-arrow-up-right me-1 lh-1 fs-6"></i>Adjustment</span>
+                            <span class="badge bg-danger text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">Total Issued</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,17 +113,21 @@
         <!-- 4. Net Purchase -->
         <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 h-100 mb-0" style="background: linear-gradient(135deg, rgba(0, 140, 173, 0.05) 0%, rgba(0, 140, 173, 0.12) 100%); border: 1px solid rgba(0, 140, 173, 0.2) !important;">
-                <div class="card-body p-3.5">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-primary fw-bold small text-uppercase">Net Purchase</span>
-                        <div class="avtar avtar-s rounded-circle bg-primary text-white">
-                            <i class="ph-duotone ph-currency-inr fs-5"></i>
+                <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-primary fw-bold small text-uppercase tracking-wider">Net Purchase</span>
+                            <div class="avtar avtar-s rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center">
+                                <i class="ph-duotone ph-currency-inr fs-5 lh-1"></i>
+                            </div>
                         </div>
+                        <h3 class="mb-3 fw-bold text-primary">₹8,43,300.00</h3>
                     </div>
-                    <h3 class="mb-1 fw-bold text-primary">₹8,43,300.00</h3>
-                    <div class="small text-muted d-flex align-items-center gap-1">
-                        <span class="badge bg-light-primary text-primary font-11"><i class="ph-duotone ph-equals me-0.5"></i> Net Cost</span>
-                        <span>(Purchase - Debit Notes)</span>
+                    <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
+                        <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(0, 140, 173, 0.12); border: 1px solid rgba(0, 140, 173, 0.25);">
+                            <span class="text-primary fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-equals me-1 lh-1 fs-6"></i>Net Cost Formula</span>
+                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">Purchase - Debit Notes</span>
+                        </div>
                     </div>
                 </div>
             </div>

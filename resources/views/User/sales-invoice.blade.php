@@ -60,17 +60,26 @@
         <!-- 1. Total Sales Invoices -->
         <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
-                <div class="card-body p-3.5">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted fw-bold small text-uppercase">Total Sales Invoices</span>
-                        <div class="avtar avtar-s rounded-circle bg-light-primary text-primary">
-                            <i class="ph-duotone ph-file-text fs-5"></i>
+                <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted fw-bold small text-uppercase tracking-wider">Total Sales Invoices</span>
+                            <div class="avtar avtar-s rounded-circle bg-light-primary text-primary d-inline-flex align-items-center justify-content-center">
+                                <i class="ph-duotone ph-file-text fs-5 lh-1"></i>
+                            </div>
                         </div>
+                        <h3 class="mb-3 fw-bold text-dark">142</h3>
                     </div>
-                    <h3 class="mb-1 fw-bold text-dark">142</h3>
-                    <div class="small text-muted d-flex align-items-center gap-1">
-                        <span class="badge bg-light-success text-success font-11"><i class="ph-duotone ph-check-circle me-0.5"></i> Generated</span>
-                        <span>Total issued invoices</span>
+                    <!-- Segregated Breakdown Pills (Square Design) -->
+                    <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
+                        <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(0, 140, 173, 0.08); border: 1px solid rgba(0, 140, 173, 0.2);">
+                            <span class="text-primary fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-file-text me-1 lh-1 fs-6"></i>Quotation</span>
+                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">86</span>
+                        </div>
+                        <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.2);">
+                            <span class="text-info fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-file-check me-1 lh-1 fs-6"></i>Proforma</span>
+                            <span class="badge bg-info text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">56</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -79,17 +88,26 @@
         <!-- 2. Total Sales Value -->
         <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
-                <div class="card-body p-3.5">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted fw-bold small text-uppercase">Total Sales Value</span>
-                        <div class="avtar avtar-s rounded-circle bg-light-success text-success">
-                            <i class="ph-duotone ph-trend-up fs-5"></i>
+                <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted fw-bold small text-uppercase tracking-wider">Total Sales Value</span>
+                            <div class="avtar avtar-s rounded-circle bg-light-success text-success d-inline-flex align-items-center justify-content-center">
+                                <i class="ph-duotone ph-trend-up fs-5 lh-1"></i>
+                            </div>
                         </div>
+                        <h3 class="mb-3 fw-bold text-dark">₹12,45,800.00</h3>
                     </div>
-                    <h3 class="mb-1 fw-bold text-dark">₹12,45,800.00</h3>
-                    <div class="small text-muted d-flex align-items-center gap-1">
-                        <span class="badge bg-light-success text-success font-11"><i class="ph-duotone ph-arrow-up-right me-0.5"></i> Turnover</span>
-                        <span>Gross invoice amount</span>
+                    <!-- Segregated Breakdown Pills (Square Design) -->
+                    <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
+                        <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(0, 140, 173, 0.08); border: 1px solid rgba(0, 140, 173, 0.2);">
+                            <span class="text-primary fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-receipt me-1 lh-1 fs-6"></i>Quotation</span>
+                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">₹7.25L</span>
+                        </div>
+                        <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.2);">
+                            <span class="text-info fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-currency-circle-dollar me-1 lh-1 fs-6"></i>Proforma</span>
+                            <span class="badge bg-info text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">₹5.20L</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -98,17 +116,21 @@
         <!-- 3. Sales Credit Note -->
         <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
-                <div class="card-body p-3.5">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-muted fw-bold small text-uppercase">Sales Credit Note</span>
-                        <div class="avtar avtar-s rounded-circle bg-light-danger text-danger">
-                            <i class="ph-duotone ph-file-arrow-down fs-5"></i>
+                <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted fw-bold small text-uppercase tracking-wider">Sales Credit Note</span>
+                            <div class="avtar avtar-s rounded-circle bg-light-danger text-danger d-inline-flex align-items-center justify-content-center">
+                                <i class="ph-duotone ph-file-arrow-down fs-5 lh-1"></i>
+                            </div>
                         </div>
+                        <h3 class="mb-3 fw-bold text-danger">₹45,200.00</h3>
                     </div>
-                    <h3 class="mb-1 fw-bold text-danger">₹45,200.00</h3>
-                    <div class="small text-muted d-flex align-items-center gap-1">
-                        <span class="badge bg-light-danger text-danger font-11"><i class="ph-duotone ph-arrow-down-right me-0.5"></i> Adjustment</span>
-                        <span>Total credit notes issued</span>
+                    <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
+                        <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2);">
+                            <span class="text-danger fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-arrow-down-right me-1 lh-1 fs-6"></i>Adjustment</span>
+                            <span class="badge bg-danger text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">Total Issued</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -117,17 +139,21 @@
         <!-- 4. Net Sales -->
         <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 h-100 mb-0" style="background: linear-gradient(135deg, rgba(0, 140, 173, 0.05) 0%, rgba(0, 140, 173, 0.12) 100%); border: 1px solid rgba(0, 140, 173, 0.2) !important;">
-                <div class="card-body p-3.5">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-primary fw-bold small text-uppercase">Net Sales</span>
-                        <div class="avtar avtar-s rounded-circle bg-primary text-white">
-                            <i class="ph-duotone ph-currency-inr fs-5"></i>
+                <div class="card-body p-3.5 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-primary fw-bold small text-uppercase tracking-wider">Net Sales</span>
+                            <div class="avtar avtar-s rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center">
+                                <i class="ph-duotone ph-currency-inr fs-5 lh-1"></i>
+                            </div>
                         </div>
+                        <h3 class="mb-3 fw-bold text-primary">₹12,00,600.00</h3>
                     </div>
-                    <h3 class="mb-1 fw-bold text-primary">₹12,00,600.00</h3>
-                    <div class="small text-muted d-flex align-items-center gap-1">
-                        <span class="badge bg-light-primary text-primary font-11"><i class="ph-duotone ph-equals me-0.5"></i> Revenue</span>
-                        <span>(Sales - Credit Notes)</span>
+                    <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
+                        <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(0, 140, 173, 0.12); border: 1px solid rgba(0, 140, 173, 0.25);">
+                            <span class="text-primary fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-equals me-1 lh-1 fs-6"></i>Revenue Formula</span>
+                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">Sales - Credit Notes</span>
+                        </div>
                     </div>
                 </div>
             </div>
