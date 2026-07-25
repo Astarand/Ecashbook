@@ -55,7 +55,85 @@
             @endif
         </div>
     </div>
-    <!-- [ breadcrumb ] end -->
+    <!-- [ Summary Cards ] start -->
+    <div class="row g-3 mb-4">
+        <!-- 1. Total Sales Invoices -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted fw-bold small text-uppercase">Total Sales Invoices</span>
+                        <div class="avtar avtar-s rounded-circle bg-light-primary text-primary">
+                            <i class="ph-duotone ph-file-text fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-1 fw-bold text-dark">142</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-light-success text-success font-11"><i class="ph-duotone ph-check-circle me-0.5"></i> Generated</span>
+                        <span>Total issued invoices</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Total Sales Value -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted fw-bold small text-uppercase">Total Sales Value</span>
+                        <div class="avtar avtar-s rounded-circle bg-light-success text-success">
+                            <i class="ph-duotone ph-trend-up fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-1 fw-bold text-dark">₹12,45,800.00</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-light-success text-success font-11"><i class="ph-duotone ph-arrow-up-right me-0.5"></i> Turnover</span>
+                        <span>Gross invoice amount</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Sales Credit Note -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted fw-bold small text-uppercase">Sales Credit Note</span>
+                        <div class="avtar avtar-s rounded-circle bg-light-danger text-danger">
+                            <i class="ph-duotone ph-file-arrow-down fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-1 fw-bold text-danger">₹45,200.00</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-light-danger text-danger font-11"><i class="ph-duotone ph-arrow-down-right me-0.5"></i> Adjustment</span>
+                        <span>Total credit notes issued</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Net Sales -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 mb-0" style="background: linear-gradient(135deg, rgba(0, 140, 173, 0.05) 0%, rgba(0, 140, 173, 0.12) 100%); border: 1px solid rgba(0, 140, 173, 0.2) !important;">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-primary fw-bold small text-uppercase">Net Sales</span>
+                        <div class="avtar avtar-s rounded-circle bg-primary text-white">
+                            <i class="ph-duotone ph-currency-inr fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-1 fw-bold text-primary">₹12,00,600.00</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-light-primary text-primary font-11"><i class="ph-duotone ph-equals me-0.5"></i> Revenue</span>
+                        <span>(Sales - Credit Notes)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ Summary Cards ] end -->
 
     <!-- [ Main Content ] start -->
     <div class="row">

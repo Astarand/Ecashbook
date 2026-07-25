@@ -37,7 +37,85 @@
             @endif
         </div>
     </div>
-    <!-- [ breadcrumb ] end -->
+    <!-- [ Summary Cards ] start -->
+    <div class="row g-3 mb-4">
+        <!-- 1. Total Purchase Invoice -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted fw-bold small text-uppercase">Total Purchase Invoice</span>
+                        <div class="avtar avtar-s rounded-circle bg-light-primary text-primary">
+                            <i class="ph-duotone ph-file-text fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-1 fw-bold text-dark">98</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-light-info text-info font-11"><i class="ph-duotone ph-shopping-cart me-0.5"></i> Inward</span>
+                        <span>Total received invoices</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Total Purchase Value -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted fw-bold small text-uppercase">Total Purchase Value</span>
+                        <div class="avtar avtar-s rounded-circle bg-light-info text-info">
+                            <i class="ph-duotone ph-shopping-bag fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-1 fw-bold text-dark">₹8,75,400.00</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-light-info text-info font-11"><i class="ph-duotone ph-arrow-down-left me-0.5"></i> Expenses</span>
+                        <span>Gross purchase amount</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Purchase Debit Note -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-muted fw-bold small text-uppercase">Purchase Debit Note</span>
+                        <div class="avtar avtar-s rounded-circle bg-light-warning text-warning">
+                            <i class="ph-duotone ph-file-arrow-up fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-1 fw-bold text-warning">₹32,100.00</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-light-warning text-warning font-11"><i class="ph-duotone ph-arrow-up-right me-0.5"></i> Return</span>
+                        <span>Total debit notes issued</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Net Purchase -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 mb-0" style="background: linear-gradient(135deg, rgba(0, 140, 173, 0.05) 0%, rgba(0, 140, 173, 0.12) 100%); border: 1px solid rgba(0, 140, 173, 0.2) !important;">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-primary fw-bold small text-uppercase">Net Purchase</span>
+                        <div class="avtar avtar-s rounded-circle bg-primary text-white">
+                            <i class="ph-duotone ph-currency-inr fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-1 fw-bold text-primary">₹8,43,300.00</h3>
+                    <div class="small text-muted d-flex align-items-center gap-1">
+                        <span class="badge bg-light-primary text-primary font-11"><i class="ph-duotone ph-equals me-0.5"></i> Net Cost</span>
+                        <span>(Purchase - Debit Notes)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ Summary Cards ] end -->
 
     <!-- [ Main Content ] start -->
     <div class=" row">
