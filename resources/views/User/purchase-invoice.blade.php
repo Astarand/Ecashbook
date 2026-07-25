@@ -56,6 +56,7 @@
                                 <th>Invoice Number</th>
                                 <th>Invoice Date</th>
                                 <th>Transation Type</th>
+                                <th>Taxable</th>
                                 <th>Grand Total</th>
                                 <th>Due</th>
                                 <th>Payment Status</th>
@@ -87,6 +88,7 @@
                                         @endif
                                     </span>
                                 </td>
+                                <td><span class="text-muted text-hover-primary">₹{{ $sale->taxable_value }}</span></td>
                                 <td><span class="text-muted text-hover-primary">₹{{ $sale->grandTotal }}</span></td>
                                 <td><span class="text-muted text-hover-primary">₹{{ $sale->due_amount ?? 0 }}</span></td>
                                 <td>

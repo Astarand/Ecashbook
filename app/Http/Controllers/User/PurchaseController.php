@@ -99,6 +99,7 @@ class PurchaseController extends Controller
 				$data = DB::table('purchase_values as pv')
 							->leftJoin('purchases as p', 'p.id', '=', 'pv.sid')
 							->selectRaw('
+								SUM(COALESCE(pv.amount, 0)) AS taxable_value,
 								SUM(COALESCE(pv.amount,0) + COALESCE(pv.tax_amt,0)) as grandTotal,
 								COALESCE(MAX(p.shipping_cost),0) as shipping_cost
 							')
@@ -107,7 +108,9 @@ class PurchaseController extends Controller
 
 				$array[$val->id]['shipping_cost'] = $data->shipping_cost;
 				$array[$val->id]['grandTotal'] = getRoundedAmount(($data->grandTotal ?? 0) + ($data->shipping_cost ?? 0));
+				$array[$val->id]['taxable_value'] = getRoundedAmount(($data->taxable_value ?? 0));
 			}else{
+				$array[$val->id]['taxable_value'] = 0;
 				$array[$val->id]['grandTotal'] = 0;
 				$array[$val->id]['shipping_cost'] = 0;
 

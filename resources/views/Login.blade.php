@@ -3,13 +3,13 @@
 <!-- [Head] start -->
 
 <head>
-    <title>Register / Login - E-Cashbook OneSuite | Intelligent Accounting, Tax & Compliance Portal</title>
+    <title>Register / Login - {{ config('app.name') }} OneSuite | Intelligent Accounting, Tax & Compliance Portal</title>
 
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="description" content="E-Cashbook - Intelligent Accounting & GST Management Platform for Chartered Accountants, Tax Professionals, and Small Businesses. Professional financial management for the digital age." />
+    <meta name="description" content="{{ config('app.name') }} - Intelligent Accounting & GST Management Platform for Chartered Accountants, Tax Professionals, and Small Businesses. Professional financial management for the digital age." />
     <meta name="author" content="360 Business & Services" />
     <meta name="robots" content="noindex, nofollow">
 	<meta name="googlebot" content="noindex">

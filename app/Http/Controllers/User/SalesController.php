@@ -83,7 +83,7 @@ class SalesController extends Controller
 					'customers.cust_phone',
 
 					DB::raw('SUM(sales_values.quantity) AS total_qty'),
-
+					DB::raw('SUM(COALESCE(sales_values.amount, 0)) AS taxable_value'),
 					DB::raw('SUM(
 						COALESCE(sales_values.amount, 0) +
 						COALESCE(sales_values.tax_amt, 0) +
@@ -146,6 +146,7 @@ class SalesController extends Controller
 			$array[$val->id]['other_payment'] = $val->other_payment;
 			$array[$val->id]['pay_status'] = $val->pay_status;
 			$array[$val->id]['total_amount'] = getRoundedAmount($val->total_amount);
+			$array[$val->id]['taxable_value'] = getRoundedAmount($val->taxable_value);
 			$array[$val->id]['status'] = $val->status;
 			$array[$val->id]['signed_pdf'] = $val->signed_pdf;
 			$array[$val->id]['signed_pdf_status'] = $val->signed_pdf_status;

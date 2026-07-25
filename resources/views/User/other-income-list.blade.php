@@ -111,6 +111,7 @@
                                 <th>Category of Income</th>                                
                                 <th>Amount</th>
                                 <th>TDS Amount</th>
+                                <th>GST</th>
 								<th>Pay Status</th>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -128,6 +129,7 @@
                                 <td><a class="text-muted text-hover-primary" href="#">{{$income->categoryIncome}}</a></td>                                
                                 <td><span class="text-muted text-hover-primary">₹{{number_format($income->amount,2)}}</span></td>
                                 <td><span class="text-muted text-hover-primary">₹{{number_format($income->tds_amount,2)}}</span></td>
+                                <td><span class="text-muted text-hover-primary">₹{{number_format($income->gst_amt,2)}}</span></td>
 								<td>
                                     @if ($income->pay_status == 'Full')
                                     <span class="badge bg-success text-dark">{{ $income->pay_status }}</span>

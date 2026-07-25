@@ -51,6 +51,7 @@
                                 <th>Expense Categories</th>
                                 <th>Expense Details</th>
                                 <th>Total Amount</th>
+                                <th>GST</th>
                                 <th>Threshold Type</th>
                                 <th>Deduction</th>
                                 <th>Approve By</th>
@@ -72,6 +73,7 @@
                                 <td><span class="text-muted text-hover-primary">{{ $expen->expense_cat }}</span></td>
                                 <td><span class="text-muted text-hover-primary">{{ ucwords(str_replace(['_', '-'], ' ', $expen->expense_type)) }}</span></td>
                                 <td><span class="text-muted text-hover-primary">₹ {{ $expen->expense_amt }}</span></td>
+                                <td><span class="text-muted text-hover-primary">₹ {{ $expen->total_gst }}</span></td>
                                 <td><span class="text-muted text-hover-primary">{{ $expen->threshold_type }}</span></td>
                                 <td>
 									<div>
