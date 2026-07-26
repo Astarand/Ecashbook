@@ -1950,8 +1950,8 @@ class LiabilitesController extends Controller
 				->where('financial_year', $financialYear)
 				->where('month', $month)
 				->where(function ($query) {
-						$query->whereNull('payment_status')
-							  ->orWhere('payment_status', 'Pending');
+						$query->whereNull('lwf_payment_status')
+							  ->orWhere('lwf_payment_status', 'Pending');
 					})
 				->get();
 
@@ -1960,9 +1960,8 @@ class LiabilitesController extends Controller
 			foreach ($records as $row) {
 				$data = json_decode($row->emp_salary_slip_response, true);		
 				if (($data['created_by'] ?? 0) == $userId) {
-					$lwfEmployee = $data['visible_data']['final_salary_calculation']['lwf_deduct'] ?? 0;
 					$lwfCompany = $data['visible_data']['final_salary_calculation']['lwf_company_contribution'] ?? 0;
-					$amount += (float) $lwfEmployee + (float) $lwfCompany;
+					$amount += (float) $lwfCompany;
 				}
 			}
 		}

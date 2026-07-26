@@ -119,6 +119,7 @@ class ExpensesController extends Controller
                 'other_expenses_details' => $val->other_expenses_details,
                 'payment_status' => $val->payment_status,
                 'expense_amt' => $val->expense_amt,
+                'total_gst' => $val->total_gst,
                 'tds_amount' => $val->tds_amount,
                 'tax_treatment' => $val->tax_treatment,
                 'allowed_ratio' => $val->allowed_ratio,

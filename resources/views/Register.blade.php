@@ -3,13 +3,13 @@
 <!-- [Head] start -->
 
 <head>
-    <title>Register - E-Cashbook</title>
+    <title>Register - {{ config('app.name') }}</title>
 
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="description" content="E-Cashbook - Intelligent Accounting & GST Management Platform for Chartered Accountants, Tax Professionals, and Small Businesses. Professional financial management for the digital age." />
+    <meta name="description" content="{{ config('app.name') }} - Intelligent Accounting & GST Management Platform for Chartered Accountants, Tax Professionals, and Small Businesses. Professional financial management for the digital age." />
     <meta name="author" content="360 Business & Services" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -90,7 +90,7 @@
             <div class="auth-form">
                 <div class="card my-5 mx-3">
                     <div class="card-body">
-                        <h4 class="f-w-500 mb-1">Welcome to Ecashbook</h4>
+                        <h4 class="f-w-500 mb-1">Welcome to {{ config('app.name') }}</h4>
                         <div>
                             <p class="mb-3">Already have an Account? <a href="{{ route('login') }}" class="link-primary">Log in</a></p>
                         </div>
@@ -330,7 +330,7 @@
             <div class="modal-body px-4 py-3" style="font-size:0.95rem; line-height:1.7;">
 
                 <div class="mb-4">
-                    <p><strong>Platform:</strong> eCashbook ERP</p>
+                    <p><strong>Platform:</strong> {{ config('app.name') }} ERP</p>
                     <p><strong>Company:</strong> ClicknGo Tech Service Pvt. Ltd.</p>
                     <p><strong>CIN:</strong> U85500WB2025PTC276321</p>
                     <p><strong>Registered Office:</strong> PS Srijan Corporate Park, EP & GP Block, Sector-V, Salt Lake, Kolkata – 700091</p>

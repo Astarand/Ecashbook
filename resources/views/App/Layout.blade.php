@@ -6,13 +6,13 @@
     <meta charset="utf-8" lang="eng" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="description" content="E-Cashbook - Intelligent Accounting & GST Management Platform for Chartered Accountants, Tax Professionals, and Small Businesses. Professional financial management for the digital age." />
+    <meta name="description" content="{{ config('app.name') }} - Intelligent Accounting & GST Management Platform for Chartered Accountants, Tax Professionals, and Small Businesses. Professional financial management for the digital age." />
     <meta name="author" content="ClicknGo Tech Service Pvt. Ltd." />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="noindex, nofollow">
     <meta name="googlebot" content="noindex">
     <meta name="bingbot" content="noindex">
-    <title>E-Cashbook OneSuite | Intelligent Accounting, Tax & Compliance Portal</title>
+    <title>{{ config('app.name') }} OneSuite | Intelligent Accounting, Tax & Compliance Portal</title>
 
     <!-- [Favicon] icon -->
     <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}" type="image/x-icon" />

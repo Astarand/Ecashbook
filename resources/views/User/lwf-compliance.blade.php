@@ -18,9 +18,13 @@
                     </ul>
                 </div>
                 <div class="col-md-7 text-end">
-                    <a href="http://127.0.0.1:8000/payslip/update#lwf-section" class="btn btn-warning shadow">
+                    <a href="{{ route('payroll.payslip_update') }}#lwf-section" class="btn btn-warning shadow">
                         LWF Challan Update 
                     </a>
+
+
+
+
                     <button class="btn btn-outline-primary px-3 py-2 rounded-3 me-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#aboutLwfModal">
                         <i class="ti ti-info-circle f-16"></i> About LWF Compliance
                     </button>

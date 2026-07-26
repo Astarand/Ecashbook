@@ -92,6 +92,7 @@
 								<th>Invoice Number</th>
 								<th>Invoice Date</th>
 								<th>Transation Type</th>
+								<th>Taxable</th>
 								<th>Grand Total</th>
 								<th>Due</th>
 								<th>Digital Signature</th>
@@ -128,6 +129,7 @@
 										@endif
 									</span>
 								</td>
+								<td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->taxable_value }}</span></td>
 								<td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->total_amount }}</span></td>
 								<td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->due_amount ?? 0 }}</span></td>
 								<td>

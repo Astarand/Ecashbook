@@ -694,7 +694,7 @@ class HomeController extends Controller
 
 								</div>
 								<div class="ft" style="background: #76bed0;display: block;">
-										<p style="text-align: center;color: #ffffff;font-size: 14px;padding:5px 0;">Copyright © '.date("Y").' E-cashbook</p>
+										<p style="text-align: center;color: #ffffff;font-size: 14px;padding:5px 0;">Copyright © '.date("Y").' '.config('app.name').'</p>
 									</div>
 								</div>
 
@@ -828,7 +828,7 @@ class HomeController extends Controller
 				<h2>$otp</h2>
 				<p>This OTP will be valid for the next 10 minutes. If you did not request this, please ignore this email.</p>
 				<p>Best regards,</p>
-				<p>Ecashbook</p>
+				<p>" . config('app.name') . "</p>
 			";
 			
 			$data_email = [
@@ -968,7 +968,7 @@ class HomeController extends Controller
 				<h2>$otp</h2>
 				<p>This OTP will be valid for the next 10 minutes. If you did not request this, please ignore this email.</p>
 				<p>Best regards,</p>
-				<p>Ecashbook</p>
+				<p>" . config('app.name') . "</p>
 			";
 		$data_email = ['email' => $user->email];
 		$emailSubject = "Password Reset OTP";
