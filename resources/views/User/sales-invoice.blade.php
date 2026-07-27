@@ -68,17 +68,17 @@
                                 <i class="ph-duotone ph-file-text fs-5 lh-1"></i>
                             </div>
                         </div>
-                        <h3 class="mb-3 fw-bold text-dark">142</h3>
+                        <h3 class="mb-3 fw-bold text-dark">{{ ($sales_count) }}</h3>
                     </div>
                     <!-- Segregated Breakdown Pills (Square Design) -->
                     <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
                         <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(0, 140, 173, 0.08); border: 1px solid rgba(0, 140, 173, 0.2);">
                             <span class="text-primary fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-file-text me-1 lh-1 fs-6"></i>Quotation</span>
-                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">86</span>
+                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">{{ ($quotation_count) }}</span>
                         </div>
                         <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.2);">
                             <span class="text-info fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-file-check me-1 lh-1 fs-6"></i>Proforma</span>
-                            <span class="badge bg-info text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">56</span>
+                            <span class="badge bg-info text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">{{ ($proforma_count) }}</span>
                         </div>
                     </div>
                 </div>
@@ -96,17 +96,33 @@
                                 <i class="ph-duotone ph-trend-up fs-5 lh-1"></i>
                             </div>
                         </div>
-                        <h3 class="mb-3 fw-bold text-dark">₹12,45,800.00</h3>
+                        <h3 class="mb-3 fw-bold text-dark">₹{{ number_format($sales_value) }}</h3>
                     </div>
                     <!-- Segregated Breakdown Pills (Square Design) -->
                     <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
                         <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(0, 140, 173, 0.08); border: 1px solid rgba(0, 140, 173, 0.2);">
                             <span class="text-primary fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-receipt me-1 lh-1 fs-6"></i>Quotation</span>
-                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">₹7.25L</span>
+                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">
+							₹{{ $quotation_value >= 10000000
+								? number_format($quotation_value / 10000000, 2) . 'Cr'
+								: ($quotation_value >= 100000
+									? number_format($quotation_value / 100000, 2) . 'L'
+									: number_format($quotation_value, 2)
+								)
+							}}
+							</span>
                         </div>
                         <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.2);">
                             <span class="text-info fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-currency-circle-dollar me-1 lh-1 fs-6"></i>Proforma</span>
-                            <span class="badge bg-info text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">₹5.20L</span>
+                            <span class="badge bg-info text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">
+							₹{{ $proforma_value >= 10000000
+								? number_format($proforma_value / 10000000, 2) . 'Cr'
+								: ($proforma_value >= 100000
+									? number_format($proforma_value / 100000, 2) . 'L'
+									: number_format($proforma_value, 2)
+								)
+							}}
+							</span>
                         </div>
                     </div>
                 </div>
@@ -124,7 +140,7 @@
                                 <i class="ph-duotone ph-file-arrow-down fs-5 lh-1"></i>
                             </div>
                         </div>
-                        <h3 class="mb-3 fw-bold text-danger">₹45,200.00</h3>
+                        <h3 class="mb-3 fw-bold text-danger">₹{{ number_format($sales_credit_note) }}</h3>
                     </div>
                     <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
                         <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2);">
@@ -147,7 +163,7 @@
                                 <i class="ph-duotone ph-currency-inr fs-5 lh-1"></i>
                             </div>
                         </div>
-                        <h3 class="mb-3 fw-bold text-primary">₹12,00,600.00</h3>
+                        <h3 class="mb-3 fw-bold text-primary">₹{{ number_format($net_sales) }}</h3>
                     </div>
                     <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
                         <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(0, 140, 173, 0.12); border: 1px solid rgba(0, 140, 173, 0.25);">

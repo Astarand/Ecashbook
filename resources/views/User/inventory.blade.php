@@ -36,7 +36,7 @@
 		  action="{{ route('user.Inventory') }}"
 		  class="mb-3 d-flex justify-content-end align-items-center inv-nature-filter">
 
-		<div class="form-check form-check-inline">
+		<!--<div class="form-check form-check-inline">
 			<input class="form-check-input"
 				   type="radio"
 				   name="buss_type"
@@ -45,7 +45,7 @@
 				   onchange="this.form.submit()"
 				   {{ $bussType == 'service' ? 'checked' : '' }}>
 			<label class="form-check-label" for="service">Service Provider</label>
-		</div>
+		</div>-->
 
 		<div class="form-check form-check-inline">
 			<input class="form-check-input"
@@ -54,7 +54,7 @@
 				   id="trading"
 				   value="product"
 				   onchange="this.form.submit()"
-				   {{ $bussType == 'product' ? 'checked' : '' }}>
+				   {{ $bussType == 'product' ? 'checked' : 'checked' }}>
 			<label class="form-check-label" for="trading">Trading / Reseller</label>
 		</div>
 

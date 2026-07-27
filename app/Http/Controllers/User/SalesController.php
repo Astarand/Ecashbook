@@ -172,12 +172,115 @@ class SalesController extends Controller
 		}
 		//$sales_pagination->setCollection(collect(array_values($array)));
 		$sales = json_decode(json_encode($array));
+		
+		//Start Summary
+		$salesSummary = DB::table('sales')
+			->leftJoin('sales_values','sales_values.sid','=','sales.id')
+			->where('sales.added_by',$userId)
+			->select(
+				DB::raw('COUNT(DISTINCT sales.id) AS total_count'),
+				DB::raw(
+					'
+					COALESCE(
+						SUM(
+							COALESCE(sales_values.amount, 0) +
+							COALESCE(sales_values.tax_amt, 0) +
+							COALESCE(sales_values.gov_pay, 0) +
+							COALESCE(sales_values.ser_pay, 0)
+						),
+						0
+					) AS total_value
+					'
+				)
+			)->first();
+			
+		$quotationSummary = DB::table('quotations')
+			->leftJoin('quotations_values','quotations_values.sid','=','quotations.id')
+			->where('quotations.added_by',$userId)
+			->select(
+				DB::raw('COUNT(DISTINCT quotations.id) AS total_count'),
+				DB::raw(
+					'
+					COALESCE(
+						SUM(
+							COALESCE(quotations_values.amount, 0) +
+							COALESCE(quotations_values.tax_amt, 0) +
+							COALESCE(quotations_values.gov_pay, 0) +
+							COALESCE(quotations_values.ser_pay, 0)
+						),
+						0
+					) AS total_value
+					'
+				)
+			)->first();
+
+		$proformaSummary = DB::table('proformas')
+			->leftJoin('proformas_values','proformas_values.sid','=','proformas.id')
+			->where('proformas.added_by',$userId)
+			->select(
+				DB::raw('COUNT(DISTINCT proformas.id) AS total_count'),
+				DB::raw(
+					'
+					COALESCE(
+						SUM(
+							COALESCE(proformas_values.amount, 0) +
+							COALESCE(proformas_values.tax_amt, 0) +
+							COALESCE(proformas_values.gov_pay, 0) +
+							COALESCE(proformas_values.ser_pay, 0)
+						),
+						0
+					) AS total_value
+					'
+				)
+
+			)->first();
+
+		$creditNoteSummary = DB::table('vouchers')
+			->where('vouchers.added_by',$userId)
+			->where(
+				'vouchers.note_type',
+				'Credit'
+			)
+			->select(
+				DB::raw('COUNT(DISTINCT vouchers.id) AS total_count'),
+				DB::raw(
+					'
+					COALESCE(
+						SUM(
+							COALESCE(vouchers.total_amt, 0)
+						),
+						0
+					) AS total_value
+					'
+				)
+			)->first();
+
+		$salesCount = (int) ($salesSummary->total_count ?? 0);
+		$salesValue =  ($salesSummary->total_value ?? 0);
+		$quotationCount = (int) ($quotationSummary->total_count ?? 0);
+		$quotationValue = ($quotationSummary->total_value ?? 0);
+		$proformaCount = (int) ($proformaSummary->total_count ?? 0);
+		$proformaValue = ($proformaSummary->total_value ?? 0);
+		$creditNoteCount = (int) ($creditNoteSummary->total_count ?? 0);
+		$creditNoteValue = ($creditNoteSummary->total_value ?? 0);
+		$netSales = $salesValue - $creditNoteValue;
+		//End Summary
 
 		return view('User.sales-invoice')->with([
 			'title' => $title,
 			'sales' => $sales,
 			'sales_pagination' => $sales_pagination,
 			'invoice_create_status' => $this->invoice_create_status(),
+
+			'sales_count' =>$salesCount,
+			'quotation_count' =>$quotationCount,
+			'proforma_count' =>$proformaCount,
+			'sales_value' =>round($salesValue,2),
+			'quotation_value' =>round($quotationValue,2),
+			'proforma_value' =>round($proformaValue,2),
+			'sales_credit_note' =>round($creditNoteValue,2),
+			'sales_credit_note_count' =>$creditNoteCount,
+			'net_sales' =>round($netSales,2),
 
 		]);
 	}

@@ -53,15 +53,15 @@
                         </div>
                         <div>
                             <span class="text-uppercase text-muted fw-bold small tracking-wider" style="font-size: 0.75rem;">Company Name (In case Proprietorship)</span>
-                            <h4 class="mb-1 fw-bold text-dark">E-Cashbook Systems Ltd</h4>
+                            <h4 class="mb-1 fw-bold text-dark">{{ $company->comp_name ?? '' }}</h4>
                             <div class="d-flex align-items-center gap-2">
-                                <span class="badge bg-light-secondary text-secondary font-monospace"><i class="ph-duotone ph-identification-card me-1"></i> GSTIN: 19ABCDE1234F1Z5</span>
+                                <span class="badge bg-light-secondary text-secondary font-monospace"><i class="ph-duotone ph-identification-card me-1"></i> GSTIN: {{ $company->gst_no ?? '' }}</span>
                                 <span class="badge bg-light-success text-success"><i class="ph-duotone ph-check-circle me-1"></i> Active Taxpayer</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-7 col-md-6">
+                <!--<div class="col-lg-7 col-md-6">
                     <div class="row g-2 justify-content-lg-end align-items-center">
                         <div class="col-sm-4">
                             <label class="form-label small fw-bold text-muted mb-1"><i class="ph-duotone ph-calendar-blank me-1"></i> Financial Year</label>
@@ -82,11 +82,53 @@
                         <div class="col-sm-4">
                             <label class="form-label small fw-bold text-muted mb-1"><i class="ph-duotone ph-clock me-1"></i> Select Period</label>
                             <select id="periodValueSelect" class="form-select form-select-sm rounded-3 fw-bold text-dark border-light-subtle" onchange="filterGstTable()">
-                                <!-- Dynamic options generated via JS (April to March per Indian Law) -->
+                                
                             </select>
                         </div>
                     </div>
-                </div>
+                </div>-->
+				<div class="col-lg-7 col-md-6">
+					<div class="row g-3 mb-4">
+
+						{{-- Financial Year --}}
+						<div class="col-md-4">
+							<label class="form-label fw-semibold">Financial Year</label>
+							<select class="form-select" id="financial_year">
+								<option value="">Select Financial Year</option>
+								@php
+									$currentYear = now()->year;
+								@endphp
+
+								@for($year = $currentYear; $year >= $currentYear - 5; $year--)
+									<option value="{{ $year }}-{{ $year + 1 }}">
+										{{ $year }}-{{ $year + 1 }}
+									</option>
+								@endfor
+							</select>
+						</div>
+
+						{{-- Period Frequency --}}
+						<div class="col-md-4">
+							<label class="form-label fw-semibold">Period Frequency</label>
+							<select class="form-select" id="period_frequency">
+								<option value="">Select Frequency</option>
+								<option value="Monthly">Monthly</option>
+								<option value="Quarterly">Quarterly</option>
+								<option value="Half-Yearly">Half-Yearly</option>
+								<option value="Yearly">Yearly</option>
+							</select>
+						</div>
+
+						{{-- Select Period --}}
+						<div class="col-md-4">
+							<label class="form-label fw-semibold">Select Period</label>
+							<select class="form-select" id="select_period">
+								<option value="">Select Period</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				
             </div>
         </div>
     </div>
@@ -103,7 +145,7 @@
                             <i class="ph-duotone ph-trend-up fs-5"></i>
                         </div>
                     </div>
-                    <h3 class="mb-1 fw-bold text-dark">₹4,85,000.00</h3>
+                    <h3 class="mb-1 fw-bold text-dark" id="totalSales">₹0.00</h3>
                     <div class="small text-muted d-flex align-items-center gap-1">
                         <span class="badge bg-light-success text-success font-11"><i class="ph-duotone ph-arrow-up-right me-0.5"></i> Outward</span>
                         <span>Gross taxable sales turnover</span>
@@ -122,7 +164,7 @@
                             <i class="ph-duotone ph-shopping-cart-simple fs-5"></i>
                         </div>
                     </div>
-                    <h3 class="mb-1 fw-bold text-dark">₹3,12,000.00</h3>
+                    <h3 class="mb-1 fw-bold text-dark" id="totalPurchase">₹0.00</h3>
                     <div class="small text-muted d-flex align-items-center gap-1">
                         <span class="badge bg-light-info text-info font-11"><i class="ph-duotone ph-arrow-down-left me-0.5"></i> Inward</span>
                         <span>Inward goods & services</span>
@@ -141,7 +183,7 @@
                             <i class="ph-duotone ph-receipt fs-5"></i>
                         </div>
                     </div>
-                    <h3 class="mb-1 fw-bold text-danger">₹87,300.00</h3>
+                    <h3 class="mb-1 fw-bold text-danger" id="outputGst">₹0.00</h3>
                     <div class="small text-muted d-flex align-items-center gap-1">
                         <span class="badge bg-light-danger text-danger font-11">Tax Liability</span>
                         <span>GST collected on sales</span>
@@ -160,7 +202,7 @@
                             <i class="ph-duotone ph-percent fs-5"></i>
                         </div>
                     </div>
-                    <h3 class="mb-1 fw-bold text-success">₹56,160.00</h3>
+                    <h3 class="mb-1 fw-bold text-success" id="inputGst">₹0.00</h3>
                     <div class="small text-muted d-flex align-items-center gap-1">
                         <span class="badge bg-light-success text-success font-11">ITC Claim</span>
                         <span>Eligible Input Tax Credit</span>
@@ -179,7 +221,7 @@
                             <i class="ph-duotone ph-scales fs-5"></i>
                         </div>
                     </div>
-                    <h3 class="mb-1 fw-bold text-dark">₹31,140.00</h3>
+                    <h3 class="mb-1 fw-bold text-dark" id="netGstLiability">₹0.00</h3>
                     <span class="small text-muted">(Output GST - Input GST Credit)</span>
                 </div>
             </div>
@@ -195,7 +237,7 @@
                             <i class="ph-duotone ph-check-square-offset fs-5"></i>
                         </div>
                     </div>
-                    <h3 class="mb-1 fw-bold text-primary">₹28,500.00</h3>
+                    <h3 class="mb-1 fw-bold text-primary" id="gstPaid">₹0.00</h3>
                     <span class="small text-muted">Challan / E-cash ledger payments</span>
                 </div>
             </div>
@@ -211,7 +253,7 @@
                             <i class="ph-duotone ph-currency-inr fs-5"></i>
                         </div>
                     </div>
-                    <h3 class="mb-1 fw-bold text-primary">₹2,640.00</h3>
+                    <h3 class="mb-1 fw-bold text-primary" id="gstPayableStatus">₹0.00</h3>
                     <span class="small text-muted font-12 fw-semibold">
                         <span class="text-danger"><i class="ph-duotone ph-arrow-circle-up me-1"></i> Balance Tax Payable</span>
                     </span>
@@ -241,6 +283,7 @@
                     <option value="Credit Note">Credit Note</option>
                     <option value="Purchase">Purchase</option>
                     <option value="Debit Note">Debit Note</option>
+                    <option value="Income">Income</option>
                     <option value="Expense">Expense</option>
                     <option value="Asset">Asset</option>
                     <option value="RCM">RCM</option>
@@ -249,7 +292,7 @@
                 <!-- Status Filter -->
                 <select id="statusFilter" class="form-select form-select-sm rounded-3 border-light-subtle fw-semibold" style="width: 160px;" onchange="filterGstTable()">
                     <option value="">All Statuses</option>
-                    <option value="Active">Active</option>
+                    <option value="Full">Full</option>
                     <option value="Advance">Advance</option>
                     <option value="Due">Due</option>
                 </select>
@@ -278,7 +321,21 @@
                             <th class="pe-4 py-3 text-center">Status</th>
                         </tr>
                     </thead>
-                    <tbody>
+					<tbody id="gstListingBody">
+
+						<tr>
+
+							<td colspan="9"
+								class="text-center text-muted py-5">
+
+								Please select Financial Year and Period.
+
+							</td>
+
+						</tr>
+
+					</tbody>
+                    {{--<tbody>
                         <!-- 1. Sales -->
                         <tr class="gst-row" data-module="Sales" data-status="Active">
                             <td class="ps-4">
@@ -478,19 +535,330 @@
                                 </span>
                             </td>
                         </tr>
-                    </tbody>
+                    </tbody> --}}
                 </table>
             </div>
         </div>
-        <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center">
-            <span class="text-muted small" id="recordCountInfo">Showing 8 entries</span>
+        <!--<div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center">
+            <span class="text-muted small" id="recordCountInfo">Showing 0 entries</span>
             <small class="text-muted">GST Module Data • Indicative Report Summary</small>
-        </div>
+        </div>-->
+		<div class="card-footer bg-white border-top py-3 px-4 
+            d-flex justify-content-between align-items-center">
+
+			<span class="text-muted small" id="recordCountInfo">
+				Showing 0 entries
+			</span>
+
+			<div class="d-flex align-items-center gap-2">
+
+				<label class="text-muted small mb-0">
+					Show
+				</label>
+
+				<select id="pageLength" class="form-select form-select-sm" style="width: 80px;">
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="100">100</option>
+					<option value="all">All</option>
+				</select>
+
+				<button type="button"
+						class="btn btn-sm btn-outline-secondary"
+						id="prevPage">
+					Previous
+				</button>
+
+				<span class="small text-muted" id="pageInfo">
+					Page 1
+				</span>
+
+				<button type="button"
+						class="btn btn-sm btn-outline-secondary"
+						id="nextPage">
+					Next
+				</button>
+			</div>
+		</div>
+		
     </div>
 </div>
 
 <!-- Invoice Details Modal -->
 <div class="modal fade" id="invoiceDetailsModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content rounded-4 border-0 shadow">
+            {{-- HEADER --}}
+            <div class="modal-header border-bottom px-4 py-3 bg-light">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="avtar avtar-s bg-light-primary text-primary rounded-circle">
+                        <i class="ph-duotone ph-file-text fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0"
+                            id="invoiceModalLabel">
+                            Invoice Breakdown Details
+                        </h5>
+
+                        <small class="text-muted"
+                               id="invoiceDetailModule">
+                            Module Transaction View
+                        </small>
+                    </div>
+
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+
+            {{-- BODY --}}
+            <div class="modal-body p-4">
+
+                {{-- INVOICE INFORMATION --}}
+                <div class="row g-3 mb-4">
+
+                    {{-- Invoice Details --}}
+                    <div class="col-md-6">
+
+                        <div class="p-3 bg-light rounded-3 border">
+
+                            <span class="text-muted small text-uppercase d-block mb-1">
+                                Invoice Number
+                            </span>
+
+                            <h5 class="fw-bold text-primary mb-2"
+                                id="invoiceDetailNo">
+                                -
+                            </h5>
+
+                            <span class="text-muted small text-uppercase d-block mb-1">
+                                Invoice Date
+                            </span>
+
+                            <p class="fw-semibold text-dark mb-0"
+                               id="invoiceDetailDate">
+                                -
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Party Details --}}
+                    <div class="col-md-6">
+
+                        <div class="p-3 bg-light rounded-3 border">
+
+                            <span class="text-muted small text-uppercase d-block mb-1">
+                                Party Name (Customer / Vendor)
+                            </span>
+
+                            <h5 class="fw-bold text-dark mb-2"
+                                id="invoiceDetailParty">
+                                -
+                            </h5>
+
+                            <span class="text-muted small text-uppercase d-block mb-1">
+                                GSTIN Number
+                            </span>
+
+                            <p class="fw-bold text-dark font-monospace mb-0"
+                               id="invoiceDetailGstin">
+                                -
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- ITEM BREAKDOWN --}}
+                <div class="table-responsive border rounded-3 mb-4">
+
+                    <table class="table table-sm align-middle m-0">
+
+                        <thead class="bg-light">
+
+                            <tr class="small fw-bold text-secondary">
+
+                                <th class="ps-3 py-3">
+                                    Item / Description
+                                </th>
+
+                                <th class="py-3">
+                                    HSN / SAC
+                                </th>
+
+                                <th class="py-3 text-end">
+                                    Qty
+                                </th>
+
+                                <th class="py-3 text-end">
+                                    Rate
+                                </th>
+
+                                <th class="py-3 text-end">
+                                    Taxable Amount
+                                </th>
+
+                                <th class="pe-3 py-3 text-end">
+                                    GST
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="invoiceBreakdownBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                {{-- GST SUMMARY --}}
+                <div class="row justify-content-end mb-4">
+
+                    <div class="col-md-5 col-lg-4">
+
+                        <div class="p-3 bg-light rounded-3 border">
+
+                            <div class="d-flex justify-content-between mb-2">
+
+                                <span class="text-muted">
+                                    Taxable Amount
+                                </span>
+
+                                <strong id="invoiceDetailTaxable">
+                                    ₹0.00
+                                </strong>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between mb-2">
+
+                                <span class="text-muted">
+                                    CGST
+                                </span>
+
+                                <span id="invoiceDetailCgst">
+                                    ₹0.00
+                                </span>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between mb-2">
+
+                                <span class="text-muted">
+                                    SGST
+                                </span>
+
+                                <span id="invoiceDetailSgst">
+                                    ₹0.00
+                                </span>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between mb-2">
+
+                                <span class="text-muted">
+                                    IGST
+                                </span>
+
+                                <span id="invoiceDetailIgst">
+                                    ₹0.00
+                                </span>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between">
+
+                                <span class="text-muted">
+                                    Total GST
+                                </span>
+
+                                <strong class="text-danger"
+                                        id="invoiceDetailGst">
+                                    ₹0.00
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- FINAL SUMMARY --}}
+                <div class="d-flex justify-content-between align-items-center p-3 rounded-3 bg-light-primary border border-primary-subtle">
+
+                    <div>
+
+                        <span class="text-muted small text-uppercase d-block mb-1">
+                            Transaction Module
+                        </span>
+
+                        <div class="fw-bold text-dark"
+                             id="invoiceDetailModuleBottom">
+                            -
+                        </div>
+
+                    </div>
+
+
+                    <div class="text-end">
+
+                        <span class="text-muted small text-uppercase d-block mb-1">
+                            Invoice Total Amount
+                        </span>
+
+                        <h4 class="fw-bold text-dark mb-0"
+                            id="invoiceDetailTotal">
+                            ₹0.00
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- FOOTER --}}
+            <div class="modal-footer border-top px-4 py-3">
+
+                <button type="button"
+                        class="btn btn-secondary px-4 rounded-3"
+                        data-bs-dismiss="modal">
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!--<div class="modal fade" id="invoiceDetailsModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content rounded-4 border-0 shadow">
             <div class="modal-header border-bottom px-4 py-3 bg-light">
@@ -566,7 +934,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>-->
 
 <script>
 function filterGstTable() {
@@ -706,6 +1074,542 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+//Start custom code
+$(document).ready(function () {
+
+    //Financial Year + Frequency Change
+    $('#financial_year, #period_frequency').on('change', function () {
+
+        let financialYear = $('#financial_year').val();
+        let frequency = $('#period_frequency').val();
+		resetGstSummary();
+        // Reset Period
+        $('#select_period').html('<option value="">Select Period</option>');
+
+        $('#gstListingBody').html(`
+            <tr>
+                <td colspan="9"
+                    class="text-center text-muted py-5">
+                    Please select period.
+                </td>
+            </tr>
+        `);
+
+        if (!financialYear || !frequency) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('gst.dashboard.periods') }}",
+            type: "GET",
+            data: {
+                financial_year: financialYear,
+                period_frequency: frequency
+            },
+
+            beforeSend: function () {
+                $('#select_period').html(`<option value="">Loading periods...</option>`);
+
+            },
+
+            success: function (response) {
+                $('#select_period').html('<option value="">Select Period</option>');
+                if (response.success && response.periods.length > 0) {
+                    $.each(response.periods, function (index, period) {
+                        $('#select_period').append(`<option value="${period.value}">${period.label}</option>`);
+                    });
+                } else {
+                    $('#select_period').html(`<option value="">No period available</option>`);
+                }
+            },
+
+            error: function () {
+                $('#select_period').html(`<option value="">Unable to load periods</option>`);
+            }
+        });
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Select Period
+    |--------------------------------------------------------------------------
+    */
+
+    $('#select_period').on('change', function () {
+
+        let financialYear = $('#financial_year').val();
+        let frequency = $('#period_frequency').val();
+        let period = $(this).val();
+
+        if (!financialYear || !frequency || !period) {
+            return;
+        }
+
+        loadTransactions(financialYear,frequency,period);
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Load Transactions
+    |--------------------------------------------------------------------------
+    */
+	let allTransactions = [];
+	let currentPage = 1;
+	let pageLength = 10;
+	
+    function loadTransactions(financialYear,frequency,period) 
+	{
+
+        $('#gstListingBody').html(`
+            <tr>
+                <td colspan="9" class="text-center py-5">
+                    <div class="spinner-border text-primary"
+                         role="status">
+                    </div>
+
+                    <div class="mt-2 text-muted">
+                        Loading transactions...
+                    </div>
+                </td>
+            </tr>
+        `);
+
+
+        $.ajax({
+            url: "{{ route('gst.dashboard.transactions') }}",
+            type: "GET",
+            data: {
+                financial_year: financialYear,
+                period_frequency: frequency,
+                period: period
+            },
+
+            success: function (response) {
+
+                if (response.success && response.data.length > 0) {
+                    allTransactions = response.data;
+                    currentPage = 1;
+                    pageLength = $('#pageLength').val() === 'all' ? allTransactions.length : parseInt($('#pageLength').val() || 10);
+                    updateGstSummary(response.summary);
+                    renderGstPage();
+                } else {
+                    allTransactions = [];
+                    renderEmptyTransactions('No transactions found.');
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                $('#gstListingBody').html(`
+                    <tr>
+                        <td colspan="9"
+                            class="text-center text-danger py-5">
+
+                            Failed to load transactions.
+
+                        </td>
+                    </tr>
+                `);
+            }
+        });
+    }
+
+	/*
+    |--------------------------------------------------------------------------
+    | Render Summary
+    |--------------------------------------------------------------------------
+    */
+
+	function updateGstSummary(summary) 
+	{
+
+		summary = summary || {};
+
+		$('#totalSales').text(
+			'₹' + formatAmount(summary.total_sales || 0)
+		);
+
+		$('#totalPurchase').text(
+			'₹' + formatAmount(summary.total_purchase || 0)
+		);
+
+		$('#outputGst').text(
+			'₹' + formatAmount(summary.output_gst || 0)
+		);
+
+		$('#inputGst').text(
+			'₹' + formatAmount(summary.input_gst || 0)
+		);
+
+		$('#netGstLiability').text(
+			'₹' + formatAmount(summary.net_gst_liability || 0)
+		);
+
+		$('#gstPaid').text(
+			'₹' + formatAmount(summary.gst_paid || 0)
+		);
+
+		let gstPayable = parseFloat(
+			summary.gst_payable || 0
+		);
+
+		$('#gstPayableRefund').text(
+			'₹' + formatAmount(Math.abs(gstPayable))
+		);
+
+		if (gstPayable > 0) {
+
+			$('#gstPayableStatus').html(`
+				<span class="text-danger">
+					<i class="ph-duotone ph-arrow-circle-up me-1"></i>
+					Balance Tax Payable
+				</span>
+			`);
+
+		} else if (gstPayable < 0) {
+
+			$('#gstPayableStatus').html(`
+				<span class="text-success">
+					<i class="ph-duotone ph-arrow-circle-down me-1"></i>
+					GST Refund / Credit Available
+				</span>
+			`);
+
+		} else {
+
+			$('#gstPayableStatus').html(`
+				<span class="text-muted">
+					No GST Payable / Refund
+				</span>
+			`);
+		}
+	}
+	
+	function resetGstSummary() {
+
+		$('#totalSales').text('₹0.00');
+		$('#totalPurchase').text('₹0.00');
+		$('#outputGst').text('₹0.00');
+		$('#inputGst').text('₹0.00');
+		$('#netGstLiability').text('₹0.00');
+		$('#gstPaid').text('₹0.00');
+		$('#gstPayableRefund').text('₹0.00');
+
+		$('#gstPayableStatus').html(`
+			<span class="text-muted">
+				Select period
+			</span>
+		`);
+	}
+	
+    /*
+    |--------------------------------------------------------------------------
+    | Render Transaction Table
+    |--------------------------------------------------------------------------
+    */
+
+    function renderGstTransactions(data) {
+
+        let html = '';
+
+        $.each(data, function (index, row) {
+
+			let status = (row.status || '').trim().toLowerCase();
+			let statusClass = 'bg-light-secondary text-secondary';
+			let statusIcon = '';
+			let displayStatus = '-';
+
+			if (status === 'active' || status === 'full') {
+				statusClass = 'bg-light-success text-success';
+				statusIcon = 'ph-check-circle';
+				displayStatus = status === 'active' ? 'Active' : 'Full';
+			} else if (status === 'advance' || status === 'partial') {
+				statusClass = 'bg-light-info text-info';
+				statusIcon = 'ph-clock';
+				displayStatus = 'Advance';
+			} else if (status === 'due') {
+				statusClass = 'bg-light-warning text-warning';
+				statusIcon = 'ph-warning';
+				displayStatus = 'Due';
+			} else if (row.status) {
+				displayStatus = row.status;
+			}
+
+
+			// ==========================================
+			// MODULE BADGE
+			// ==========================================
+
+			let moduleClass = 'bg-light-secondary text-dark';
+			let moduleIcon = 'ph-receipt';
+
+			switch (row.module) {
+				case 'Sales':
+					moduleClass = 'bg-light-primary text-dark';
+					moduleIcon = 'ph-trend-up';
+					break;
+				case 'Credit Note':
+					moduleClass = 'bg-light-danger text-danger';
+					moduleIcon = 'ph-file-arrow-down';
+					break;
+				case 'Purchase':
+					moduleClass = 'bg-light-info text-dark';
+					moduleIcon = 'ph-shopping-cart';
+					break;
+				case 'Debit Note':
+					moduleClass = 'bg-light-warning text-warning';
+					moduleIcon = 'ph-file-arrow-up';
+					break;
+				case 'Expense':
+					moduleClass = 'bg-light-secondary text-dark';
+					moduleIcon = 'ph-receipt';
+					break;
+				case 'Asset':
+					moduleClass = 'bg-light-success text-dark';
+					moduleIcon = 'ph-desktop';
+					break;
+				case 'RCM':
+					moduleClass = 'bg-light-dark text-dark';
+					moduleIcon = 'ph-swap';
+					break;
+			}
+
+            html += `
+                <tr class="gst-row" data-module="${row.module}" data-status="${displayStatus}">
+                     <td class="ps-4">
+						<span class="badge ${moduleClass} fw-bold px-2.5 py-1.5 rounded-pill">
+							<i class="ph-duotone ${moduleIcon} me-1"></i>
+							${row.module}
+						</span>
+					</td>
+                     <td class="fw-semibold text-dark">${row.invoice_date ?? '-'}</td>
+                    <td>
+                        <a href="javascript:void(0);"
+                           class="fw-bold text-primary text-decoration-underline show-invoice-details" data-module="${row.module}"
+                           data-id="${row.id}"
+                           data-invoice-no="${row.invoice_no || ''}">
+                            ${row.invoice_no || 'View'}
+                        </a>
+                    </td>
+                    <td class="fw-bold text-dark">${row.party_name ?? '-'} </td>
+                    <td>
+                        <span class="font-monospace text-muted small">
+                            ${row.gstin ?? '-'}
+                        </span>
+                    </td>
+                    <td class="text-end fw-semibold">₹${formatAmount(row.taxable_amount)}</td>
+                    <td class="text-end fw-bold text-danger">₹${formatAmount(row.gst_amount)}</td>
+                    <td class="text-end fw-bold text-dark"> ₹${formatAmount(row.invoice_total)}</td>
+                    <td class="pe-4 text-center">
+						<span class="badge ${statusClass} fw-bold px-3 py-1.5 rounded-pill">
+							${statusIcon
+								? `<i class="ph-duotone ${statusIcon} me-1"></i>`
+								: ''
+							}
+							${displayStatus}
+						</span>
+					</td>
+                </tr>`;
+        });
+
+        $('#gstListingBody').html(html);
+
+    }
+
+    function renderEmptyTransactions(message) {
+        $('#gstListingBody').html(`
+            <tr>
+                <td colspan="9"
+                    class="text-center text-muted py-5">
+                    ${message}
+                </td>
+            </tr>
+        `);
+        $('#recordCountInfo').text('Showing 0 entries');
+        $('#pageInfo').text('Page 0 of 0');
+        $('#prevPage, #nextPage').prop('disabled', true);
+    }
+
+    function renderGstPage() {
+        const totalRecords = allTransactions.length;
+        const effectivePageLength = pageLength === 'all' ? totalRecords : pageLength || 10;
+        const totalPages = effectivePageLength > 0 ? Math.max(1, Math.ceil(totalRecords / effectivePageLength)) : 0;
+
+        if (totalRecords === 0) {
+            renderEmptyTransactions('No transactions found.');
+            return;
+        }
+
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        const startIndex = effectivePageLength === totalRecords ? 0 : (currentPage - 1) * effectivePageLength;
+        const endIndex = effectivePageLength === totalRecords ? totalRecords : Math.min(totalRecords, startIndex + effectivePageLength);
+        const pageData = allTransactions.slice(startIndex, endIndex);
+
+        renderGstTransactions(pageData);
+
+        const showingText = effectivePageLength === totalRecords
+            ? `Showing ${totalRecords} entries`
+            : `Showing ${startIndex + 1} - ${endIndex} of ${totalRecords} entries`;
+
+        $('#recordCountInfo').text(showingText);
+        $('#pageInfo').text(`Page ${currentPage} of ${totalPages}`);
+        $('#prevPage').prop('disabled', currentPage <= 1);
+        $('#nextPage').prop('disabled', currentPage >= totalPages);
+    }
+
+    function updatePaginationLength(value) {
+        if (value === 'all') {
+            pageLength = allTransactions.length;
+        } else {
+            pageLength = parseInt(value || 10);
+        }
+        currentPage = 1;
+        renderGstPage();
+    }
+
+    $('#pageLength').on('change', function () {
+        updatePaginationLength($(this).val());
+    });
+
+    $('#prevPage').on('click', function () {
+        if (currentPage > 1) {
+            currentPage -= 1;
+            renderGstPage();
+        }
+    });
+
+    $('#nextPage').on('click', function () {
+        const effectivePageLength = pageLength === 'all' ? allTransactions.length : pageLength || 10;
+        const totalPages = effectivePageLength > 0 ? Math.max(1, Math.ceil(allTransactions.length / effectivePageLength)) : 0;
+        if (currentPage < totalPages) {
+            currentPage += 1;
+            renderGstPage();
+        }
+    });
+
+    $(document).on('click', '.show-invoice-details', function () {
+        const module = $(this).data('module');
+        const id = $(this).data('id');
+        const invoiceNo = $(this).data('invoice-no');
+
+        $('#invoiceDetailsModal').modal('show');
+        $('#invoiceBreakdownBody').html(`
+            <tr>
+                <td colspan="6" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <div class="mt-2 text-muted">Loading invoice details...</div>
+                </td>
+            </tr>
+        `);
+
+        $.ajax({
+            url: "{{ route('gst.dashboard.invoice.details') }}",
+            type: "GET",
+            data: {
+                module: module,
+                id: id,
+                invoice_no: invoiceNo
+            },
+            success: function (response) {
+                if (response.success) {
+                    renderInvoiceBreakdown(response);
+                } else {
+                    $('#invoiceBreakdownBody').html(`
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No details found.</td>
+                        </tr>
+                    `);
+                }
+            },
+            error: function () {
+                $('#invoiceBreakdownBody').html(`
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">Failed to load invoice details.</td>
+                    </tr>
+                `);
+            }
+        });
+    });
+
+    function renderInvoiceBreakdown(data) {
+        const invoice = data.invoice || {};
+        const items = data.items || [];
+        const gstBreakup = data.gst_breakup || {};
+
+        let html = '';
+
+        $.each(items, function (index, item) {
+            const itemName = item.item_name || item.prodservname || item.product_name || item.description || '-';
+            const hsnSac = item.hsn_sac || item.hsn_sac_code || '-';
+            const qty = parseFloat(item.qty || item.quantity || 1);
+            const rate = parseFloat(item.rate || item.rate_unit_price || 0);
+            const taxableAmount = parseFloat(item.taxable_amount || item.amount || 0);
+            const gstAmount = parseFloat(item.gst_amount || item.tax_amt || 0);
+
+            html += `
+                <tr>
+                    <td class="ps-3 fw-semibold text-dark">${itemName}</td>
+                    <td class="font-monospace">${hsnSac}</td>
+                    <td class="text-end">${qty.toFixed(2)}</td>
+                    <td class="text-end">₹${formatAmount(rate)}</td>
+                    <td class="text-end fw-semibold">₹${formatAmount(taxableAmount)}</td>
+                    <td class="pe-3 text-end">₹${formatAmount(gstAmount)}</td>
+                </tr>
+            `;
+        });
+
+        if (html === '') {
+            html = `
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">No item details found.</td>
+                </tr>
+            `;
+        }
+
+        $('#invoiceBreakdownBody').html(html);
+
+        const moduleName = data.module || '-';
+        $('#invoiceDetailModule').text(moduleName);
+        $('#invoiceDetailModuleBottom').text(moduleName);
+        $('#invoiceDetailNo').text(invoice.invoice_no || 'View');
+        $('#invoiceDetailDate').text(invoice.invoice_date || '-');
+        $('#invoiceDetailParty').text(invoice.party_name || '-');
+        $('#invoiceDetailGstin').text(invoice.gstin || '-');
+
+        $('#invoiceDetailTaxable').text('₹' + formatAmount(invoice.taxable_amount || 0));
+        $('#invoiceDetailGst').text('₹' + formatAmount(invoice.gst_amount || 0));
+        $('#invoiceDetailTotal').text('₹' + formatAmount(invoice.invoice_total || 0));
+
+        $('#invoiceDetailCgst').text('₹' + formatAmount(gstBreakup.cgst || 0));
+        $('#invoiceDetailSgst').text('₹' + formatAmount(gstBreakup.sgst || 0));
+        $('#invoiceDetailIgst').text('₹' + formatAmount(gstBreakup.igst || 0));
+    }
+
+    function formatAmount(amount) {
+
+        return Number(
+            amount || 0
+        ).toLocaleString(
+            'en-IN',
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
+
+    }
+
+});
+
+//End custom code
+
+
 </script>
 
 @endsection

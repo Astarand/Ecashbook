@@ -118,11 +118,82 @@ class PurchaseController extends Controller
 		}
 		$sales = json_decode(json_encode($array));
 		//echo "<pre>"; print_r($sales);exit;
+		
+		//Start Summary
+		$purchaseSummary = DB::table('purchases')
+			->leftJoin('purchase_values','purchase_values.sid','=','purchases.id')
+			->where('purchases.added_by',$userId)
+			->select(
+				DB::raw('COUNT(DISTINCT purchases.id) AS total_count'),
+				DB::raw(
+					'
+					COALESCE(
+						SUM(
+							COALESCE(purchase_values.amount, 0) +
+							COALESCE(purchase_values.tax_amt, 0)
+						),
+						0
+					) AS total_value
+					'
+				)
+			)->first();
+			
+		$poSummary = DB::table('puos')
+			->leftJoin('puo_values','puo_values.sid','=','puos.id')
+			->where('puos.added_by',$userId)
+			->select(
+				DB::raw('COUNT(DISTINCT puos.id) AS total_count'),
+				DB::raw(
+					'
+					COALESCE(
+						SUM(
+							COALESCE(puo_values.amount, 0) +
+							COALESCE(puo_values.tax_amt, 0)
+						),
+						0
+					) AS total_value
+					'
+				)
+			)->first();
+
+		$debitNoteSummary = DB::table('voucher_purchases')
+			->where('voucher_purchases.added_by',$userId)
+			->where('voucher_purchases.note_type','Debit')
+			->select(
+				DB::raw('COUNT(DISTINCT voucher_purchases.id) AS total_count'),
+				DB::raw(
+					'
+					COALESCE(
+						SUM(
+							COALESCE(voucher_purchases.total_amt, 0)
+						),
+						0
+					) AS total_value
+					'
+				)
+			)->first();
+
+		$purchaseCount = (int) ($purchaseSummary->total_count ?? 0);
+		$purchaseValue =  ($purchaseSummary->total_value ?? 0);
+		$poCount = (int) ($poSummary->total_count ?? 0);
+		$poValue = ($poSummary->total_value ?? 0);
+		$debitNoteCount = (int) ($debitNoteSummary->total_count ?? 0);
+		$debitNoteValue = ($debitNoteSummary->total_value ?? 0);
+		$netPurchase = $purchaseValue - $debitNoteValue;
+		//End Summary
         return view('User.purchase-invoice')->with([
 			'title' =>$title,
 			'sales'=>$sales,
 			'sales_pagination' =>$sales_pagination,
 			'invoice_create_status' => $this->invoice_create_status(),
+			
+			'purchase_count' =>$purchaseCount,
+			'po_count' =>$poCount,
+			'purchase_value' =>round($purchaseValue,2),
+			'po_value' =>round($poValue,2),
+			'purchase_debit_note' =>round($debitNoteValue,2),
+			'purchase_debit_note_count' =>$debitNoteCount,
+			'net_purchase' =>round($netPurchase,2),
 		]);
     }
 	

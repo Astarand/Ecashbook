@@ -36,7 +36,8 @@ class InventoryController extends Controller
 		// service / product / mixed
 		$bussType = $request->input('buss_type');
 		if (empty($bussType)) {
-			$bussType = 'service';
+			//$bussType = 'service';
+			$bussType = 'product';
 		}
 		
 		//CURRENT FINANCIAL YEAR

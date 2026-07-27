@@ -1299,5 +1299,8 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/settlement/amount',[SettlementController::class, 'getSettlementAmount'])->name('settlement.amount');
 	
 	Route::get('/gst-dashboard', [GstDashboardController::class, 'GstDashboard'])->name('User.GstDashboard');
+	Route::get('/gst-dashboard/periods',[GstDashboardController::class, 'getPeriods'])->name('gst.dashboard.periods');
+	Route::get('/gst-dashboard/transactions',[GstDashboardController::class, 'getTransactions'])->name('gst.dashboard.transactions');
+	Route::get('/gst-dashboard/invoice-details',[GstDashboardController::class, 'getInvoiceDetails'])->name('gst.dashboard.invoice.details');
 
 });

@@ -224,7 +224,6 @@
 								</a>
 								<ul class="pc-submenu">
 									<li class="pc-item"><a class="pc-link" href="{{ route('user.AssetList') }}">Asset Details</a></li>
-									<li class="pc-item"><a class="pc-link" href="{{ route('user.AssetVoucherList') }}">Asset Vouchers</a></li>
 								</ul>
 							</li>
 							@endif
@@ -1691,7 +1690,6 @@
 									</a>
 									<ul class="pc-submenu">
 										<li class="pc-item"><a class="pc-link" href="{{ route('user.AssetList') }}">Asset Details</a></li>
-										<li class="pc-item"><a class="pc-link" href="{{ route('user.AssetVoucherList') }}">Asset Vouchers</a></li>
 									</ul>
 								</li>
 								@endif

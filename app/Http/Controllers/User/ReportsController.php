@@ -65,12 +65,40 @@ class ReportsController extends Controller
 			$openingCr = $opening['opening_cr'];
 		}
 		//echo "<pre>";print_r($opening);exit;
-		
-		$ledgers = DB::table('journals')
-			->where('added_by', $userId)
-			->whereNotNull('ledger')
-			->distinct()
-			->pluck('ledger');
+			
+		// Ledger names from journals
+		$ledgerList = collect();
+		$ledgerList = $ledgerList->merge(
+			DB::table('journals')
+				->where('added_by', $userId)
+				->whereNotNull('ledger')
+				->where('ledger', '!=', '')
+				->distinct()
+				->pluck('ledger')
+		);
+		// Customer names
+		$ledgerList = $ledgerList->merge(
+			DB::table('customers')
+				->where('userId', $userId)
+				->whereNotNull('cust_name')
+				->where('cust_name', '!=', '')
+				->pluck('cust_name')
+		);
+		// Vendor names
+		$ledgerList = $ledgerList->merge(
+			DB::table('vendors')
+				->where('userId', $userId)
+				->whereNotNull('vendor_name')
+				->where('vendor_name', '!=', '')
+				->pluck('vendor_name')
+		);
+		// Remove duplicates and sort
+		$ledgers = $ledgerList
+			->map(fn($name) => trim($name))
+			->filter()
+			->unique()
+			->sort()
+			->values();
 			
 		$proprietorships = DB::table('proprietorship_profiles')
 						->select('id','comp_name')
@@ -137,6 +165,54 @@ class ReportsController extends Controller
 
 		$ledgerFilter     = $r->ledger_name;
 		$ledgerGroup      = $r->ledger_group;
+		
+		/*
+		|--------------------------------------------------------------------------
+		| LEDGER / CUSTOMER / VENDOR FILTER IDs
+		|--------------------------------------------------------------------------
+		*/
+
+		$salesIds    = collect();
+		$purchaseIds = collect();
+		$expenseIds  = collect();
+		$assetIds    = collect();
+
+		if (!empty($ledgerFilter) && $ledgerFilter !== 'all') {
+
+			$customerId = DB::table('customers')
+				->where('cust_name', $ledgerFilter)
+				->where('userId', $userId)
+				->value('id');
+
+			$vendorId = DB::table('vendors')
+				->where('vendor_name', $ledgerFilter)
+				->where('userId', $userId)
+				->value('id');
+				
+			if ($customerId) {
+				$salesIds = DB::table('sales')
+					->where('inv_name', $customerId)
+					->pluck('id');
+			}
+
+			if ($vendorId) {
+				$purchaseIds = DB::table('purchases')
+					->where('inv_name', $vendorId)
+					->pluck('id');
+			}
+
+			if ($vendorId) {
+				$expenseIds = DB::table('expenses')
+					->where('vendor_id', $vendorId)
+					->pluck('id');
+			}
+
+			if ($vendorId) {
+				$assetIds = DB::table('assets')
+					->where('vendor_id', $vendorId)
+					->pluck('id');
+			}
+		}
 
 		// ================= FETCH JOURNAL =================
 		$journals = DB::table('journals')
@@ -158,12 +234,57 @@ class ReportsController extends Controller
 			if (empty($row->ledger)) {
 				continue;
 			}
+			//Start LEDGER / CUSTOMER / VENDOR FILTER
+			if (!empty($ledgerFilter) && $ledgerFilter !== 'all') {
+				$isMatched = false;
+				//1. NORMAL LEDGER MATCH
+				if ($row->ledger === $ledgerFilter) {
+					$isMatched = true;
+				}
+				// 2. DIRECT PARTY NAME MATCH
+				if ($row->party_name === $ledgerFilter) {
+					$isMatched = true;
+				}
+				// 3. CUSTOMER SALES MATCH
+				if (
+					strtolower($row->entry_type) === 'sales'
+					&& $salesIds->contains($row->autoId)
+				) {
+					$isMatched = true;
+				}
+				// 4. VENDOR PURCHASE MATCH
+				if (
+					strtolower($row->entry_type) === 'purchase'
+					&& $purchaseIds->contains($row->autoId)
+				) {
+					$isMatched = true;
+				}
+				// 5. VENDOR EXPENSE MATCH
+				if (
+					strtolower($row->entry_type) === 'expense'
+					&& $expenseIds->contains($row->autoId)
+				) {
+					$isMatched = true;
+				}
+				// 6. VENDOR ASSET MATCH
+				if (
+					strtolower($row->entry_type) === 'asset'
+					&& $assetIds->contains($row->autoId)
+				) {
+					$isMatched = true;
+				}
+				// Skip journal if no match
+				if (!$isMatched) {
+					continue;
+				}
+			}
+			//End LEDGER / CUSTOMER / VENDOR FILTER
 			$ledger = trim($row->ledger);
 			$group    = $this->getLedgerGroup($row);
 			$subGroup = $this->getLedgerSubGroup($row);
 
 			// ================= FILTER SUPPORT =================
-			if ($ledgerFilter && $ledgerFilter !== 'all' && $ledger !== $ledgerFilter) continue;
+			//if ($ledgerFilter && $ledgerFilter !== 'all' && $ledger !== $ledgerFilter) continue;
 			if ($ledgerGroup && strtolower($group) !== strtolower($ledgerGroup)) continue;
 
 			// ================= INIT =================
@@ -931,12 +1052,40 @@ class ReportsController extends Controller
 					->select('vendor_name', 'id')
 					->where('userId', $userId)
 					->get();
-	
-		$ledgers = DB::table('journals')
-			->where('added_by', $userId)
-			->whereNotNull('ledger')
-			->distinct()
-			->pluck('ledger');
+					
+		// Ledger names from journals
+		$ledgerList = collect();
+		$ledgerList = $ledgerList->merge(
+			DB::table('journals')
+				->where('added_by', $userId)
+				->whereNotNull('ledger')
+				->where('ledger', '!=', '')
+				->distinct()
+				->pluck('ledger')
+		);
+		// Customer names
+		$ledgerList = $ledgerList->merge(
+			DB::table('customers')
+				->where('userId', $userId)
+				->whereNotNull('cust_name')
+				->where('cust_name', '!=', '')
+				->pluck('cust_name')
+		);
+		// Vendor names
+		$ledgerList = $ledgerList->merge(
+			DB::table('vendors')
+				->where('userId', $userId)
+				->whereNotNull('vendor_name')
+				->where('vendor_name', '!=', '')
+				->pluck('vendor_name')
+		);
+		// Remove duplicates and sort
+		$ledgers = $ledgerList
+			->map(fn($name) => trim($name))
+			->filter()
+			->unique()
+			->sort()
+			->values();
 
 		$parties = DB::table('journals')
 			->where('added_by', $userId)
@@ -1132,12 +1281,89 @@ class ReportsController extends Controller
 		if (!empty($partyName)) {
 			$query->where('j.party_name', $partyName);
 		}
-
-		// ================= FILTER: LEDGER TYPE =================
+		
+		// ================= FILTER: LEDGER / CUSTOMER / VENDOR SEARCH =================
 		if (!empty($ledger)) {
-			$query->where(function ($q) use ($ledger) {
+			$customerId = DB::table('customers')
+				->where('cust_name', $ledger)
+				->where('userId', $userId)
+				->value('id');
+
+			$vendorId = DB::table('vendors')
+				->where('vendor_name', $ledger)
+				->where('userId', $userId)
+				->value('id');
+
+
+			$salesIds = collect();
+			if ($customerId) {
+				$salesIds = DB::table('sales')
+					->where('inv_name', $customerId)
+					->pluck('id');
+			}
+
+			$purchaseIds = collect();
+			if ($vendorId) {
+				$purchaseIds = DB::table('purchases')
+					->where('inv_name', $vendorId)
+					->pluck('id');
+			}
+
+			$expenseIds = collect();
+			if ($vendorId) {
+				$expenseIds = DB::table('expenses')
+					->where('vendor_id', $vendorId)
+					->pluck('id');
+			}
+
+			$assetIds = collect();
+			if ($vendorId) {
+				$assetIds = DB::table('assets')
+					->where('vendor_id', $vendorId)
+					->pluck('id');
+			}
+			// APPLY FILTER
+			$query->where(function ($q) use (
+				$ledger,
+				$salesIds,
+				$purchaseIds,
+				$expenseIds,
+				$assetIds
+			) {
+
+				// 1. Normal Ledger
 				$q->where('j.ledger', $ledger)
-				  ->orWhere('j.party_name', $ledger);
+					// 2. Direct journal party name
+					->orWhere('j.party_name', $ledger);
+				// 3. Customer Sales
+				if ($salesIds->isNotEmpty()) {
+					$q->orWhere(function ($sub) use ($salesIds) {
+						$sub->where('j.entry_type', 'Sales')
+							->whereIn('j.autoId', $salesIds);
+					});
+				}
+				// 4. Vendor Purchase
+				if ($purchaseIds->isNotEmpty()) {
+					$q->orWhere(function ($sub) use ($purchaseIds) {
+						$sub->where('j.entry_type', 'Purchase')
+							->whereIn('j.autoId', $purchaseIds);
+					});
+				}
+				// 5. Vendor Expense
+				if ($expenseIds->isNotEmpty()) {
+					$q->orWhere(function ($sub) use ($expenseIds) {
+						$sub->where('j.entry_type', 'Expense')
+							->whereIn('j.autoId', $expenseIds);
+					});
+				}
+				// 6. Vendor Asset
+				if ($assetIds->isNotEmpty()) {
+					$q->orWhere(function ($sub) use ($assetIds) {
+						$sub->where('j.entry_type', 'Asset')
+							->whereIn('j.autoId', $assetIds);
+					});
+				}
+
 			});
 		}
 

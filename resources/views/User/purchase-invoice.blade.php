@@ -50,13 +50,13 @@
                                 <i class="ph-duotone ph-file-text fs-5 lh-1"></i>
                             </div>
                         </div>
-                        <h3 class="mb-3 fw-bold text-dark">98</h3>
+                        <h3 class="mb-3 fw-bold text-dark">{{ ($purchase_count) }}</h3>
                     </div>
                     <!-- Segregated Breakdown Pills (Square Design) -->
                     <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
                         <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(0, 140, 173, 0.08); border: 1px solid rgba(0, 140, 173, 0.2);">
                             <span class="text-primary fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-shopping-cart me-1 lh-1 fs-6"></i>Purchase Order</span>
-                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">64</span>
+                            <span class="badge bg-primary text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">{{ ($po_count) }}</span>
                         </div>
                     </div>
                 </div>
@@ -74,13 +74,21 @@
                                 <i class="ph-duotone ph-shopping-bag fs-5 lh-1"></i>
                             </div>
                         </div>
-                        <h3 class="mb-3 fw-bold text-dark">₹8,75,400.00</h3>
+                        <h3 class="mb-3 fw-bold text-dark">₹{{ number_format($purchase_value) }}</h3>
                     </div>
                     <!-- Segregated Breakdown Pills (Square Design) -->
                     <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
                         <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.2);">
                             <span class="text-info fw-bold font-11 d-inline-flex align-items-center"><i class="ph-duotone ph-receipt me-1 lh-1 fs-6"></i>Purchase Order</span>
-                            <span class="badge bg-info text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">₹5.80L</span>
+                            <span class="badge bg-info text-white fw-extrabold font-11 ms-1 px-2 py-0.5 rounded-1 d-inline-flex align-items-center justify-content-center">
+							₹{{ $po_value >= 10000000
+								? number_format($po_value / 10000000, 2) . 'Cr'
+								: ($po_value >= 100000
+									? number_format($po_value / 100000, 2) . 'L'
+									: number_format($po_value, 2)
+								)
+							}}
+							</span>
                         </div>
                     </div>
                 </div>
@@ -98,7 +106,7 @@
                                 <i class="ph-duotone ph-file-arrow-up fs-5 lh-1"></i>
                             </div>
                         </div>
-                        <h3 class="mb-3 fw-bold text-warning">₹32,100.00</h3>
+                        <h3 class="mb-3 fw-bold text-warning">₹{{ number_format($purchase_debit_note) }}</h3>
                     </div>
                     <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
                         <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2);">
@@ -121,7 +129,7 @@
                                 <i class="ph-duotone ph-currency-inr fs-5 lh-1"></i>
                             </div>
                         </div>
-                        <h3 class="mb-3 fw-bold text-primary">₹8,43,300.00</h3>
+                        <h3 class="mb-3 fw-bold text-primary">₹{{ number_format($net_purchase) }}</h3>
                     </div>
                     <div class="d-flex align-items-center justify-content-between gap-2 pt-2 border-top border-light-subtle">
                         <div class="flex-fill d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(0, 140, 173, 0.12); border: 1px solid rgba(0, 140, 173, 0.25);">
