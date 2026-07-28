@@ -136,60 +136,64 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom px-4 py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    {{-- Filter controls --}}
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <select id="esi_fy" class="form-select form-select-sm" style="width:150px;">
+                            @php
+                                $today = now();
+                                $fyStart = $today->month >= 4 ? $today->year : $today->year - 1;
+                            @endphp
+                            @for ($y = $fyStart - 1; $y <= $fyStart + 1; $y++)
+                                <option value="{{ $y }}-{{ $y + 1 }}" {{ $y === $fyStart ? 'selected' : '' }}>
+                                    FY {{ $y }}-{{ $y + 1 }}
+                                </option>
+                            @endfor
+                        </select>
+                        <select id="esi_filter_type" class="form-select form-select-sm" style="width:140px;" onchange="renderEsiPageFilter()">
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="half-yearly">Half-Yearly</option>
+                            <option value="yearly">Full Year</option>
+                        </select>
+                        <select id="esi_filter_period" class="form-select form-select-sm" style="width:160px;"></select>
+                        <button class="btn btn-primary btn-sm px-4" onclick="loadEsiPageData()">
+                            <i class="ti ti-refresh me-1"></i> Load
+                        </button>
+                    </div>
+                    {{-- Export buttons --}}
+                    <div class="d-flex gap-2">
+                        <button onclick="exportEsiPDF()" class="btn btn-sm px-3 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="background:#ffeef0;color:#dc3545;">
+                            <i class="ti ti-file-type-pdf f-16"></i> PDF
+                        </button>
+                        <button onclick="exportEsiExcel()" class="btn btn-sm px-3 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="background:#e8fadf;color:#198754;">
+                            <i class="ti ti-file-spreadsheet f-16"></i> Excel
+                        </button>
+                    </div>
+                </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table tbl-product m-0 custom-list-table align-middle" id="pc-dt-simple">
+                        <table class="table tbl-product m-0 custom-list-table align-middle" id="esiPageTable">
                             <thead>
                                 <tr class="bg-light-header">
-                                    <th class="text-end py-3 ps-4" style="width: 60px;">#</th>
+                                    <th class="text-end py-3 ps-4" style="width:50px;">#</th>
                                     <th class="py-3">Employee ID</th>
                                     <th class="py-3">Employee Name</th>
-                                    <th class="py-3">ESIC No</th>
-                                    <th class="py-3">Gross Wages</th>
+                                    <th class="py-3">ESI (IP) Number</th>
+                                    <th class="py-3">ECR Gross Wages</th>
                                     <th class="py-3">ESI Wages</th>
-                                    <th class="py-3">Employee Contribution</th>
-                                    <th class="py-3">Challan No</th>
-                                    <th class="py-3">Payment Date</th>
-                                    <th class="py-3">Status</th>
-                                    <th class="text-center py-3 pe-4" style="width: 100px;">Action</th>
+                                    <th class="py-3">Employee ESI (0.75%)</th>
+                                    <th class="py-3">Employer ESI (3.25%)</th>
+                                    <th class="py-3">Total ESI (4%)</th>
+                                    <th class="text-center py-3 pe-4" style="width:90px;">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @forelse ($employees as $key => $emp)
-                                    <tr>
-                                        <td class="text-end ps-4 fw-medium text-muted">{{ $key + 1 }}</td>
-                                        <td class="fw-bold text-dark">{{ $emp->employee_id }}</td>
-                                        <td>{{ $emp->name }}</td>
-                                        <td class="text-muted">{{ $emp->esic_no }}</td>
-                                        <td class="fw-semibold text-dark">₹ {{ number_format($emp->total_addition, 2) }}</td>
-                                        <td class="fw-semibold text-dark">₹ {{ number_format($emp->total_addition, 2) }}</td>
-                                        <td class="text-primary fw-semibold">₹ {{ number_format($emp->esi, 2) }}</td>
-                                        <td class="text-muted">{{ $emp->payslip_no }}</td>
-                                        <td class="text-muted">{{ \Carbon\Carbon::parse($emp->payment_date)->format('d-m-Y') }}</td>
-                                        <td><span class="badge-pill-custom badge-pill-resolved">Done</span></td>
-                                        <td class="text-center pe-4">
-                                            <a href="javascript:void(0)"
-                                                class="btn-action-detail viewESI"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#viewDetailsModal"
-                                                data-esic="{{ $emp->esic_no }}"
-                                                data-gross="{{ $emp->total_addition }}"
-                                                data-empesi="{{ $emp->esi }}"
-                                                data-employeresi="{{ number_format(($emp->total_addition * 3.25) / 100, 2) }}"
-                                                data-total="{{ number_format($emp->esi + (($emp->total_addition * 3.25) / 100), 2) }}"
-                                                data-date="{{ \Carbon\Carbon::parse($emp->payment_date)->format('d-m-Y') }}"
-                                                title="View Details">
-                                                <i class="ti ti-eye"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="11" class="text-center text-muted py-4">
-                                            No ESI records found for this month
-                                        </td>
-                                    </tr>
-                                @endforelse
+                            <tbody id="esiPageBody">
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted py-4">
+                                        Select filters and click Load
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -580,57 +584,162 @@
 		return new bootstrap.Tooltip(tooltipTriggerEl);
 	});
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const initEsiPeriodToggle = function() {
-            const periodRadios = document.querySelectorAll('input[name="esiPeriodType"]');
-            const monthGroup = document.getElementById('filterEsiMonthGroup');
-            const quarterGroup = document.getElementById('filterEsiQuarterGroup');
-            const yearGroup = document.getElementById('filterEsiYearGroup');
-            const resetButton = document.getElementById('esiFilterReset');
-            const form = document.getElementById('esiFilterForm');
+    // ============================================================
+    // Period dropdown helpers
+    // ============================================================
+    const ESI_MONTHS = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
 
-            if (!periodRadios.length || !monthGroup || !quarterGroup || !yearGroup || !form) {
-                console.log('Elements not found for ESI period toggle');
+    function prevEsiMonthIdx() {
+        const d = new Date();
+        d.setMonth(d.getMonth() - 1);
+        return d.getMonth();
+    }
+
+    function buildEsiPeriodOptions(type) {
+        let html = '';
+        const prev = prevEsiMonthIdx();
+        if (type === 'monthly') {
+            ESI_MONTHS.forEach((m, i) => {
+                html += `<option value="${m}" ${i === prev ? 'selected' : ''}>${m}</option>`;
+            });
+        } else if (type === 'quarterly') {
+            [['Q1','Q1 (Apr–Jun)'],['Q2','Q2 (Jul–Sep)'],['Q3','Q3 (Oct–Dec)'],['Q4','Q4 (Jan–Mar)']].forEach(([v,l]) => {
+                html += `<option value="${v}">${l}</option>`;
+            });
+        } else if (type === 'half-yearly') {
+            html = `<option value="H1">H1 (Apr–Sep)</option><option value="H2">H2 (Oct–Mar)</option>`;
+        } else {
+            html = `<option value="full">Full Year</option>`;
+        }
+        return html;
+    }
+
+    function renderEsiPageFilter() {
+        const sel  = document.getElementById('esi_filter_type');
+        const type = sel ? sel.value : 'monthly';
+        const period = document.getElementById('esi_filter_period');
+        if (!period) return;
+
+        let html = '';
+        const prev = prevEsiMonthIdx();
+
+        if (type === 'monthly') {
+            ESI_MONTHS.forEach((m, i) => {
+                html += `<option value="${m}"${i === prev ? ' selected' : ''}>${m}</option>`;
+            });
+            period.style.display = '';
+        } else if (type === 'quarterly') {
+            [['Q1','Q1 (Apr–Jun)'],['Q2','Q2 (Jul–Sep)'],['Q3','Q3 (Oct–Dec)'],['Q4','Q4 (Jan–Mar)']].forEach(([v,l]) => {
+                html += `<option value="${v}">${l}</option>`;
+            });
+            period.style.display = '';
+        } else if (type === 'half-yearly') {
+            html = `<option value="H1">H1 (Apr–Sep)</option><option value="H2">H2 (Oct–Mar)</option>`;
+            period.style.display = '';
+        } else {
+            html = `<option value="full">Full Year</option>`;
+            period.style.display = 'none';
+        }
+
+        period.innerHTML = html;
+    }
+
+    // ============================================================
+    // Load ESI data via AJAX — same route as Payroll-reports
+    // ============================================================
+    function loadEsiPageData() {
+        const fy   = $('#esi_fy').val();
+        const type = $('#esi_filter_type').val();
+        const per  = type === 'yearly' ? '' : $('#esi_filter_period').val();
+
+        $('#esiPageBody').html(
+            '<tr><td colspan="10" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>'
+        );
+
+        $.get('{{ route("payroll.esi.list") }}', {
+            financial_year: fy,
+            filter_type: type,
+            period: per
+        }, function(data) {
+            if (!data.length) {
+                $('#esiPageBody').html(
+                    '<tr><td colspan="10" class="text-center text-muted py-4">No ESIC applicable records found for selected period.</td></tr>'
+                );
                 return;
             }
 
-            const toggleGroups = function() {
-                const selected = document.querySelector('input[name="esiPeriodType"]:checked');
-                const value = selected ? selected.value : 'month';
+            let html       = '';
+            let idx        = 1;
+            let totalEmpEsi  = 0;
+            let totalEmprEsi = 0;
+            let totalEsi     = 0;
 
-                monthGroup.classList.toggle('d-none', value !== 'month');
-                quarterGroup.classList.toggle('d-none', value !== 'quarter');
-                yearGroup.classList.toggle('d-none', value !== 'year');
-            };
+            data.forEach(r => {
+                const gross    = parseFloat(r.gross_wages   || 0);
+                const esiWages = parseFloat(r.esi_wages     || 0);
+                const empEsi   = parseFloat(r.employee_esi  || 0);
+                const emprEsi  = parseFloat(r.employer_esi  || 0);
+                const totEsi   = parseFloat(r.total_esi     || 0);
+                const esicNo   = r.esic_no || '—';
+                const challan  = r.esi_challan_no || 'N/A';
+                const date     = r.esi_challan_submitted_date || r.esi_challan_created_date || 'N/A';
 
-            periodRadios.forEach(function(radio) {
-                radio.addEventListener('change', function() {
-                    toggleGroups();
-                });
+                totalEmpEsi  += empEsi;
+                totalEmprEsi += emprEsi;
+                totalEsi     += totEsi;
+
+                html += `<tr>
+                    <td class="text-end ps-4 text-muted">${idx++}</td>
+                    <td class="fw-bold text-dark">${r.employee_id || '—'}</td>
+                    <td class="fw-bold text-dark">${r.name || '—'}</td>
+                    <td>${esicNo}</td>
+                    <td>₹${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>₹${esiWages.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-primary fw-semibold">₹${empEsi.toFixed(2)}</td>
+                    <td class="text-success fw-semibold">₹${emprEsi.toFixed(2)}</td>
+                    <td class="fw-bold text-dark">₹${totEsi.toFixed(2)}</td>
+                    <td class="text-center pe-4">
+                        <button class="btn-action-detail viewESI"
+                            data-esic="${esicNo}"
+                            data-gross="${gross.toFixed(2)}"
+                            data-empesi="${empEsi.toFixed(2)}"
+                            data-employeresi="${emprEsi.toFixed(2)}"
+                            data-total="${totEsi.toFixed(2)}"
+                            data-date="${date}"
+                            data-challan="${challan}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#viewDetailsModal"
+                            title="View Details">
+                            <i class="ti ti-eye f-16"></i>
+                        </button>
+                    </td>
+                </tr>`;
             });
 
-            if (resetButton) {
-                resetButton.addEventListener('click', function() {
-                    form.reset();
-                    setTimeout(function() {
-                        toggleGroups();
-                    }, 50);
-                });
+            // Totals footer
+            if (data.length > 1) {
+                html += `<tr class="table-light fw-bold border-top">
+                    <td class="ps-4 text-end text-muted" colspan="6">Total</td>
+                    <td class="text-primary">₹${totalEmpEsi.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-success">₹${totalEmprEsi.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="fw-bold text-dark">₹${totalEsi.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>—</td>
+                </tr>`;
             }
 
-            toggleGroups();
-        };
+            $('#esiPageBody').html(html);
 
-        initEsiPeriodToggle();
+        }).fail(() => {
+            $('#esiPageBody').html(
+                '<tr><td colspan="10" class="text-center text-danger py-4">Failed to load ESI data. Please try again.</td></tr>'
+            );
+        });
+    }
 
-        const offcanvasElement = document.getElementById('esiFilterOffcanvas');
-        if (offcanvasElement) {
-            offcanvasElement.addEventListener('shown.bs.offcanvas', function() {
-                initEsiPeriodToggle();
-            });
-        }
-    });
-
+    // ============================================================
+    // View Details modal population
+    // ============================================================
     $(document).on('click', '.viewESI', function () {
         let gross = parseFloat($(this).data('gross'));
         $('#esi_no').text($(this).data('esic'));
@@ -639,6 +748,113 @@
         $('#esi_employer').text('₹ ' + $(this).data('employeresi'));
         $('#esi_total').text('₹ ' + $(this).data('total'));
         $('#esi_date').text($(this).data('date'));
+    });
+
+    // ============================================================
+    // Export helpers
+    // ============================================================
+    function exportEsiPDF() {
+        const table = document.getElementById('esiPageTable');
+        if (!table) return;
+        if (typeof window.jspdf === 'undefined') { alert('jsPDF library not loaded.'); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+        doc.text('Employee State Insurance (ESIC) Summary', 14, 14);
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+        doc.text('FY: ' + $('#esi_fy').val() + '   Generated: ' + new Date().toLocaleDateString('en-IN'), 14, 21);
+
+        const headers = [['#','Employee ID','Employee Name','ESI (IP) No','ECR Gross Wages','ESI Wages','Emp ESI (0.75%)','Empr ESI (3.25%)','Total ESI (4%)']];
+        const body = [];
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length >= 9 && cells[0].textContent.trim() !== '—') {
+                body.push([...cells].slice(0, 9).map(td => td.innerText.trim()));
+            }
+        });
+        if (!body.length) { alert('No data to export.'); return; }
+        doc.autoTable({
+            head: headers, body,
+            startY: 26,
+            styles: { fontSize: 8, cellPadding: 2 },
+            headStyles: { fillColor: [220, 53, 69], textColor: 255, fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: [255, 245, 245] },
+            margin: { left: 14, right: 14 }
+        });
+        doc.save('ESI_Summary_' + $('#esi_fy').val() + '.pdf');
+    }
+
+    function exportEsiExcel() {
+        const table = document.getElementById('esiPageTable');
+        if (!table || typeof XLSX === 'undefined') { alert('XLSX library not loaded.'); return; }
+        const fy = $('#esi_fy').val();
+        const wsData = [
+            ['Employee State Insurance (ESIC) Summary'],
+            ['Financial Year: ' + fy, '', '', '', '', '', '', '', 'Generated: ' + new Date().toLocaleDateString('en-IN')],
+            [],
+            ['#','Employee ID','Employee Name','ESI (IP) Number','ECR Gross Wages','ESI Wages','Employee ESI (0.75%)','Employer ESI (3.25%)','Total ESI (4%)']
+        ];
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length >= 9 && cells[0].textContent.trim() !== '—') {
+                wsData.push([...cells].slice(0, 9).map(td => td.innerText.trim()));
+            }
+        });
+        if (wsData.length <= 4) { alert('No data to export.'); return; }
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        ws['!cols'] = [5, 14, 22, 18, 18, 16, 18, 18, 16].map(w => ({ wch: w }));
+        XLSX.utils.book_append_sheet(wb, ws, 'ESI Summary');
+        XLSX.writeFile(wb, 'ESI_Summary_' + fy + '.xlsx');
+    }
+
+    // ============================================================
+    // Offcanvas period toggle + init
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Init filter dropdowns and auto-load
+        renderEsiPageFilter();
+        loadEsiPageData();
+
+        const initEsiPeriodToggle = function() {
+            const periodRadios = document.querySelectorAll('input[name="esiPeriodType"]');
+            const monthGroup   = document.getElementById('filterEsiMonthGroup');
+            const quarterGroup = document.getElementById('filterEsiQuarterGroup');
+            const yearGroup    = document.getElementById('filterEsiYearGroup');
+            const resetButton  = document.getElementById('esiFilterReset');
+            const form         = document.getElementById('esiFilterForm');
+
+            if (!periodRadios.length || !monthGroup || !quarterGroup || !yearGroup || !form) return;
+
+            const toggleGroups = function() {
+                const val = (document.querySelector('input[name="esiPeriodType"]:checked') || {}).value || 'month';
+                monthGroup.classList.toggle('d-none',   val !== 'month');
+                quarterGroup.classList.toggle('d-none', val !== 'quarter');
+                yearGroup.classList.toggle('d-none',    val !== 'year');
+            };
+
+            periodRadios.forEach(r => r.addEventListener('change', toggleGroups));
+
+            if (resetButton) {
+                resetButton.addEventListener('click', function() {
+                    form.reset();
+                    setTimeout(toggleGroups, 50);
+                });
+            }
+            toggleGroups();
+        };
+
+        initEsiPeriodToggle();
+
+        const offcanvasEl = document.getElementById('esiFilterOffcanvas');
+        if (offcanvasEl) {
+            offcanvasEl.addEventListener('shown.bs.offcanvas', initEsiPeriodToggle);
+        }
+
+        // Re-render period dropdown on filter type change
+        $('#esi_fy, #esi_filter_type').on('change', function() {
+            renderEsiPageFilter();
+        });
     });
 
     function checkEsiFormat() {

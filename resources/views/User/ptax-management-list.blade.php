@@ -96,49 +96,63 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom px-4 py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    {{-- Filter controls --}}
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <select id="ptax_fy" class="form-select form-select-sm" style="width:150px;">
+                            @php
+                                $today = now();
+                                $fyStart = $today->month >= 4 ? $today->year : $today->year - 1;
+                            @endphp
+                            @for ($y = $fyStart - 1; $y <= $fyStart + 1; $y++)
+                                <option value="{{ $y }}-{{ $y + 1 }}" {{ $y === $fyStart ? 'selected' : '' }}>
+                                    FY {{ $y }}-{{ $y + 1 }}
+                                </option>
+                            @endfor
+                        </select>
+                        <select id="ptax_filter_type" class="form-select form-select-sm" style="width:140px;" onchange="renderPtaxFilter()">
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="half-yearly">Half-Yearly</option>
+                            <option value="yearly">Full Year</option>
+                        </select>
+                        <select id="ptax_filter_period" class="form-select form-select-sm" style="width:160px;"></select>
+                        <button class="btn btn-primary btn-sm px-4" onclick="loadPtaxSummary()">
+                            <i class="ti ti-refresh me-1"></i> Load
+                        </button>
+                    </div>
+                    {{-- Export buttons --}}
+                    <div class="d-flex gap-2">
+                        <button onclick="exportPtaxPDF()" class="btn btn-sm px-3 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="background:#ffeef0;color:#dc3545;">
+                            <i class="ti ti-file-type-pdf f-16"></i> PDF
+                        </button>
+                        <button onclick="exportPtaxExcel()" class="btn btn-sm px-3 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="background:#e8fadf;color:#198754;">
+                            <i class="ti ti-file-spreadsheet f-16"></i> Excel
+                        </button>
+                    </div>
+                </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table tbl-product m-0 custom-list-table align-middle" id="pc-dt-simple">
+                        <table class="table tbl-product m-0 custom-list-table align-middle" id="ptaxSummaryTable">
                             <thead>
                                 <tr class="bg-light-header">
-                                    <th class="text-end py-3 ps-4" style="width: 60px;">#</th>
-                                    <th class="py-3">Employee ID</th>
-                                    <th class="py-3">Employee Name</th>
-                                    <th class="py-3">Gross Wages</th>
-                                    <th class="py-3">PTAX Wages</th>
-                                    <th class="py-3">Challan No</th>
-                                    <th class="py-3">Payment Date</th>
-                                    <th class="py-3">Remarks</th>
-                                    <th class="text-center py-3 pe-4" style="width: 100px;">Action</th>
+                                    <th class="text-end py-3 ps-4" style="width:50px;">#</th>
+                                    <th class="py-3">Registration No</th>
+                                    <th class="py-3">Employer Name</th>
+                                    <th class="py-3">Employee Count</th>
+                                    <th class="py-3">Gross Salary</th>
+                                    <th class="py-3">PT Deduction</th>
+                                    <th class="py-3">Total PT Payable</th>
+                                    <th class="py-3">Period</th>
+                                    <th class="text-center py-3 pe-4" style="width:90px;">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach ($employees as $index => $ptax)
+                            <tbody id="ptaxSummaryBody">
                                 <tr>
-                                    <td class="text-end ps-4 fw-medium text-muted">{{ $index + 1 }}</td>
-                                    <td class="fw-bold text-dark">{{ $ptax->employee_id }}</td>
-                                    <td>{{ $ptax->name }}</td>
-                                    <td class="fw-semibold text-dark">₹ {{ number_format($ptax->gross_salary, 2) }}</td>
-                                    <td class="fw-semibold text-dark">₹ {{ number_format($ptax->ptax_amount, 2) }}</td>
-                                    <td class="text-muted">{{ $ptax->payslip_no }}</td>
-                                    <td class="text-muted">{{ \Carbon\Carbon::parse($ptax->payment_date)->format('d-m-Y') }}</td>
-                                    <td><span class="badge-pill-custom badge-pill-resolved">Done</span></td>
-                                    <td class="text-center pe-4">
-                                        <button class="btn-action-detail view-ptax-details-btn"
-                                            data-employee-id="{{ $ptax->employee_id }}"
-                                            data-employee-name="{{ $ptax->name }}"
-                                            data-gross-salary="{{ number_format($ptax->gross_salary, 2) }}"
-                                            data-ptax-amount="{{ number_format($ptax->ptax_amount, 2) }}"
-                                            data-challan-no="{{ $ptax->payslip_no }}"
-                                            data-payment-date="{{ \Carbon\Carbon::parse($ptax->payment_date)->format('d-m-Y') }}"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#viewDetailsModal"
-                                            title="View Details">
-                                            <i class="ti ti-eye"></i>
-                                        </button>
+                                    <td colspan="9" class="text-center text-muted py-4">
+                                        Select filters and click Load
                                     </td>
                                 </tr>
-                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -154,7 +168,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title fw-bold text-dark font-20">PTAX Filing Details</h5>
+                <h5 class="modal-title fw-bold text-dark font-20">P-Tax Period Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -162,32 +176,32 @@
                 <div class="table-responsive rounded-3 overflow-hidden border">
                     <table class="table table-striped table-hover m-0 align-middle font-14">
                         <tr>
-                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Employee ID</th>
-                            <td id="detailEmployeeId" class="ps-3 text-muted"></td>
+                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Registration No</th>
+                            <td id="detailRegNo" class="ps-3 text-muted"></td>
                         </tr>
                         <tr>
-                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Employee Name</th>
-                            <td id="detailEmployeeName" class="ps-3 text-muted"></td>
+                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Employer Name</th>
+                            <td id="detailEmployerName" class="ps-3 text-muted"></td>
                         </tr>
                         <tr>
-                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Gross Wages</th>
-                            <td id="detailGrossWages" class="ps-3 fw-semibold text-dark"></td>
+                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Period</th>
+                            <td id="detailPeriod" class="ps-3 text-muted"></td>
                         </tr>
                         <tr>
-                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">PTAX Wages</th>
-                            <td id="detailPtaxWages" class="ps-3 fw-semibold text-dark"></td>
+                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Employee Count</th>
+                            <td id="detailEmpCount" class="ps-3 fw-semibold text-dark"></td>
                         </tr>
                         <tr>
-                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Challan No</th>
-                            <td id="detailChallanNo" class="ps-3 text-muted"></td>
+                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Gross Salary</th>
+                            <td id="detailGrossSalary" class="ps-3 fw-semibold text-dark"></td>
                         </tr>
                         <tr>
-                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Payment Date</th>
-                            <td id="detailPaymentDate" class="ps-3 text-muted"></td>
+                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">PT Deduction</th>
+                            <td id="detailPtDeduction" class="ps-3 fw-semibold text-danger"></td>
                         </tr>
                         <tr>
-                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Remarks</th>
-                            <td id="detailRemarks" class="ps-3 text-muted"></td>
+                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Total PT Payable</th>
+                            <td id="detailPtPayable" class="ps-3 fw-bold text-success"></td>
                         </tr>
                     </table>
                 </div>
@@ -512,73 +526,272 @@
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const initPtaxPeriodToggle = function() {
-            const periodRadios = document.querySelectorAll('input[name="ptaxPeriodType"]');
-            const monthGroup = document.getElementById('filterPtaxMonthGroup');
-            const quarterGroup = document.getElementById('filterPtaxQuarterGroup');
-            const yearGroup = document.getElementById('filterPtaxYearGroup');
-            const resetButton = document.getElementById('ptaxFilterReset');
-            const form = document.getElementById('ptaxFilterForm');
+    // ============================================================
+    // Period dropdown helpers (same pattern as Payroll-reports)
+    // ============================================================
+    const PTAX_MONTHS = ['January','February','March','April','May','June',
+                         'July','August','September','October','November','December'];
 
-            if (!periodRadios.length || !monthGroup || !quarterGroup || !yearGroup || !form) {
-                console.log('Elements not found for PTAX period toggle');
+    function prevMonthIdx() {
+        const d = new Date();
+        d.setMonth(d.getMonth() - 1);
+        return d.getMonth(); // 0-based
+    }
+
+    function buildPtaxPeriodOptions(type) {
+        let html = '';
+        const prev = prevMonthIdx();
+        if (type === 'monthly') {
+            PTAX_MONTHS.forEach((m, i) => {
+                html += `<option value="${m}" ${i === prev ? 'selected' : ''}>${m}</option>`;
+            });
+        } else if (type === 'quarterly') {
+            [['Q1','Q1 (Apr–Jun)'],['Q2','Q2 (Jul–Sep)'],['Q3','Q3 (Oct–Dec)'],['Q4','Q4 (Jan–Mar)']].forEach(([v,l]) => {
+                html += `<option value="${v}">${l}</option>`;
+            });
+        } else if (type === 'half-yearly') {
+            html = `<option value="H1">H1 (Apr–Sep)</option><option value="H2">H2 (Oct–Mar)</option>`;
+        } else {
+            html = `<option value="full">Full Year</option>`;
+        }
+        return html;
+    }
+
+    function renderPtaxFilter() {
+        const sel  = document.getElementById('ptax_filter_type');
+        const type = sel ? sel.value : 'monthly';
+        const period = document.getElementById('ptax_filter_period');
+        if (!period) return;
+
+        let html = '';
+        const prev = prevMonthIdx();
+
+        if (type === 'monthly') {
+            PTAX_MONTHS.forEach((m, i) => {
+                html += `<option value="${m}"${i === prev ? ' selected' : ''}>${m}</option>`;
+            });
+            period.style.display = '';
+        } else if (type === 'quarterly') {
+            [['Q1','Q1 (Apr–Jun)'],['Q2','Q2 (Jul–Sep)'],['Q3','Q3 (Oct–Dec)'],['Q4','Q4 (Jan–Mar)']].forEach(([v,l]) => {
+                html += `<option value="${v}">${l}</option>`;
+            });
+            period.style.display = '';
+        } else if (type === 'half-yearly') {
+            html = `<option value="H1">H1 (Apr–Sep)</option><option value="H2">H2 (Oct–Mar)</option>`;
+            period.style.display = '';
+        } else {
+            html = `<option value="full">Full Year</option>`;
+            period.style.display = 'none';
+        }
+
+        period.innerHTML = html;
+    }
+
+    // ============================================================
+    // Load PT Summary via AJAX (reuses payroll.ptax.summary route)
+    // ============================================================
+    function loadPtaxSummary() {
+        const fy   = $('#ptax_fy').val();
+        const type = $('#ptax_filter_type').val();
+        const per  = type === 'yearly' ? '' : $('#ptax_filter_period').val();
+
+        $('#ptaxSummaryBody').html(
+            '<tr><td colspan="9" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>'
+        );
+
+        $.get('{{ route("payroll.ptax.summary") }}', {
+            financial_year: fy,
+            filter_type: type,
+            period: per
+        }, function(data) {
+            if (!data.length) {
+                $('#ptaxSummaryBody').html(
+                    '<tr><td colspan="9" class="text-center text-muted py-4">No P-Tax applicable records found for selected period.</td></tr>'
+                );
                 return;
             }
 
-            const toggleGroups = function() {
-                const selected = document.querySelector('input[name="ptaxPeriodType"]:checked');
-                const value = selected ? selected.value : 'month';
+            let html       = '';
+            let totalEmp   = 0;
+            let totalGross = 0;
+            let totalPtax  = 0;
+            let idx        = 1;
 
-                monthGroup.classList.toggle('d-none', value !== 'month');
-                quarterGroup.classList.toggle('d-none', value !== 'quarter');
-                yearGroup.classList.toggle('d-none', value !== 'year');
+            data.forEach(r => {
+                const empCount = parseInt(r.employee_count      || 0);
+                const gross    = parseFloat(r.total_gross_salary || 0);
+                const ptax     = parseFloat(r.total_ptax        || 0);
+                const period   = (r.month_name || '') + (r.financial_year ? ' ' + r.financial_year : '');
+
+                totalEmp   += empCount;
+                totalGross += gross;
+                totalPtax  += ptax;
+
+                html += `<tr>
+                    <td class="text-end ps-4 text-muted">${idx++}</td>
+                    <td class="fw-bold text-dark">${r.reg_no || '—'}</td>
+                    <td class="fw-bold text-dark">${r.employer_name || '—'}</td>
+                    <td>${empCount} Employee${empCount !== 1 ? 's' : ''}</td>
+                    <td class="fw-semibold">₹${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="fw-bold text-danger">₹${ptax.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="fw-bold text-success">₹${ptax.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-muted">${period}</td>
+                    <td class="text-center pe-4">
+                        <button class="btn-action-detail view-ptax-details-btn"
+                            data-reg-no="${r.reg_no || '—'}"
+                            data-employer-name="${r.employer_name || '—'}"
+                            data-period="${period}"
+                            data-emp-count="${empCount}"
+                            data-gross="${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}"
+                            data-ptax="${ptax.toLocaleString('en-IN', {minimumFractionDigits:2})}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#viewDetailsModal"
+                            title="View Details">
+                            <i class="ti ti-eye f-16"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+
+            // Totals footer when multiple rows
+            if (data.length > 1) {
+                html += `<tr class="table-light fw-bold border-top">
+                    <td class="ps-4 text-end text-muted">—</td>
+                    <td colspan="2" class="fw-bold text-dark">Total</td>
+                    <td>${totalEmp} Employees</td>
+                    <td>₹${totalGross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-danger">₹${totalPtax.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-success">₹${totalPtax.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td colspan="2">—</td>
+                </tr>`;
+            }
+
+            $('#ptaxSummaryBody').html(html);
+
+        }).fail(() => {
+            $('#ptaxSummaryBody').html(
+                '<tr><td colspan="9" class="text-center text-danger py-4">Failed to load P-Tax data. Please try again.</td></tr>'
+            );
+        });
+    }
+
+    // ============================================================
+    // View Details modal population
+    // ============================================================
+    $(document).on('click', '.view-ptax-details-btn', function () {
+        $('#detailRegNo').text($(this).data('reg-no'));
+        $('#detailEmployerName').text($(this).data('employer-name'));
+        $('#detailPeriod').text($(this).data('period'));
+        $('#detailEmpCount').text($(this).data('emp-count'));
+        $('#detailGrossSalary').text('₹ ' + $(this).data('gross'));
+        $('#detailPtDeduction').text('₹ ' + $(this).data('ptax'));
+        $('#detailPtPayable').text('₹ ' + $(this).data('ptax'));
+    });
+
+    // ============================================================
+    // Export helpers
+    // ============================================================
+    function exportPtaxPDF() {
+        const table = document.getElementById('ptaxSummaryTable');
+        if (!table) return;
+        const { jsPDF } = window.jspdf;
+        if (!jsPDF) { alert('jsPDF library not loaded.'); return; }
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        doc.setFontSize(13); doc.setFont('helvetica','bold');
+        doc.text('Professional Tax (P-Tax) Summary', 14, 14);
+        doc.setFontSize(9); doc.setFont('helvetica','normal');
+        doc.text('FY: ' + $('#ptax_fy').val() + '   Generated: ' + new Date().toLocaleDateString('en-IN'), 14, 21);
+
+        const headers = [['#','Registration No','Employer Name','Employee Count','Gross Salary','PT Deduction','Total PT Payable','Period']];
+        const body = [];
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length >= 8 && cells[0].textContent.trim() !== '—') {
+                body.push([...cells].slice(0, 8).map(td => td.innerText.trim()));
+            }
+        });
+        if (!body.length) { alert('No data to export.'); return; }
+        doc.autoTable({ head: headers, body, startY: 26,
+            styles: { fontSize: 8, cellPadding: 2 },
+            headStyles: { fillColor: [66, 47, 144], textColor: 255, fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: [245,245,250] },
+            margin: { left: 14, right: 14 }
+        });
+        doc.save('PTax_Summary_' + $('#ptax_fy').val() + '.pdf');
+    }
+
+    function exportPtaxExcel() {
+        const table = document.getElementById('ptaxSummaryTable');
+        if (!table || typeof XLSX === 'undefined') { alert('XLSX library not loaded.'); return; }
+        const fy = $('#ptax_fy').val();
+        const wsData = [
+            ['Professional Tax (P-Tax) Summary'],
+            ['Financial Year: ' + fy, '', '', '', '', '', '', 'Generated: ' + new Date().toLocaleDateString('en-IN')],
+            [],
+            ['#','Registration No','Employer Name','Employee Count','Gross Salary','PT Deduction','Total PT Payable','Period']
+        ];
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length >= 8 && cells[0].textContent.trim() !== '—') {
+                wsData.push([...cells].slice(0, 8).map(td => td.innerText.trim()));
+            }
+        });
+        if (wsData.length <= 4) { alert('No data to export.'); return; }
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        ws['!cols'] = [5,20,25,18,18,16,18,20].map(w => ({ wch: w }));
+        XLSX.utils.book_append_sheet(wb, ws, 'PTax Summary');
+        XLSX.writeFile(wb, 'PTax_Summary_' + fy + '.xlsx');
+    }
+
+    // ============================================================
+    // Offcanvas period toggle (unchanged)
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Init table filter dropdowns
+        renderPtaxFilter();
+        // Auto-load on page ready
+        loadPtaxSummary();
+
+        const initPtaxPeriodToggle = function() {
+            const periodRadios = document.querySelectorAll('input[name="ptaxPeriodType"]');
+            const monthGroup   = document.getElementById('filterPtaxMonthGroup');
+            const quarterGroup = document.getElementById('filterPtaxQuarterGroup');
+            const yearGroup    = document.getElementById('filterPtaxYearGroup');
+            const resetButton  = document.getElementById('ptaxFilterReset');
+            const form         = document.getElementById('ptaxFilterForm');
+
+            if (!periodRadios.length || !monthGroup || !quarterGroup || !yearGroup || !form) return;
+
+            const toggleGroups = function() {
+                const val = (document.querySelector('input[name="ptaxPeriodType"]:checked') || {}).value || 'month';
+                monthGroup.classList.toggle('d-none',   val !== 'month');
+                quarterGroup.classList.toggle('d-none', val !== 'quarter');
+                yearGroup.classList.toggle('d-none',    val !== 'year');
             };
 
-            periodRadios.forEach(function(radio) {
-                radio.addEventListener('change', function() {
-                    toggleGroups();
-                });
-            });
+            periodRadios.forEach(r => r.addEventListener('change', toggleGroups));
 
             if (resetButton) {
                 resetButton.addEventListener('click', function() {
                     form.reset();
-                    setTimeout(function() {
-                        toggleGroups();
-                    }, 50);
+                    setTimeout(toggleGroups, 50);
                 });
             }
-
-            // Initial toggle
             toggleGroups();
         };
 
         initPtaxPeriodToggle();
 
-        const offcanvasElement = document.getElementById('ptaxFilterOffcanvas');
-        if (offcanvasElement) {
-            offcanvasElement.addEventListener('shown.bs.offcanvas', function() {
-                initPtaxPeriodToggle();
-            });
+        const offcanvasEl = document.getElementById('ptaxFilterOffcanvas');
+        if (offcanvasEl) {
+            offcanvasEl.addEventListener('shown.bs.offcanvas', initPtaxPeriodToggle);
         }
-    });
 
-    $(document).on('click', '.view-ptax-details-btn', function () {
-        let employeeId   = $(this).data('employee-id');
-        let employeeName = $(this).data('employee-name');
-        let grossSalary  = $(this).data('gross-salary');
-        let ptaxAmount   = $(this).data('ptax-amount');
-        let challanNo    = $(this).data('challan-no');
-        let paymentDate  = $(this).data('payment-date');
-
-        $('#detailEmployeeId').text(employeeId);
-        $('#detailEmployeeName').text(employeeName);
-        $('#detailGrossWages').text('₹ ' + grossSalary);
-        $('#detailPtaxWages').text('₹ ' + ptaxAmount);
-        $('#detailChallanNo').text(challanNo);
-        $('#detailPaymentDate').text(paymentDate);
-        $('#detailRemarks').text('Done');
+        // Re-load table when FY changes
+        $('#ptax_fy, #ptax_filter_type').on('change', function() {
+            renderPtaxFilter();
+        });
     });
 
     function checkPtaxFormat() {

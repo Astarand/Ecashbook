@@ -15,217 +15,8 @@ use DatePeriod;
 
 class PayrollReportController extends Controller
 {
-    public function summary_bpk(Request $request)
-    {
-        $ownerId = currentOwnerId();
-        $authUserId = auth()->id();
-
-        $month = $request->month;
-        $fy = $request->fy;
-
-        // Month Name => Month Number
-        $months = [
-            'January'   => 1,
-            'February'  => 2,
-            'March'     => 3,
-            'April'     => 4,
-            'May'       => 5,
-            'June'      => 6,
-            'July'      => 7,
-            'August'    => 8,
-            'September' => 9,
-            'October'   => 10,
-            'November'  => 11,
-            'December'  => 12,
-        ];
-
-        $currentMonth = $months[$month] ?? date('n');
-
-        [$fyStart, $fyEnd] = explode('-', $fy);
-
-        // Previous Month & FY
-        $previousMonth = $currentMonth - 1;
-        $previousFY = $fy;
-
-        if ($previousMonth == 0) {
-            $previousMonth = 12;
-            $previousFY = ($fyStart - 1) . '-' . ($fyEnd - 1);
-        }
-
-        // Employee Summary
-        $grossSalary = 0;
-        $netSalary = 0;
-        $pfLiability = 0;
-        $esiLiability = 0;
-        $ptLiability = 0;
-        $tdsLiability = 0;
-        $lwfLiability = 0;
-        $lopTotal = 0;
-        $paid = 0;
-        $unpaid = 0;
-        $totalActiveEmployees = 0;
-        // Active employees are those who have a payslip generated for the selected month and FY
-        $selectedMonthStart = Carbon::createFromDate($fyStart, $currentMonth, 1)->startOfMonth();
-
-        // January, February, March belong to next FY
-        if ($currentMonth <= 3) {
-            $selectedMonthStart->year = $fyEnd;
-        }
-        $selectedMonthEnd = $selectedMonthStart->copy()->endOfMonth();
-
-        $totalActiveEmployees = DB::table('employees')
-            ->where('added_by', $ownerId)
-            ->where(function ($q) use ($selectedMonthEnd) {
-
-                // Active Employees
-                $q->whereIn('emp_status', ['Confirmed', 'In Probation'])
-
-                // Resigned / Terminated
-                ->orWhere(function ($qq) use ($selectedMonthEnd) {
-                    $qq->whereIn('emp_status', ['Resigned', 'Terminated'])
-                    ->whereNotNull('regine_date')
-                    // Employee is counted if resigned/terminated on or after
-                    // the selected month's last date.
-                    ->whereDate('regine_date', '>=', $selectedMonthEnd);
-                });
-            })
-            ->get();
-
-        //---------- Previous Financial Month And Year ------------
-        // Current date
-        $today = now();
-
-        // Current Financial Year
-        $currentFY = ($today->month >= 4)
-            ? $today->year . '-' . ($today->year + 1)
-            : ($today->year - 1) . '-' . $today->year;
-
-        // Current month and future months of the current FY should return zero
-        if ($fy == $currentFY && $currentMonth >= $today->month) {
-
-            return response()->json([
-                'success' => true,
-                'total_active_employees' => 0,
-                'gross_salary' => 0,
-                'net_salary' => 0,
-                'pf_liability' => 0,
-                'esi_liability' => 0,
-                'pt_liability' => 0,
-                'tds_liability' => 0,
-                'lwf_liability' => 0,
-                'lop_total' => 0,
-                'paid' => 0,
-                'unpaid' => 0,
-                'previous_month' => $previousMonth,
-                'previous_financial_year' => $previousFY,
-            ]);
-        }
-
-        //----------- End Previous Month Calculation ------------
-
-        // Check if payslips exist for the selected month and FY
-
-        $payslipExists = DB::table('user_payslip')
-            ->where('added_by', $ownerId)
-            ->where('month', $currentMonth)
-            ->where('financial_year', $fy)
-            ->exists();
-        
-
-        if ($payslipExists) {
-
-            $payslips = DB::table('user_payslip')
-                ->where('added_by', $ownerId)
-                ->where('month', $currentMonth)
-                ->where('financial_year', $fy)
-                ->select('emp_salary_slip_response')
-                ->get();
-
-            foreach ($payslips as $row) {
-
-                $response = json_decode($row->emp_salary_slip_response, true);
-
-                if (empty($response['visible_data']['final_salary_calculation'])) {
-                    continue;
-                }
-
-                $salary = $response['visible_data']['final_salary_calculation'];
-
-                $grossSalary += (float)($salary['basic_salary'] ?? 0);
-                $netSalary += (float)($salary['net_salary'] ?? 0);
-                $pfLiability += (float)($salary['provident_fund'] ?? 0);
-                $esiLiability += (float)($salary['esi'] ?? 0);
-                $ptLiability += (float)($salary['ptax'] ?? 0);
-                $tdsLiability += (float)($salary['tds'] ?? 0);
-                $lwfLiability += (float)($salary['lwf'] ?? 0);
-                $lopTotal += (float)($salary['lop'] ?? 0);
-
-                $paid++;
-            }
-
-        } else {
-
-            /*
-            ==========================================================
-            Write your "Payslip Not Generated" calculation here
-            ==========================================================
-            */
-
-            $employees = $totalActiveEmployees;
-
-            foreach ($employees as $employee) {
-
-                $salary = $this->calculateEmployeeSalary(
-                    $employee,
-                    $currentMonth,
-                    $fy
-                );
-
-                $grossSalary += $salary['gross_salary'];
-                $netSalary += $salary['net_salary'];
-                $pfLiability += $salary['pf'];
-                $esiLiability += $salary['esi'];
-                $ptLiability += $salary['pt'];
-                $tdsLiability += $salary['tds'];
-                $lwfLiability += $salary['lwf'];
-                $lopTotal += $salary['lop'];
-
-                $unpaid++;
-            }
-
-        }
-
-        $totalActiveEmployees = count($totalActiveEmployees);
-        $totalGrossSalary = round($grossSalary, 2);
-        $totalNetSalary = round($netSalary, 2);
-        $totalPfLiability = round($pfLiability, 2);
-        $totalEsiLiability = round($esiLiability, 2);
-        $ptLiability = round($ptLiability, 2);
-        $totalLwfLiability = round($lwfLiability, 2);
-        $tdsLiability = round($tdsLiability, 2);
-
-
-        return response()->json([
-            'success' => true,
-
-            'total_active_employees' => $totalActiveEmployees,
-            'gross_salary'           => $totalGrossSalary,
-            'net_salary'             => $totalNetSalary,
-            'pf_liability'           => $totalPfLiability,
-            'esi_liability'          => $totalEsiLiability,
-            'pt_liability'           => $ptLiability,
-            'tds_liability'          => $tdsLiability,
-            'lwf_liability'          => $totalLwfLiability,
-            'lop_total'              => $lopTotal,
-            'paid'                   => $paid,
-            'unpaid'                 => $unpaid,
-
-            'previous_month'         => $previousMonth,
-            'previous_financial_year'=> $previousFY,
-        ]);
-    }
     
-    public function summary(Request $request)
+    public function summary_bpk(Request $request)
     {
         $ownerId = currentOwnerId();
         $authUserId = auth()->id();
@@ -271,6 +62,16 @@ class PayrollReportController extends Controller
         }
         $selectedMonthEnd = $selectedMonthStart->copy()->endOfMonth();
 
+        $resignedThisMonth = DB::table('employees')
+            ->where('added_by', $ownerId)
+            ->whereIn('emp_status', ['Resigned', 'Terminated'])
+            ->whereNotNull('regine_date')
+            ->whereBetween('regine_date', [
+                $selectedMonthStart,
+                $selectedMonthEnd
+            ])
+            ->count();
+
         // Fetch Active & Eligible Employees for the selected month
         $activeEmployees = DB::table('employees')
             ->where('added_by', $ownerId)
@@ -297,6 +98,7 @@ class PayrollReportController extends Controller
             return response()->json([
                 'success'                 => true,
                 'total_active_employees' => 0,
+                'total_resigned'         => 0,
                 'gross_salary'           => 0,
                 'net_salary'             => 0,
                 'pf_liability'           => 0,
@@ -330,6 +132,21 @@ class PayrollReportController extends Controller
         $lopTotal    = 0;
         $paid        = 0;
         $unpaid      = 0;
+
+        $pfPaidAmount = 0;
+        $pfUnpaidAmount = 0;
+
+        $esiPaidAmount = 0;
+        $esiUnpaidAmount = 0;
+
+        $ptPaidAmount = 0;
+        $ptUnpaidAmount = 0;
+
+        $tdsPaidAmount = 0;
+        $tdsUnpaidAmount = 0;
+
+        $lwfPaidAmount = 0;
+        $lwfUnpaidAmount = 0;
 
         // Loop through each active employee and determine whether to use payslip or calculate live
         foreach ($activeEmployees as $employee) {
@@ -372,6 +189,7 @@ class PayrollReportController extends Controller
         return response()->json([
             'success'                 => true,
             'total_active_employees' => count($activeEmployees),
+            'total_resigned'         => $resignedThisMonth,
             'gross_salary'           => round($grossSalary, 2),
             'net_salary'             => round($netSalary, 2),
             'pf_liability'           => round($pfLiability, 2),
@@ -384,6 +202,366 @@ class PayrollReportController extends Controller
             'unpaid'                 => $unpaid,
             'previous_month'         => $previousMonth,
             'previous_financial_year'=> $previousFY,
+        ]);
+    }
+
+    public function summary(Request $request)
+    {
+        $ownerId = currentOwnerId();
+
+        $month = $request->month;
+        $fy    = $request->fy;
+
+        // Month Name => Month Number
+        $months = [
+            'January'   => 1,
+            'February'  => 2,
+            'March'     => 3,
+            'April'     => 4,
+            'May'       => 5,
+            'June'      => 6,
+            'July'      => 7,
+            'August'    => 8,
+            'September' => 9,
+            'October'   => 10,
+            'November'  => 11,
+            'December'  => 12,
+        ];
+
+        $currentMonth = $months[$month] ?? date('n');
+
+        [$fyStart, $fyEnd] = explode('-', $fy);
+
+        // Previous Month & FY
+        $previousMonth = $currentMonth - 1;
+        $previousFY    = $fy;
+
+        if ($previousMonth == 0) {
+            $previousMonth = 12;
+            $previousFY    = ($fyStart - 1) . '-' . ($fyEnd - 1);
+        }
+
+        // Determine target month date range
+        $selectedMonthStart = Carbon::createFromDate($fyStart, $currentMonth, 1)->startOfMonth();
+
+        // Jan-Feb-Mar belong to second year of FY
+        if ($currentMonth <= 3) {
+            $selectedMonthStart->year = $fyEnd;
+        }
+
+        $selectedMonthEnd = $selectedMonthStart->copy()->endOfMonth();
+
+        // =========================================================
+        // Employees resigned / terminated in selected month
+        // =========================================================
+        $resignedThisMonth = DB::table('employees')
+            ->where('added_by', $ownerId)
+            ->whereIn('emp_status', ['Resigned', 'Terminated'])
+            ->whereNotNull('regine_date')
+            ->whereBetween('regine_date', [$selectedMonthStart, $selectedMonthEnd])
+            ->count();
+
+        // =========================================================
+        // Active employees for selected month
+        // =========================================================
+        $activeEmployees = DB::table('employees')
+            ->where('added_by', $ownerId)
+            ->where(function ($q) use ($selectedMonthEnd) {
+                $q->whereIn('emp_status', ['Confirmed', 'In Probation'])
+                ->orWhere(function ($qq) use ($selectedMonthEnd) {
+                    $qq->whereIn('emp_status', ['Resigned', 'Terminated'])
+                        ->whereNotNull('regine_date')
+                        ->whereDate('regine_date', '>=', $selectedMonthEnd);
+                });
+            })
+            ->get();
+
+        // =========================================================
+        // Block current / future month
+        // =========================================================
+        $today = now();
+
+        $currentFY = ($today->month >= 4)
+            ? $today->year . '-' . ($today->year + 1)
+            : ($today->year - 1) . '-' . $today->year;
+
+        if ($fy == $currentFY && $currentMonth >= $today->month) {
+
+            return response()->json([
+                'success'                  => true,
+                'total_active_employees'  => 0,
+                'total_resigned'          => 0,
+
+                'gross_salary'            => 0,
+                'net_salary'              => 0,
+
+                'pf_liability'            => 0,
+                'esi_liability'           => 0,
+                'pt_liability'            => 0,
+                'tds_liability'           => 0,
+                'lwf_liability'           => 0,
+
+                'pf_paid_amount'          => 0,
+                'pf_unpaid_amount'        => 0,
+
+                'esi_paid_amount'         => 0,
+                'esi_unpaid_amount'       => 0,
+
+                'pt_paid_amount'          => 0,
+                'pt_unpaid_amount'        => 0,
+
+                'tds_paid_amount'         => 0,
+                'tds_unpaid_amount'       => 0,
+
+                'lwf_paid_amount'         => 0,
+                'lwf_unpaid_amount'       => 0,
+
+                'lop_total'               => 0,
+                'paid'                    => 0,
+                'unpaid'                  => 0,
+
+                'previous_month'          => $previousMonth,
+                'previous_financial_year' => $previousFY,
+            ]);
+        }
+
+        // =========================================================
+        // Existing payslips
+        // =========================================================
+        $existingPayslips = DB::table('user_payslip')
+            ->where('added_by', $ownerId)
+            ->where('month', $currentMonth)
+            ->where('financial_year', $fy)
+            ->get()
+            ->keyBy('user_emp_id');
+
+        // =========================================================
+        // Summary variables
+        // =========================================================
+        $grossSalary  = 0;
+        $netSalary    = 0;
+
+        $pfLiability  = 0;
+        $esiLiability = 0;
+        $ptLiability  = 0;
+        $tdsLiability = 0;
+        $lwfLiability = 0;
+
+        $lopTotal     = 0;
+
+        $paid         = 0;
+        $unpaid       = 0;
+
+        // Payment status totals
+        $pfPaidAmount   = 0;
+        $pfUnpaidAmount = 0;
+
+        $esiPaidAmount   = 0;
+        $esiUnpaidAmount = 0;
+
+        $ptPaidAmount   = 0;
+        $ptUnpaidAmount = 0;
+
+        $tdsPaidAmount   = 0;
+        $tdsUnpaidAmount = 0;
+
+        $lwfPaidAmount   = 0;
+        $lwfUnpaidAmount = 0;
+
+        $salaryPaidAmount = 0;
+        $salaryUnpaidAmount = 0;
+
+        // =========================================================
+        // Employee Loop
+        // =========================================================
+        foreach ($activeEmployees as $employee) {
+
+            // -----------------------------------------------------
+            // CASE A : Payslip Exists
+            // -----------------------------------------------------
+            if (isset($existingPayslips[$employee->empId])) {
+
+                $payslip = $existingPayslips[$employee->empId];
+
+                $response = json_decode($payslip->emp_salary_slip_response, true);
+
+                $salary = $response['visible_data']['final_salary_calculation'] ?? [];
+
+                $gross = (float)($salary['basic_salary'] ?? 0);
+                $net   = (float)($salary['net_salary'] ?? 0);
+
+                $pf    = (float)($salary['provident_fund'] ?? 0);
+                $esi   = (float)($salary['esi'] ?? 0);
+                $pt    = (float)($salary['ptax'] ?? 0);
+                $tds   = (float)($salary['tds'] ?? 0);
+                $lwf   = (float)($salary['lwf'] ?? 0);
+                $lop   = (float)($salary['lop'] ?? 0);
+
+                // Liability totals
+                $grossSalary  += $gross;
+                $netSalary    += $net;
+
+                $pfLiability  += $pf;
+                $esiLiability += $esi;
+                $ptLiability  += $pt;
+                $tdsLiability += $tds;
+                $lwfLiability += $lwf;
+                $lopTotal     += $lop;
+
+                // ----------------------------------------------
+                // Salary
+                // ---------------------------------------------
+                if ($payslip->payment_status == 'Done') {
+                    $salaryPaidAmount += $net;
+                } else {
+                    $salaryUnpaidAmount += $net;
+                }
+
+                // -------------------------------------------------
+                // PF
+                // -------------------------------------------------
+                if ($payslip->pf_payment_status == 'Done') {
+                    $pfPaidAmount += $pf;
+                } else {
+                    $pfUnpaidAmount += $pf;
+                }
+
+                // -------------------------------------------------
+                // ESI
+                // -------------------------------------------------
+                if ($payslip->esi_payment_status == 'Done') {
+                    $esiPaidAmount += $esi;
+                } else {
+                    $esiUnpaidAmount += $esi;
+                }
+
+                // -------------------------------------------------
+                // PT
+                // -------------------------------------------------
+                if ($payslip->ptax_payment_status == 'Done') {
+                    $ptPaidAmount += $pt;
+                } else {
+                    $ptUnpaidAmount += $pt;
+                }
+
+                // -------------------------------------------------
+                // TDS
+                // -------------------------------------------------
+                if ($payslip->tds_deposit_status == 'Done') {
+                    $tdsPaidAmount += $tds;
+                } else {
+                    $tdsUnpaidAmount += $tds;
+                }
+
+                // -------------------------------------------------
+                // LWF
+                // -------------------------------------------------
+                // Recommended: add lwf_payment_status ENUM('Pending','Done')
+                if ($payslip->lwf_payment_status  == 'Done') {
+                    $lwfPaidAmount += $lwf;
+                } else {
+                    $lwfUnpaidAmount += $lwf;
+                }
+
+                $paid++;
+            }
+
+            // -----------------------------------------------------
+            // CASE B : Payslip NOT Exists
+            // -----------------------------------------------------
+            else {
+
+                $salary = $this->calculateEmployeeSalary(
+                    $employee,
+                    $currentMonth,
+                    $fy
+                );
+
+                $gross = (float)($salary['gross_salary'] ?? 0);
+                $net   = (float)($salary['net_salary'] ?? 0);
+
+                $pf    = (float)($salary['pf'] ?? 0);
+                $esi   = (float)($salary['esi'] ?? 0);
+                $pt    = (float)($salary['pt'] ?? 0);
+                $tds   = (float)($salary['tds'] ?? 0);
+                $lwf   = (float)($salary['lwf'] ?? 0);
+                $lop   = (float)($salary['lop'] ?? 0);
+
+                $grossSalary  += $gross;
+                $netSalary    += $net;
+
+                $pfLiability  += $pf;
+                $esiLiability += $esi;
+                $ptLiability  += $pt;
+                $tdsLiability += $tds;
+                $lwfLiability += $lwf;
+
+                $lopTotal     += $lop;
+
+                // No payslip => unpaid
+                $pfUnpaidAmount  += $pf;
+                $esiUnpaidAmount += $esi;
+                $ptUnpaidAmount  += $pt;
+                $tdsUnpaidAmount += $tds;
+                $lwfUnpaidAmount += $lwf;
+                $salaryUnpaidAmount += $net;
+
+                $unpaid++;
+            }
+        }
+
+        // =========================================================
+        // Response
+        // =========================================================
+        return response()->json([
+
+            'success'                  => true,
+
+            // Employee Summary
+            'total_active_employees'  => count($activeEmployees),
+            'total_resigned'          => $resignedThisMonth,
+
+            // Salary Summary
+            'gross_salary'            => round($grossSalary, 2),
+            'net_salary'              => round($netSalary, 2),
+            'salary_paid_amount'      => round($salaryPaidAmount, 2),
+            'salary_unpaid_amount'    => round($salaryUnpaidAmount, 2),
+
+            // Liabilities
+            'pf_liability'            => round($pfLiability, 2),
+            'esi_liability'           => round($esiLiability, 2),
+            'pt_liability'            => round($ptLiability, 2),
+            'tds_liability'           => round($tdsLiability, 2),
+            'lwf_liability'           => round($lwfLiability, 2),
+
+            // PF
+            'pf_paid_amount'          => round($pfPaidAmount, 2),
+            'pf_unpaid_amount'        => round($pfUnpaidAmount, 2),
+
+            // ESI
+            'esi_paid_amount'         => round($esiPaidAmount, 2),
+            'esi_unpaid_amount'       => round($esiUnpaidAmount, 2),
+
+            // PT
+            'pt_paid_amount'          => round($ptPaidAmount, 2),
+            'pt_unpaid_amount'        => round($ptUnpaidAmount, 2),
+
+            // TDS
+            'tds_paid_amount'         => round($tdsPaidAmount, 2),
+            'tds_unpaid_amount'       => round($tdsUnpaidAmount, 2),
+
+            // LWF
+            'lwf_paid_amount'         => round($lwfPaidAmount, 2),
+            'lwf_unpaid_amount'       => round($lwfUnpaidAmount, 2),
+
+            // Other
+            'lop_total'               => round($lopTotal, 2),
+
+            'paid'                    => $paid,
+            'unpaid'                  => $unpaid,
+
+            'previous_month'          => $previousMonth,
+            'previous_financial_year' => $previousFY,
         ]);
     }
 

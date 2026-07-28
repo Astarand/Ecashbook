@@ -104,7 +104,7 @@
                 <div class="table-responsive">
                     <table class="table tbl-product my-3" id="pc-dt-simple">
                         <thead>
-                            <tr style="background-color: #cbcbcb;">
+                            {{-- <tr style="background-color: #cbcbcb;">
                                 <th class="text-end">#</th>
                                 <th>Vendor/ Employee ID</th>
                                 <th>Name</th>
@@ -119,10 +119,31 @@
                                 <th>Return Quarter</th>
                                 <th>Remarks</th>
                                 <th>Action</th>
+                            </tr> --}}
+                            <tr style="background-color: #cbcbcb;">
+                                <th class="text-end">#</th>
+                                <th>TAN</th>
+                                <th>PAN</th>
+                                <th>Employee Name</th>
+                                <th>Salary Amount</th>
+                                <th>TDS Amount</th>
+                                <th>Nature of Payment</th>
+                                <th>Challan No</th>
+                                <th>BSR Code</th>
+                                <th>Deposit Date</th>
+                                <th>Tender Date</th>
+                                <th>CIN</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @php $i = 1; @endphp
+                            <tr>
+                                <td colspan="14" class="text-center text-muted">
+                                    No TDS applicable records found
+                                </td>
+                            </tr>
+                            {{-- @php $i = 1; @endphp
 
                             @forelse($employees as $emp)
                             <tr>
@@ -237,7 +258,7 @@
                                     No TDS applicable records found
                                 </td>
                             </tr>
-                            @endforelse
+                            @endforelse --}}
                         </tbody>
                     </table>
                 </div>

@@ -122,65 +122,67 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom px-4 py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    {{-- Filter controls --}}
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <select id="pf_fy" class="form-select form-select-sm" style="width:150px;">
+                            @php
+                                $today = now();
+                                $fyStart = $today->month >= 4 ? $today->year : $today->year - 1;
+                            @endphp
+                            @for ($y = $fyStart - 1; $y <= $fyStart + 1; $y++)
+                                <option value="{{ $y }}-{{ $y + 1 }}" {{ $y === $fyStart ? 'selected' : '' }}>
+                                    FY {{ $y }}-{{ $y + 1 }}
+                                </option>
+                            @endfor
+                        </select>
+                        <select id="pf_filter_type" class="form-select form-select-sm" style="width:140px;" onchange="renderPfPageFilter()">
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="half-yearly">Half-Yearly</option>
+                            <option value="yearly">Full Year</option>
+                        </select>
+                        <select id="pf_filter_period" class="form-select form-select-sm" style="width:160px;"></select>
+                        <button class="btn btn-primary btn-sm px-4" onclick="loadPfPageData()">
+                            <i class="ti ti-refresh me-1"></i> Load
+                        </button>
+                    </div>
+                    {{-- Export buttons --}}
+                    <div class="d-flex gap-2">
+                        <button onclick="exportPfPDF()" class="btn btn-sm px-3 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="background:#ffeef0;color:#dc3545;">
+                            <i class="ti ti-file-type-pdf f-16"></i> PDF
+                        </button>
+                        <button onclick="exportPfExcel()" class="btn btn-sm px-3 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="background:#e8fadf;color:#198754;">
+                            <i class="ti ti-file-spreadsheet f-16"></i> Excel
+                        </button>
+                    </div>
+                </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table tbl-product m-0 custom-list-table align-middle" id="pc-dt-simple">
+                        <table class="table tbl-product m-0 custom-list-table align-middle" id="pfPageTable">
                             <thead>
                                 <tr class="bg-light-header">
-                                    <th class="text-end py-3 ps-4" style="width: 60px;">#</th>
-                                    <th class="py-3">Employee ID</th>
-                                    <th class="py-3">Employee Name</th>
+                                    <th class="text-end py-3 ps-4" style="width:50px;">#</th>
                                     <th class="py-3">UAN</th>
+                                    <th class="py-3">Member Name</th>
                                     <th class="py-3">Gross Wages</th>
-                                    <th class="py-3">PF Wages</th>
-                                    <th class="py-3">Employee Contribution</th>
-                                    <th class="py-3">Employer Contribution</th>
-                                    <th class="py-3">Challan No</th>
-                                    <th class="py-3">Payment Date</th>
-                                    <th class="py-3">Status</th>
-                                    <th class="text-center py-3 pe-4" style="width: 100px;">Action</th>
+                                    <th class="py-3">EPF Wages</th>
+                                    <th class="py-3">EPS Wages</th>
+                                    <th class="py-3">EDLI Wages</th>
+                                    <th class="py-3">Employee EPF (12%)</th>
+                                    <th class="py-3">Employer EPS (8.33%)</th>
+                                    <th class="py-3">EPF Diff (Employer)</th>
+                                    <th class="py-3">NCP Days</th>
+                                    <th class="py-3">Refund of Advances</th>
+                                    <th class="text-center py-3 pe-4" style="width:90px;">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @forelse ($employees as $key => $emp)
-                                    <tr>
-                                        <td class="text-end ps-4 fw-medium text-muted">{{ $key + 1 }}</td>
-                                        <td class="fw-bold text-dark">{{ $emp->employee_id }}</td>
-                                        <td>{{ $emp->name }}</td>
-                                        <td class="text-muted">{{ $emp->epf_no }}</td>
-                                        <td class="fw-semibold text-dark">₹ {{ number_format($emp->total_addition, 2) }}</td>
-                                        <td class="fw-semibold text-dark">₹ {{ number_format($emp->total_addition, 2) }}</td>
-                                        <td class="text-primary fw-semibold">₹ {{ number_format($emp->provident_fund, 2) }}</td>
-                                        <td class="text-success fw-semibold">₹ {{ number_format($emp->provident_fund, 2) }}</td>
-                                        <td class="text-muted">{{ $emp->payslip_no }}</td>
-                                        <td class="text-muted">{{ \Carbon\Carbon::parse($emp->payment_date)->format('d-m-Y') }}</td>
-                                        <td><span class="badge-pill-custom badge-pill-resolved">Done</span></td>
-                                        <td class="text-center pe-4">
-                                            <a href="javascript:void(0)"
-                                                class="btn-action-detail viewPF"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#viewDetailsModal"
-                                                data-month="{{ \Carbon\Carbon::parse($emp->payment_date)->format('F Y') }}"
-                                                data-name="{{ $emp->name }} ({{ $emp->employee_id }})"
-                                                data-uan="{{ $emp->epf_no }}"
-                                                data-basic="{{ number_format($emp->total_addition, 2) }}"
-                                                data-emp_pf="{{ number_format($emp->provident_fund, 2) }}"
-                                                data-employer_pf="{{ number_format($emp->provident_fund, 2) }}"
-                                                data-pension="{{ number_format(($emp->total_addition * 8.33) / 100, 2) }}"
-                                                data-total="{{ number_format(($emp->provident_fund * 2), 2) }}"
-                                                data-challan="{{ $emp->payslip_no }}"
-                                                title="View Details">
-                                                <i class="ti ti-eye"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="12" class="text-center text-muted py-4">
-                                            No PF records found for this month
-                                        </td>
-                                    </tr>
-                                @endforelse
+                            <tbody id="pfPageBody">
+                                <tr>
+                                    <td colspan="13" class="text-center text-muted py-4">
+                                        Select filters and click Load
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -207,7 +209,7 @@
                         <p class="text-dark fw-semibold mb-0" id="pf_month"></p>
                     </div>
                     <div class="col-6">
-                        <label class="fw-bold text-dark font-12 uppercase text-muted">Employee Name & ID</label>
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">Employee Name</label>
                         <p class="text-dark fw-semibold mb-0" id="emp_name_id"></p>
                     </div>
                     <div class="col-12"><hr class="my-1 border-light"></div>
@@ -216,30 +218,30 @@
                         <p class="text-dark fw-semibold mb-0" id="uan"></p>
                     </div>
                     <div class="col-6">
-                        <label class="fw-bold text-dark font-12 uppercase text-muted">Basic Salary</label>
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">EPF Wages</label>
                         <p class="text-dark fw-semibold mb-0" id="basic_salary"></p>
                     </div>
                     <div class="col-12"><hr class="my-1 border-light"></div>
                     <div class="col-6">
-                        <label class="fw-bold text-dark font-12 uppercase text-muted">Employee PF (12%)</label>
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">Employee EPF (12%)</label>
                         <p class="text-primary fw-bold mb-0" id="emp_pf"></p>
                     </div>
                     <div class="col-6">
-                        <label class="fw-bold text-dark font-12 uppercase text-muted">Employer PF (3.67%)</label>
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">Employer EPF Diff</label>
                         <p class="text-success fw-bold mb-0" id="employer_pf"></p>
                     </div>
                     <div class="col-12"><hr class="my-1 border-light"></div>
                     <div class="col-6">
-                        <label class="fw-bold text-dark font-12 uppercase text-muted">Pension (8.33%)</label>
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">Employer EPS (8.33%)</label>
                         <p class="text-dark fw-semibold mb-0" id="pension_pf"></p>
                     </div>
                     <div class="col-6">
-                        <label class="fw-bold text-dark font-12 uppercase text-muted">Total Contribution</label>
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">NCP Days</label>
                         <p class="text-dark fw-bold mb-0" id="total_pf"></p>
                     </div>
                     <div class="col-12"><hr class="my-1 border-light"></div>
                     <div class="col-12">
-                        <label class="fw-bold text-dark font-12 uppercase text-muted">PF Challan Reference</label>
+                        <label class="fw-bold text-dark font-12 uppercase text-muted">PF Challan Reference (TRRN)</label>
                         <p class="text-dark fw-bold mb-0" id="challan_no"></p>
                     </div>
                 </div>
@@ -582,82 +584,301 @@
 </style>
 
 <script>
-     $(document).on('click', '.viewPF', function () {
-        $('#pf_month').text($(this).data('month'));
-        $('#emp_name_id').text($(this).data('name'));
-        $('#uan').text($(this).data('uan'));
-        $('#basic_salary').text('₹ ' + $(this).data('basic'));
-        $('#emp_pf').text('₹ ' + $(this).data('emp_pf'));
-        $('#employer_pf').text('₹ ' + $(this).data('employer_pf'));
-        $('#pension_pf').text('₹ ' + $(this).data('pension'));
-        $('#total_pf').text('₹ ' + $(this).data('total'));
-        $('#challan_no').text($(this).data('challan'));
-    });
+    // ============================================================
+    // Period dropdown helpers
+    // ============================================================
+    const PF_MONTHS = ['January','February','March','April','May','June',
+                       'July','August','September','October','November','December'];
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const initPfPeriodToggle = function() {
-            const periodRadios = document.querySelectorAll('input[name="pfPeriodType"]');
-            const monthGroup = document.getElementById('filterPfMonthGroup');
-            const quarterGroup = document.getElementById('filterPfQuarterGroup');
-            const yearGroup = document.getElementById('filterPfYearGroup');
-            const resetButton = document.getElementById('pfFilterReset');
-            const form = document.getElementById('pfFilterForm');
+    function prevPfMonthIdx() {
+        const d = new Date();
+        d.setMonth(d.getMonth() - 1);
+        return d.getMonth();
+    }
 
-            if (!periodRadios.length || !monthGroup || !quarterGroup || !yearGroup || !form) {
-                console.log('Elements not found for PF period toggle');
+    function buildPfPeriodOptions(type) {
+        let html = '';
+        const prev = prevPfMonthIdx();
+        if (type === 'monthly') {
+            PF_MONTHS.forEach((m, i) => {
+                html += `<option value="${m}" ${i === prev ? 'selected' : ''}>${m}</option>`;
+            });
+        } else if (type === 'quarterly') {
+            [['Q1','Q1 (Apr–Jun)'],['Q2','Q2 (Jul–Sep)'],['Q3','Q3 (Oct–Dec)'],['Q4','Q4 (Jan–Mar)']].forEach(([v,l]) => {
+                html += `<option value="${v}">${l}</option>`;
+            });
+        } else if (type === 'half-yearly') {
+            html = `<option value="H1">H1 (Apr–Sep)</option><option value="H2">H2 (Oct–Mar)</option>`;
+        } else {
+            html = `<option value="full">Full Year</option>`;
+        }
+        return html;
+    }
+
+    function renderPfPageFilter() {
+        const sel  = document.getElementById('pf_filter_type');
+        const type = sel ? sel.value : 'monthly';
+        const period = document.getElementById('pf_filter_period');
+        if (!period) return;
+
+        let html = '';
+        const prev = prevPfMonthIdx();
+
+        if (type === 'monthly') {
+            PF_MONTHS.forEach((m, i) => {
+                html += `<option value="${m}"${i === prev ? ' selected' : ''}>${m}</option>`;
+            });
+            period.style.display = '';
+        } else if (type === 'quarterly') {
+            [['Q1','Q1 (Apr–Jun)'],['Q2','Q2 (Jul–Sep)'],['Q3','Q3 (Oct–Dec)'],['Q4','Q4 (Jan–Mar)']].forEach(([v,l]) => {
+                html += `<option value="${v}">${l}</option>`;
+            });
+            period.style.display = '';
+        } else if (type === 'half-yearly') {
+            html = `<option value="H1">H1 (Apr–Sep)</option><option value="H2">H2 (Oct–Mar)</option>`;
+            period.style.display = '';
+        } else {
+            html = `<option value="full">Full Year</option>`;
+            period.style.display = 'none';
+        }
+
+        period.innerHTML = html;
+    }
+
+    // ============================================================
+    // Load PF data via AJAX — same route as Payroll-reports
+    // ============================================================
+    function loadPfPageData() {
+        const fy   = $('#pf_fy').val();
+        const type = $('#pf_filter_type').val();
+        const per  = type === 'yearly' ? '' : $('#pf_filter_period').val();
+
+        $('#pfPageBody').html(
+            '<tr><td colspan="13" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>'
+        );
+
+        $.get('{{ route("payroll.pf.list") }}', {
+            financial_year: fy,
+            filter_type: type,
+            period: per
+        }, function(data) {
+            if (!data.length) {
+                $('#pfPageBody').html(
+                    '<tr><td colspan="13" class="text-center text-muted py-4">No EPF applicable records found for selected period.</td></tr>'
+                );
                 return;
             }
 
-            const toggleGroups = function() {
-                const selected = document.querySelector('input[name="pfPeriodType"]:checked');
-                const value = selected ? selected.value : 'month';
+            let html  = '';
+            let idx   = 1;
+            let totalEmpPf  = 0;
+            let totalEps    = 0;
+            let totalDiff   = 0;
 
-                monthGroup.classList.toggle('d-none', value !== 'month');
-                quarterGroup.classList.toggle('d-none', value !== 'quarter');
-                yearGroup.classList.toggle('d-none', value !== 'year');
+            data.forEach(r => {
+                const gross    = parseFloat(r.gross_salary      || 0);
+                const epfWages = parseFloat(r.epf_wages         || 0);
+                const empPf    = parseFloat(r.provident_fund    || 0);
+                const empEps   = parseFloat(r.employer_eps      || 0);
+                const empDiff  = parseFloat(r.employer_epf_diff || 0);
+                const ncp      = parseInt(r.ncp_days            || 0);
+                const uan      = r.epf_no    || '—';
+                const trrn     = r.pf_trrn   || 'N/A';
+                const month    = r.month_name || '—';
+
+                totalEmpPf += empPf;
+                totalEps   += empEps;
+                totalDiff  += empDiff;
+
+                html += `<tr>
+                    <td class="text-end ps-4 text-muted">${idx++}</td>
+                    <td class="fw-bold text-dark">${uan}</td>
+                    <td class="fw-bold text-dark">${r.name || '—'}</td>
+                    <td>₹${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>₹${epfWages.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>₹${epfWages.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td>₹${epfWages.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-primary fw-bold">₹${empPf.toFixed(2)}</td>
+                    <td class="text-danger fw-semibold">₹${empEps.toFixed(2)}</td>
+                    <td class="text-success fw-semibold">₹${empDiff.toFixed(2)}</td>
+                    <td>${ncp}</td>
+                    <td>₹0.00</td>
+                    <td class="text-center pe-4">
+                        <button class="btn-action-detail viewPF"
+                            data-month="${month}"
+                            data-name="${r.name || '—'}"
+                            data-uan="${uan}"
+                            data-epf-wages="${'₹' + epfWages.toLocaleString('en-IN', {minimumFractionDigits:2})}"
+                            data-emp-pf="${'₹' + empPf.toFixed(2)}"
+                            data-emp-diff="${'₹' + empDiff.toFixed(2)}"
+                            data-eps="${'₹' + empEps.toFixed(2)}"
+                            data-ncp="${ncp}"
+                            data-trrn="${trrn}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#viewDetailsModal"
+                            title="View Details">
+                            <i class="ti ti-eye f-16"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+
+            // Totals footer
+            if (data.length > 1) {
+                html += `<tr class="table-light fw-bold border-top">
+                    <td class="ps-4 text-end text-muted" colspan="7">Total</td>
+                    <td class="text-primary">₹${totalEmpPf.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-danger">₹${totalEps.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td class="text-success">₹${totalDiff.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
+                    <td colspan="3">—</td>
+                </tr>`;
+            }
+
+            $('#pfPageBody').html(html);
+
+        }).fail(() => {
+            $('#pfPageBody').html(
+                '<tr><td colspan="13" class="text-center text-danger py-4">Failed to load PF data. Please try again.</td></tr>'
+            );
+        });
+    }
+
+    // ============================================================
+    // View Details modal population
+    // ============================================================
+    $(document).on('click', '.viewPF', function () {
+        $('#pf_month').text($(this).data('month'));
+        $('#emp_name_id').text($(this).data('name'));
+        $('#uan').text($(this).data('uan'));
+        $('#basic_salary').text($(this).data('epf-wages'));
+        $('#emp_pf').text($(this).data('emp-pf'));
+        $('#employer_pf').text($(this).data('emp-diff'));
+        $('#pension_pf').text($(this).data('eps'));
+        $('#total_pf').text($(this).data('ncp') + ' days');
+        $('#challan_no').text($(this).data('trrn'));
+    });
+
+    // ============================================================
+    // Export helpers
+    // ============================================================
+    function exportPfPDF() {
+        const table = document.getElementById('pfPageTable');
+        if (!table) return;
+        if (typeof window.jspdf === 'undefined') { alert('jsPDF library not loaded.'); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+        doc.text('Provident Fund (PF / EPF) Summary', 14, 14);
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+        doc.text('FY: ' + $('#pf_fy').val() + '   Generated: ' + new Date().toLocaleDateString('en-IN'), 14, 21);
+
+        const headers = [['#','UAN','Member Name','Gross Wages','EPF Wages','EPS Wages','EDLI Wages','Emp EPF (12%)','Empr EPS (8.33%)','EPF Diff','NCP Days','Refund']];
+        const body = [];
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length >= 12 && cells[0].textContent.trim() !== '—') {
+                body.push([...cells].slice(0, 12).map(td => td.innerText.trim()));
+            }
+        });
+        if (!body.length) { alert('No data to export.'); return; }
+        doc.autoTable({
+            head: headers, body,
+            startY: 26,
+            styles: { fontSize: 7, cellPadding: 1.5 },
+            headStyles: { fillColor: [66, 47, 144], textColor: 255, fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: [245, 245, 250] },
+            margin: { left: 10, right: 10 }
+        });
+        doc.save('PF_Summary_' + $('#pf_fy').val() + '.pdf');
+    }
+
+    function exportPfExcel() {
+        const table = document.getElementById('pfPageTable');
+        if (!table || typeof XLSX === 'undefined') { alert('XLSX library not loaded.'); return; }
+        const fy = $('#pf_fy').val();
+        const wsData = [
+            ['Provident Fund (PF / EPF) Summary'],
+            ['Financial Year: ' + fy, '', '', '', '', '', '', '', '', '', '', 'Generated: ' + new Date().toLocaleDateString('en-IN')],
+            [],
+            ['#','UAN','Member Name','Gross Wages','EPF Wages','EPS Wages','EDLI Wages','Employee EPF (12%)','Employer EPS (8.33%)','EPF Difference','NCP Days','Refund of Advances']
+        ];
+        table.querySelectorAll('tbody tr').forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length >= 12 && cells[0].textContent.trim() !== '—') {
+                wsData.push([...cells].slice(0, 12).map(td => td.innerText.trim()));
+            }
+        });
+        if (wsData.length <= 4) { alert('No data to export.'); return; }
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        ws['!cols'] = [5,16,22,14,14,14,14,18,18,16,10,14].map(w => ({ wch: w }));
+        XLSX.utils.book_append_sheet(wb, ws, 'PF Summary');
+        XLSX.writeFile(wb, 'PF_Summary_' + fy + '.xlsx');
+    }
+
+    // ============================================================
+    // Offcanvas period toggle (unchanged)
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Init filter dropdowns and auto-load
+        renderPfPageFilter();
+        loadPfPageData();
+
+        const initPfPeriodToggle = function() {
+            const periodRadios = document.querySelectorAll('input[name="pfPeriodType"]');
+            const monthGroup   = document.getElementById('filterPfMonthGroup');
+            const quarterGroup = document.getElementById('filterPfQuarterGroup');
+            const yearGroup    = document.getElementById('filterPfYearGroup');
+            const resetButton  = document.getElementById('pfFilterReset');
+            const form         = document.getElementById('pfFilterForm');
+
+            if (!periodRadios.length || !monthGroup || !quarterGroup || !yearGroup || !form) return;
+
+            const toggleGroups = function() {
+                const val = (document.querySelector('input[name="pfPeriodType"]:checked') || {}).value || 'month';
+                monthGroup.classList.toggle('d-none',   val !== 'month');
+                quarterGroup.classList.toggle('d-none', val !== 'quarter');
+                yearGroup.classList.toggle('d-none',    val !== 'year');
             };
 
-            periodRadios.forEach(function(radio) {
-                radio.addEventListener('change', function() {
-                    toggleGroups();
-                });
-            });
+            periodRadios.forEach(r => r.addEventListener('change', toggleGroups));
 
             if (resetButton) {
                 resetButton.addEventListener('click', function() {
                     form.reset();
-                    setTimeout(function() {
-                        toggleGroups();
-                    }, 50);
+                    setTimeout(toggleGroups, 50);
                 });
             }
-
             toggleGroups();
         };
 
         initPfPeriodToggle();
 
-        const offcanvasElement = document.getElementById('pfFilterOffcanvas');
-        if (offcanvasElement) {
-            offcanvasElement.addEventListener('shown.bs.offcanvas', function() {
-                initPfPeriodToggle();
-            });
+        const offcanvasEl = document.getElementById('pfFilterOffcanvas');
+        if (offcanvasEl) {
+            offcanvasEl.addEventListener('shown.bs.offcanvas', initPfPeriodToggle);
         }
+
+        // Re-render period dropdown on filter type change
+        $('#pf_fy, #pf_filter_type').on('change', function() {
+            renderPfPageFilter();
+        });
     });
 
+    // Offcanvas download button — builds and submits form
     $('#pfFilterForm button').on('click', function () {
         $('<form>', {
             action: "{{ route('download.pf.filing') }}",
             method: 'POST'
         }).append(
-            $('<input>', { type: 'hidden', name: '_token', value: "{{ csrf_token() }}" }),
-            $('<input>', { type: 'hidden', name: 'name', value: $('#filterPfName').val() }),
-            $('<input>', { type: 'hidden', name: 'employee_id', value: $('#filterPfEmployeeId').val() }),
-            $('<input>', { type: 'hidden', name: 'pfPeriodType', value: $('input[name="pfPeriodType"]:checked').val() }),
-            $('<input>', { type: 'hidden', name: 'month', value: $('#filterPfMonth').val() }),
-            $('<input>', { type: 'hidden', name: 'quarter', value: $('#filterPfQuarter').val() }),
-            $('<input>', { type: 'hidden', name: 'year', value: $('#filterPfYear').val() }),
-            $('<input>', { type: 'hidden', name: 'download_format', value: $('#pfDownloadFormat').val() })
+            $('<input>', { type: 'hidden', name: '_token',         value: "{{ csrf_token() }}" }),
+            $('<input>', { type: 'hidden', name: 'name',           value: $('#filterPfName').val() }),
+            $('<input>', { type: 'hidden', name: 'employee_id',    value: $('#filterPfEmployeeId').val() }),
+            $('<input>', { type: 'hidden', name: 'pfPeriodType',   value: $('input[name="pfPeriodType"]:checked').val() }),
+            $('<input>', { type: 'hidden', name: 'month',          value: $('#filterPfMonth').val() }),
+            $('<input>', { type: 'hidden', name: 'quarter',        value: $('#filterPfQuarter').val() }),
+            $('<input>', { type: 'hidden', name: 'year',           value: $('#filterPfYear').val() }),
+            $('<input>', { type: 'hidden', name: 'download_format',value: $('#pfDownloadFormat').val() })
         ).appendTo('body').submit().remove();
     });
 </script>
