@@ -2486,6 +2486,8 @@ class SalesController extends Controller
 			//'adjusted_amount' => 'required',
 			'challan_no' => 'required',
 			'challan_date' => 'required',
+			'taxable_value' => 'required',
+			'total_amt' => 'required',
 			//'doc_no' => 'required',
 			//'doc_date' => 'required',
 		]);

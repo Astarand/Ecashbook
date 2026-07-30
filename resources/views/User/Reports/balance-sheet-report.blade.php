@@ -473,6 +473,7 @@
 								advance_from_customer: "Advance from Customer",
 								salary_payable: "Salary Payable",
 								gst_payable: "GST Payable",
+								output_gst: "GST Output",
 								tds_payable: "TDS Payable",
 								pf_payable: "PF Payable",
 								esi_payable: "ESI Payable",

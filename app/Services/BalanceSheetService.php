@@ -63,20 +63,20 @@ class BalanceSheetService
 								->first();
 								
 			$expenseAmount = DB::table('expenses')
-									->where('added_by', $userId)
-									->whereBetween('expense_date', [$startDate, $endDate])
-									->selectRaw('
-										SUM(
-											GREATEST(
-												COALESCE(expense_amt, 0)
-												- COALESCE(advance_amount, 0),
-												0
-											)
-										) AS payable
-									')
-									->value('payable') ?? 0;
+								->where('added_by', $userId)
+								->whereBetween('expense_date', [$startDate, $endDate])
+								->selectRaw('
+									SUM(
+										GREATEST(
+											COALESCE(expense_amt, 0)
+											+ COALESCE(total_gst, 0)
+											- COALESCE(advance_amount, 0),
+											0
+										)
+									) AS payable
+								')
+								->value('payable') ?? 0;
 
-			//$purchaseCredit = $voucherPurchaseTotals->total_credit ?? 0;
 			$purchaseDebit  = $voucherPurchaseTotals->total_debit ?? 0;
 			$amount = ($purchaseAmount - $purchaseDebit + $expenseAmount);
 		}
@@ -180,7 +180,12 @@ class BalanceSheetService
 		if ($type == 'gst_payable') {
 			$gst = $this->calculateGST($userId, $startDate, $endDate);
 			$amount = $gst['gst_payable'];
-			//$amount = $gst['output_gst'];
+		}
+		
+		// GST Output
+		if ($type == 'output_gst') {
+			$gst = $this->calculateGST($userId, $startDate, $endDate);
+			$amount = $gst['output_gst'];
 		}
 
 		// TDS Payable
@@ -353,8 +358,17 @@ class BalanceSheetService
 				->where('addBy', $userId)
 				->where('status', 1)
 				->whereBetween('dateInput', [$startDate, $endDate])
-				->selectRaw('SUM(COALESCE(amount,0) - COALESCE(advance_amt,0)) as receivable')
-				->value('receivable');
+				->selectRaw('
+					SUM(
+						GREATEST(
+							COALESCE(amount, 0)
+							+ COALESCE(gst_amt, 0)
+							- COALESCE(advance_amt, 0),
+							0
+						)
+					) AS receivable
+				')
+				->value('receivable') ?? 0;
 
 			// Sales Credit/Debit Notes
 			$voucherSalesTotals = DB::table('vouchers')
@@ -369,7 +383,6 @@ class BalanceSheetService
 									->first();
 
 			$salesCredit = $voucherSalesTotals->total_credit ?? 0;
-			//$salesDebit  = $voucherSalesTotals->total_debit ?? 0;
 			$amount = ($salesReceivable - $salesCredit) + ($incomeReceivable ?? 0);
 		}
 
@@ -421,7 +434,6 @@ class BalanceSheetService
 		*/
 		if ($type == 'Input GST Credit') {
 			$gst = $this->calculateGST($userId, $startDate, $endDate);
-			//$amount = $gst['gst_receivable'];
 			$amount = $gst['input_gst'];
 		}
 
@@ -552,7 +564,7 @@ class BalanceSheetService
 			'output_gst'     => $outputGST,
 			'input_gst'      => $inputGST,
 			'net_gst'        => $netGST,
-			'gst_payable'    => max($netGST, 0),
+			'gst_payable'    => $netGST,//max($netGST, 0),
 			'gst_receivable' => max(-$netGST, 0),
 		];
 	}

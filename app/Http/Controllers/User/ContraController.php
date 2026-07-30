@@ -450,6 +450,7 @@ class ContraController extends Controller
     {
 		$title = 'Banks';
 		$userId = currentOwnerId();
+		$toDate = now()->toDateString();
 		checkCoreAccess('Cash & Banking');
 
 		$req_type = 0;
@@ -487,13 +488,48 @@ class ContraController extends Controller
 							->select(DB::raw('SUM(bank_trans.tran_amt) as totaltransaction'))
 							->where('bankId', '=', $bankId)
 							->get();
-		$closingBalance = DB::table('bank_trans')
-							->where('bankId', $bankId)
-							->orderBy('tran_date', 'desc')
-							->orderBy('id', 'asc')
-							->value('curr_amt');
 
-		$closingBalance = $closingBalance ?? 0;
+		// =================START BANK CLOSING BALANCE =================
+		// 1. Existing Bank Transactions
+		$bankCurrentBalance = DB::table('banks')
+								->where('id', $bankId)
+								->where('added_by', $userId)
+								->when($prop_id, function ($q) use ($prop_id) {
+									$q->where('propId', $prop_id);
+								})
+								->value('curr_bal') ?? 0;
+
+
+		// 2. Payment Voucher Bank Transactions
+		$paymentVoucherBalance = DB::table('payment_vouchers')
+			->where('added_by', $userId)
+			->where('bank_id', $bankId)
+			->where('payment_mode', 'Bank')
+			->when($prop_id, function ($q) use ($prop_id) {
+				$q->where('propId', $prop_id);
+			})
+			->whereDate('date', '<=', $toDate)
+			->selectRaw("
+				COALESCE(
+					SUM(
+						CASE
+							WHEN LOWER(credit_debit) = 'credit'
+								THEN COALESCE(amount, 0)
+
+							WHEN LOWER(credit_debit) = 'debit'
+								THEN -COALESCE(amount, 0)
+
+							ELSE 0
+						END
+					),
+					0
+				) AS balance
+			")
+			->value('balance') ?? 0;
+
+		$closingBalance = $bankCurrentBalance + $paymentVoucherBalance;
+		$closingBalance = round($closingBalance, 2);
+		// =================END BANK CLOSING BALANCE =================
 
 		$cashLimit = ($bank->curr_bal);
 		$totaltransaction = ($totaltransaction[0]->totaltransaction);

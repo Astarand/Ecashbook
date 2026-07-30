@@ -334,27 +334,24 @@ class ProfitLossService
 						->groupBy('s.inv_num');
 						
 		$voucherAdjustments = DB::table('vouchers as v')
-								->joinSub($invoiceType, 't', function ($join) {
-									$join->on('t.inv_num', '=', 'v.invoice_number');
-								})
-								->selectRaw("
-									t.item_type,
+							->joinSub($invoiceType, 't', function ($join) {
+								$join->on('t.inv_num', '=', 'v.invoice_number');
+							})
+							->selectRaw("
+								t.item_type,
 
-									SUM(
-										CASE
-											WHEN v.note_type = 'Credit'
-											THEN COALESCE(v.total_amt, 0)
-												 - COALESCE(v.cgst_amount, 0)
-												 - COALESCE(v.sgst_amount, 0)
-												 - COALESCE(v.igst_amount, 0)
-											ELSE 0
-										END
-									) AS credit
-								")
-								->where('v.added_by', $userId)
-								->whereBetween('v.inv_date', [$startDate, $endDate])
-								->groupBy('t.item_type')
-								->get();
+								SUM(
+									CASE
+										WHEN v.note_type = 'Credit'
+										THEN COALESCE(v.taxable_value, 0)
+										ELSE 0
+									END
+								) AS credit
+							")
+							->where('v.added_by', $userId)
+							->whereBetween('v.inv_date', [$startDate, $endDate])
+							->groupBy('t.item_type')
+							->get();
 		//End Sales credit/debit
 		$productCr = $serviceCr = 0;
 		foreach ($voucherAdjustments as $row) {
@@ -486,10 +483,7 @@ class ProfitLossService
 									SUM(
 										CASE
 											WHEN vp.note_type = 'Debit'
-											THEN COALESCE(vp.total_amt, 0)
-												 - COALESCE(vp.cgst_amount, 0)
-												 - COALESCE(vp.sgst_amount, 0)
-												 - COALESCE(vp.igst_amount, 0)
+											THEN COALESCE(vp.taxable_value, 0)
 											ELSE 0
 										END
 									) AS debit

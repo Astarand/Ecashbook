@@ -1542,6 +1542,13 @@ class PayrollReportController extends Controller
                 'user_payslip.pf_challan_generated_on',
                 'user_payslip.pf_payment_confirmation_date',
                 'user_payslip.pf_payment_status',
+
+                'user_payslip.pf_establishment_id',
+                'user_payslip.pf_wage_month',
+                
+                'user_payslip.pf_total_amount',
+                'user_payslip.pf_payment_type',
+                
                 // Gross wages from JSON
                 DB::raw("
                     CAST(
@@ -1623,6 +1630,8 @@ class PayrollReportController extends Controller
                 'pf_wage_month' => $request->pf_wage_month,
 
                 'pf_total_amount' => $request->pf_total_amount,
+
+                'pf_payment_type' => $request->pf_payment_type,
 
                 'pf_crn' => $request->pf_crn,
 
@@ -1737,6 +1746,7 @@ class PayrollReportController extends Controller
                 'user_payslip.esi_amount_paid',
                 'user_payslip.esi_transaction_no',
                 'user_payslip.esi_payment_status',
+
                 // Gross wages from JSON
                 DB::raw("
                     CAST(
@@ -1806,7 +1816,7 @@ class PayrollReportController extends Controller
             ->whereIn('id', $request->ids)
             ->update([
 
-                // 'esi_employer_code'            => $request->esi_employer_code,
+                'esi_employer_code'            => $request->esi_employer_code,
                 // 'esi_employer_name'            => $request->esi_employer_name,
                 'esi_contribution_period'      => $request->esi_contribution_period,
                 'esi_challan_no'               => $request->esi_challan_no,
@@ -1933,6 +1943,7 @@ class PayrollReportController extends Controller
                 'user_payslip.ptax_payment_ref_no',
                 'user_payslip.ptax_amount_paid',
                 'user_payslip.ptax_payment_status',
+
                 // PT deduction from final_salary_calculation
                 DB::raw("
                     CAST(
@@ -1973,7 +1984,6 @@ class PayrollReportController extends Controller
 
         return response()->json($records);
     }
-
     
     //------- PTAX Summary (grouped by period) -------//
     public function getPtaxSummary(Request $request)
@@ -2202,7 +2212,14 @@ class PayrollReportController extends Controller
 
                 'user_payslip.lwf_receipt_date',
                 'user_payslip.lwf_receipt_no',
-                'user_payslip.lwf_payment_status'
+                'user_payslip.lwf_payment_status',
+                
+                'user_payslip.lwf_payment_month',
+                'user_payslip.lwf_total_payment',
+                'user_payslip.lwf_interest_amount',
+                'user_payslip.lwf_employee_count',
+                'user_payslip.lwf_employee_contribution',
+                'user_payslip.lwf_employer_contribution',
             )
             ->orderBy('employees.employee_id')
             ->get();

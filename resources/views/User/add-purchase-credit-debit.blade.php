@@ -60,7 +60,7 @@
                     <div class="mb-3 col-md-3">
 							<label class="form-label" for="InvoiceaddressType">Note Type<span class="text-danger">*</span></label>
 							<select class="form-control error" name="note_type" id="note_type" required>
-								<option>Select</option>
+								<option value="">Select</option>
 								<!--<option value="Credit">Credit</option>-->
 								<option value="Debit">Debit</option>
 							</select>
@@ -269,7 +269,7 @@
                                         <input type="text" name="gst_rate" id="gst_rate" class="form-control" placeholder="GST Rate">
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label class="form-label">Taxable Value</label>
+                                        <label class="form-label">Taxable Value <span class="text-danger">*</span></label>
                                         <input type="text" name="taxable_value" id="taxable_value" class="form-control" placeholder="Taxable Value">
                                     </div>
                                     <div class="col-md-3 mb-3">
@@ -285,7 +285,7 @@
                                         <input type="text" name="igst_amount" id="igst_amount" class="form-control" placeholder="IGST Amount">
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label class="form-label">Total Amount</label>
+                                        <label class="form-label">Total Amount <span class="text-danger">*</span></label>
                                         <input type="text" name="total_amt" id="total_amt" class="form-control" placeholder="Total Amount">
                                     </div>
                                     <div class="col-md-3 mb-3">

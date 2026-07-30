@@ -534,7 +534,7 @@
                                     <div class="row align-items-end">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">Amount <span class="text-danger">*</span></label>
-                                            <input type="number" name="cl_amount_trade_payables" id="cl_amount_trade_payables" class="form-control" placeholder="Enter Amount">
+                                            <input type="number" readonly name="cl_amount_trade_payables" id="cl_amount_trade_payables" class="form-control" placeholder="Enter Amount">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <a href="{{ url('/purchase-order') }}" target="_blank" class="btn btn-outline-primary w-100">
@@ -549,7 +549,7 @@
                                     <div class="row align-items-end">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">Amount <span class="text-danger">*</span></label>
-                                            <input type="number" name="cl_amount_advance_from_customer" id="cl_amount_advance_from_customer" class="form-control" placeholder="Enter Amount">
+                                            <input type="number" readonly name="cl_amount_advance_from_customer" id="cl_amount_advance_from_customer" class="form-control" placeholder="Enter Amount">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <a href="{{ url('/sale-invoices') }}" target="_blank" class="btn btn-outline-primary w-100">
@@ -564,7 +564,7 @@
                                     <div class="row align-items-end">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">Amount <span class="text-danger">*</span></label>
-                                            <input type="number" name="cl_amount_outstanding_expenses" id="cl_amount_outstanding_expenses" class="form-control" placeholder="Enter Amount">
+                                            <input type="number" readonly name="cl_amount_outstanding_expenses" id="cl_amount_outstanding_expenses" class="form-control" placeholder="Enter Amount">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <a href="{{ url('/expenses-list') }}" target="_blank" class="btn btn-outline-primary w-100">
@@ -579,7 +579,7 @@
                                     <div class="row align-items-end">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">Amount <span class="text-danger">*</span></label>
-                                            <input type="number" name="cl_amount_salary_payable" id="cl_amount_salary_payable" class="form-control" placeholder="Enter Amount">
+                                            <input type="number" readonly name="cl_amount_salary_payable" id="cl_amount_salary_payable" class="form-control" placeholder="Enter Amount">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <a href="{{ url('/expenses-list') }}" target="_blank" class="btn btn-outline-primary w-100">
@@ -594,7 +594,7 @@
                                     <div class="row align-items-end">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">Amount <span class="text-danger">*</span></label>
-                                            <input type="number" name="cl_amount_gst_payable" id="cl_amount_gst_payable" class="form-control" placeholder="Enter Amount">
+                                            <input type="number" readonly name="cl_amount_gst_payable" id="cl_amount_gst_payable" class="form-control" placeholder="Enter Amount">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <a href="{{ url('/gst-returns') }}" target="_blank" class="btn btn-outline-primary w-100">
@@ -609,7 +609,7 @@
                                     <div class="row align-items-end">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">Amount <span class="text-danger">*</span></label>
-                                            <input type="number" name="cl_amount_tds_payable" id="cl_amount_tds_payable" class="form-control" placeholder="Enter Amount">
+                                            <input type="number" readonly name="cl_amount_tds_payable" id="cl_amount_tds_payable" class="form-control" placeholder="Enter Amount">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <a href="{{ url('/tds-returns-filing') }}" target="_blank" class="btn btn-outline-primary w-100">
@@ -624,7 +624,7 @@
                                     <div class="row align-items-end">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">Amount <span class="text-danger">*</span></label>
-                                            <input type="number" name="cl_amount_pf_payable" id="cl_amount_pf_payable" class="form-control" placeholder="Enter Amount">
+                                            <input type="number" readonly name="cl_amount_pf_payable" id="cl_amount_pf_payable" class="form-control" placeholder="Enter Amount">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <a href="{{ url('/pf-management-list') }}" target="_blank" class="btn btn-outline-primary w-100">
@@ -639,7 +639,7 @@
                                     <div class="row align-items-end">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">Amount <span class="text-danger">*</span></label>
-                                            <input type="number" name="cl_amount_esi_payable" id="cl_amount_esi_payable" class="form-control" placeholder="Enter Amount">
+                                            <input type="number" readonly name="cl_amount_esi_payable" id="cl_amount_esi_payable" class="form-control" placeholder="Enter Amount">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <a href="{{ url('/esi-management-list') }}" target="_blank" class="btn btn-outline-primary w-100">
@@ -654,7 +654,7 @@
                                     <div class="row align-items-end">
                                         <div class="col-xl-4 mb-3">
                                             <label class="form-label">Amount <span class="text-danger">*</span></label>
-                                            <input type="number" name="cl_amount_lwf_payable" id="cl_amount_lwf_payable" class="form-control" placeholder="Enter Amount">
+                                            <input type="number" readonly name="cl_amount_lwf_payable" id="cl_amount_lwf_payable" class="form-control" placeholder="Enter Amount">
                                         </div>
                                         <div class="col-xl-4 mb-3">
                                             <a href="{{ url('/payroll-reports') }}" target="_blank" class="btn btn-outline-primary w-100">

@@ -289,7 +289,7 @@
                         <div class="table-responsive">
                             <table class="table table-bordered align-middle mb-0">
                                 <thead class="table-light">
-                                    <tr>
+                                    {{-- <tr>
                                         <th><input type="checkbox" id="select-all-tds"></th>
                                         <th>Employee ID</th>
                                         <th>Name</th>
@@ -299,6 +299,15 @@
                                         <th>UTR</th>
                                         <th>Update Date</th>
                                         <th>BSR Code</th>
+                                    </tr> --}}
+                                    <tr>
+                                        <th><input type="checkbox" id="select-all-tds"></th>
+                                        <th>Nature of Payment</th>
+                                        <th>Challan Number</th>
+                                        <th>Date of Deposit</th>
+                                        <th>Bank Ref. No</th>
+                                        <th>BSR Code</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tdsTable">
@@ -401,6 +410,11 @@
                                     </div>
 
                                     <div class="col-md-3">
+                                        <label class="form-label">Payment Type</label>
+                                        <input type="text" id="pf_payment_type" class="form-control" placeholder="Enter Payment Type">
+                                    </div>
+
+                                    <div class="col-md-3">
                                         <label class="form-label">CRN</label>
                                         <input type="text" id="pf_crn_input" class="form-control" placeholder="Enter CRN">
                                     </div>
@@ -424,7 +438,7 @@
                         <div class="table-responsive">
                             <table class="table table-bordered align-middle mb-0">
                                 <thead class="table-light">
-                                    <tr>
+                                    {{-- <tr>
                                         <th><input type="checkbox" id="select-all-pf"></th>
                                         <th>Employee ID</th>
                                         <th>Name</th>
@@ -434,6 +448,19 @@
                                         <th>Challan Generated On</th>
                                         <th>Payment Confirmation Date</th>
                                         <th>Status</th>
+                                    </tr> --}}
+
+                                    <tr>
+                                        <th><input type="checkbox" id="select-all-pf"></th>
+                                        <th>Establishment ID</th>
+                                        <th>Wage Month</th>
+                                        <th>TRRN</th>
+                                        <th>CRN</th>
+                                        <th>Payment Confirmation Date</th>
+                                        <th>Total Amount</th>
+                                        <th>Payment Type</th>
+                                        <th>Status</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody id="pfTable">
@@ -511,13 +538,13 @@
                             <div class="card-body">
                                 <div class="row g-3 align-items-end">
 
-                                    {{-- <div class="col-md-3">
+                                    <div class="col-md-3">
                                         <label class="form-label">Employer Code</label>
                                         <input type="text" id="esi_employer_code_input" class="form-control"
                                             placeholder="Enter Employer Code">
                                     </div>
 
-                                    <div class="col-md-3">
+                                    {{--  <div class="col-md-3">
                                         <label class="form-label">Employer Name</label>
                                         <input type="text" id="esi_employer_name_input" class="form-control"
                                             placeholder="Enter Employer Name">
@@ -572,7 +599,7 @@
                         <div class="table-responsive">
                             <table class="table table-bordered align-middle mb-0">
                                 <thead class="table-light">
-                                    <tr>
+                                    {{-- <tr>
                                         <th width="40">
                                             <input type="checkbox" id="select-all-esi">
                                         </th>
@@ -584,7 +611,22 @@
                                         <th>Transaction Number</th>
                                         <th>Challan Created Date</th>
                                         <th>Status</th>
+                                    </tr> --}}
+
+                                    <tr>
+                                        <th width="40">
+                                            <input type="checkbox" id="select-all-esi">
+                                        </th>
+                                        <th>Contribution Period</th>
+                                        <th>Amount</th>
+                                        <th>Employer Code</th>
+                                        <th>Challan Number</th>
+                                        <th>Challan Submitted Date</th>
+                                        <th>Transaction Number</th>
+                                        <th>Challan Created Date</th>
+                                        <th>Status</th>
                                     </tr>
+
                                 </thead>
                                 <tbody id="esiTable">
                                     <tr>
@@ -722,7 +764,7 @@
                         <div class="table-responsive">
                             <table class="table table-bordered align-middle mb-0">
                                 <thead class="table-light">
-                                    <tr>
+                                    {{-- <tr>
                                         <th width="40">
                                             <input type="checkbox" id="select-all-ptax">
                                         </th>
@@ -732,6 +774,19 @@
                                         <th>GRIPS Payment ID</th>
                                         <th>Period From</th>
                                         <th>Period To</th>
+                                        <th>Payment Reference No</th>
+                                        <th>Status</th>
+                                    </tr> --}}
+                                    <tr>
+                                        <th width="40">
+                                            <input type="checkbox" id="select-all-ptax">
+                                        </th>
+                                        <th>Payment Initiated Date</th>
+                                        <th>GRN</th>
+                                        <th>GRIPS Payment ID</th>
+                                        <th>Period From</th>
+                                        <th>Period To</th>
+                                        <th>Amount</th>
                                         <th>Payment Reference No</th>
                                         <th>Status</th>
                                     </tr>
@@ -901,13 +956,28 @@
                         <div class="table-responsive">
                             <table class="table table-bordered align-middle mb-0">
                                 <thead class="table-light">
-                                    <tr>
+                                    {{-- <tr>
                                         <th width="40">
                                             <input type="checkbox" id="select-all-lwf">
                                         </th>
                                         <th>Employee ID</th>
                                         <th>Name</th>
                                         <th>Financial Year</th>
+                                        <th>Employee Contribution</th>
+                                        <th>Company Contribution</th>
+                                        <th>Receipt Date </th>
+                                        <th>Receipt No</th>
+                                        <th>Status</th>
+                                    </tr> --}}
+
+                                    <tr>
+                                        <th width="40">
+                                            <input type="checkbox" id="select-all-lwf">
+                                        </th>
+                                        <th>Payment for the Month</th>
+                                        <th>Total Payment</th>
+                                        <th>Interest Amount</th>
+                                        <th>No. of Employees</th>
                                         <th>Employee Contribution</th>
                                         <th>Company Contribution</th>
                                         <th>Receipt Date </th>
@@ -1391,7 +1461,7 @@
 
                     html=`
                         <tr>
-                            <td colspan="9" class="text-center">
+                            <td colspan="7" class="text-center">
                                 No Record Found
                             </td>
                         </tr>
@@ -1399,36 +1469,68 @@
 
                 }else{
 
+                    // $.each(response,function(index,row){
+
+                    //     html+=`
+
+                    //     <tr>
+
+                    //         <td>
+                    //             <input type="checkbox"
+                    //                 class="tds-row-checkbox"
+                    //                 value="${row.id}">
+                    //         </td>
+
+                    //         <td>${row.employee_id ?? '-'}</td>
+
+                    //         <td>${row.name ?? '-'}</td>
+
+                    //         <td>${row.financial_year}</td>
+
+                    //         <td>${$('#tds-period-type option:selected').text()}</td>
+
+                    //         <td>${row.month}</td>
+
+                    //         <td>${row.tds_challan_no ?? '-'}</td>
+
+                    //         <td>${row.tds_deposit_date ?? '-'}</td>
+
+                    //         <td>${row.tds_bsr_code ?? '-'}</td>
+
+                    //     </tr>
+
+                    //     `;
+
+                    // });
+
                     $.each(response,function(index,row){
 
-                        html+=`
+                        html += `
+                            <tr>
 
-                        <tr>
+                                <td>
+                                    <input type="checkbox"
+                                        class="tds-row-checkbox"
+                                        value="${row.id}">
+                                </td>
 
-                            <td>
-                                <input type="checkbox"
-                                    class="tds-row-checkbox"
-                                    value="${row.id}">
-                            </td>
+                                <td>${row.tds_nature_of_payment ?? '-'}</td>
 
-                            <td>${row.employee_id ?? '-'}</td>
+                                <td>${row.tds_challan_no ?? '-'}</td>
 
-                            <td>${row.name ?? '-'}</td>
+                                <td>${row.tds_deposit_date ?? '-'}</td>
 
-                            <td>${row.financial_year}</td>
+                                <td>${row.tds_cin ?? '-'}</td>
 
-                            <td>${$('#tds-period-type option:selected').text()}</td>
+                                <td>${row.tds_bsr_code ?? '-'}</td>
 
-                            <td>${row.month}</td>
+                                <td>
+                                    ${row.tds_deposit_status === 'Done'
+                                        ? '<span class="badge bg-success">Done</span>'
+                                        : '<span class="badge bg-warning text-dark">Pending</span>'}
+                                </td>
 
-                            <td>${row.tds_challan_no ?? '-'}</td>
-
-                            <td>${row.tds_deposit_date ?? '-'}</td>
-
-                            <td>${row.tds_bsr_code ?? '-'}</td>
-
-                        </tr>
-
+                            </tr>
                         `;
 
                     });
@@ -1527,7 +1629,41 @@
 
                 }else{
 
-                    $.each(response,function(index,row){
+                    // $.each(response,function(index,row){
+
+                    //     html += `
+                    //         <tr>
+                    //             <td>
+                    //                 <input type="checkbox"
+                    //                     class="pf-row-checkbox"
+                    //                     value="${row.id}">
+                    //             </td>
+
+                    //             <td>${row.employee_id ?? '-'}</td>
+
+                    //             <td>${row.name ?? '-'}</td>
+
+                    //             <td>${row.financial_year ?? '-'}</td>
+
+                    //             <td>${row.pf_trrn ?? '-'}</td>
+
+                    //             <td>${row.pf_crn ?? '-'}</td>
+
+                    //             <td>${row.pf_challan_generated_on ?? '-'}</td>
+
+                    //             <td>${row.pf_payment_confirmation_date ?? '-'}</td>
+
+                    //             <td>
+                    //                 ${row.pf_payment_status === 'Done'
+                    //                     ? '<span class="badge bg-success">Done</span>'
+                    //                     : '<span class="badge bg-warning text-dark">Pending</span>'}
+                    //             </td>
+
+                    //         </tr>`;
+
+                    // });
+
+                    $.each(response, function(index, row) {
 
                         html += `
                             <tr>
@@ -1537,19 +1673,19 @@
                                         value="${row.id}">
                                 </td>
 
-                                <td>${row.employee_id ?? '-'}</td>
+                                <td>${row.pf_establishment_id ?? '-'}</td>
 
-                                <td>${row.name ?? '-'}</td>
-
-                                <td>${row.financial_year ?? '-'}</td>
+                                <td>${row.pf_wage_month ?? '-'}</td>
 
                                 <td>${row.pf_trrn ?? '-'}</td>
 
                                 <td>${row.pf_crn ?? '-'}</td>
 
-                                <td>${row.pf_challan_generated_on ?? '-'}</td>
-
                                 <td>${row.pf_payment_confirmation_date ?? '-'}</td>
+
+                                <td>${row.pf_total_amount ?? '-'}</td>
+
+                                <td>${row.pf_payment_type ?? '-'}</td>
 
                                 <td>
                                     ${row.pf_payment_status === 'Done'
@@ -1558,7 +1694,6 @@
                                 </td>
 
                             </tr>`;
-
                     });
 
                 }
@@ -1607,6 +1742,8 @@
 
                 pf_total_amount: $('#pf_total_amount_input').val(),
 
+                pf_payment_type: $('#pf_payment_type').val(),
+
                 pf_crn: $('#pf_crn_input').val(),
 
                 pf_payment_date: $('#pf_payment_date_input').val()
@@ -1622,6 +1759,7 @@
                 $('#pf_establishment_id_input').val('');
                 $('#pf_wage_month_input').val('');
                 $('#pf_total_amount_input').val('');
+                $('#pf_payment_type').val('');
                 $('#pf_crn_input').val('');
                 $('#pf_payment_date_input').val('');
 
@@ -1695,7 +1833,43 @@
 
                 }else{
 
-                    $.each(response,function(index,row){
+                    // $.each(response,function(index,row){
+
+                    //     html += `
+                    //         <tr>
+
+                    //             <td>
+                    //                 <input type="checkbox"
+                    //                     class="esi-row-checkbox"
+                    //                     value="${row.id}">
+                    //             </td>
+
+                    //             <td>${row.employee_id ?? '-'}</td>
+
+                    //             <td>${row.name ?? '-'}</td>
+
+                    //             <td>${row.financial_year ?? '-'}</td>
+
+                    //             <td>${row.esi_challan_no ?? '-'}</td>
+
+                    //             <td>${row.esi_transaction_no ?? '-'}</td>
+
+                    //             <td>${row.esi_challan_created_date ?? '-'}</td>
+
+                    //             <td>${row.esi_challan_submitted_date ?? '-'}</td>
+
+                    //             <td>
+                    //                 ${
+                    //                     row.esi_payment_status === 'Done'
+                    //                     ? '<span class="badge bg-success">Done</span>'
+                    //                     : '<span class="badge bg-warning text-dark">Pending</span>'
+                    //                 }
+                    //             </td>
+
+                    //         </tr>`;
+                    // });
+
+                    $.each(response, function(index, row){
 
                         html += `
                             <tr>
@@ -1706,19 +1880,19 @@
                                         value="${row.id}">
                                 </td>
 
-                                <td>${row.employee_id ?? '-'}</td>
+                                <td>${row.esi_contribution_period ?? '-'}</td>
 
-                                <td>${row.name ?? '-'}</td>
+                                <td>${row.esi_amount_paid ?? '-'}</td>
 
-                                <td>${row.financial_year ?? '-'}</td>
+                                <td>${row.esi_employer_code ?? '-'}</td>
 
                                 <td>${row.esi_challan_no ?? '-'}</td>
+
+                                <td>${row.esi_challan_submitted_date ?? '-'}</td>
 
                                 <td>${row.esi_transaction_no ?? '-'}</td>
 
                                 <td>${row.esi_challan_created_date ?? '-'}</td>
-
-                                <td>${row.esi_challan_submitted_date ?? '-'}</td>
 
                                 <td>
                                     ${
@@ -1767,7 +1941,7 @@
 
                 ids: ids,
 
-                // esi_employer_code: $('#esi_employer_code_input').val(),
+                esi_employer_code: $('#esi_employer_code_input').val(),
 
                 // esi_employer_name: $('#esi_employer_name_input').val(),
 
@@ -1870,7 +2044,45 @@
 
                 }else{
 
-                    $.each(response,function(index,row){
+                    // $.each(response,function(index,row){
+
+                    //     html += `
+                    //     <tr>
+
+                    //         <td>
+                    //             <input type="checkbox"
+                    //                 class="ptax-row-checkbox"
+                    //                 value="${row.id}">
+                    //         </td>
+
+                    //         <td>${row.employee_id ?? '-'}</td>
+
+                    //         <td>${row.name ?? '-'}</td>
+
+                    //         <td>${row.financial_year ?? '-'}</td>
+
+                    //         <td>${row.ptax_grips_payment_id ?? '-'}</td>
+
+                    //         <td>${row.ptax_period_from ?? '-'}</td>
+
+                    //         <td>${row.ptax_period_to ?? '-'}</td>
+
+                    //         <td>${row.ptax_payment_ref_no ?? '-'}</td>
+
+                    //         <td>
+                    //             ${
+                    //                 row.ptax_payment_status === 'Done'
+                    //                 ? '<span class="badge bg-success">Done</span>'
+                    //                 : '<span class="badge bg-warning text-dark">Pending</span>'
+                    //             }
+                    //         </td>
+
+                    //     </tr>
+                    //     `;
+
+                    // });
+
+                    $.each(response, function(index, row){
 
                         html += `
                         <tr>
@@ -1881,17 +2093,17 @@
                                     value="${row.id}">
                             </td>
 
-                            <td>${row.employee_id ?? '-'}</td>
+                            <td>${row.ptax_payment_initiated_date ?? '-'}</td>
 
-                            <td>${row.name ?? '-'}</td>
-
-                            <td>${row.financial_year ?? '-'}</td>
+                            <td>${row.ptax_grn ?? '-'}</td>
 
                             <td>${row.ptax_grips_payment_id ?? '-'}</td>
 
                             <td>${row.ptax_period_from ?? '-'}</td>
 
                             <td>${row.ptax_period_to ?? '-'}</td>
+
+                            <td>${row.ptax_amount_paid ?? '-'}</td>
 
                             <td>${row.ptax_payment_ref_no ?? '-'}</td>
 
@@ -2025,7 +2237,7 @@
 
                 $('#lwfTable').html(`
                     <tr>
-                        <td colspan="9" class="text-center">
+                        <td colspan="10" class="text-center">
                             Loading...
                         </td>
                     </tr>
@@ -2041,7 +2253,7 @@
 
                     html=`
                         <tr>
-                            <td colspan="9" class="text-center">
+                            <td colspan="10" class="text-center">
                                 No Record Found
                             </td>
                         </tr>
@@ -2049,7 +2261,45 @@
 
                 }else{
 
-                    $.each(response,function(index,row){
+                    // $.each(response,function(index,row){
+
+                    //     html += `
+                    //     <tr>
+
+                    //         <td>
+                    //             <input type="checkbox"
+                    //                 class="lwf-row-checkbox"
+                    //                 value="${row.id}">
+                    //         </td>
+
+                    //         <td>${row.employee_id ?? '-'}</td>
+
+                    //         <td>${row.name ?? '-'}</td>
+
+                    //         <td>${row.financial_year ?? '-'}</td>
+
+                    //         <td>${row.employee_contribution ?? '0.00'}</td>
+
+                    //         <td>${row.company_contribution ?? '0.00'}</td>
+
+                    //         <td>${row.lwf_receipt_date ?? '-'}</td>
+
+                    //         <td>${row.lwf_receipt_no ?? '-'}</td>
+
+                    //         <td>
+                    //             ${
+                    //                 row.lwf_payment_status === 'Done'
+                    //                 ? '<span class="badge bg-success">Done</span>'
+                    //                 : '<span class="badge bg-warning text-dark">Pending</span>'
+                    //             }
+                    //         </td>
+
+                    //     </tr>
+                    //     `;
+
+                    // });
+
+                    $.each(response, function(index, row){
 
                         html += `
                         <tr>
@@ -2060,15 +2310,17 @@
                                     value="${row.id}">
                             </td>
 
-                            <td>${row.employee_id ?? '-'}</td>
+                            <td>${row.lwf_payment_month ?? '-'}</td>
 
-                            <td>${row.name ?? '-'}</td>
+                            <td>${row.lwf_total_payment ?? '0.00'}</td>
 
-                            <td>${row.financial_year ?? '-'}</td>
+                            <td>${row.lwf_interest_amount ?? '0.00'}</td>
 
-                            <td>${row.employee_contribution ?? '0.00'}</td>
+                            <td>${row.lwf_employee_count ?? '0'}</td>
 
-                            <td>${row.company_contribution ?? '0.00'}</td>
+                            <td>${row.lwf_employee_contribution ?? '0.00'}</td>
+
+                            <td>${row.lwf_employer_contribution ?? '0.00'}</td>
 
                             <td>${row.lwf_receipt_date ?? '-'}</td>
 
@@ -2086,6 +2338,7 @@
                         `;
 
                     });
+
 
                 }
 

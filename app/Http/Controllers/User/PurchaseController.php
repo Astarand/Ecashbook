@@ -2033,6 +2033,8 @@ class PurchaseController extends Controller
 				'v_num' => 'required',
 				'challan_no' => 'required',
 				'challan_date' => 'required',
+				'taxable_value' => 'required',
+				'total_amt' => 'required',
 			]);
 
     }
