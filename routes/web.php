@@ -1293,6 +1293,8 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::post('/payroll/lwf/update', [PayrollReportController::class, 'updateLwf'])->name('payroll.lwf.update');
 	Route::get('/payroll/gratuity/list', [PayrollReportController::class, 'getGratuityList'])->name('payroll.gratuity.list');
 	Route::get('/payslip/multiplePayslipGenerate',[PayrollReportController::class, 'multiplePayslipGenerate'])->name('payroll.multiplePayslipGenerate');
+	Route::get('/payroll/bulk-payslip/employees', [PayrollReportController::class, 'getBulkPayslipEmployees'])->name('payroll.bulk.employees');
+	Route::post('/payroll/bulk-payslip/generate', [PayrollReportController::class, 'bulkGeneratePayslip'])->name('payroll.bulk.generate');
 
 	
 	Route::post('/get-tds-rule-liab', [CommonController::class, 'getTdsRuleLiability'])->name('get.tds.rule');

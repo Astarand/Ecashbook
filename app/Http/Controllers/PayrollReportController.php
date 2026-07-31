@@ -2358,4 +2358,376 @@ class PayrollReportController extends Controller
         return view('User.multiple-generate-payslip');
     }
 
+    // ------- Bulk Payslip: get employees without payslip for a given month/FY -------//
+    public function getBulkPayslipEmployees(Request $request)
+    {
+        $ownerId       = currentOwnerId();
+        $financialYear = $request->financial_year;
+        $month         = Carbon::parse('1 ' . $request->month)->month;
+
+        [$fyStart, $fyEnd] = explode('-', $financialYear);
+        $year = ($month >= 4) ? $fyStart : $fyEnd;
+
+        // IDs that already have a payslip
+        $existingEmpIds = DB::table('user_payslip')
+            ->where('added_by', $ownerId)
+            ->where('financial_year', $financialYear)
+            ->where('month', $month)
+            ->pluck('user_emp_id')
+            ->toArray();
+
+        $firstDayOfMonth = Carbon::create($year, $month, 1)->startOfMonth();
+        $lastDayOfMonth  = $firstDayOfMonth->copy()->endOfMonth();
+
+        // Show employee for a month only if:
+        // 1. They joined on or before the last day of the selected month
+        // 2. AND they were active (Confirmed/In Probation)
+        //    OR resigned/terminated but their last day (regine_date) is within or after the first day of that month
+        //    meaning: if Khokan resigned 15-June, show in June (regine_date >= June-01),
+        //             hide in July (regine_date < July-01),
+        //             and hide in May-2025 because joining_date 2026-01-20 > May-2025 last day
+        $query = DB::table('employees as e')
+            ->leftJoin('users as u', 'u.id', '=', 'e.empId')
+            ->leftJoin('designations as d', 'd.id', '=', 'e.desig_id')
+            ->where('e.added_by', $ownerId)
+            // Must have joined on or before the last day of the selected month
+            ->where(function ($q) use ($lastDayOfMonth) {
+                $q->whereNull('e.joining_date')
+                  ->orWhereDate('e.joining_date', '<=', $lastDayOfMonth);
+            })
+            // Must be active OR resigned/terminated with last day >= first day of month
+            ->where(function ($q) use ($firstDayOfMonth) {
+                $q->whereIn('e.emp_status', ['Confirmed', 'In Probation'])
+                  ->orWhere(function ($qq) use ($firstDayOfMonth) {
+                      $qq->whereIn('e.emp_status', ['Resigned', 'Terminated'])
+                         ->whereNotNull('e.regine_date')
+                         ->whereDate('e.regine_date', '>=', $firstDayOfMonth);
+                  });
+            });
+
+        // Only exclude existing payslip employees if there are any
+        if (!empty($existingEmpIds)) {
+            $query->whereNotIn('e.empId', $existingEmpIds);
+        }
+
+        $employees = $query
+            ->select(
+                'e.empId',
+                'e.employee_id',
+                'u.name',
+                'e.emp_status',
+                'e.regine_date',
+                'e.basic_sal',
+                'e.hra',
+                'e.convayance',
+                'e.medical_allowance',
+                'e.special_bonus',
+                'e.total_addition',
+                'e.net_sal',
+                'e.provident_fund',
+                'e.esi',
+                'e.ptax',
+                'e.tds',
+                'e.loan_deduction',
+                'e.lwf_applicable',
+                'e.lwf_deduct',
+                'e.epf_applicable',
+                'e.esic_applicable',
+                'e.ptax_applicable',
+                'e.tds_applicable',
+                'd.designation_name'
+            )
+            ->orderBy('u.name')
+            ->get();
+
+        // Working days for the month
+        $firstDay = Carbon::create($year, $month, 1)->startOfMonth();
+        $lastDay  = $firstDay->copy()->endOfMonth();
+
+        $weeklySchedule = DB::table('weekly_schedules')
+            ->where('added_by', $ownerId)
+            ->pluck('status', 'day')
+            ->mapWithKeys(fn($v, $k) => [strtolower(trim($k)) => $v])
+            ->toArray();
+
+        $holidayDates = DB::table('holidays')
+            ->where('added_by', $ownerId)
+            ->whereBetween('holidayDate', [$firstDay, $lastDay])
+            ->pluck('holidayDate')
+            ->map(fn($d) => Carbon::parse($d)->format('Y-m-d'))
+            ->toArray();
+
+        $totalWorkingDays = 0;
+        for ($d = $firstDay->copy(); $d->lte($lastDay); $d->addDay()) {
+            $dayName = strtolower($d->format('l'));
+            $dateStr = $d->format('Y-m-d');
+            $isWeekend = isset($weeklySchedule[$dayName]) && strtolower($weeklySchedule[$dayName]) === 'closed';
+            if (!$isWeekend && !in_array($dateStr, $holidayDates)) {
+                $totalWorkingDays++;
+            }
+        }
+        $totalWorkingDays = max($totalWorkingDays - 1, 0);
+
+        foreach ($employees as $emp) {
+            $gross    = (float)($emp->total_addition ?? 0);
+            $basic    = (float)($emp->basic_sal      ?? 0);
+            $pf       = $emp->epf_applicable   ? (float)($emp->provident_fund ?? 0) : 0;
+            $esi      = $emp->esic_applicable  ? (float)($emp->esi            ?? 0) : 0;
+            $pt       = $emp->ptax_applicable  ? (float)($emp->ptax           ?? 0) : 0;
+            $tds      = $emp->tds_applicable   ? (float)($emp->tds            ?? 0) : 0;
+            $loan     = (float)($emp->loan_deduction ?? 0);
+            $lwf      = $emp->lwf_applicable   ? (float)($emp->lwf_deduct     ?? 0) : 0;
+            $net      = $gross - $pf - $esi - $pt - $tds - $loan - $lwf;
+
+            $emp->gross_salary       = round($gross, 2);
+            $emp->basic_salary       = round($basic, 2);
+            $emp->pf                 = round($pf, 2);
+            $emp->esi_amount         = round($esi, 2);
+            $emp->ptax_amount        = round($pt, 2);
+            $emp->tds_amount         = round($tds, 2);
+            $emp->loan_ded           = round($loan, 2);
+            $emp->lwf_amount         = round($lwf, 2);
+            $emp->net_salary         = round($net, 2);
+            $emp->total_working_days = $totalWorkingDays;
+            $emp->performance_bonus  = 0;
+            $emp->overtime           = 0;
+        }
+
+        return response()->json([
+            'employees'         => $employees,
+            'total_working_days'=> $totalWorkingDays,
+            'month'             => $month,
+            'financial_year'    => $financialYear,
+        ]);
+    }
+
+    // ------- Bulk Payslip: generate & save all -------//
+    public function bulkGeneratePayslip(Request $request)
+    {
+        $ownerId       = currentOwnerId();
+        $financialYear = $request->financial_year;
+        $monthNum      = (int)$request->month;
+        $employeesData = $request->employees; // array from JS
+
+        [$fyStart, $fyEnd] = explode('-', $financialYear);
+        $year = ($monthNum >= 4) ? $fyStart : $fyEnd;
+
+        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
+                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+
+        $firstDay = Carbon::create($year, $monthNum, 1)->startOfMonth();
+
+        // Working days calculation (same as getBulkPayslipEmployees)
+        $weeklySchedule = DB::table('weekly_schedules')
+            ->where('added_by', $ownerId)
+            ->pluck('status', 'day')
+            ->mapWithKeys(fn($v, $k) => [strtolower(trim($k)) => $v])
+            ->toArray();
+
+        $holidayDates = DB::table('holidays')
+            ->where('added_by', $ownerId)
+            ->whereBetween('holidayDate', [$firstDay, $firstDay->copy()->endOfMonth()])
+            ->pluck('holidayDate')
+            ->map(fn($d) => Carbon::parse($d)->format('Y-m-d'))
+            ->toArray();
+
+        $totalWorkingDays = 0;
+        $totalHolidays   = count($holidayDates);
+        $totalWeekends   = 0;
+        for ($d = $firstDay->copy(); $d->lte($firstDay->copy()->endOfMonth()); $d->addDay()) {
+            $dayName = strtolower($d->format('l'));
+            $isWeekend = isset($weeklySchedule[$dayName]) && strtolower($weeklySchedule[$dayName]) === 'closed';
+            if ($isWeekend) { $totalWeekends++; continue; }
+            if (!in_array($d->format('Y-m-d'), $holidayDates)) $totalWorkingDays++;
+        }
+        $totalWorkingDays = max($totalWorkingDays - 1, 0);
+
+        $generated = 0;
+        $skipped   = 0;
+        $errors    = [];
+
+        foreach ($employeesData as $row) {
+            $empId = $row['emp_id'];
+
+            // Skip if payslip already exists
+            $exists = DB::table('user_payslip')
+                ->where('user_emp_id', $empId)
+                ->where('financial_year', $financialYear)
+                ->where('month', $monthNum)
+                ->exists();
+
+            if ($exists) { $skipped++; continue; }
+
+            try {
+                $gross      = (float)($row['gross_salary']      ?? 0);
+                $basic      = (float)($row['basic_salary']       ?? 0);
+                $pf         = (float)($row['pf']                 ?? 0);
+                $esi        = (float)($row['esi']                ?? 0);
+                $pt         = (float)($row['ptax']               ?? 0);
+                $tds        = (float)($row['tds']                ?? 0);
+                $loan       = (float)($row['loan']               ?? 0);
+                $lwf        = (float)($row['lwf']                ?? 0);
+                $perfBonus  = (float)($row['performance_bonus']  ?? 0);
+                $overtime   = (float)($row['overtime']           ?? 0);
+                $net        = (float)($row['net_salary']         ?? 0);
+                $hra        = round($basic * 0.5, 2);
+                $conveyance = 1600;
+                $medAllowance = 1250;
+                $specialAllowance = max($gross - ($basic + $hra + $medAllowance + $conveyance), 0);
+                $totalEarnings = $basic + $hra + $conveyance + $medAllowance + $specialAllowance + $perfBonus + $overtime;
+                $totalDeductions = $pf + $esi + $pt + $tds + $loan + $lwf;
+
+                // Payslip number — matches the format used in checkPayslip
+                $payslipNo = 'PS/' . ($row['employee_id'] ?? $empId) . '/' . str_pad($monthNum, 2, '0', STR_PAD_LEFT) . $year;
+
+                // -------------------------------------------------------
+                // Build the SAME structure as generate-payslip.blade.php
+                // savePayslip stores: { visible_data: finalSalaryJson, raw_api_response: empResponse, ... }
+                // finalSalaryJson = fullPayslipJson from JS which has all sections at top level
+                // -------------------------------------------------------
+                $finalSalaryJson = [
+                    // Meta
+                    'payslip_no'     => $payslipNo,
+                    'financial_year' => $financialYear,
+                    'month'          => $monthNum,
+                    'generate_date'  => now()->toDateString(),
+                    'notes'          => '',
+                    'created_at'     => now()->toISOString(),
+
+                    // Employee details (matches generate-payslip employee object)
+                    'employee_details' => [
+                        'name'               => $row['name']        ?? '',
+                        'employee_id'        => $row['employee_id'] ?? '',
+                        'empId'              => $empId,
+                        'dept_name'          => '',
+                        'designation_name'   => $row['designation_name'] ?? '',
+                        'joining_date'       => '',
+                        'epf_no'             => '',
+                        'bank_name'          => '',
+                        'bank_branch'        => '',
+                        'ifsc'               => '',
+                        'account_holder_name'=> '',
+                        'account_number'     => '',
+                        'pan_number'         => '',
+                        'aadhaar_number'     => '',
+                    ],
+
+                    // Month details
+                    'month_details' => [
+                        'total_days'         => $firstDay->daysInMonth,
+                        'total_working_days' => $totalWorkingDays,
+                        'total_holidays'     => $totalHolidays,
+                        'total_weekends'     => $totalWeekends,
+                        'month_name'         => $monthNames[$monthNum] ?? '',
+                        'financial_year'     => $financialYear,
+                    ],
+
+                    // Attendance details (no per-employee attendance in bulk)
+                    'attendance_details' => [
+                        'total_present'             => 0,
+                        'total_present_on_time'     => 0,
+                        'total_present_late'        => 0,
+                        'total_early_logout'        => 0,
+                        'total_absent'              => 0,
+                        'total_leave_approved'      => 0,
+                        'total_holiday'             => $totalHolidays,
+                        'total_office_weekend'      => $totalWeekends,
+                        'total_overtime_hours'      => '00:00:00',
+                        'totalEarlyLogoutDeductionDays' => 0,
+                    ],
+
+                    // Salary details (matches salaryDetails from checkPayslip response)
+                    'salary_details' => [
+                        'gross_salary'       => $gross,
+                        'base_salary'        => $basic,
+                        'hra'                => $hra,
+                        'conveyance'         => $conveyance,
+                        'medical_allowance'  => $medAllowance,
+                        'special_bonus'      => $perfBonus,
+                        'total_addition'     => $totalEarnings,
+                        'provident_fund'     => $pf,   // read by PF list: $.visible_data.salary_details.provident_fund
+                        'esi'                => $esi,
+                        'ptax'               => $pt,
+                        'tds'                => $tds,
+                        'loan'               => $loan,
+                        'advance_amount'     => 0,
+                        'per_day_salary'     => round($gross / 30, 2),
+                        'lateDeductionDays'  => 0,
+                        'lwf_applicable'     => $lwf > 0 ? 1 : 0,
+                        'lwf_deduct'         => $lwf,
+                        'lwf_company_contribution' => 0,
+                    ],
+
+                    // Final salary calculation — the key section read by all report queries
+                    'final_salary_calculation' => [
+                        'basic_salary'           => $basic,
+                        'gross_salary'           => $gross,
+                        'hra'                    => $hra,
+                        'conveyance'             => $conveyance,
+                        'medical_allowance'      => $medAllowance,
+                        'special_allowance'      => $specialAllowance,
+                        'performance_bonus'      => $perfBonus,
+                        'overtime_payment'       => $overtime,
+                        'total_earnings'         => $totalEarnings,
+                        'provident_fund'         => $pf,
+                        'esi'                    => $esi,
+                        'ptax'                   => $pt,
+                        'tds'                    => $tds,
+                        'loan'                   => $loan,
+                        'lop'                    => 0,
+                        'lwf_applicable'         => $lwf > 0 ? 1 : 0,
+                        'lwf_deduct'             => $lwf,
+                        'lwf_company_contribution' => 0,
+                        'total_deductions'       => $totalDeductions,
+                        'net_salary'             => $net,
+                        'in_words'               => '',
+                        'generated_at'           => now()->toISOString(),
+                    ],
+                ];
+
+                // Outer wrapper — matches what savePayslip stores
+                $payslipData = [
+                    'payslip_no'       => $payslipNo,
+                    'employee_id'      => $empId,
+                    'financial_year'   => $financialYear,
+                    'month'            => $monthNum,
+                    'generate_date'    => now()->toDateString(),
+                    'notes'            => '',
+                    'visible_data'     => $finalSalaryJson,  // same key as savePayslip
+                    'raw_api_response' => [],
+                    'created_by'       => auth()->id(),
+                    'created_at'       => now()->toISOString(),
+                ];
+
+                $jsonToStore = json_encode($payslipData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+                DB::table('user_payslip')->insert([
+                    'payslip_no'               => $payslipNo,
+                    'user_emp_id'              => $empId,
+                    'financial_year'           => $financialYear,
+                    'month'                    => $monthNum,
+                    'payslip_text'             => '',
+                    'date'                     => now()->toDateString(),
+                    'emp_salary_slip_response' => $jsonToStore,
+                    'added_by'                 => $ownerId,
+                    'created_at'               => now(),
+                    'updated_at'               => now(),
+                ]);
+
+                $generated++;
+
+            } catch (\Exception $e) {
+                $errors[] = ['emp_id' => $empId, 'error' => $e->getMessage()];
+            }
+        }
+
+        return response()->json([
+            'success'   => true,
+            'generated' => $generated,
+            'skipped'   => $skipped,
+            'errors'    => $errors,
+            'message'   => "{$generated} payslip(s) generated successfully." . ($skipped ? " {$skipped} already existed." : ''),
+        ]);
+    }
+
 }
