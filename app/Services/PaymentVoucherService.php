@@ -130,14 +130,14 @@ class PaymentVoucherService
 					$propId = $sales->propId;
 					$date = $data['date'] ?? $sales->inv_date;
 					$invoiceNo = $id; //$sales->inv_num;
-					$partyType = 'Customer';
+					$partyType = $data['party_type'] ?? 'Customer';
 					//$partyId = $sales->customer_id ?? null;
 					//$partyName = $sales->cust_name ?? '';	
 					$partyId = $data['settlement_ledger_id'] ?? $sales->customer_id ?? null;
 					$partyName = $data['settlement_ledger_name']?? $sales->cust_name ?? '';
 					
 					$amount = $currentPayment;
-					$transactionDetails = '';
+					/*$transactionDetails = '';
 					if (($sales->due_amount ?? 0) <= 0)
 					{
 						$transactionDetails = 'Against Invoice';
@@ -145,7 +145,8 @@ class PaymentVoucherService
 					else
 					{
 						$transactionDetails = 'Advance Payment';
-					}
+					}*/
+					$transactionDetails = $data['transaction_details'] ?? (($sales->due_amount ?? 0) <= 0 ? 'Against Invoice' : 'Advance Payment');
 					$creditDebit = 'Credit';
 					$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $sales->mode_of_pay ?? null);
 					$bankId = $data['bank_id'] ?? null;
@@ -270,14 +271,14 @@ class PaymentVoucherService
 				$propId = $purchase->propId;
 				$date = $data['date'] ?? $purchase->inv_date;
 				$invoiceNo = $id; //$purchase->inv_num;
-				$partyType = 'Vendor';
+				$partyType = $data['party_type'] ?? 'Vendor';
 				//$partyId = $purchase->vendor_id ?? null;
 				//$partyName = $purchase->vendor_name ?? '';
 				$partyId = $data['settlement_ledger_id'] ?? $purchase->vendor_id ?? null;
 				$partyName = $data['settlement_ledger_name']?? $purchase->vendor_name ?? '';
 
 				$amount = $currentPayment;
-				$transactionDetails = '';
+				/*$transactionDetails = '';
 				if (($purchase->due_amount ?? 0) <= 0)
 				{
 					$transactionDetails = 'Against Invoice';
@@ -285,7 +286,8 @@ class PaymentVoucherService
 				else
 				{
 					$transactionDetails = 'Advance Payment';
-				}
+				}*/
+				$transactionDetails = $data['transaction_details'] ?? (($purchase->due_amount ?? 0) <= 0 ? 'Against Invoice' : 'Advance Payment');
 				$creditDebit = 'Debit';
 				$paymentMode = $this->getPaymentMode($data['payment_mode'] ?? $purchase->mode_of_pay ?? null);
 				$bankId = $data['bank_id'] ?? null;
@@ -339,6 +341,7 @@ class PaymentVoucherService
 				// Vendor -> Employee -> Other
 				// ==========================================
 				if ($addFlag == 1) {
+					$partyType = $data['party_type'] ?? 'Vendor';
 					$partyId = $data['settlement_ledger_id'] ?? null;
 					$partyName = $data['settlement_ledger_name'] ?? '';
 				}
@@ -363,13 +366,24 @@ class PaymentVoucherService
 				// ==========================================
 
 				$amount = $currentPayment;
-				$transactionDetails = '';
+				/*$transactionDetails = '';
 				if (strtolower($expense->payment_status) == 'full') {
 					$transactionDetails = 'Expense Payment';
 				} else if (strtolower($expense->payment_status) == 'advance') {
 					$transactionDetails = 'Advance Payment';
 				}else{	
 					$transactionDetails = 'Against Invoice';
+				}*/
+				if (!empty($data['transaction_details'])) {
+					$transactionDetails = $data['transaction_details'];
+				} elseif (strtolower($expense->payment_status ?? '') == 'full') {
+					$transactionDetails = 'Expense Payment';
+				} elseif (strtolower($expense->payment_status ?? '') == 'advance') {
+					$transactionDetails = 'Advance Payment';
+				} elseif (($expense->due_amount ?? 0) > 0) {
+					$transactionDetails = 'Against Invoice';
+				} else {
+					$transactionDetails = 'Expense Payment';
 				}
 				
 				if ($addFlag == 0 && $expense->payment_status == 'due') {

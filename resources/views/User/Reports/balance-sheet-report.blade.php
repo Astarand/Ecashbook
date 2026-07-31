@@ -477,6 +477,7 @@
 								tds_payable: "TDS Payable",
 								pf_payable: "PF Payable",
 								esi_payable: "ESI Payable",
+								ptax_payable: "PTAX Payable",
 								lwf_payable: "LWF Payable",
 								short_term_loans: "Short-term Loans",
 								interest_payable: "Interest Payable",

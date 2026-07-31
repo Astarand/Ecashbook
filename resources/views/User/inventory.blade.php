@@ -28,48 +28,80 @@
     </div>
   </div>
   <!-- [ breadcrumb ] end -->
-  @php
-    // Default buss_type = service if not present in request
-    $bussType = request()->get('buss_type', 'service');
-@endphp
-	<form method="GET"
-		  action="{{ route('user.Inventory') }}"
-		  class="mb-3 d-flex justify-content-end align-items-center inv-nature-filter">
+	@php
+		// Default buss_type = service if not present in request
+		$bussType = request()->get('buss_type', 'service');
+	@endphp
+	<div class="card shadow-sm border-0 mb-4">
+		<div class="card-body py-3">
 
-		<!--<div class="form-check form-check-inline">
-			<input class="form-check-input"
-				   type="radio"
-				   name="buss_type"
-				   id="service"
-				   value="service"
-				   onchange="this.form.submit()"
-				   {{ $bussType == 'service' ? 'checked' : '' }}>
-			<label class="form-check-label" for="service">Service Provider</label>
-		</div>-->
+			<form method="GET"
+				  action="{{ route('user.Inventory') }}"
+				  class="row align-items-end g-3">
 
-		<div class="form-check form-check-inline">
-			<input class="form-check-input"
-				   type="radio"
-				   name="buss_type"
-				   id="trading"
-				   value="product"
-				   onchange="this.form.submit()"
-				   {{ $bussType == 'product' ? 'checked' : 'checked' }}>
-			<label class="form-check-label" for="trading">Trading / Reseller</label>
+				<!-- Financial Year -->
+				<div class="col-lg-3 col-md-4">
+					<label class="form-label fw-semibold mb-1">
+						Financial Year
+					</label>
+
+					<select class="form-select"
+							name="financial_year"
+							onchange="this.form.submit()">
+						@foreach($financialYears as $fy)
+							<option value="{{ $fy }}"
+								{{ $selectedFY == $fy ? 'selected' : '' }}>
+								{{ $fy }}
+							</option>
+						@endforeach
+					</select>
+				</div>
+
+				<!-- Business Type -->
+				<div class="col-lg-9 col-md-8">
+
+					<label class="form-label fw-semibold mb-2">
+						Business Nature
+					</label>
+
+					<div class="d-flex flex-wrap gap-3">
+
+						<div class="form-check">
+							<input class="form-check-input"
+								   type="radio"
+								   name="buss_type"
+								   id="trading"
+								   value="product"
+								   onchange="this.form.submit()"
+								   {{ $bussType == 'product' ? 'checked' : '' }}>
+
+							<label class="form-check-label" for="trading">
+								Trading / Reseller
+							</label>
+						</div>
+
+						<div class="form-check">
+							<input class="form-check-input"
+								   type="radio"
+								   name="buss_type"
+								   id="mixed"
+								   value="mixed"
+								   onchange="this.form.submit()"
+								   {{ $bussType == 'mixed' ? 'checked' : '' }}>
+
+							<label class="form-check-label" for="mixed">
+								Mixed Nature
+							</label>
+						</div>
+
+					</div>
+
+				</div>
+
+			</form>
+
 		</div>
-
-		<div class="form-check form-check-inline">
-			<input class="form-check-input"
-				   type="radio"
-				   name="buss_type"
-				   id="mixed"
-				   value="mixed"
-				   onchange="this.form.submit()"
-				   {{ $bussType == 'mixed' ? 'checked' : '' }}>
-			<label class="form-check-label" for="mixed">Mixed Nature</label>
-		</div>
-
-	</form>
+	</div>
 
 
 
@@ -118,38 +150,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- 4. Total Purchase Credit Notes Value -->
-        <div class="col-md-2-4 col-lg-2-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center p-3">
-                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                        style="width: 50px; height: 50px;">
-                        <i class="ph-duotone ph-plus-circle text-warning" style="font-size: 1.5rem;"></i>
-                    </div>
-                    <h4 class="mb-2 fw-bold text-warning" id="purchaseCreditValue">₹{{ number_format($purchaseCredit,2) }}</h4>
-                    <p class="mb-0 text-muted small fw-semibold">Purchase Credit</p>
-                    <small class="text-muted" style="font-size: 0.7rem;">Credit Notes</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5. Total Sales Debit Notes Value -->
-        <div class="col-md-2-4 col-lg-2-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center p-3">
-                    <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                        style="width: 50px; height: 50px;">
-                        <i class="ph-duotone ph-receipt text-info" style="font-size: 1.5rem;"></i>
-                    </div>
-                    <h4 class="mb-2 fw-bold text-info" id="salesDebitValue">₹{{ number_format($salesDebit,2) }}</h4>
-                    <p class="mb-0 text-muted small fw-semibold">Sales Debit</p>
-                    <small class="text-muted" style="font-size: 0.7rem;">Debit Notes</small>
-                </div>
-            </div>
-        </div>
-
-        <!-- Row 2: 5 Boxes -->
 
         <!-- 6. Total Sales Credit Notes Value -->
         <div class="col-md-2-4 col-lg-2-4">
@@ -515,6 +515,31 @@
     </div>
   </div>
 </div>
+
+<style>
+.form-check {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 0;
+    transition: all .2s ease;
+}
+
+.form-check:hover {
+    background: #eef5ff;
+    border-color: #0d6efd;
+}
+
+.form-check-input:checked ~ .form-check-label {
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+.form-label {
+    font-size: 14px;
+}
+</style>
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {

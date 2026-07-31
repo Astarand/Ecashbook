@@ -154,6 +154,27 @@ class BalanceSheetService
 			}
 		}
 		
+		// PTAX Payable
+		if ($type == 'ptax_payable') {
+
+			$records = DB::table('user_payslip')
+				->whereBetween('date', [$startDate, $endDate])
+				->where(function ($query) {
+						$query->whereNull('ptax_payment_status')
+							  ->orWhere('ptax_payment_status', 'Pending');
+					})
+				->get();
+
+			$amount = 0;
+
+			foreach ($records as $row) {
+				$data = json_decode($row->emp_salary_slip_response, true);
+				if (($data['created_by'] ?? 0) == $userId) {
+					$amount += (float) ($data['visible_data']['final_salary_calculation']['ptax'] ?? 0);
+				}
+			}
+		}
+		
 		// LWF Payable
 		if ($type == 'lwf_payable') {
 
@@ -458,30 +479,47 @@ class BalanceSheetService
 		|--------------------------------------------------------------------------
 		*/
 		if ($type == 'Inventories') {
-
-			// OPTION 1: Stock valuation from sales (COST approach like COGS inverse)
-			$soldQtyValue = DB::table('sales_values as sv')
-				->join('sales as s', 's.id', '=', 'sv.sid')
-				->join('products as p', 'p.id', '=', 'sv.prod_id')
-				->where('s.added_by', $userId)
-				->whereBetween('s.inv_date', [$startDate, $endDate])
-				->selectRaw("
-					COALESCE(SUM(sv.quantity * p.purchase_price), 0) as consumed_stock
-				")
-				->value('consumed_stock');
-
-			// OPTION 2: Opening stock from purchases (inventory creation)
-			$purchaseStock = DB::table('purchase_values as pv')
+			
+			$purchaseQty = DB::table('purchase_values as pv')
 				->join('purchases as p', 'p.id', '=', 'pv.sid')
 				->where('p.added_by', $userId)
 				->whereBetween('p.inv_date', [$startDate, $endDate])
-				->selectRaw("
-					COALESCE(SUM(pv.quantity * pv.rate), 0) as stock_in
-				")
-				->value('stock_in');
+				->select(
+					'pv.prod_id',
+					DB::raw('SUM(pv.quantity) as purchase_qty')
+				)
+				->groupBy('pv.prod_id');
 
-			// FINAL INVENTORY VALUE (simple model)
-			$amount = max(0, $purchaseStock - $soldQtyValue);
+			$soldQty = DB::table('sales_values as sv')
+				->join('sales as s', 's.id', '=', 'sv.sid')
+				->where('s.added_by', $userId)
+				->whereBetween('s.inv_date', [$startDate, $endDate])
+				->select(
+					'sv.prod_id',
+					DB::raw('SUM(sv.quantity) as sold_qty')
+				)
+				->groupBy('sv.prod_id');
+
+			$amount = DB::table('products as p')
+				->leftJoinSub($purchaseQty, 'pq', function ($join) {
+					$join->on('p.id', '=', 'pq.prod_id');
+				})
+				->leftJoinSub($soldQty, 'sq', function ($join) {
+					$join->on('p.id', '=', 'sq.prod_id');
+				})
+				->where('p.added_by', $userId)
+				->where('p.item_type', 'product')
+				->selectRaw("
+					SUM(
+						GREATEST(
+							p.opening_stock_bal
+							+ COALESCE(pq.purchase_qty,0)
+							- COALESCE(sq.sold_qty,0),
+							0
+						) * p.selling_price
+					) as inventory_value
+				")
+				->value('inventory_value');
 		}
 
 		return $amount;

@@ -238,7 +238,7 @@
                                             </li>
 											@endif
 											@if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
-												@if ($sale->pay_status == 'Due')
+												@if ($sale->pay_status != 'Full')
 												<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Third Party Settlement">
 													<a href="javascript:void(0);" title="Third Party Settlement"
 															class="btn btn-sm btn-warning settlement-btn"

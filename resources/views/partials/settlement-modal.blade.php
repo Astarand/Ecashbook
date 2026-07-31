@@ -75,15 +75,47 @@
                             <label class="form-label">
                                 Settlement Amount
                             </label>
-                            <input type="number"
-                                   step="0.01"
-                                   min="0"
-                                   name="settlement_amount"
-                                   id="settlement_amount"
-                                   class="form-control"
-								   readonly
-                                   required>
+                            <input type="number" step="0.01" min="0" name="settlement_amount" id="settlement_amount" class="form-control" required>
                         </div>
+						
+						<!-- Settlement Date -->
+						<div class="col-md-6 mb-3">
+							<label class="form-label">
+								Date <span class="text-danger">*</span>
+							</label>
+							<input type="date"
+								   name="settlement_date"
+								   id="settlement_date"
+								   class="form-control"
+								   value="{{ date('Y-m-d') }}"
+								   required>
+						</div>
+
+						<!-- Party Type -->
+						<div class="col-md-6 mb-3">
+							<label class="form-label">
+								Party Type <span class="text-danger">*</span>
+							</label>
+							<select name="party_type" id="party_type" class="form-select" required >
+								<option value="">-- Select Party Type --</option>
+								<option value="Customer">Customer</option>
+								<option value="Vendor">Vendor</option>
+								<option value="Director">Director/Partner</option>
+								<option value="Employee">Employee</option>
+								<option value="Group Company">Group Company</option>
+								<option value="Other">Other</option>
+							</select>
+						</div>
+
+						<!-- Party Name -->
+						<div class="col-md-6 mb-3">
+							<label class="form-label">
+								Party Name <span class="text-danger">*</span>
+							</label>
+							<select name="settlement_ledger_id" id="settlement_ledger_id" class="form-select" required>
+									<option value="">-- Select Settlement Ledger --</option>
+							</select>
+						</div>
 						
 						<!-- Payment Mode -->
 						<div class="col-md-6 mb-3">
@@ -120,34 +152,11 @@
 
                     <!-- Third Party Section -->
 
-                    <div id="thirdPartySettlementBox"
-                         style="display:none;">
+                    <div id="thirdPartySettlementBox">
 
                         <div class="row">
-
-                            <!-- Settlement Ledger -->
-							<div class="col-md-6 mb-3">
-
-								<label class="form-label">
-									Settlement Ledger <span class="text-danger">*</span>
-								</label>
-
-								<select name="settlement_ledger_id"
-										id="settlement_ledger_id"
-										class="form-select"
-										required>
-
-									<option value="">-- Select Settlement Ledger --</option>
-
-								</select>
-
-							</div>
-
 							<!-- Other Settlement Ledger -->
-							<div class="col-md-6 mb-3"
-								 id="otherSettlementLedgerBox"
-								 style="display:none;">
-
+							<div class="col-md-6 mb-3" id="otherSettlementLedgerBox" style="display:none;">
 								<label class="form-label">
 									Settlement Ledger Name <span class="text-danger">*</span>
 								</label>
@@ -157,7 +166,6 @@
 									   id="other_settlement_ledger"
 									   class="form-control"
 									   placeholder="Enter settlement ledger name">
-
 							</div>
 
 
@@ -166,10 +174,7 @@
                                 <label class="form-label">
                                     Settlement Reason
                                 </label>
-                                <input type="text"
-                                       name="settlement_reason"
-                                       class="form-control"
-                                       placeholder="Enter settlement reason">
+                                <input type="text" name="settlement_reason" id="settlement_reason" class="form-control" placeholder="Enter settlement reason">
 
                             </div>
 
@@ -221,10 +226,7 @@
 			},
 			success: function (response) {
 				if (response.success) {
-					$('#settlement_amount').val(
-						parseFloat(response.amount || 0).toFixed(2)
-					);
-
+					$('#settlement_amount').val(parseFloat(response.amount || 0).toFixed(2));
 				} else {
 					$('#settlement_amount').val('');
 				}
@@ -234,145 +236,51 @@
 			}
 		});
 
+		$('input[name="settlement_mode"][value="Self"]').prop('checked', true);
 
-		// ==========================================
-		// DEFAULT SETTLEMENT MODE = SELF
-		// ==========================================
-
-		$('input[name="settlement_mode"][value="Self"]')
-			.prop('checked', true);
-
-		$('input[name="settlement_mode"][value="Third Party"]')
-			.prop('checked', false);
-
-
-		// Hide Third Party section
-		$('#thirdPartySettlementBox').hide();
-
+		$('input[name="settlement_mode"][value="Third Party"]').prop('checked', false);
 
 		// Reset Settlement Ledger
-		$('#settlement_ledger_id')
-			.val('')
-			.prop('required', false);
-
-
-		// Reset Other Ledger
+		$('#party_type').val('');
+		$('#settlement_ledger_id').val('');
+		$('#settlement_payment_mode').val('');
+		$('#settlement_bank_id').val('');
+		$('#settlement_reason').val('');
 		$('#otherSettlementLedgerBox').hide();
-
-		$('#other_settlement_ledger')
-			.val('')
-			.prop('required', false);
-
-
-		// ==========================================
-		// LOAD SETTLEMENT LEDGERS
-		// ==========================================
-
-		const $ledger = $('#settlement_ledger_id');
-
-		$ledger.html(
-			'<option value="">Loading...</option>'
-		);
-
-
-		$.ajax({
-
-			url: '/settlement/ledgers',
-
-			type: 'GET',
-
-			data: {
-				module_type: moduleType
-			},
-
-			success: function (response) {
-
-				$ledger.empty();
-
-				$ledger.append(
-					'<option value="">-- Select Settlement Ledger --</option>'
-				);
-
-				// Other should be first
-				$ledger.append(
-					'<option value="other">Other</option>'
-				);
-
-				$.each(response.data, function (index, item) {
-
-					$ledger.append(
-						$('<option>', {
-							value: item.id,
-							text: item.name
-						})
-					);
-
-				});
-
-			},
-
-			error: function () {
-
-				$ledger.html(
-					'<option value="">Unable to load settlement ledgers</option>'
-				);
-
-			}
-
-		});
-
-
-		// ==========================================
-		// SHOW MODAL
-		// ==========================================
+		$('#other_settlement_ledger').val('').prop('required', false);
 
 		$('#settlementModal').modal('show');
 
 	});
 	
-	$(document).on('change', '#settlement_ledger_id', function () {
+	$('#party_type').change(function () {
 
-		if ($(this).val() === 'other') {
-
-			$('#otherSettlementLedgerBox').slideDown();
-
-			$('#other_settlement_ledger')
-				.prop('required', true);
-
+		if ($(this).val() === 'Other') {
+			$('#otherSettlementLedgerBox').show();
+			$('#other_settlement_ledger').prop('required', true);
+			$('#settlement_ledger_id').val('').prop('required', false);
 		} else {
-
-			$('#otherSettlementLedgerBox').slideUp();
-
-			$('#other_settlement_ledger')
-				.val('')
-				.prop('required', false);
-
+			$('#otherSettlementLedgerBox').hide();
+			$('#other_settlement_ledger').prop('required', false).val('');
+			$('#settlement_ledger_id').val('').prop('required', true);
 		}
+		
+		$.get('/settlement/ledgers', {
+			party_type: $(this).val()
+		}, function (res) {
+
+			let html = '<option value="">Select Party</option>';
+
+			$.each(res.data, function(i, row) {
+				html += `<option value="${row.id}" data-party_name="${row.name}">${row.name}</option>`;
+			});
+
+			$('#settlement_ledger_id').html(html);
+
+		});
 
 	});
 
-
-	// Settlement Mode Change
-	$(document).on('change','input[name="settlement_mode"]',function () {
-
-		if ($(this).val() === 'Third Party') {
-
-			$('#thirdPartySettlementBox').slideDown();
-
-			$('#settlement_ledger_id')
-				.prop('required', true);
-
-		} else {
-
-			$('#thirdPartySettlementBox').slideUp();
-
-			$('#settlement_ledger_id')
-				.prop('required', false)
-				.val('');
-
-		}
-
-	});
 	
 	// ==========================================
 	// PAYMENT MODE CHANGE
@@ -428,7 +336,6 @@
 		e.preventDefault();
 		
 		const settlementMode = $('input[name="settlement_mode"]:checked').val();
-		// Self settlement is not allowed
 		if (settlementMode === 'Self') {
 			showToast(
 				'Please select Third Party Settlement before submitting.',
@@ -436,11 +343,16 @@
 			);
 			return false;
 		}
+		
+		// Get selected party name
+		let partyName = $('#settlement_ledger_id option:selected').data('party_name') || '';
+		let formData = $(this).serialize();
+		formData += '&party_name=' + encodeURIComponent(partyName);
 
 		$.ajax({
 			url: '/settlement/store',
 			type: "POST",
-			data: $(this).serialize(),
+			data: formData,
 			success: function(response) {
 
 				if (response.success) {

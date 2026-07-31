@@ -45,6 +45,9 @@
                     <a href="{{ route('payroll.payslip_update') }}" class="btn btn-primary float-end">
                         Update Payslip
                     </a>
+                    <a href="{{ route('payroll.multiplePayslipGenerate') }}" class="btn btn-primary float-end">
+                        Multiple Payslip Generate
+                    </a>
                 </div>
             </div>
         </div>

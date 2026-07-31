@@ -24,13 +24,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Services\JournalService;
 use App\Services\PaymentVoucherService;
+use App\Services\ProfitLossService;
 
 class OtherIncomeController extends Controller
 {
-	public function __construct(JournalService $journalService, PaymentVoucherService $paymentVoucherService = null)
+	public function __construct(JournalService $journalService, PaymentVoucherService $paymentVoucherService = null,ProfitLossService $profitLossService)
     {
         $this->journalService = $journalService;
 		$this->paymentVoucherService = $paymentVoucherService;
+		$this->profitLossService = $profitLossService;
     }
 	
     public function OtherIncomeList(request $request)
@@ -531,66 +533,47 @@ class OtherIncomeController extends Controller
 
         return response()->json(['message' => 'Income deleted successfully']);
     }
+	
+	public function getIncomeData(Request $request)
+	{
+		$userId = currentOwnerId();
 
-    public function getIncomeData(Request $request)
-    {
-        $userId = currentOwnerId();
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
-			
 			$userId = getAccessCompanyId($request);
-			
 		}
 
-        $incomeType = $request->input('incomeType');
-        $fromDate = $request->input('fromDate');
-        $toDate = $request->input('toDate');
+		$incomeType = $request->incomeType;
+		$fromDate   = $request->fromDate;
+		$toDate     = $request->toDate;
 
-		$fullPayments = DB::table('sales')
-						->where('added_by', $userId)
-						->whereBetween('created_at', [$fromDate, $toDate])
-						// ->where('pay_status', 'Full')
-						->get();
+		// ================= SALES INCOME =================
+		$salesIncome = DB::table('sales_values as sv')
+			->join('sales as s', 's.id', '=', 'sv.sid')
+			->where('s.added_by', $userId)
+			->whereBetween('s.inv_date', [$fromDate, $toDate])
+			->sum(DB::raw('sv.amount'));
 
-		$totalIncome =0;
+		// ======Gross Sales Income = Total Sales Revenue (before returns and discounts)========
+		$grossIncome = $salesIncome;
+		// ======Net Income = Profit Before Tax − Income Tax================
+		$periodType = 'full-yearly';
+		$pbt = $this->profitLossService->calculatePL($fromDate, $toDate, $userId, $periodType)['pbt'] ?? 0;
+		$incomeTax = $this->profitLossService->calculatePL($fromDate, $toDate, $userId, $periodType)['tax']['current_tax'] ?? 0;
+		$netIncome = $pbt - $incomeTax;
 
-		foreach ($fullPayments as $payment) {
-
-				$totalIncome += DB::table('sales_values')
-								->where('sid', $payment->id)
-								->sum(DB::raw('amount + tax_amt'));
-
+		if ($incomeType == 'gross_income') {
+			$income = $grossIncome;
+			$incomeType = 'Gross Income';
+		} else {
+			$income = $netIncome;
+			$incomeType = 'Net Income';
 		}
 
-        if ($incomeType == 'gross_income') {
-
-            $incomeType='Gross Income';
-            $income = $totalIncome;
-        } else {
-            $vouchers = DB::table('vouchers')
-                            ->where('added_by', $userId)
-                            ->where('note_type', 'Credit')
-                            ->whereBetween('created_at', [$fromDate, $toDate])
-                            ->sum(DB::raw('credit_debit_amount + adjusted_amount'));
-                            // ->where('pay_status', 'Full')
-                            //->get();
-
-
-                            // ->where('pay_status', 'Full')
-            $total_discound = '0';
-			foreach ($fullPayments as $payment) {
-
-				$total_discound += DB::table('sales_values')
-								->where('sid', $payment->id)
-								->sum('disc_amt');;
-
-			}
-
-            $income = $totalIncome - ($vouchers + $total_discound);
-            $incomeType='Net Income';
-        }
-
-        return response()->json(['income' => number_format($income, 2, '.', ''), 'incomeType'=> $incomeType]);
-    }
+		return response()->json([
+			'income' => number_format($income, 2, '.', ''),
+			'incomeType' => $incomeType
+		]);
+	}
 	
 	public function journalEntry($id)
 	{

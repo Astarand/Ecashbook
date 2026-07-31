@@ -377,7 +377,9 @@ class BalanceSheetController extends Controller
 			'tds_payable',
 			'pf_payable',
 			'esi_payable',
+			'ptax_payable',
 			'lwf_payable',
+			'output_gst',
 			'short_term_loans',
 			'interest_payable',
 		];
@@ -740,7 +742,9 @@ class BalanceSheetController extends Controller
 				'tds_payable'           => (float) $request->tds_payable,
 				'pf_payable'            => (float) $request->pf_payable,
 				'esi_payable'           => (float) $request->esi_payable,
+				'ptax_payable'          => 0,
 				'lwf_payable'           => 0,
+				'output_gst'            => 0,
 				'short_term_loans'      => (float) $request->short_term_loans,
 				'interest_payable'      => (float) $request->interest_payable,
 			];

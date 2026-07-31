@@ -91,7 +91,7 @@
                             </h4>
                         </div>
                         <div class="card-body">
-                            <h1 class="text-success text-center my-5" id="totalAmount">₹{{ number_format($totalIncome,2) }}</h1>
+                            <h1 class="text-success text-center my-5" id="totalAmount">₹0.00</h1>
                         </div>
                     </div>
                 </div>
@@ -314,28 +314,48 @@
         var fromDate = $('#from_date').val();
         var toDate = $('#to_date').val();
         var base_url = $("#base_url").val();
+		
+		if (!incomeType) {
+			showToast("Please select Income Type.", "error");
+			return false;
+		}
+
+		if (!fromDate) {
+			showToast("Please select From Date.", "error");
+			$('#from_date').focus();
+			return false;
+		}
+
+		if (!toDate) {
+			showToast("Please select To Date.", "error");
+			$('#to_date').focus();
+			return false;
+		}
+
+		if (new Date(fromDate) > new Date(toDate)) {
+			showToast("From Date cannot be greater than To Date.", "error");
+			$('#from_date').focus();
+			return false;
+		}
 
         var requestData = {
             incomeType: incomeType,
             fromDate: fromDate,
             toDate: toDate
         };
-
+		$("#loader").show();
         $.ajax({
             url: "/GetIncomeData",
             method: 'POST',
             data: requestData,
             success: function(response) {
-                // Handle the successful response
-                // alert('Income: ' + response.income); 
-                console.log(response);
-
+                $("#loader").hide();
                 $('#totalAmount').html('₹' + response.income);
                 $('#invoiceType').html(response.incomeType);
 
             },
             error: function(xhr, status, error) {
-                // Handle any errors that occurred
+                $("#loader").hide();
                 alert('An error occurred: ' + xhr.responseText);
             }
         });

@@ -68,8 +68,8 @@ class ProfitLossController extends Controller
 		// Previous period
 		[$prevStartDate, $prevEndDate] = $this->getPreviousDateRange($startDate, $endDate, $period_type);
 
-		$pYearData = $this->profitLossService->calculatePL($prevStartDate, $prevEndDate, $userId, $period_type);
 		$cYearData = $this->profitLossService->calculatePL($startDate, $endDate, $userId, $period_type);
+		$pYearData = $this->profitLossService->calculatePL($prevStartDate, $prevEndDate, $userId, $period_type);
 
         return response()->json([
             'success' => true,

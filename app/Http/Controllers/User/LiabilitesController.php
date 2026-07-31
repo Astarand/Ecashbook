@@ -1856,6 +1856,28 @@ class LiabilitesController extends Controller
 				}
 			}
 		}
+		
+		// PTAX Payable
+		if ($type == 'ptax_payable') {
+
+			$records = DB::table('user_payslip')
+				->whereBetween('date', [$startDate, $endDate])
+				->where(function ($query) {
+						$query->whereNull('ptax_payment_status')
+							  ->orWhere('ptax_payment_status', 'Pending');
+					})
+				->get();
+
+			$amount = 0;
+
+			foreach ($records as $row) {
+				$data = json_decode($row->emp_salary_slip_response, true);
+				// Match created_by from JSON
+				if (($data['created_by'] ?? 0) == $userId) {
+					$amount += $data['visible_data']['final_salary_calculation']['ptax'] ?? 0;
+				}
+			}
+		}
 
 		// GST Payable
 		if ($type == 'gst_payable') {

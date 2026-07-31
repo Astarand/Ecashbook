@@ -361,10 +361,16 @@ class ProfitLossService
 				$serviceCr = $row->credit;
 			}
 		}
+		
+		$manualCredit = DB::table('vouchers')
+							->where('added_by', $userId)
+							->whereRaw("LOWER(note_type) = 'credit'")
+							->whereBetween('inv_date', [$startDate, $endDate])
+							->sum(DB::raw('COALESCE(taxable_value, 0)'));
 
 		$totalReseller = ($totalReseller - $productCr);
 		$totalService  = ($totalService - $serviceCr);
-		$profit_sale = $totalReseller + $totalService;
+		$profit_sale = $totalReseller + $totalService - $manualCredit;
 
 		/* ================================
 		 | OTHER INCOME - TDS amount
@@ -495,17 +501,25 @@ class ProfitLossService
 
 		$productPurchaseDr = 0;
 		$servicePurchaseDr = 0;
+
 		foreach ($purchaseVoucherAdjustments as $row) {
-			if ($row->item_type == 'product') {
-				$productPurchaseDr = $row->debit;
-			} elseif ($row->item_type == 'service') {
-				$servicePurchaseDr = $row->debit;
+			if (strtolower($row->item_type) === 'product') {
+				$productPurchaseDr += (float) $row->debit;
+			} elseif (strtolower($row->item_type) === 'service') {
+				$servicePurchaseDr += (float) $row->debit;
 			}
 		}
-		
-		$totalPurchaseVoucherDr = $productPurchaseDr + $servicePurchaseDr;
-		$purchases = (($itemTotal ?? 0) - $totalPurchaseVoucherDr); 
-		$totalPurchases = (($itemTotal ?? 0) - $totalPurchaseVoucherDr);
+		// ================= MANUAL PURCHASE DEBIT =================
+		$manualPurchaseDr = DB::table('voucher_purchases')
+							->where('added_by', $userId)
+							->whereRaw("LOWER(note_type) = 'debit'")
+							->whereBetween('inv_date', [$startDate, $endDate])
+							->sum(DB::raw('COALESCE(taxable_value, 0)'));
+
+		//$totalPurchaseVoucherDr = $productPurchaseDr + $servicePurchaseDr + $manualPurchaseDr;
+		$totalPurchaseVoucherDr = $manualPurchaseDr;
+		$purchases = ($itemTotal ?? 0) - $totalPurchaseVoucherDr;
+		$totalPurchases = $purchases;
 		//End Purchase credit/debit
 		
 		/*

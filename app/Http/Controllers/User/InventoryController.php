@@ -29,26 +29,28 @@ class InventoryController extends Controller
 			$userId = getAccessCompanyId($request);
 			$req_type = 1;
 		}
-		
 		//end ca-accountant access
+		
+		$financialYears = [];
+		for ($year = 2023; $year <= date('Y') + 2; $year++) {
+			$financialYears[] = $year . '-' . substr($year + 1, -2);
+		}
+		$currentYear = date('Y');
+		$currentMonth = date('m');
+		$currentFY = $currentMonth >= 4
+			? $currentYear . '-' . substr($currentYear + 1, -2)
+			: ($currentYear - 1) . '-' . substr($currentYear, -2);
+
+		$selectedFY = $request->financial_year ?? $currentFY;
+		$startYear = (int) substr($selectedFY, 0, 4);
+		$startFY = $startYear . '-04-01';
+		$endFY   = ($startYear + 1) . '-03-31';
 
 
 		// service / product / mixed
 		$bussType = $request->input('buss_type');
 		if (empty($bussType)) {
-			//$bussType = 'service';
 			$bussType = 'product';
-		}
-		
-		//CURRENT FINANCIAL YEAR
-		$year = date('Y');
-		$month = date('m');
-		if ($month >= 4) {
-			$startFY = $year . '-04-01';
-			$endFY   = ($year + 1) . '-03-31';
-		} else {
-			$startFY = ($year - 1) . '-04-01';
-			$endFY   = $year . '-03-31';
 		}
 
 		//INVENTORY INWARD (PURCHASES)
@@ -75,42 +77,24 @@ class InventoryController extends Controller
 
 		//PURCHASE DEBIT NOTES
 		$purchaseDebit = DB::table('voucher_purchases as vp')
-			->join('voucher_purchase_values as vpv', 'vpv.sid', '=', 'vp.id')
-			->where('vp.note_type','=', 'Debit')
-			->where('vp.added_by', $userId)
-			->whereBetween('vp.inv_date', [$startFY, $endFY])
-			->sum(DB::raw('(vpv.amount + vpv.tax_amt - vpv.disc_amt)'));
+						->where('vp.note_type', 'Debit')
+						->where('vp.added_by', $userId)
+						->whereBetween('vp.inv_date', [$startFY, $endFY])
+						->sum('vp.total_amt');
 
-		//PURCHASE CREDIT NOTES
-		$purchaseCredit = DB::table('voucher_purchases as vp')
-			->join('voucher_purchase_values as vpv', 'vpv.sid', '=', 'vp.id')
-			->where('vp.note_type','=', 'Credit')
-			->where('vp.added_by', $userId)
-			->whereBetween('vp.inv_date', [$startFY, $endFY])
-			->sum(DB::raw('(vpv.amount + vpv.tax_amt - vpv.disc_amt)'));
-
-		//SALES DEBIT NOTES
-		$salesDebit = DB::table('vouchers as v')
-			->join('vouchers_values as vv', 'vv.sid', '=', 'v.id')
-			->where('v.note_type','=', 'Debit')
-			->where('v.added_by', $userId)
-			->whereBetween('v.inv_date', [$startFY, $endFY])
-			->sum(DB::raw('(vv.amount + vv.tax_amt - vv.disc_amt)'));
-
-		//SALES CREDIT NOTES
+		//SALES CREDIT NOTES			
 		$salesCredit = DB::table('vouchers as v')
-			->join('vouchers_values as vv', 'vv.sid', '=', 'v.id')
-			->where('v.note_type','=', 'Credit')
-			->where('v.added_by', $userId)
-			->whereBetween('v.inv_date', [$startFY, $endFY])
-			->sum(DB::raw('(vv.amount + vv.tax_amt - vv.disc_amt)'));
+							->where('v.note_type', 'Credit')
+							->where('v.added_by', $userId)
+							->whereBetween('v.inv_date', [$startFY, $endFY])
+							->sum('v.total_amt');
 
 		//DIRECT EXPENSES
 		$directExpenses = DB::table('expenses')
 			->where('added_by', $userId)
 			->where('expense_cat', 'direct')
 			->whereBetween('expense_date', [$startFY, $endFY])
-			->sum('expense_amt');
+			->sum(DB::raw('(expense_amt + total_gst)'));
 
 		// INVENTORY WRITE-OFF / LOSS (purchase price + GST)
 		$writeOffs = DB::table('inventoryremovestocks as ir')
@@ -170,6 +154,7 @@ class InventoryController extends Controller
 		$totalSales = DB::table('sales_values as sv')
 					->join('sales as s', 's.id', '=', 'sv.sid')
 					->join('products as p', 'p.id', '=', 'sv.prod_id')
+					->whereBetween('s.inv_date', [$startFY, $endFY])
 					->where('s.added_by', $userId)
 					->when($bussType && $bussType != 'mixed', function($query) use ($bussType) {
 						$query->where('p.item_type', $bussType);
@@ -180,6 +165,7 @@ class InventoryController extends Controller
 		$totalCOGS = DB::table('products as p')
 				->join('sales_values as sv', 'sv.prod_id', '=', 'p.id')
 				->join('sales as s', 's.id', '=', 'sv.sid')
+				 ->whereBetween('s.inv_date', [$startFY, $endFY])
 				->where('p.added_by', $userId)
 				->where('s.added_by', $userId)
 				->when($bussType && $bussType != 'mixed', function($query) use ($bussType) {
@@ -188,87 +174,81 @@ class InventoryController extends Controller
 				->select(DB::raw('SUM(sv.quantity * p.purchase_price) as cogs'))
 				->value('cogs');
 	
-		$grossProfit = ($totalSales - $totalCOGS);
+		$grossProfit = (($totalSales - $salesCredit) - ($totalCOGS - $purchaseDebit));
 
 			
 		//Product listing
-		/*$items =  DB::table('products')
-							->select(DB::raw('products.*,company_profiles.comp_name'))
-							->leftJoin('company_profiles', 'products.added_by', '=', 'company_profiles.userId')
-							->where('added_by', '=', $userId)
-							->when($bussType && $bussType != 'mixed', function($query) use ($bussType) {
-								$query->where('item_type', $bussType);
-							})
-							->orderBy('created_at', 'DESC')->paginate(10);*/
-					$purchaseSub = DB::table('purchase_values')
-						->select('prod_id', DB::raw('SUM(quantity) as total_purchase_qty'))
-						->groupBy('prod_id');
+		$purchaseSub = DB::table('purchase_values as pv')
+			->join('purchases as p', 'p.id', '=', 'pv.sid')
+			->whereBetween('p.inv_date', [$startFY, $endFY])
+			->where('p.added_by', $userId)
+			->select(
+				'pv.prod_id',
+				DB::raw('SUM(pv.quantity) as total_purchase_qty')
+			)
+			->groupBy('pv.prod_id');
 
-					$salesSub = DB::table('sales_values')
-						->select('prod_id', DB::raw('SUM(quantity) as total_sales_qty'))
-						->groupBy('prod_id');
+		$salesSub = DB::table('sales_values as sv')
+			->join('sales as s', 's.id', '=', 'sv.sid')
+			->whereBetween('s.inv_date', [$startFY, $endFY])
+			->where('s.added_by', $userId)
+			->select(
+				'sv.prod_id',
+				DB::raw('SUM(sv.quantity) as total_sales_qty')
+			)
+			->groupBy('sv.prod_id');
 
-					$items = DB::table('products as p')
-						->leftJoin('company_profiles as cp', 'p.added_by', '=', 'cp.userId')
-						
-						->leftJoinSub($purchaseSub, 'pv', function ($join) {
-							$join->on('p.id', '=', 'pv.prod_id');
-						})
-						
-						->leftJoinSub($salesSub, 'sv', function ($join) {
-							$join->on('p.id', '=', 'sv.prod_id');
-						})
+		$items = DB::table('products as p')
+			->leftJoin('company_profiles as cp', 'p.added_by', '=', 'cp.userId')
+			
+			->leftJoinSub($purchaseSub, 'pv', function ($join) {
+				$join->on('p.id', '=', 'pv.prod_id');
+			})
+			
+			->leftJoinSub($salesSub, 'sv', function ($join) {
+				$join->on('p.id', '=', 'sv.prod_id');
+			})
 
-						->where('p.added_by', $userId)
+			->where('p.added_by', $userId)
 
-						->when($bussType && $bussType != 'mixed', function ($query) use ($bussType) {
-							$query->where('p.item_type', $bussType);
-						})
+			->when($bussType && $bussType != 'mixed', function ($query) use ($bussType) {
+				$query->where('p.item_type', $bussType);
+			})
 
-						->select(
-							'p.*',
-							'cp.comp_name',
-							DB::raw('COALESCE(pv.total_purchase_qty,0) as total_purchase_qty'),
-							DB::raw('COALESCE(sv.total_sales_qty,0) as total_sales_qty'),
-							DB::raw('
-								(
-									p.opening_stock_bal
-									+ COALESCE(pv.total_purchase_qty,0)
-									- COALESCE(sv.total_sales_qty,0)
-								) as current_stock
-							')
-						)
+			->select(
+				'p.*',
+				'cp.comp_name',
+				DB::raw('COALESCE(pv.total_purchase_qty,0) as total_purchase_qty'),
+				DB::raw('COALESCE(sv.total_sales_qty,0) as total_sales_qty'),
+				DB::raw('
+					(
+						p.opening_stock_bal
+						+ COALESCE(pv.total_purchase_qty,0)
+						- COALESCE(sv.total_sales_qty,0)
+					) as current_stock
+				')
+			)
 
-						->orderBy('p.created_at', 'DESC')
-						->paginate(10);
-
-
-
-		/*$history =DB::table('products')
-							->select(DB::raw('products.*,company_profiles.comp_name,inventorystocks.*,inventoryremovestocks.*'))
-							->leftJoin('company_profiles', 'products.added_by', '=', 'company_profiles.userId')
-							->leftJoin('inventorystocks', 'products.id', '=', 'inventorystocks.prodId')
-							->leftJoin('inventoryremovestocks', 'products.id', '=', 'inventoryremovestocks.prodId')
-							->where('products.added_by', '=', $userId)
-							->orderBy('products.id', 'DESC')->paginate(10);*/
+			->orderBy('p.created_at', 'DESC')
+			->paginate(10);
+			
+		$items->appends($request->query());
 
 		//echo "<pre>"; print_r($items);exit;
         return view('User.inventory')->with([
 			'title' =>$title,
+			'financialYears' => $financialYears,
+			'selectedFY'     => $selectedFY,
 			'items'=>$items,
 			'inventoryInward'    => $inventoryInward,
 			'inventoryOutward'   => $inventoryOutward,
 			'purchaseDebit'      => $purchaseDebit,
-			'purchaseCredit'     => $purchaseCredit,
-			'salesDebit'         => $salesDebit,
 			'salesCredit'        => $salesCredit,
 			'directExpenses'     => $directExpenses,
 			'writeOffs'          => $writeOffs,
 			'closingStock'       => $totalClosingStock,
 			'grossProfit'        => $grossProfit,
 			'req_type'           => $req_type
-
-			//'history'=>$history,
 			//'items_pagination' =>$items_pagination,
 		]);
     }

@@ -653,11 +653,19 @@
                                                     <div class="col-sm-12 mb-3">
                                                         <label class="form-label">Category Of Business <span class="text-danger">*</span></label>
                                                         <div id="business">
+															<div class="form-check form-check-inline">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="comp_nature" id="manufacturing"
+                                                                    value="manufacturing"
+                                                                    {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'manufacturing' ? 'checked' : '') : '' }}>
+                                                                <label class="form-check-label"
+                                                                    for="manufacturing">Manufacturing</label>
+                                                            </div>
                                                             <div class="form-check form-check-inline">
                                                                 <input class="form-check-input" type="radio"
                                                                     name="comp_nature" id="trading"
                                                                     value="trading"
-                                                                    {{ isset($compDetails->comp_category) ? ($compDetails->comp_category == 'trading' ? 'checked' : '') : '' }}>
+                                                                    {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'trading' ? 'checked' : '') : '' }}>
                                                                 <label class="form-check-label"
                                                                     for="trading">Trading / Reseller</label>
                                                             </div>

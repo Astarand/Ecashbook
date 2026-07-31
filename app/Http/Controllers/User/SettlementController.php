@@ -27,6 +27,7 @@ use App\Models\Journals;
 use Helper;
 use Image;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cookie;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -44,6 +45,18 @@ class SettlementController extends Controller
         $this->journalService = $journalService;
         $this->paymentVoucherService = $paymentVoucherService;
     }
+	
+	//Total amount already settled through Third Party
+	public function getPaidAmount($module_type,$f_id,$uid)
+	{
+		$settledAmount = DB::table('payment_vouchers')
+						->where('added_by', $uid)
+						->where('source', $module_type)
+						->where('f_id', $f_id)
+						->where('transaction_details', 'Third Party Settlement')
+						->sum('amount');
+		return $settledAmount;
+	}
 	
 	public function getSettlementAmount(Request $request)
 	{
@@ -87,7 +100,8 @@ class SettlementController extends Controller
 					->value('total') ?? 0;
 
 				$advance = $sale->advance_amount ?? 0;
-				$amount = getRoundedAmount($total);
+				$settledAmount = $this->getPaidAmount($request->module_type,$sale->id,$uid);
+				$amount =  max(0, getRoundedAmount($total) - $settledAmount); //getRoundedAmount($total);
 
 				break;
 
@@ -118,7 +132,8 @@ class SettlementController extends Controller
 					->value('total') ?? 0;
 
 				$advance = $purchase->advance_amount ?? 0;
-				$amount = getRoundedAmount($total);
+				$settledAmount = $this->getPaidAmount($request->module_type,$purchase->id,$uid);
+				$amount =  max(0, getRoundedAmount($total) - $settledAmount);
 
 				break;
 
@@ -138,7 +153,8 @@ class SettlementController extends Controller
 
 				$expenseAmount = $expense->expense_amt ?? 0;
 				$advance = $expense->advance_amount ?? 0;
-				$amount = getRoundedAmount($expenseAmount);
+				$settledAmount = $this->getPaidAmount($request->module_type,$expense->id,$uid);
+				$amount =  max(0, getRoundedAmount($expenseAmount) - $settledAmount);
 
 				break;
 		}
@@ -155,34 +171,56 @@ class SettlementController extends Controller
 	{
 		$uid = currentOwnerId();
 
-		$moduleType = $request->module_type;
+		$partyType = $request->party_type;
 
-		$data = collect();
+		switch ($partyType) {
 
-		if ($moduleType === 'Sales') {
+			case 'Customer':
+				$data = DB::table('customers')
+					->where('userId', $uid)
+					->select('id', DB::raw('cust_name as name'))
+					->orderBy('cust_name')
+					->get();
+				break;
 
-			$data = DB::table('customers')
-				->where('userId', $uid)
-				->select(
-					'id',
-					DB::raw("cust_name as name")
-				)
-				->orderBy('cust_name')
-				->get();
+			case 'Vendor':
+				$data = DB::table('vendors')
+					->where('userId', $uid)
+					->select('id', DB::raw('vendor_name as name'))
+					->orderBy('vendor_name')
+					->get();
+				break;
 
-		} elseif (
-			$moduleType === 'Purchase' ||
-			$moduleType === 'Expense'
-		) {
+			case 'Director':
+				$data = DB::table('comp_directors')
+					->where('compId', $uid)
+					->select('id', DB::raw('director_name as name'))
+					->orderBy('name')
+					->get();
+				break;
 
-			$data = DB::table('vendors')
-				->where('userId', $uid)
-				->select(
-					'id',
-					DB::raw("vendor_name as name")
-				)
-				->orderBy('vendor_name')
-				->get();
+			case 'Employee':
+				$data = DB::table('employees as e')
+					->join('users as u', 'u.id', '=', 'e.empId')
+					->where('e.added_by', $uid)
+					->select(
+						'u.id',
+						DB::raw('u.name as name')
+					)
+					->orderBy('u.name')
+					->get();
+				break;
+
+			case 'Group Company':
+				$data = DB::table('proprietorship_profiles')
+					->where('userId', $uid)
+					->select('id', DB::raw('comp_name as name'))
+					->orderBy('comp_name')
+					->get();
+				break;
+
+			default:
+				$data = collect();
 		}
 
 		return response()->json([
@@ -195,16 +233,20 @@ class SettlementController extends Controller
 	{
 		$request->validate([
 			'module_type' => 'required|in:Sales,Purchase,Expense',
+			'party_type' => 'required',
 			'p_id' => 'required|integer',
 			'settlement_mode' => 'required|in:Self,Third Party',
 			'settlement_amount' => 'required|numeric|min:0.01',
 			'settlement_ledger_id' => [
 				'nullable',
-				'required_if:settlement_mode,Third Party',
+				Rule::requiredIf(fn () =>
+					$request->settlement_mode === 'Third Party' &&
+					$request->party_type !== 'Other'
+				),
 			],
 			'other_settlement_ledger' => [
 				'nullable',
-				'required_if:settlement_ledger_id,other',
+				'required_if:party_type,Other',
 				'string',
 				'max:255',
 			],
@@ -235,7 +277,7 @@ class SettlementController extends Controller
 								->first();
 				// Delete journal and settlement
 				if ($settm) {
-					DB::table('journals')
+					/*DB::table('journals')
 							->where('source', 'Settlement')
 							->where('autoId', $settm->id)
 							->where('source', 'Settlement')
@@ -245,7 +287,7 @@ class SettlementController extends Controller
 					DB::table('settlements')
 						->where('p_id', $request->p_id)
 						->where('uid', $uid)
-						->delete();
+						->delete();*/
 				}
 
 				/*
@@ -262,10 +304,9 @@ class SettlementController extends Controller
 					if ($request->settlement_ledger_id === 'other') 
 					{
 						$settlementLedgerName = $request->other_settlement_ledger;
-
 					} else {
-						$settlementLedgerId = $request->settlement_ledger_id;
-						$settlementLedgerName = $this->getSettlementLedgerName($request->module_type,$settlementLedgerId,$uid);
+						$settlementLedgerId = $request->settlement_ledger_id;						
+						$settlementLedgerName = $request->party_name ?? $request->other_settlement_ledger;
 					}
 				}
 				//Create Settlement
@@ -275,10 +316,11 @@ class SettlementController extends Controller
 					'p_id' =>$request->p_id,
 					'settlement_mode' =>$request->settlement_mode,
 					'settlement_amount' =>$request->settlement_amount,
+					'party_type' =>$request->party_type ?? '',
 					'settlement_ledger_id' =>$settlementLedgerId,
 					'settlement_ledger_name' =>$settlementLedgerName,
 					'settlement_reason' =>$request->settlement_reason,
-					'settlement_date' =>now()->toDateString(),
+					'settlement_date' =>$request->settlement_date,
 					'created_at' =>now(),
 					'updated_at' =>now(),
 				]);
@@ -296,7 +338,7 @@ class SettlementController extends Controller
 				
 				//Create Payment Voucher
 				$payment_mode = $request->payment_mode ?? '';
-				$bank_id = $request->bank_id ?? '';
+				$bank_id = $request->bank_id ?? null;
 				$paymentVoucherId = $this->createSettlementPaymentVoucher($settlement,$uid,$payment_mode,$bank_id);
 
 				return [
@@ -398,33 +440,6 @@ class SettlementController extends Controller
 		return null;
 	}
 	
-	private function getSettlementLedgerName($moduleType,$ledgerId,$uid) 
-	{
-
-		if ($moduleType === 'Sales') {
-
-			return DB::table('customers')
-				->where('id', $ledgerId)
-				->where('userId', $uid)
-				->value('cust_name');
-		}
-
-
-		if (
-			$moduleType === 'Purchase' ||
-			$moduleType === 'Expense'
-		) {
-
-			return DB::table('vendors')
-				->where('id', $ledgerId)
-				->where('userId', $uid)
-				->value('vendor_name');
-		}
-
-
-		return null;
-	}
-	
 	private function createSettlementJournal($settlement,$document,$uid) 
 	{
 		$amount = (float) $settlement->settlement_amount;
@@ -462,17 +477,19 @@ class SettlementController extends Controller
 		$module_type = $settlement->module_type;
 		$settlement_amount = $settlement->settlement_amount;
 		
-		DB::table('payment_vouchers')
+		/*DB::table('payment_vouchers')
 			->where('f_id', $p_id)
 			->where('source', $module_type)
-			->delete();
+			->delete();*/
 
 		$data = [
 			'date' => $settlement->settlement_date,
+			'party_type' => $settlement->party_type,
 			'settlement_ledger_id' => $settlement->settlement_ledger_id,
 			'settlement_ledger_name' => $settlement->settlement_ledger_name,
 			'payment_mode' => $payment_mode,
 			'bank_id' =>$bank_id,
+			'transaction_details' =>'Third Party Settlement',
 			'addFlag' =>1,
 		];
 		
@@ -482,65 +499,139 @@ class SettlementController extends Controller
 		return $paymentVoucherId;
 	}
 	
-	private function updateSettlementPaymentStatus(int $id,string $type,float $settlementAmount)
+	private function updateSettlementPaymentStatus(int $id, string $type,float $settlementAmount)
 	{
-		$currentPaid = DB::table('payment_vouchers')
+		// Total paid against this transaction
+		$paid = DB::table('payment_vouchers')
 			->where('f_id', $id)
 			->where('source', $type)
 			->sum('amount');
 
-		$paid = $settlementAmount;
+		switch ($type) {
 
-		if ($type === 'Sales') {
-			$status = 'Full';
+			case 'Sales':
 
-			DB::table('sales')
-				->where('id', $id)
-				->update([
-					'pay_status' =>$status,
-					'advance_amount' =>0,
-					'adjusted_amount' => $paid,
-					'due_amount' =>0,
-				]);
+				$total = DB::table('sales_values')
+					->where('sid', $id)
+					->selectRaw('SUM(
+						COALESCE(amount,0)
+						+ COALESCE(tax_amt,0)
+						+ COALESCE(gov_pay,0)
+						+ COALESCE(ser_pay,0)
+					) as total')
+					->value('total') ?? 0;
 
-			return;
+				$due = max(0, $total - $paid);
+
+				if ($paid <= 0) {
+					$status = 'Due';
+					$advanceAmount = 0;
+					$adjustedAmount = 0;
+				} elseif ($due > 0) {
+					$status = 'Partial';
+					$advanceAmount = $paid;
+					$adjustedAmount = $paid;
+				} else {
+					$status = 'Full';
+					$advanceAmount = 0;
+					$adjustedAmount = $total;
+					$due = 0;
+				}
+
+				DB::table('sales')
+					->where('id', $id)
+					->update([
+						'pay_status'      => $status,
+						'advance_amount'  => $advanceAmount,
+						'adjusted_amount' => $adjustedAmount,
+						'due_amount'      => $due,
+					]);
+
+				break;
+
+			case 'Purchase':
+
+				$total = DB::table('purchase_values')
+					->where('sid', $id)
+					->selectRaw('SUM(
+						COALESCE(amount,0)
+						+ COALESCE(tax_amt,0)
+					) as total')
+					->value('total') ?? 0;
+
+				$due = max(0, $total - $paid);
+
+				if ($paid <= 0) {
+					$status = 'Due';
+					$advanceAmount = 0;
+					$adjustedAmount = 0;
+				} elseif ($due > 0) {
+					$status = 'Partial';
+					$advanceAmount = $paid;
+					$adjustedAmount = $paid;
+				} else {
+					$status = 'Full';
+					$advanceAmount = 0;
+					$adjustedAmount = $total;
+					$due = 0;
+				}
+
+				DB::table('purchases')
+					->where('id', $id)
+					->update([
+						'pay_status'      => $status,
+						'advance_amount'  => $advanceAmount,
+						'adjusted_amount' => $adjustedAmount,
+						'due_amount'      => $due,
+					]);
+
+				break;
+
+			case 'Expense':
+
+				$expense = DB::table('expenses')
+					->where('id', $id)
+					->first();
+
+				$total = $expense->expense_amt;
+				$due   = max(0, $total - $paid);
+
+				if ($paid <= 0) {
+					$status = 'due';
+					$advanceAmount = 0;
+					$adjustedAmount = 0;
+				} elseif ($due > 0) {
+					$status = 'advance';
+					$advanceAmount = $paid;
+					$adjustedAmount = $paid;
+				} else {
+					$status = 'full';
+					$advanceAmount = 0;
+					$adjustedAmount = $total;
+					$due = 0;
+				}
+
+				DB::table('expenses')
+					->where('id', $id)
+					->update([
+						'payment_status' => strtolower($status),
+						'advance_amount' => $advanceAmount,
+						'adjusted_now'   => $adjustedAmount,
+						'balance_amount' => $due,
+					]);
+
+				break;
 		}
-		if ($type === 'Purchase') {
-			$status = 'Full';
 
-			DB::table('purchases')
-				->where('id', $id)
-				->update([
-					'pay_status' =>$status,
-					'advance_amount' =>0,
-					'adjusted_amount' => $paid,
-					'due_amount' =>0,
-				]);
-
-			return;
-		}
-		if ($type === 'Expense') {
-			$status = 'full';
-
-			DB::table('expenses')
-				->where('id', $id)
-				->update([
-					'payment_status' =>$status,
-					'advance_amount' =>0,
-					'adjusted_now' =>$paid,
-					'balance_amount' =>0,
-				]);
-		}
-		
 		$payStatus = ucfirst(strtolower($status ?? ''));
 		DB::table('journals')
-			->where('entry_type', $type)
+			->where('entry_type', $type.' Settlement')
+			->where('source', 'Settlement')
 			->where('autoId', $id)
 			->update([
 				'payment_status' => $payStatus
 			]);
-			
-		return;
 	}
+	
 	//End Payment voucher entry
 }

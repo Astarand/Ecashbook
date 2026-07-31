@@ -133,7 +133,7 @@
                                                     </a>
                                                 </li>
                                                 @endif
-												@if ($expen->payment_status == 'due')
+												@if ($expen->payment_status != 'full')
 												<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Third Party Settlement">
 													<a href="javascript:void(0);" title="Third Party Settlement"
 															class="btn btn-sm btn-warning settlement-btn"
