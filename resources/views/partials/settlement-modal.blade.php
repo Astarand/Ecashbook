@@ -29,44 +29,23 @@
                     <div class="row">
 
                         <!-- Settlement Mode -->
-
                         <div class="col-md-6 mb-3">
-
                             <label class="form-label">
                                 Settlement Mode
                             </label>
-
                             <div>
-
                                 <div class="form-check form-check-inline">
 
                                     <input type="radio"
                                            class="form-check-input"
                                            name="settlement_mode"
-                                           value="Self"
-                                           checked>
-
-                                    <label class="form-check-label">
-                                        Self
-                                    </label>
-
-                                </div>
-
-                                <div class="form-check form-check-inline">
-
-                                    <input type="radio"
-                                           class="form-check-input"
-                                           name="settlement_mode"
-                                           value="Third Party">
+                                           value="Third Party" checked>
 
                                     <label class="form-check-label">
                                         Third Party
                                     </label>
-
                                 </div>
-
                             </div>
-
                         </div>
 
 
@@ -236,9 +215,9 @@
 			}
 		});
 
-		$('input[name="settlement_mode"][value="Self"]').prop('checked', true);
+		//$('input[name="settlement_mode"][value="Self"]').prop('checked', true);
 
-		$('input[name="settlement_mode"][value="Third Party"]').prop('checked', false);
+		$('input[name="settlement_mode"][value="Third Party"]').prop('checked', true);
 
 		// Reset Settlement Ledger
 		$('#party_type').val('');

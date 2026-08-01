@@ -444,12 +444,11 @@ class SettlementController extends Controller
 	{
 		$amount = (float) $settlement->settlement_amount;
 		$settlement_ledger_id = $settlement->settlement_ledger_id;
-		$partyName = $settlement->settlement_ledger_name ?? '';
+		//$partyName = $settlement->settlement_ledger_name ?? '';
+		$originalParty = $document->party_name ?? '';
+		$thirdParty    = $settlement->settlement_ledger_name ?? '';
+		$partyNarration = $originalParty . ' → ' . $thirdParty;
 		
-		
-		if ($settlement->settlement_mode === 'Self') {
-			return null;
-		}
 		return $this->journalService->storeSettlementJournalEntries([
 
 					'module_type' => $settlement->module_type,
@@ -460,9 +459,9 @@ class SettlementController extends Controller
 					'date' => $settlement->settlement_date,
 					'reference_no' => '',
 					'entry_type' => $settlement->module_type.' Settlement',
-					'party_name' => $partyName,
+					'party_name' => $partyNarration,
 					'amount' => $settlement->settlement_amount,
-					'settlement_ledger' => $partyName,
+					'settlement_ledger' => $thirdParty,
 					'settlement_reason' => $settlement->settlement_reason,
 					'status' => 'Posted',
 

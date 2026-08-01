@@ -9,12 +9,17 @@ use Carbon\CarbonPeriod;
 
 use DateInterval;
 use DatePeriod;
-
-
+use App\Services\JournalService;
 
 
 class PayrollReportController extends Controller
 {
+    protected JournalService $journalService;
+
+    public function __construct(JournalService $journalService)
+    {
+        $this->journalService = $journalService;
+    }
 
     public function summary(Request $request)
     {
@@ -677,8 +682,6 @@ class PayrollReportController extends Controller
             'absent_days' => $absentDays,
         ];
     }
-
-    
 
     //------- Payroll Register Report -------//
     public function payrollRegister(Request $request)
@@ -2546,6 +2549,16 @@ class PayrollReportController extends Controller
         $skipped   = 0;
         $errors    = [];
 
+        // Accumulators for the consolidated journal entry
+        $totalGross = 0;
+        $totalNet   = 0;
+        $totalPf    = 0;
+        $totalEsi   = 0;
+        $totalPt    = 0;
+        $totalTds   = 0;
+        $totalLoan  = 0;
+        $totalLwf   = 0;
+
         foreach ($employeesData as $row) {
             $empId = $row['emp_id'];
 
@@ -2714,10 +2727,179 @@ class PayrollReportController extends Controller
                     'updated_at'               => now(),
                 ]);
 
+                // Accumulate totals for the consolidated journal entry
+                $totalGross += $totalEarnings;
+                $totalNet   += $net;
+                $totalPf    += $pf;
+                $totalEsi   += $esi;
+                $totalPt    += $pt;
+                $totalTds   += $tds;
+                $totalLoan  += $loan;
+                $totalLwf   += $lwf;
+
                 $generated++;
 
             } catch (\Exception $e) {
                 $errors[] = ['emp_id' => $empId, 'error' => $e->getMessage()];
+            }
+        }
+
+        // -------------------------------------------------------
+        // ONE consolidated journal entry for the entire bulk run
+        // autoId = max(journals.autoId) + 1  — a fresh unique ID
+        // shared across all lines of this single entry so they
+        // can be grouped / deleted together later.
+        // -------------------------------------------------------
+        if ($generated > 0) {
+            try {
+                $ownerPropId = DB::table('employees')
+                    ->where('added_by', $ownerId)
+                    ->whereNotNull('propId')
+                    ->value('propId');
+
+                $monthLabel = ($monthNames[$monthNum] ?? '') . ' ' . $financialYear;
+                $bulkRef    = 'BLK/' . str_pad($monthNum, 2, '0', STR_PAD_LEFT) . '/' . $financialYear;
+
+                // Fresh autoId: max in journals + 1 (scoped to owner to avoid cross-user collision)
+                $nextAutoId = (int) DB::table('journals')
+                    ->where('added_by', $ownerId)
+                    ->max('autoId') + 1;
+
+                // Journal number: max for this user + 1
+                $lastJournalNo = (int) DB::table('journals')
+                    ->where('added_by', $ownerId)
+                    ->max('journal_no');
+                $journalNo = str_pad($lastJournalNo + 1, 5, '0', STR_PAD_LEFT);
+
+                $now = now();
+
+                $common = [
+                    'autoId'           => $nextAutoId,
+                    'added_by'         => $ownerId,
+                    'propId'           => $ownerPropId,
+                    'journal_no'       => $journalNo,
+                    'journal_date'     => $now->toDateString(),
+                    'reference_type'   => 'New Ref',
+                    'reference_no'     => $bulkRef,
+                    'entry_type'       => 'Payroll',
+                    'source'           => 'Payroll',
+                    'settlement_type'  => null,
+                    'against_ledger'   => null,
+                    'narration'        => null,
+                    'party_name'       => 'Bulk Payroll (' . $generated . ' employees)',
+                    'payment_status'   => 'Payroll',
+                    'status'           => 'Posted',
+                    'rev_amend_status' => null,
+                    'tds_applicable'   => 'no',
+                    'tds_percent'      => 0,
+                    'tds_amt'          => 0,
+                    'tds_id'           => null,
+                    'gst_applicable'   => 'no',
+                    'gst_rate'         => 0,
+                    'gst_trans'        => null,
+                    'other_note'       => null,
+                    'hsn_sac_code'     => null,
+                    'created_at'       => $now,
+                    'updated_at'       => $now,
+                ];
+
+                $entries = [];
+
+                // Salary Expense — Debit (gross = total_earnings across all employees)
+                $entries[] = array_merge($common, [
+                    'ledger'       => 'Salary Expense',
+                    'debit_credit' => 'Debit',
+                    'amount'       => round($totalGross, 2),
+                    'tot_amt'      => round($totalGross, 2),
+                    'notes'        => 'Salary Expense - ' . $monthLabel,
+                ]);
+
+                // PF Payable — Credit
+                if ($totalPf > 0) {
+                    $entries[] = array_merge($common, [
+                        'ledger'       => 'PF Payable',
+                        'debit_credit' => 'Credit',
+                        'amount'       => round($totalPf, 2),
+                        'tot_amt'      => round($totalPf, 2),
+                        'notes'        => 'PF Deduction - ' . $monthLabel,
+                    ]);
+                }
+
+                // ESI Payable — Credit
+                if ($totalEsi > 0) {
+                    $entries[] = array_merge($common, [
+                        'ledger'       => 'ESI Payable',
+                        'debit_credit' => 'Credit',
+                        'amount'       => round($totalEsi, 2),
+                        'tot_amt'      => round($totalEsi, 2),
+                        'notes'        => 'ESI Deduction - ' . $monthLabel,
+                    ]);
+                }
+
+                // PTAX Payable — Credit
+                if ($totalPt > 0) {
+                    $entries[] = array_merge($common, [
+                        'ledger'       => 'PTAX Payable',
+                        'debit_credit' => 'Credit',
+                        'amount'       => round($totalPt, 2),
+                        'tot_amt'      => round($totalPt, 2),
+                        'notes'        => 'Professional Tax Deduction - ' . $monthLabel,
+                    ]);
+                }
+
+                // TDS Payable — Credit
+                if ($totalTds > 0) {
+                    $entries[] = array_merge($common, [
+                        'ledger'       => 'TDS Payable',
+                        'debit_credit' => 'Credit',
+                        'amount'       => round($totalTds, 2),
+                        'tot_amt'      => round($totalTds, 2),
+                        'notes'        => 'TDS Deduction - ' . $monthLabel,
+                    ]);
+                }
+
+                // LWF Payable — Credit
+                if ($totalLwf > 0) {
+                    $entries[] = array_merge($common, [
+                        'ledger'       => 'LWF Payable',
+                        'debit_credit' => 'Credit',
+                        'amount'       => round($totalLwf, 2),
+                        'tot_amt'      => round($totalLwf, 2),
+                        'notes'        => 'Labour Welfare Fund Deduction - ' . $monthLabel,
+                    ]);
+                }
+
+                // Loan Recovery — Credit
+                if ($totalLoan > 0) {
+                    $entries[] = array_merge($common, [
+                        'ledger'       => 'Employee Loan Recovery',
+                        'debit_credit' => 'Credit',
+                        'amount'       => round($totalLoan, 2),
+                        'tot_amt'      => round($totalLoan, 2),
+                        'notes'        => 'Loan Recovery - ' . $monthLabel,
+                    ]);
+                }
+
+                // Net Salary Payable — Credit
+                if ($totalNet > 0) {
+                    $entries[] = array_merge($common, [
+                        'ledger'       => 'Salary Payable',
+                        'debit_credit' => 'Credit',
+                        'amount'       => round($totalNet, 2),
+                        'tot_amt'      => round($totalNet, 2),
+                        'notes'        => 'Net Salary Payable - ' . $monthLabel,
+                    ]);
+                }
+
+                DB::table('journals')->insert($entries);
+
+            } catch (\Exception $e) {
+                \Log::error('Bulk payroll journal entry failed', [
+                    'error' => $e->getMessage(),
+                    'line'  => $e->getLine(),
+                    'file'  => $e->getFile(),
+                ]);
+                $errors[] = ['journal_error' => $e->getMessage()];
             }
         }
 

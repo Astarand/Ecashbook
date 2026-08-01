@@ -76,9 +76,27 @@ class BalanceSheetService
 									) AS payable
 								')
 								->value('payable') ?? 0;
+			// Outstanding Non-Current Asset Payables
+			$assetAmount = DB::table('assets')
+							->where('added_by', $userId)
+							->where('assetType', 'non-current')
+							->where('isActive', 1)
+							->where('pay_status', '!=', 'Full')
+							->whereBetween('date', [$startDate, $endDate])
+							->selectRaw('
+								SUM(
+									GREATEST(
+										COALESCE(invoice_value, 0)
+										- COALESCE(advance_amt, 0)
+										- COALESCE(adjusted_amt, 0),
+										0
+									)
+								) AS payable
+							')
+							->value('payable') ?? 0;
 
 			$purchaseDebit  = $voucherPurchaseTotals->total_debit ?? 0;
-			$amount = ($purchaseAmount - $purchaseDebit + $expenseAmount);
+			$amount = ($purchaseAmount - $purchaseDebit + $expenseAmount + $assetAmount);
 		}
 
 		// Advance from Customer
@@ -377,6 +395,7 @@ class BalanceSheetService
 			// Income Receivable
 			$incomeReceivable = DB::table('income')
 				->where('addBy', $userId)
+				->where('pay_status', '!=', 'Full')
 				->where('status', 1)
 				->whereBetween('dateInput', [$startDate, $endDate])
 				->selectRaw('

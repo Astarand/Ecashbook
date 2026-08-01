@@ -202,8 +202,42 @@ function loadEmployees() {
     const month = document.getElementById('monthSelect').value;
 
     if (!fy || !month) {
-        alert('Please select both Financial Year and Month.');
+        showToast('Please select both Financial Year and Month.', 'warning');
         return;
+    }
+
+    // =========================================================
+    // Future Month Validation Logic
+    // =========================================================
+    const monthsMap = {
+        'January': 1, 'February': 2, 'March': 3, 'April': 4,
+        'May': 5, 'June': 6, 'July': 7, 'August': 8,
+        'September': 9, 'October': 10, 'November': 11, 'December': 12
+    };
+
+    // Convert month string to integer (1-12)
+    const selectedMonthNum = isNaN(month) ? monthsMap[month] : parseInt(month, 10);
+
+    if (selectedMonthNum) {
+        const [fyStartStr, fyEndStr] = fy.split('-');
+        const fyStart = parseInt(fyStartStr, 10);
+        const fyEnd   = parseInt(fyEndStr, 10);
+
+        // In an Indian FY (Apr-Mar), Jan-Mar belong to fyEnd, Apr-Dec belong to fyStart
+        const selectedYear = (selectedMonthNum <= 3) ? fyEnd : fyStart;
+
+        const now = new Date();
+        const currentYear  = now.getFullYear();
+        const currentMonth = now.getMonth(); // JS months are 0-indexed (0 = Jan)
+
+        // Check if selected period is strictly in the future
+        const isFuture = (selectedYear > currentYear) || 
+                         (selectedYear === currentYear && selectedMonthNum > currentMonth);
+
+        if (isFuture) {
+            showToast('Future month cannot be selected.', 'warning');
+            return;
+        }
     }
 
     const btn = document.getElementById('checkPayslipBtn');
