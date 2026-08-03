@@ -1702,32 +1702,25 @@ class JournalService
 			}
 
 			$common = [
-				'journal_no'        => $journalNo,
-				'added_by'          => $userId,
-				'autoId'            => $autoId,
-				'propId'            => $propId,
-				'journal_date'      => $data['date'],
-				'reference_type'    => 'New Ref',
-				'reference_no'      => $data['reference_no'],
-				'entry_type'        => $entryType,
-				'source'            => $source,
-				'settlement_type'   => null,
-				'against_ledger'    => null,
-				'narration'         => null,
-				'payment_status'    => 'Payroll',
-				'status'            => 'Posted',
-				'rev_amend_status'  => null,
-				'tds_applicable'    => 'no',
-				'tds_percent'       => 0,
-				'tds_amt'           => 0,
-				'tds_id'            => null,
-				'gst_applicable'    => 'no',
-				'gst_rate'          => 0,
-				'gst_trans'         => null,
-				'other_note'        => null,
-				'hsn_sac_code'      => null,
-				'created_at'        => now(),
-				'updated_at'        => now(),
+				'journal_no'     => $journalNo,
+				'added_by'       => $userId,
+				'autoId'         => $autoId,
+				'propId'         => $propId,
+				'journal_date'   => $data['date'],
+				'reference_type' => 'New Ref',
+				'reference_no'   => $data['reference_no'],
+				'entry_type'     => $entryType,
+				'source'         => $source,
+				'payment_status' => 'Payroll',
+				'status'         => 'Posted',
+				'tds_applicable' => 'no',
+				'tds_percent'    => 0,
+				'tds_amt'        => 0,
+				'gst_applicable' => 'no',
+				'gst_rate'       => 0,
+				'gst_trans'      => null,
+				'other_note'     => null,
+				'hsn_sac_code'   => null,
 			];
 
 			$grossSalary = (float) ($data['gross_salary'] ?? 0);
@@ -1736,7 +1729,6 @@ class JournalService
 			$ptax        = (float) ($data['ptax'] ?? 0);
 			$tds         = (float) ($data['tds'] ?? 0);
 			$loan        = (float) ($data['loan'] ?? 0);
-			$lwf         = (float) ($data['lwf'] ?? 0);
 
 			$employeeName = $data['employee_name'] ?? '';
 
@@ -1838,22 +1830,6 @@ class JournalService
 					'amount'        => $loan,
 					'tot_amt'       => $loan,
 					'notes'         => 'Loan Recovery  - '.$payrollMonth,
-				]);
-			}
-
-			/*
-			|--------------------------------------------------------------------------
-			| LWF Payable (Credit)
-			|--------------------------------------------------------------------------
-			*/
-			if ($lwf > 0) {
-				$entries[] = array_merge($common, [
-					'ledger'        => 'LWF Payable',
-					'party_name'    => $employeeName,
-					'debit_credit'  => 'Credit',
-					'amount'        => $lwf,
-					'tot_amt'       => $lwf,
-					'notes'         => 'Labour Welfare Fund Deduction - '.$payrollMonth,
 				]);
 			}
 
@@ -2058,11 +2034,78 @@ class JournalService
 					'gst_trans' => null,
 				]);
 			}
+			elseif ($moduleType === 'Income') {
 
+				// -------------------------------
+				// DEBIT
+				// Settlement Ledger
+				// -------------------------------
 
-			// =====================================================
-			// INSERT JOURNAL
-			// =====================================================
+				$entries[] = array_merge($common, [
+					'ledger' => $settlementLedger,
+					'party_name' => $party,
+					'debit_credit' => 'Debit',
+					'amount' => $amount,
+					'tot_amt' => $amount,
+					'notes' => $reason,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+
+				// -------------------------------
+				// CREDIT
+				// Income Receivable
+				// -------------------------------
+
+				$entries[] = array_merge($common, [
+					'ledger' => 'Income Receivable',
+					'party_name' => $party,
+					'debit_credit' => 'Credit',
+					'amount' => $amount,
+					'tot_amt' => $amount,
+					'notes' => $reason,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+			}
+			elseif ($moduleType === 'Asset') {
+
+				// -------------------------------
+				// DEBIT
+				// Asset Payable
+				// -------------------------------
+
+				$entries[] = array_merge($common, [
+					'ledger' => 'Asset Payable',
+					'party_name' => $party,
+					'debit_credit' => 'Debit',
+					'amount' => $amount,
+					'tot_amt' => $amount,
+					'notes' => $reason,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+
+				// -------------------------------
+				// CREDIT
+				// Settlement Ledger
+				// -------------------------------
+
+				$entries[] = array_merge($common, [
+					'ledger' => $settlementLedger,
+					'party_name' => $party,
+					'debit_credit' => 'Credit',
+					'amount' => $amount,
+					'tot_amt' => $amount,
+					'notes' => $reason,
+					'gst_applicable' => 'no',
+					'gst_rate' => 0,
+					'gst_trans' => null,
+				]);
+			}
 
 			if (!empty($entries)) {
 

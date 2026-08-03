@@ -10,15 +10,18 @@ use Carbon\CarbonPeriod;
 use DateInterval;
 use DatePeriod;
 use App\Services\JournalService;
+use App\Services\PaymentVoucherService;
 
 
 class PayrollReportController extends Controller
 {
     protected JournalService $journalService;
+    protected PaymentVoucherService $paymentVoucherService;
 
-    public function __construct(JournalService $journalService)
+    public function __construct(JournalService $journalService, PaymentVoucherService $paymentVoucherService)
     {
-        $this->journalService = $journalService;
+        $this->journalService        = $journalService;
+        $this->paymentVoucherService = $paymentVoucherService;
     }
 
     public function summary(Request $request)
@@ -1045,10 +1048,11 @@ class PayrollReportController extends Controller
             return response()->json(['message' => 'No payslip IDs provided.'], 422);
         }
 
-        $paymentDate = $request->input('payment_date');
+        $paymentDate   = $request->input('payment_date');
         $transactionId = $request->input('transaction_id');
+        $salaryAmount  = (float) $request->input('amount_salary_input', 0);
 
-        $update = [];
+        $update = ['payment_status' => 'Done'];
 
         if ($paymentDate) {
             $update['payment_date'] = $paymentDate;
@@ -1058,15 +1062,40 @@ class PayrollReportController extends Controller
             $update['payment_trans_id'] = $transactionId;
         }
 
-        $update['payment_status'] = 'Done';
-
         try {
             $affected = DB::table('user_payslip')
                 ->whereIn('id', $ids)
                 ->where('added_by', $ownerId)
                 ->update($update);
 
+            // ------- Single Payment Voucher from form data -------
+            // One PV for the entire batch using the amount entered in the form
+            if ($salaryAmount > 0) {
+
+                $firstPayslip = DB::table('user_payslip as up')
+                    ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+                    ->where('up.id', $ids[0])
+                    ->where('up.added_by', $ownerId)
+                    ->select('up.id', 'up.payslip_no', 'up.date', 'e.propId')
+                    ->first();
+
+                $this->paymentVoucherService->storePaymentVoucherEntries(
+                    $firstPayslip->id ?? $ids[0],
+                    'Payroll',
+                    $salaryAmount,
+                    [
+                        'propId'        => $firstPayslip->propId ?? null,
+                        'date'          => $paymentDate ?: ($firstPayslip->date ?? now()->toDateString()),
+                        'reference_no'  => $transactionId ?: ($firstPayslip->payslip_no ?? null),
+                        'party_name'    => 'Salary Payment (' . count($ids) . ' employees)',
+                        'payroll_month' => '',
+                        'added_by'      => $ownerId,
+                    ]
+                );
+            }
+
             return response()->json(['message' => "Updated {$affected} record(s)", 'updated' => $affected]);
+
         } catch (\Exception $e) {
             return response()->json(['message' => 'Update failed: ' . $e->getMessage()], 500);
         }

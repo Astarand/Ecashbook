@@ -61,7 +61,7 @@ class SettlementController extends Controller
 	public function getSettlementAmount(Request $request)
 	{
 		$request->validate([
-			'module_type' => 'required|in:Sales,Purchase,Expense',
+			'module_type' => 'required',
 			'p_id' => 'required|integer',
 		]);
 
@@ -72,7 +72,6 @@ class SettlementController extends Controller
 		switch ($request->module_type) {
 
 			case 'Sales':
-
 				$sale = DB::table('sales')
 					->where('id', $request->p_id)
 					->where('added_by', $uid)
@@ -101,12 +100,11 @@ class SettlementController extends Controller
 
 				$advance = $sale->advance_amount ?? 0;
 				$settledAmount = $this->getPaidAmount($request->module_type,$sale->id,$uid);
-				$amount =  max(0, getRoundedAmount($total) - $settledAmount); //getRoundedAmount($total);
+				$amount =  max(0, getRoundedAmount($total) - $settledAmount);
 
 				break;
 
 			case 'Purchase':
-
 				$purchase = DB::table('purchases')
 					->where('id', $request->p_id)
 					->where('added_by', $uid)
@@ -156,6 +154,58 @@ class SettlementController extends Controller
 				$settledAmount = $this->getPaidAmount($request->module_type,$expense->id,$uid);
 				$amount =  max(0, getRoundedAmount($expenseAmount) - $settledAmount);
 
+				break;
+				
+			case 'Income':
+				$income = DB::table('income')
+					->where('id', $request->p_id)
+					->where('addBy', $uid)
+					->first();
+
+				if (!$income) {
+					return response()->json([
+						'success' => false,
+						'message' => 'Income not found.'
+					], 404);
+				}
+
+				$incomeAmount = $income->amount ?? 0;
+				$advance = $income->advance_amt ?? 0;
+				$settledAmount = $this->getPaidAmount($request->module_type,$income->id,$uid);
+				$amount =  max(0, getRoundedAmount($incomeAmount) - $settledAmount);
+
+				break;
+				
+			case 'Asset':
+				$asset = DB::table('assets as a')
+							->leftJoin('vendors as v', 'v.id', '=', 'a.vendor_id')
+							->select(
+								'a.*',
+								'v.vendor_name as party_name'
+							)
+							->where('a.id', $request->p_id)
+							->where('a.added_by', $uid)
+							->first();
+
+				if (!$asset) {
+					return response()->json([
+						'success' => false,
+						'message' => 'Asset not found.'
+					], 404);
+				}
+
+				// Check if it is CWIP
+				$isCwip = $asset->assetType == 'non-current' && $asset->nonCurrentAssetType == 'Capital Work in Progress';
+				if ($isCwip) {
+					$totalAmount = $asset->cwip_amount ?? 0;
+					$advance     = $asset->cwip_advance_amt ?? 0;
+				} else {
+					$totalAmount = $asset->invoice_value ?? 0;
+					$advance     = $asset->advance_amt ?? 0;
+				}
+
+				$settledAmount = $this->getPaidAmount($request->module_type,$asset->id,$uid);
+				$amount = max(0, getRoundedAmount($totalAmount) - $settledAmount);
 				break;
 		}
 
@@ -232,7 +282,7 @@ class SettlementController extends Controller
 	public function store(Request $request)
 	{
 		$request->validate([
-			'module_type' => 'required|in:Sales,Purchase,Expense',
+			'module_type' => 'required|in:Sales,Purchase,Expense,Income,Asset',
 			'party_type' => 'required',
 			'p_id' => 'required|integer',
 			'settlement_mode' => 'required|in:Self,Third Party',
@@ -435,6 +485,31 @@ class SettlementController extends Controller
 				->where('p.added_by', $uid)
 				->first();
 		}
+		
+		if ($moduleType === 'Income') {
+
+			return DB::table('income')
+				->select(
+					'income.*',
+					'income.customer_name as party_name'
+				)
+				->where('id', $pId)
+				->where('addBy', $uid)
+				->first();
+		}
+		
+		if ($moduleType === 'Asset') {
+
+			return DB::table('assets as a')
+				->leftJoin('vendors as v','v.id','=','a.vendor_id')
+				->select(
+					'a.*',
+					'v.vendor_name as party_name'
+				)
+				->where('a.id', $pId)
+				->where('a.added_by', $uid)
+				->first();
+		}
 
 
 		return null;
@@ -447,7 +522,7 @@ class SettlementController extends Controller
 		//$partyName = $settlement->settlement_ledger_name ?? '';
 		$originalParty = $document->party_name ?? '';
 		$thirdParty    = $settlement->settlement_ledger_name ?? '';
-		$partyNarration = $originalParty . ' → ' . $thirdParty;
+		$partyNarration = 'Third Party Settlement' . ' - ' . $thirdParty;
 		
 		return $this->journalService->storeSettlementJournalEntries([
 
@@ -587,7 +662,6 @@ class SettlementController extends Controller
 				break;
 
 			case 'Expense':
-
 				$expense = DB::table('expenses')
 					->where('id', $id)
 					->first();
@@ -618,6 +692,106 @@ class SettlementController extends Controller
 						'adjusted_now'   => $adjustedAmount,
 						'balance_amount' => $due,
 					]);
+
+				break;
+				
+			case 'Income':
+				$income = DB::table('income')
+					->where('id', $id)
+					->first();
+
+				$total = $income->amount;
+				$due   = max(0, $total - $paid);
+
+				if ($paid <= 0) {
+					$status = 'Due';
+					$advanceAmount = 0;
+					$adjustedAmount = 0;
+				} elseif ($due > 0) {
+					$status = 'Advance';
+					$advanceAmount = $paid;
+					$adjustedAmount = $paid;
+				} else {
+					$status = 'Full';
+					$advanceAmount = 0;
+					$adjustedAmount = $total;
+					$due = 0;
+				}
+
+				DB::table('income')
+					->where('id', $id)
+					->update([
+						'pay_status'     => $status,
+						'advance_amt'    => $advanceAmount,
+						'adjust_amt'     => $adjustedAmount,
+						'receivable_amt' => $due,
+					]);
+
+				break;
+				
+			case 'Asset':
+				$asset = DB::table('assets')
+					->where('id', $id)
+					->first();
+
+				$isCwip = $asset->assetType == 'non-current' && $asset->nonCurrentAssetType == 'Capital Work in Progress';
+				if ($isCwip) {
+					$total = $asset->cwip_amount;
+					$due   = max(0, $total - $paid);
+
+					if ($paid <= 0) {
+						$status = 'Due';
+						$advanceAmount = 0;
+						$adjustedAmount = 0;
+					} elseif ($due > 0) {
+						$status = 'Advance';
+						$advanceAmount = $paid;
+						$adjustedAmount = $paid;
+					} else {
+						$status = 'Full';
+						$advanceAmount = 0;
+						$adjustedAmount = $total;
+						$due = 0;
+					}
+
+					DB::table('assets')
+						->where('id', $id)
+						->update([
+							'cwip_pay_status'   => $status,
+							'cwip_advance_amt'  => $advanceAmount,
+							'cwip_adjusted_amt' => $adjustedAmount,
+							'cwip_payable_amt'  => $due,
+						]);
+
+				} else {
+
+					$total = $asset->invoice_value;
+					$due   = max(0, $total - $paid);
+
+					if ($paid <= 0) {
+						$status = 'Due';
+						$advanceAmount = 0;
+						$adjustedAmount = 0;
+					} elseif ($due > 0) {
+						$status = 'Advance';
+						$advanceAmount = $paid;
+						$adjustedAmount = $paid;
+					} else {
+						$status = 'Full';
+						$advanceAmount = 0;
+						$adjustedAmount = $total;
+						$due = 0;
+					}
+
+					DB::table('assets')
+						->where('id', $id)
+						->update([
+							'pay_status'   => $status,
+							'advance_amt'  => $advanceAmount,
+							'adjusted_amt' => $adjustedAmount,
+							'payable_amt'  => $due,
+						]);
+				}
 
 				break;
 		}

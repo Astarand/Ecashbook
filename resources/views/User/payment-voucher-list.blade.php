@@ -93,6 +93,14 @@
 									   class="form-control"
 									   value="{{ request('to_date') }}">
 							</div>
+							
+							<div class="col-md-3">
+								<label class="form-label">Search Transaction</label>
+								<select class="form-select" name="search_transaction" id="search_transaction">
+									<option value="">All Transactions</option>
+									<option value="Third Party Settlement" {{ request('search_transaction')=='Third Party Settlement'?'selected':'' }}>Third Party Settlement</option>
+								</select>
+							</div>
 
 							<!-- Voucher -->
 							<div class="col-lg-3 col-md-6">
@@ -205,22 +213,22 @@
 
 								<div class="col-lg-3 col-md-6">
 									<label class="form-label">Party Type</label>
-									<select name="party_type" class="form-select">
+									<select name="partyType" class="form-select">
 										<option value="">All</option>
 										<option value="Customer"
-											{{ request('party_type')=='Customer'?'selected':'' }}>
+											{{ request('partyType')=='Customer'?'selected':'' }}>
 											Customer
 										</option>
 										<option value="Vendor"
-											{{ request('party_type')=='Vendor'?'selected':'' }}>
+											{{ request('partyType')=='Vendor'?'selected':'' }}>
 											Vendor
 										</option>
 										<option value="Employee"
-											{{ request('party_type')=='Employee'?'selected':'' }}>
+											{{ request('partyType')=='Employee'?'selected':'' }}>
 											Employee
 										</option>
 										<option value="Other"
-											{{ request('party_type')=='Other'?'selected':'' }}>
+											{{ request('partyType')=='Other'?'selected':'' }}>
 											Other
 										</option>
 									</select>
@@ -275,6 +283,7 @@
                                 <th width="120">Date</th>
                                 <th width="">Paid</th>
                                 <th>Voucher No</th>
+                                <th>Transaction</th>
                                 <th>Source</th>
                                 <th>Party Type</th>
                                 <th>Party Name</th>								
@@ -304,6 +313,7 @@
 									</div>
 								</td>
                                 <td><span class="text-muted text-hover-primary">{{ $v->voucher_no }}</span></td>
+                                <td><span class="text-muted text-hover-primary">{{ $v->transaction_details }}</span></td>
                                 <td><span class="text-muted text-hover-primary">{{ $v->source }}</span></td>
                                 <td><span class="text-muted text-hover-primary">{{ $v->party_type }}</span></td>
                                 <td><span class="text-muted text-hover-primary">{{ $v->party_name }}</span></td>
@@ -814,7 +824,7 @@ $(document).ready(function () {
 
 	function loadPartyList(selectedId = '')
 	{
-		let partyType = $('#party_type').val();
+		let partyType = selectedId;
 
 		if(!partyType || partyType === 'Other')
 		{
@@ -966,7 +976,7 @@ $(document).ready(function () {
 	// PARTY TYPE CHANGE
 	// =========================================
 
-	$('#party_type').on('change', function () {
+	$(document).on('change', '#party_type', function () {
 
 		// reset dependent fields
 		resetPartyFields();
@@ -993,7 +1003,7 @@ $(document).ready(function () {
 			return;
 		}
 
-		loadPartyList();
+		loadPartyList(val);
 	});
 
 	// =========================================

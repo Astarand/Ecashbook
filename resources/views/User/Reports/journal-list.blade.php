@@ -93,6 +93,7 @@
 											{{ $type }}
 										</option>
 									@endforeach
+									<option value="Settlement" {{ request('entry_type')=='Settlement' ? 'selected':'' }}>Third Party Settlement</option>
 								</select>
 							</div>
 

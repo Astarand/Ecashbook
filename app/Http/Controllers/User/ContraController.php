@@ -2328,6 +2328,11 @@ class ContraController extends Controller
 			$query->whereDate('payment_vouchers.date', '<=', $request->to_date);
 		}
 		
+		// TRANSACTION FILTER
+		if (!empty($request->search_transaction)) {
+			$query->where('payment_vouchers.transaction_details', $request->search_transaction);
+		}
+		
 		// VOUCHER NO FILTER
 		if (!empty($request->voucher_no)) {
 			$query->where(
@@ -2363,8 +2368,8 @@ class ContraController extends Controller
 		}
 
 		// PARTY TYPE FILTER
-		if (!empty($request->party_type)) {
-			$query->where('payment_vouchers.party_type', $request->party_type);
+		if (!empty($request->partyType)) {
+			$query->where('payment_vouchers.party_type', $request->partyType);
 		}
 		
 		if (!empty($request->record_type)) {

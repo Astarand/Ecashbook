@@ -166,6 +166,17 @@
                                                         </a>
                                                     </li>
                                                 @endif
+												
+												@if ($income->pay_status != 'Full')
+												<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Third Party Settlement">
+													<a href="javascript:void(0);" title="Third Party Settlement"
+															class="btn btn-sm btn-warning settlement-btn"
+															data-module="Income"
+															data-id="{{ $income->id }}">
+														<i class="ti ti-replace"></i>
+													</a>
+												</li>
+												@endif
 
                                                 <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
                                                     <a href="#" data-id="{{ base64_encode($income->id) }}" class="avtar avtar-xs btn-link-danger btn-pc-default delete-btn" data-bs-toggle="modal" data-bs-target="#delete_modal">

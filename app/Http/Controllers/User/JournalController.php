@@ -63,7 +63,11 @@ class JournalController extends Controller
 
 		// Entry Type
 		if ($request->filled('entry_type')) {
-			$query->where('entry_type', $request->entry_type);
+			if ($request->entry_type == 'Settlement') {
+				$query->where('source', 'Settlement');
+			} else {
+				$query->where('entry_type', $request->entry_type);
+			}
 		}
 
 		// Status
@@ -114,6 +118,7 @@ class JournalController extends Controller
 
 		$entryTypes = Journals::where('added_by', $userId)
 			->select('entry_type')
+			->where('entry_type', '!=', 'Third Party Settlement')
 			->distinct()
 			->orderBy('entry_type')
 			->pluck('entry_type');

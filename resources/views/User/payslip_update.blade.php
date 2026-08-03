@@ -128,6 +128,10 @@
                                         <input type="text" id="transaction_id_input" class="form-control" placeholder="Enter transaction ID">
                                     </div>
                                     <div class="col-md-4">
+                                        <label class="form-label">Amount (₹)</label>
+                                        <input type="text" id="amount_salary_input" class="form-control" placeholder="Enter Salary Amount">
+                                    </div>
+                                    <div class="col-md-4">
                                         <div class="d-flex gap-2">
                                             {{-- <button type="button" id="btnSingleUpdate" class="btn btn-success">Single Update</button> --}}
                                             <button type="button" id="btnMultipleUpdate" class="btn btn-success">Update Payslips</button>
@@ -1406,6 +1410,7 @@
                     ids: selectedIds,
                     payment_date: paymentDate,
                     transaction_id: transactionId,
+                    amount_salary_input: $('#amount_salary_input').val(),
                     _token: '{{ csrf_token() }}'
                 },
                 beforeSend: function(){
