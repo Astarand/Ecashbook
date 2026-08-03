@@ -295,7 +295,7 @@ function renderTable(data, month, fy, workingDays) {
 
         html += `<tr data-idx="${idx}">
             <td class="ps-3">
-                <input type="checkbox" class="form-check-input row-check" data-idx="${idx}" onchange="updateGenerateBtn()">
+                <input type="checkbox" class="form-check-input row-check" data-idx="${idx}" onchange="updateGenerateBtn()" checked>
             </td>
             <td class="text-muted">${idx + 1}</td>
             <td class="fw-bold text-dark">${emp.employee_id || '—'}</td>
@@ -395,14 +395,32 @@ function toggleSelectAll() {
     const checkboxes = document.querySelectorAll('.row-check');
     const allChecked = [...checkboxes].every(c => c.checked);
     checkboxes.forEach(c => c.checked = !allChecked);
-    document.getElementById('masterCheck').checked = !allChecked;
-    document.getElementById('selectAllBtn').textContent = allChecked ? '☐ Select All' : '✓ Deselect All';
+    updateSelectAllButtonState();
     updateGenerateBtn();
 }
 
 function masterToggle(master) {
     document.querySelectorAll('.row-check').forEach(c => c.checked = master.checked);
+    updateSelectAllButtonState();
     updateGenerateBtn();
+}
+
+function updateSelectAllButtonState() {
+    const checkboxes = document.querySelectorAll('.row-check');
+    const masterCheck = document.getElementById('masterCheck');
+    const selectAllBtn = document.getElementById('selectAllBtn');
+
+    if (!checkboxes.length) {
+        masterCheck.checked = false;
+        selectAllBtn.innerHTML = '<i class="ph ph-check-square me-1"></i> Select All';
+        return;
+    }
+
+    const allChecked = [...checkboxes].every(c => c.checked);
+    masterCheck.checked = allChecked;
+    selectAllBtn.innerHTML = allChecked
+        ? '<i class="ph ph-check-square me-1"></i> Deselect All'
+        : '<i class="ph ph-check-square me-1"></i> Select All';
 }
 
 function updateGenerateBtn() {
@@ -412,6 +430,7 @@ function updateGenerateBtn() {
     btn.innerHTML = count
         ? `<i class="ph-duotone ph-file-plus me-1 fs-5"></i> Generate ${count} Payslip${count !== 1 ? 's' : ''}`
         : `<i class="ph-duotone ph-file-plus me-1 fs-5"></i> Generate Selected Payslips`;
+    updateSelectAllButtonState();
 }
 
 // ================================================================

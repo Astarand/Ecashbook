@@ -2787,7 +2787,7 @@ class PayrollReportController extends Controller
                     'against_ledger'   => null,
                     'narration'        => null,
                     'party_name'       => 'Bulk Payroll (' . $generated . ' employees)',
-                    'payment_status'   => 'Payroll',
+                    'payment_status'   => 'Full',
                     'status'           => 'Posted',
                     'rev_amend_status' => null,
                     'tds_applicable'   => 'no',
