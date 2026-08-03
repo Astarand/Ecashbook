@@ -77,26 +77,32 @@ class InvoiceController extends Controller
 		$custDetails = DB::table('customers')
 						->select(DB::raw('customers.*'))					                   					
 						->where('customers.id','=',$custId) 
-						->get();
+						->first();
 		//echo "<pre>";print_r($custDetails);exit;
-		$custDetails = isset($custDetails[0])?$custDetails[0]:$custDetails;
-		$stateBill = DB::table('states')
+		$stateBill = null;
+		$cityBill = null;
+		$stateShip = null;
+		$cityShip = null;
+		if (!empty($custDetails?->cust_bill_state)) {
+			$stateBill = DB::table('states')
 					->select(DB::raw('states.name'))
 				    ->where('states.id', '=', $custDetails->cust_bill_state) 
 				    ->get();
-		$cityBill = DB::table('cities')
-					->select(DB::raw('cities.name'))
-					->where('cities.id', '=', $custDetails->cust_bill_city) 
-					->get();
-		$stateShip = DB::table('states')
-					->select(DB::raw('states.name'))
-					->where('states.id', '=', $custDetails->cust_ship_state) 
-					->get();
 		
-		$cityShip = DB::table('cities')
-					->select(DB::raw('cities.name'))
-					->where('cities.id', '=', $custDetails->cust_ship_city) 
-					->get();
+			$cityBill = DB::table('cities')
+						->select(DB::raw('cities.name'))
+						->where('cities.id', '=', $custDetails->cust_bill_city) 
+						->get();
+			$stateShip = DB::table('states')
+						->select(DB::raw('states.name'))
+						->where('states.id', '=', $custDetails->cust_ship_state) 
+						->get();
+			
+			$cityShip = DB::table('cities')
+						->select(DB::raw('cities.name'))
+						->where('cities.id', '=', $custDetails->cust_ship_city) 
+						->get();
+		}
 		//get sales items 
 		$sales_values = DB::table('sales_values')
 								->select(DB::raw('sales_values.*'))

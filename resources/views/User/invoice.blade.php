@@ -32,10 +32,10 @@
                         <div class="col-sm-4">
                             <div class="border rounded p-3">
                                 <h6 class="mb-0">Billing Address:</h6>
-                                <h5>{{ $custDetails->cust_name }}</h5>
+                                <h5>{{ $custDetails->cust_name ?? 'N/A' }}</h5>
                                 <p class="mb-0">{{ optional($sales)->bill_addone ?? '' }}, {{ optional($sales)->bill_pin ?? '' }}</p>
-                                <p class="mb-0">PAN: {{ $custDetails->cust_pan }}</p>
-                                <p class="mb-0">GSTIN: {{ $custDetails->cust_gst_no }}</p>
+                                <p class="mb-0">PAN: {{ $custDetails->cust_pan ?? 'N/A' }}</p>
+                                <p class="mb-0">GSTIN: {{ $custDetails->cust_gst_no ?? 'N/A' }}</p>
                             </div>
                         </div>
                         <div class="col-sm-4">
