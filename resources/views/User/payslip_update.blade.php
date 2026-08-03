@@ -1128,6 +1128,82 @@
             updateSelectAllTdsState();
         }
 
+        // ── PF ──────────────────────────────────────────────────────
+        function getPfRowCheckboxes() {
+            return document.querySelectorAll('.pf-row-checkbox');
+        }
+        function updateSelectAllPfState() {
+            const checkboxes = getPfRowCheckboxes();
+            if (!selectAllPf) return;
+            selectAllPf.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+        }
+        function attachPfCheckboxHandlers() {
+            const checkboxes = getPfRowCheckboxes();
+            checkboxes.forEach(function (checkbox) {
+                checkbox.removeEventListener('change', onPfCheckboxChange);
+                checkbox.addEventListener('change', onPfCheckboxChange);
+            });
+            updateSelectAllPfState();
+        }
+        function onPfCheckboxChange() { updateSelectAllPfState(); }
+
+        // ── ESI ─────────────────────────────────────────────────────
+        function getEsiRowCheckboxes() {
+            return document.querySelectorAll('.esi-row-checkbox');
+        }
+        function updateSelectAllEsiState() {
+            const checkboxes = getEsiRowCheckboxes();
+            if (!selectAllEsi) return;
+            selectAllEsi.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+        }
+        function attachEsiCheckboxHandlers() {
+            const checkboxes = getEsiRowCheckboxes();
+            checkboxes.forEach(function (checkbox) {
+                checkbox.removeEventListener('change', onEsiCheckboxChange);
+                checkbox.addEventListener('change', onEsiCheckboxChange);
+            });
+            updateSelectAllEsiState();
+        }
+        function onEsiCheckboxChange() { updateSelectAllEsiState(); }
+
+        // ── PTAX ────────────────────────────────────────────────────
+        function getPtaxRowCheckboxes() {
+            return document.querySelectorAll('.ptax-row-checkbox');
+        }
+        function updateSelectAllPtaxState() {
+            const checkboxes = getPtaxRowCheckboxes();
+            if (!selectAllPtax) return;
+            selectAllPtax.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+        }
+        function attachPtaxCheckboxHandlers() {
+            const checkboxes = getPtaxRowCheckboxes();
+            checkboxes.forEach(function (checkbox) {
+                checkbox.removeEventListener('change', onPtaxCheckboxChange);
+                checkbox.addEventListener('change', onPtaxCheckboxChange);
+            });
+            updateSelectAllPtaxState();
+        }
+        function onPtaxCheckboxChange() { updateSelectAllPtaxState(); }
+
+        // ── LWF ─────────────────────────────────────────────────────
+        function getLwfRowCheckboxes() {
+            return document.querySelectorAll('.lwf-row-checkbox');
+        }
+        function updateSelectAllLwfState() {
+            const checkboxes = getLwfRowCheckboxes();
+            if (!selectAllLwf) return;
+            selectAllLwf.checked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+        }
+        function attachLwfCheckboxHandlers() {
+            const checkboxes = getLwfRowCheckboxes();
+            checkboxes.forEach(function (checkbox) {
+                checkbox.removeEventListener('change', onLwfCheckboxChange);
+                checkbox.addEventListener('change', onLwfCheckboxChange);
+            });
+            updateSelectAllLwfState();
+        }
+        function onLwfCheckboxChange() { updateSelectAllLwfState(); }
+
         const typeSelect = document.getElementById('tds-period-type');
         const periodWrapper = document.getElementById('tds-period-wrapper');
         const periodValue = document.getElementById('tds-period-value');

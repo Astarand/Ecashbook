@@ -1109,69 +1109,65 @@ class PayrollReportController extends Controller
         $ids = (array) $request->input('ids', []);
 
         if (empty($ids)) {
-            return response()->json([
-                'message' => 'No TDS IDs provided.'
-            ], 422);
+            return response()->json(['message' => 'No TDS IDs provided.'], 422);
         }
 
         $update = [];
 
-        if ($request->filled('tds_tan')) {
-            $update['tds_tan'] = $request->tds_tan;
-        }
-
-        if ($request->filled('tds_financial_year')) {
-            $update['tds_financial_year'] = $request->tds_financial_year;
-        }
-
-        if ($request->filled('tds_nature_of_payment')) {
-            $update['tds_nature_of_payment'] = $request->tds_nature_of_payment;
-        }
-
-        if ($request->filled('tds_amount')) {
-            $update['tds_amount'] = $request->tds_amount;
-        }
-
-        if ($request->filled('tds_cin')) {
-            $update['tds_cin'] = $request->tds_cin;
-        }
-
-        if ($request->filled('tds_challan_no')) {
-            $update['tds_challan_no'] = $request->tds_challan_no;
-        }
-
-        if ($request->filled('tds_bsr_code')) {
-            $update['tds_bsr_code'] = $request->tds_bsr_code;
-        }
-
-        if ($request->filled('tds_deposit_date')) {
-            $update['tds_deposit_date'] = $request->tds_deposit_date;
-        }
-
-        if ($request->filled('tds_tender_date')) {
-            $update['tds_tender_date'] = $request->tds_tender_date;
-        }
+        if ($request->filled('tds_tan'))                { $update['tds_tan']                = $request->tds_tan; }
+        if ($request->filled('tds_financial_year'))     { $update['tds_financial_year']     = $request->tds_financial_year; }
+        if ($request->filled('tds_nature_of_payment'))  { $update['tds_nature_of_payment']  = $request->tds_nature_of_payment; }
+        if ($request->filled('tds_amount'))             { $update['tds_amount']             = $request->tds_amount; }
+        if ($request->filled('tds_cin'))                { $update['tds_cin']                = $request->tds_cin; }
+        if ($request->filled('tds_challan_no'))         { $update['tds_challan_no']         = $request->tds_challan_no; }
+        if ($request->filled('tds_bsr_code'))           { $update['tds_bsr_code']           = $request->tds_bsr_code; }
+        if ($request->filled('tds_deposit_date'))       { $update['tds_deposit_date']       = $request->tds_deposit_date; }
+        if ($request->filled('tds_tender_date'))        { $update['tds_tender_date']        = $request->tds_tender_date; }
 
         $update['tds_deposit_status'] = 'Done';
 
         try {
-
             $affected = DB::table('user_payslip')
                 ->whereIn('id', $ids)
                 ->where('added_by', $ownerId)
                 ->update($update);
 
-            return response()->json([
-                'message' => "Updated {$affected} record(s)",
-                'updated' => $affected
-            ]);
+            // Single Receipt Voucher for TDS deposited amount
+            $tdsAmount = (float) $request->input('tds_amount', 0);
+            if ($tdsAmount > 0) {
+                $firstPayslip = DB::table('user_payslip as up')
+                    ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+                    ->where('up.id', $ids[0])
+                    ->where('up.added_by', $ownerId)
+                    ->select('up.id', 'up.payslip_no', 'up.date', 'e.propId')
+                    ->first();
+
+                $this->paymentVoucherService->storePaymentVoucherEntries(
+                    $firstPayslip->id ?? $ids[0],
+                    'Payroll',
+                    $tdsAmount,
+                    [
+                        'propId'        => $firstPayslip->propId ?? null,
+                        'date'          => $request->tds_deposit_date ?: ($firstPayslip->date ?? now()->toDateString()),
+                        'reference_no'  => $request->tds_challan_no ?: ($firstPayslip->payslip_no ?? null),
+                        'party_name'    => 'TDS Deposit (' . count($ids) . ' records)',
+                        'payroll_month' => '',
+                        'added_by'      => $ownerId,
+                        'net_salary'    => 0,
+                        'pf'            => 0,
+                        'esi'           => 0,
+                        'tds'           => $tdsAmount,
+                        'lwf'           => 0,
+                        'ptax'          => 0,
+                        'loan'          => 0,
+                    ]
+                );
+            }
+
+            return response()->json(['message' => "Updated {$affected} record(s)", 'updated' => $affected]);
 
         } catch (\Exception $e) {
-
-            return response()->json([
-                'message' => 'TDS update failed: '.$e->getMessage()
-            ],500);
-
+            return response()->json(['message' => 'TDS update failed: ' . $e->getMessage()], 500);
         }
     }
 
@@ -1456,38 +1452,60 @@ class PayrollReportController extends Controller
     //------- Update PF -------//
     public function updatePf(Request $request)
     {
-        $request->validate([
-            'ids' => 'required|array|min:1',
-        ]);
+        $ownerId = currentOwnerId();
+
+        $request->validate(['ids' => 'required|array|min:1']);
+
+        $ids = $request->ids;
 
         DB::table('user_payslip')
-            ->whereIn('id', $request->ids)
+            ->whereIn('id', $ids)
             ->update([
-
-                'pf_trrn' => $request->pf_trrn,
-
-                'pf_challan_generated_on' => $request->pf_challan_generated,
-
-                'pf_establishment_id' => $request->pf_establishment_id,
-
-                'pf_wage_month' => $request->pf_wage_month,
-
-                'pf_total_amount' => $request->pf_total_amount,
-
-                'pf_payment_type' => $request->pf_payment_type,
-
-                'pf_crn' => $request->pf_crn,
-
-                'pf_payment_confirmation_date' => $request->pf_payment_date,
-
-                'updated_at' => now()
-
+                'pf_trrn'                      => $request->pf_trrn,
+                'pf_challan_generated_on'       => $request->pf_challan_generated,
+                'pf_establishment_id'           => $request->pf_establishment_id,
+                'pf_wage_month'                 => $request->pf_wage_month,
+                'pf_total_amount'               => $request->pf_total_amount,
+                'pf_payment_type'               => $request->pf_payment_type,
+                'pf_crn'                        => $request->pf_crn,
+                'pf_payment_confirmation_date'  => $request->pf_payment_date,
+                'pf_payment_status'             => 'Done',
+                'updated_at'                    => now(),
             ]);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Selected PF records updated successfully.'
-        ]);
+        // Single Receipt Voucher for PF deposited amount
+        $pfAmount = (float) $request->input('pf_total_amount', 0);
+        if ($pfAmount > 0) {
+            $firstPayslip = DB::table('user_payslip as up')
+                ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+                ->where('up.id', $ids[0])
+                ->where('up.added_by', $ownerId)
+                ->select('up.id', 'up.payslip_no', 'up.date', 'e.propId')
+                ->first();
+
+            $this->paymentVoucherService->storePaymentVoucherEntries(
+                $firstPayslip->id ?? $ids[0],
+                'Payroll',
+                $pfAmount,
+                [
+                    'propId'        => $firstPayslip->propId ?? null,
+                    'date'          => $request->pf_payment_date ?: ($firstPayslip->date ?? now()->toDateString()),
+                    'reference_no'  => $request->pf_trrn ?: ($firstPayslip->payslip_no ?? null),
+                    'party_name'    => 'PF Deposit (' . count($ids) . ' records)',
+                    'payroll_month' => $request->pf_wage_month ?? '',
+                    'added_by'      => $ownerId,
+                    'net_salary'    => 0,
+                    'pf'            => $pfAmount,
+                    'esi'           => 0,
+                    'tds'           => 0,
+                    'lwf'           => 0,
+                    'ptax'          => 0,
+                    'loan'          => 0,
+                ]
+            );
+        }
+
+        return response()->json(['status' => true, 'message' => 'Selected PF records updated successfully.']);
     }
 
     //------- ESI List -------//
@@ -1651,31 +1669,59 @@ class PayrollReportController extends Controller
     //------- Update ESI -------//
     public function updateEsi(Request $request)
     {
-        $request->validate([
-            'ids' => 'required|array|min:1',
-        ]);
+        $ownerId = currentOwnerId();
+
+        $request->validate(['ids' => 'required|array|min:1']);
+
+        $ids = $request->ids;
 
         DB::table('user_payslip')
-            ->whereIn('id', $request->ids)
+            ->whereIn('id', $ids)
             ->update([
-
-                'esi_employer_code'            => $request->esi_employer_code,
-                // 'esi_employer_name'            => $request->esi_employer_name,
-                'esi_contribution_period'      => $request->esi_contribution_period,
-                'esi_challan_no'               => $request->esi_challan_no,
-                'esi_challan_created_date'     => $request->esi_challan_created_date,
-                'esi_challan_submitted_date'   => $request->esi_challan_submitted_date,
-                'esi_amount_paid'              => $request->esi_amount_paid,
-                'esi_transaction_no'           => $request->esi_transaction_no,
-                'esi_payment_status'           => 'Done',
-                'updated_at'                   => now()
-
+                'esi_employer_code'          => $request->esi_employer_code,
+                'esi_contribution_period'    => $request->esi_contribution_period,
+                'esi_challan_no'             => $request->esi_challan_no,
+                'esi_challan_created_date'   => $request->esi_challan_created_date,
+                'esi_challan_submitted_date' => $request->esi_challan_submitted_date,
+                'esi_amount_paid'            => $request->esi_amount_paid,
+                'esi_transaction_no'         => $request->esi_transaction_no,
+                'esi_payment_status'         => 'Done',
+                'updated_at'                 => now(),
             ]);
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Selected ESI records updated successfully.'
-        ]);
+        // Single Receipt Voucher for ESI deposited amount
+        $esiAmount = (float) $request->input('esi_amount_paid', 0);
+        if ($esiAmount > 0) {
+            $firstPayslip = DB::table('user_payslip as up')
+                ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+                ->where('up.id', $ids[0])
+                ->where('up.added_by', $ownerId)
+                ->select('up.id', 'up.payslip_no', 'up.date', 'e.propId')
+                ->first();
+
+            $this->paymentVoucherService->storePaymentVoucherEntries(
+                $firstPayslip->id ?? $ids[0],
+                'Payroll',
+                $esiAmount,
+                [
+                    'propId'        => $firstPayslip->propId ?? null,
+                    'date'          => $request->esi_challan_submitted_date ?: ($firstPayslip->date ?? now()->toDateString()),
+                    'reference_no'  => $request->esi_challan_no ?: ($firstPayslip->payslip_no ?? null),
+                    'party_name'    => 'ESI Deposit (' . count($ids) . ' records)',
+                    'payroll_month' => $request->esi_contribution_period ?? '',
+                    'added_by'      => $ownerId,
+                    'net_salary'    => 0,
+                    'pf'            => 0,
+                    'esi'           => $esiAmount,
+                    'tds'           => 0,
+                    'lwf'           => 0,
+                    'ptax'          => 0,
+                    'loan'          => 0,
+                ]
+            );
+        }
+
+        return response()->json(['status' => true, 'message' => 'Selected ESI records updated successfully.']);
     }
 
     //------- PTAX List -------//
@@ -1922,32 +1968,60 @@ class PayrollReportController extends Controller
 
     public function updatePtax(Request $request)
     {
-        $request->validate([
-            'ids' => 'required|array|min:1',
-        ]);
+        $ownerId = currentOwnerId();
+
+        $request->validate(['ids' => 'required|array|min:1']);
+
+        $ids = $request->ids;
 
         DB::table('user_payslip')
-            ->whereIn('id', $request->ids)
+            ->whereIn('id', $ids)
             ->update([
-
-                'ptax_grips_payment_id'      => $request->ptax_grips_payment_id,
-                'ptax_payment_initiated_date'=> $request->ptax_payment_initiated_date,
-                'ptax_brn'                  => $request->ptax_brn,
-                'ptax_grn'                  => $request->ptax_grn,
-                'ptax_period_from'          => $request->ptax_period_from,
-                'ptax_period_to'            => $request->ptax_period_to,
-                'ptax_payment_ref_no'       => $request->ptax_payment_ref_no,
-                'ptax_amount_paid'          => $request->ptax_amount_paid,
-                'ptax_payment_status'       => 'Done',
-
-                'updated_at' => now()
-
+                'ptax_grips_payment_id'       => $request->ptax_grips_payment_id,
+                'ptax_payment_initiated_date' => $request->ptax_payment_initiated_date,
+                'ptax_brn'                    => $request->ptax_brn,
+                'ptax_grn'                    => $request->ptax_grn,
+                'ptax_period_from'            => $request->ptax_period_from,
+                'ptax_period_to'              => $request->ptax_period_to,
+                'ptax_payment_ref_no'         => $request->ptax_payment_ref_no,
+                'ptax_amount_paid'            => $request->ptax_amount_paid,
+                'ptax_payment_status'         => 'Done',
+                'updated_at'                  => now(),
             ]);
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Selected PTax records updated successfully.'
-        ]);
+        // Single Receipt Voucher for PTAX deposited amount
+        $ptaxAmount = (float) $request->input('ptax_amount_paid', 0);
+        if ($ptaxAmount > 0) {
+            $firstPayslip = DB::table('user_payslip as up')
+                ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+                ->where('up.id', $ids[0])
+                ->where('up.added_by', $ownerId)
+                ->select('up.id', 'up.payslip_no', 'up.date', 'e.propId')
+                ->first();
+
+            $this->paymentVoucherService->storePaymentVoucherEntries(
+                $firstPayslip->id ?? $ids[0],
+                'Payroll',
+                $ptaxAmount,
+                [
+                    'propId'        => $firstPayslip->propId ?? null,
+                    'date'          => $request->ptax_payment_initiated_date ?: ($firstPayslip->date ?? now()->toDateString()),
+                    'reference_no'  => $request->ptax_payment_ref_no ?: ($firstPayslip->payslip_no ?? null),
+                    'party_name'    => 'PTAX Deposit (' . count($ids) . ' records)',
+                    'payroll_month' => ($request->ptax_period_from ?? '') . ($request->ptax_period_to ? ' to ' . $request->ptax_period_to : ''),
+                    'added_by'      => $ownerId,
+                    'net_salary'    => 0,
+                    'pf'            => 0,
+                    'esi'           => 0,
+                    'tds'           => 0,
+                    'lwf'           => 0,
+                    'ptax'          => $ptaxAmount,
+                    'loan'          => 0,
+                ]
+            );
+        }
+
+        return response()->json(['status' => true, 'message' => 'Selected PTax records updated successfully.']);
     }
 
     //------- LWF Full List -------//
@@ -2072,27 +2146,60 @@ class PayrollReportController extends Controller
 
     public function updateLwf(Request $request)
     {
+        $ownerId = currentOwnerId();
+
+        $ids = (array) $request->input('ids', []);
+
         DB::table('user_payslip')
-            ->whereIn('id', $request->ids)
+            ->whereIn('id', $ids)
             ->update([
-                'lwf_grips_payment_id'          => $request->lwf_grips_payment_id,
-                'lwf_receipt_date'              => $request->lwf_receipt_date,
-                'lwf_receipt_no'                => $request->lwf_receipt_no,
-                'lwf_organization_account_no'   => $request->lwf_organization_account_no,
-                'lwf_payment_month'             => $request->lwf_payment_month,
-                'lwf_employee_count'            => $request->lwf_employee_count,
-                'lwf_employee_contribution'     => $request->lwf_employee_contribution,
-                'lwf_employer_contribution'     => $request->lwf_employer_contribution,
-                'lwf_total_payment'             => $request->lwf_total_payment,
-                'lwf_interest_amount'           => $request->lwf_interest_amount,
-                'lwf_payment_status'            => 'Done',
-                'updated_at'                    => now(),
+                'lwf_grips_payment_id'        => $request->lwf_grips_payment_id,
+                'lwf_receipt_date'            => $request->lwf_receipt_date,
+                'lwf_receipt_no'              => $request->lwf_receipt_no,
+                'lwf_organization_account_no' => $request->lwf_organization_account_no,
+                'lwf_payment_month'           => $request->lwf_payment_month,
+                'lwf_employee_count'          => $request->lwf_employee_count,
+                'lwf_employee_contribution'   => $request->lwf_employee_contribution,
+                'lwf_employer_contribution'   => $request->lwf_employer_contribution,
+                'lwf_total_payment'           => $request->lwf_total_payment,
+                'lwf_interest_amount'         => $request->lwf_interest_amount,
+                'lwf_payment_status'          => 'Done',
+                'updated_at'                  => now(),
             ]);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Selected LWF records updated successfully.'
-        ]);
+        // Single Receipt Voucher for LWF deposited amount
+        $lwfAmount = (float) $request->input('lwf_total_payment', 0);
+        if ($lwfAmount > 0 && !empty($ids)) {
+            $firstPayslip = DB::table('user_payslip as up')
+                ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+                ->where('up.id', $ids[0])
+                ->where('up.added_by', $ownerId)
+                ->select('up.id', 'up.payslip_no', 'up.date', 'e.propId')
+                ->first();
+
+            $this->paymentVoucherService->storePaymentVoucherEntries(
+                $firstPayslip->id ?? $ids[0],
+                'Payroll',
+                $lwfAmount,
+                [
+                    'propId'        => $firstPayslip->propId ?? null,
+                    'date'          => $request->lwf_receipt_date ?: ($firstPayslip->date ?? now()->toDateString()),
+                    'reference_no'  => $request->lwf_receipt_no ?: ($firstPayslip->payslip_no ?? null),
+                    'party_name'    => 'LWF Deposit (' . count($ids) . ' records)',
+                    'payroll_month' => $request->lwf_payment_month ?? '',
+                    'added_by'      => $ownerId,
+                    'net_salary'    => 0,
+                    'pf'            => 0,
+                    'esi'           => 0,
+                    'tds'           => 0,
+                    'lwf'           => $lwfAmount,
+                    'ptax'          => 0,
+                    'loan'          => 0,
+                ]
+            );
+        }
+
+        return response()->json(['status' => true, 'message' => 'Selected LWF records updated successfully.']);
     }
 
     // ------- Salary Sheet (Bank Transfer Sheet) -------//
