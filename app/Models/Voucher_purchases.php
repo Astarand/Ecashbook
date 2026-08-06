@@ -16,6 +16,7 @@ class Voucher_purchases extends Model
         'inv_date',
         'v_num',
         'v_name',
+        'prod_serv_type',
         'seller_name',
         'seller_contact',
         'seller_email',

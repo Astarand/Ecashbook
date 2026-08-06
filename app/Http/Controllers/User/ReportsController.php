@@ -174,7 +174,8 @@ class ReportsController extends Controller
 
 		$salesIds    = collect();
 		$purchaseIds = collect();
-		$expenseIds  = collect();
+		$expenseTypeIds   = collect();
+		$expenseVendorIds = collect();
 		$assetIds    = collect();
 
 		if (!empty($ledgerFilter) && $ledgerFilter !== 'all') {
@@ -201,8 +202,13 @@ class ReportsController extends Controller
 					->pluck('id');
 			}
 
+			$expenseTypeIds = DB::table('expenses')
+				->where('expense_type', $ledgerFilter)
+				->where('added_by', $userId)
+				->pluck('id');
+
 			if ($vendorId) {
-				$expenseIds = DB::table('expenses')
+				$expenseVendorIds = DB::table('expenses')
 					->where('vendor_id', $vendorId)
 					->pluck('id');
 			}
@@ -261,8 +267,11 @@ class ReportsController extends Controller
 				}
 				// 5. VENDOR EXPENSE MATCH
 				if (
-					strtolower($row->entry_type) === 'expense'
-					&& $expenseIds->contains($row->autoId)
+					str_contains(strtolower($row->entry_type), 'expense') &&
+					(
+						$expenseTypeIds->contains($row->autoId) ||
+						$expenseVendorIds->contains($row->autoId)
+					)
 				) {
 					$isMatched = true;
 				}
@@ -372,7 +381,7 @@ class ReportsController extends Controller
 		//Journal Opening
 		$rows = DB::table('journals')
 			->where('added_by', $userId)
-			//->where('ledger', $ledger)
+			->where('ledger', $ledger)
 			->whereDate('journal_date', '<', $fromDate)
 			->when($propId, function ($q) use ($propId) {
 				$q->where('propId', $propId);
@@ -412,14 +421,25 @@ class ReportsController extends Controller
 		$source = strtolower(trim($row->source));
 		$entry  = strtolower(trim($row->entry_type));
 
-		// GST
+		// Input GST → Asset
 		if (
-			str_contains($ledger, 'gst') ||
-			str_contains($ledger, 'cgst') ||
-			str_contains($ledger, 'sgst') ||
-			str_contains($ledger, 'igst')
+			str_contains($ledger, 'input cgst') ||
+			str_contains($ledger, 'input sgst') ||
+			str_contains($ledger, 'input igst') ||
+			str_contains($ledger, 'input gst')
 		) {
-			return 'Liability';   // GST Payable
+			return 'Asset';
+		}
+
+		// Output GST / GST Payable → Liability
+		if (
+			str_contains($ledger, 'output cgst') ||
+			str_contains($ledger, 'output sgst') ||
+			str_contains($ledger, 'output igst') ||
+			str_contains($ledger, 'gst payable') ||
+			str_contains($ledger, 'output gst')
+		) {
+			return 'Liability';
 		}
 
 		// Asset

@@ -16,6 +16,7 @@ class Vouchers extends Model
         'inv_date',
         'v_num',
         'v_name',
+        'prod_serv_type',
         'seller_name',
         'seller_addone',
         'seller_addtwo',

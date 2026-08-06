@@ -35,7 +35,7 @@
                 <input type="hidden" name="id" id="sId" value="">
                 @csrf
                 <div class="row">
-                    <div class="mb-3 col-md-6">
+                    <div class="mb-3 col-md-3">
 						<label class="form-label">
 							Invoice Number <span class="text-danger">*</span>
 						</label>
@@ -77,6 +77,14 @@
 							<!--<option value="Debit">Debit</option>-->
 						</select>
 					</div>
+					<div class="mb-3 col-md-3">
+						<label class="form-label" for="InvoiceaddressType">Product/Service<span class="text-danger">*</span></label>
+						<select class="form-control error" name="prod_serv_type" id="prod_serv_type" required>
+							<option value="">Select</option>
+							<option value="product">Product</option>
+							<option value="service">Service</option>
+						</select>
+                    </div>
                 </div>
             </form>
         </div>

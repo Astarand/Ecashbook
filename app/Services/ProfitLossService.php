@@ -333,7 +333,7 @@ class ProfitLossService
 						->whereBetween('s.inv_date', [$startDate, $endDate])
 						->groupBy('s.inv_num');
 						
-		$voucherAdjustments = DB::table('vouchers as v')
+		/*$voucherAdjustments = DB::table('vouchers as v')
 							->joinSub($invoiceType, 't', function ($join) {
 								$join->on('t.inv_num', '=', 'v.invoice_number');
 							})
@@ -351,13 +351,29 @@ class ProfitLossService
 							->where('v.added_by', $userId)
 							->whereBetween('v.inv_date', [$startDate, $endDate])
 							->groupBy('t.item_type')
+							->get();*/
+		$voucherAdjustments = DB::table('vouchers as v')
+							->selectRaw("
+								v.prod_serv_type,
+
+								SUM(
+									CASE
+										WHEN LOWER(v.note_type) = 'credit'
+										THEN COALESCE(v.taxable_value, 0)
+										ELSE 0
+									END
+								) AS credit
+							")
+							->where('v.added_by', $userId)
+							->whereBetween('v.inv_date', [$startDate, $endDate])
+							->groupBy('v.prod_serv_type')
 							->get();
 		//End Sales credit/debit
 		$productCr = $serviceCr = 0;
 		foreach ($voucherAdjustments as $row) {
-			if ($row->item_type == 'product') {
+			if ($row->prod_serv_type == 'product') {
 				$productCr = $row->credit;
-			} else {
+			} elseif ($row->prod_serv_type == 'service') {
 				$serviceCr = $row->credit;
 			}
 		}
@@ -370,7 +386,8 @@ class ProfitLossService
 
 		$totalReseller = ($totalReseller - $productCr);
 		$totalService  = ($totalService - $serviceCr);
-		$profit_sale = $totalReseller + $totalService - $manualCredit;
+		//$profit_sale = $totalReseller + $totalService - $manualCredit;
+		$profit_sale = $totalReseller + $totalService;
 
 		/* ================================
 		 | OTHER INCOME - TDS amount

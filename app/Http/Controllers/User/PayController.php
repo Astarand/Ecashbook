@@ -273,21 +273,24 @@ class PayController extends Controller
 			if($paid == 0)
 			{
 				$status = 'Due';
+				$advanceAmount = 0;
 			}
 			elseif($paid >= $total)
 			{
 				$status = 'Full';
+				$advanceAmount = 0;
 			}
 			else
 			{
 				$status = 'Partial';
+				$advanceAmount = $paid;
 			}
 
 			DB::table('sales')
 				->where('id',$id)
 				->update([
 					'pay_status'=>$status,
-					'advance_amount'=>$paid,
+					'advance_amount'=>$advanceAmount,
 					'adjusted_amount'=>$paid,
 					'due_amount'=>max(0,$total-$paid)
 				]);
@@ -310,21 +313,24 @@ class PayController extends Controller
 			if($paid == 0)
 			{
 				$status = 'Due';
+				$advanceAmount = 0;
 			}
 			elseif($paid >= $total)
 			{
 				$status = 'Full';
+				$advanceAmount = 0;
 			}
 			else
 			{
 				$status = 'Partial';
+				$advanceAmount = $paid;
 			}
 
 			DB::table('proformas')
 				->where('id',$id)
 				->update([
 					'pay_status'=>$status,
-					'advance_amount'=>$paid,
+					'advance_amount'=>$advanceAmount,
 					'adjusted_amount'=>$paid,
 					'due_amount'=>max(0,$total-$paid)
 				]);
@@ -351,22 +357,25 @@ class PayController extends Controller
 
 			if($paid == 0)
 			{
-				$status='Due';
+				$status = 'Due';
+				$advanceAmount = 0;
 			}
 			elseif($paid >= $total)
 			{
-				$status='Full';
+				$status = 'Full';
+				$advanceAmount = 0;
 			}
 			else
 			{
-				$status='Partial';
+				$status = 'Partial';
+				$advanceAmount = $paid;
 			}
 
 			DB::table('purchases')
 				->where('id',$id)
 				->update([
 					'pay_status'=>$status,
-					'advance_amount'=>$paid,
+					'advance_amount'=>$advanceAmount,
 					'adjusted_amount'=>$paid,
 					'due_amount'=>max(0,$total-$paid)
 				]);
@@ -384,19 +393,23 @@ class PayController extends Controller
 				->where('f_id',$id)
 				->sum('amount');
 
-			if($paid==0)
+			if($paid==0){
 				$status='due';
-			elseif($paid >= $total)
+				$advanceAmount = 0;
+			}elseif($paid >= $total){
 				$status='full';
-			else
+				$advanceAmount = 0;
+			}else{
 				$status='advance';
+				$advanceAmount = $paid;
+			}
 
 			//update payment status in expenses
 			DB::table('expenses')
 				->where('id',$id)
 				->update([
 					'payment_status'=>$status,
-					'advance_amount'=>$paid,
+					'advance_amount'=>$advanceAmount,
 					'adjusted_now'=>$paid,
 					'balance_amount'=>max(0,$total-$paid)
 				]);
@@ -424,19 +437,23 @@ class PayController extends Controller
 					->where('f_id', $id)
 					->sum('amount');
 
-				if($received == 0)
+				if($received == 0){
 					$status = 'Due';
-				elseif($received >= $total)
+					$advanceAmount = 0;
+				}elseif($received >= $total){
 					$status = 'Full';
-				else
+					$advanceAmount = 0;
+				}else{
 					$status = 'Advance';
+					$advanceAmount = $received;
+				}
 
 				// Update Income
 				DB::table('income')
 					->where('id', $id)
 					->update([
 						'pay_status'     => $status,
-						'advance_amt'    => $received,
+						'advance_amt'    => $advanceAmount,
 						'adjust_amt'     => $received,
 						'receivable_amt' => max(0, $total - $received)
 					]);
@@ -473,12 +490,16 @@ class PayController extends Controller
 					->where('f_id', $id)
 					->sum('amount');
 
-				if($paid == 0)
+				if($paid == 0){
 					$status = 'Due';
-				elseif($paid >= $total)
+					$advanceAmount = 0;
+				}elseif($paid >= $total){
 					$status = 'Full';
-				else
+					$advanceAmount = 0;
+				}else{
 					$status = 'Advance';
+					$advanceAmount = $paid;
+				}
 
 				// Update Asset
 				if($asset->nonCurrentAssetType == 'Capital Work in Progress')
@@ -487,7 +508,7 @@ class PayController extends Controller
 					->where('id', $id)
 					->update([
 						'cwip_pay_status'    => $status,
-						'cwip_advance_amt'   => $paid,
+						'cwip_advance_amt'   => $advanceAmount,
 						'cwip_adjusted_amt'  => $paid,
 						'cwip_payable_amt'   => max(0, $total - $paid)
 					]);
@@ -498,7 +519,7 @@ class PayController extends Controller
 					->where('id', $id)
 					->update([
 						'pay_status'    => $status,
-						'advance_amt'   => $paid,
+						'advance_amt'   => $advanceAmount,
 						'adjusted_amt'  => $paid,
 						'payable_amt'   => max(0, $total - $paid)
 					]);
@@ -595,7 +616,7 @@ class PayController extends Controller
 				'entry_type'    => 'Sales',
 				'party_name'    => $sale->cust_name ?? '',
 				'pay_status'    => $sale->pay_status ?? $payment_mode,
-				'amount'    	=> $amount ?? 0,
+				'amount'    	=> (($sale->pay_status ?? $payment_mode) === 'Full') ? ($totals->total_amount ?? 0) : ($amount ?? 0),
 				'total_amount'  => $totals->total_amount ?? 0,
 				'base_amount'   => ($totals->total_amount - $totals->total_tax),
 				'gst_amount'    => $totals->total_tax ?? 0,
@@ -641,7 +662,7 @@ class PayController extends Controller
 				'entry_type'    => 'Purchase',
 				'party_name'    => $purchase->vendor_name ?? '',
 				'pay_status'    => $purchase->pay_status ?? $payment_mode,
-				'amount'    	=> $amount ?? 0,
+				'amount'    	=> (($purchase->pay_status ?? $payment_mode) === 'Full') ? ($totals->total_amount ?? 0) : ($amount ?? 0),
 				'total_amount'  => $totals->total_amount ?? 0,
 				'gst_amount'    => $totals->total_tax ?? 0,
 				'gst_rate'      => $totals->avg_gst_rate ?? 0,

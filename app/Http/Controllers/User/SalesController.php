@@ -2398,6 +2398,7 @@ class SalesController extends Controller
 			$array[$val->id]['cust_phone'] = isset($customerName[0]->cust_phone) ? $customerName[0]->cust_phone : "";
 			$array[$val->id]['v_num'] = $val->v_num;
 			$array[$val->id]['note_type'] = $val->note_type;
+			$array[$val->id]['prod_serv_type'] = $val->prod_serv_type;
 			$array[$val->id]['status'] = $val->status;
 			$array[$val->id]['is_paid'] = $val->is_paid;
 			$array[$val->id]['total_amt'] = $val->total_amt;
@@ -2470,6 +2471,7 @@ class SalesController extends Controller
 		return Validator::make($data, [
 			'inv_num' => 'required',
 			'inv_date' => 'required',
+			'prod_serv_type' => 'required',
 			//'seller_name' => 'required',
 			'seller_addone' => 'required',
 			//'seller_country' => 'required',
@@ -2521,6 +2523,7 @@ class SalesController extends Controller
 			'v_name' => $data['v_name'],
 			'note_type' => $data['note_type'],
 			'note_date' => $data['note_date'],
+			'prod_serv_type' => $data['prod_serv_type'],
 			'reason_issuance' => $data['reason_issuance'],
 
 			'v_num' => $data['v_num'],

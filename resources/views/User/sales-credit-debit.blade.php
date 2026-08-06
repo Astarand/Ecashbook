@@ -45,6 +45,7 @@
                             <th>Customer Name</th>
                             <th>Invoice Number</th>
                             <th>Voucher Number</th>
+                            <th>Item Type</th>
                             <th>Date</th>
                             <th>Note Type</th>
                             <th>Total Amount</th>
@@ -67,6 +68,7 @@
                             </td>
                             <td><span class="text-muted text-hover-primary">{{ $sale->invoice_number }}</span></td>
                             <td><span class="text-muted text-hover-primary">{{ $sale->v_num }}</span></td>
+                            <td><span class="text-muted text-hover-primary">{{ $sale->prod_serv_type }}</span></td>
                             <td>{{ date("d-m-Y", strtotime($sale->inv_date)) }}</td>
                             <td><span class="text-muted text-hover-primary">{{ $sale->note_type }}</span></td>
                             <td><span class="text-muted text-hover-primary">₹{{ $sale->total_amt }}</span></td>

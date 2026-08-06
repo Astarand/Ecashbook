@@ -173,7 +173,7 @@
 								
 								<tr>
 									<td class="text-center" style="border: 1px solid #ddd;"><strong>4.</strong></td>
-									<td colspan="4" class="text-start" style="background-color: yellow; border: 1px solid #ddd;"><strong>TOTAL REVENUE (1 + 2)</strong></td>
+									<td colspan="4" class="text-start" style="background-color: yellow; border: 1px solid #ddd;"><strong>TOTAL REVENUE (1 + 2 + 3)</strong></td>
 									<td class="text-start" style="border: 1px solid #ddd;"><strong>₹ <span id="curr_total_sales_income">00.00</span></strong></td>
 									<td class="text-start" style="border: 1px solid #ddd;"><strong>₹ <span id="prev_total_sales_income">00.00</span></strong></td>
 								</tr>

@@ -322,6 +322,7 @@ class PurchaseController extends Controller
 		$userId = currentOwnerId();
 
 		// Update purchase shipping cost
+		$expenseAmt   = (float) $request->shipping_cost;
 		DB::table('purchases')
 			->where('id', $request->sId)
 			->update([
@@ -337,11 +338,10 @@ class PurchaseController extends Controller
 		{
 			// Tax master
 			$taxMaster = DB::table('tax_deduction_masters')
-				->where('expense_type', 'indirect')
-				->where('expense_head', 'travel_conveyance')
+				->where('expense_type', 'direct')
+				->where('expense_head', 'Freight / Carriage Inward')
 				->first();
 
-			$expenseAmt   = (float) $request->shipping_cost;
 			$allowedRatio = (float) ($taxMaster->allow_start ?? 100);
 			$rebateAmt = round(($expenseAmt * $allowedRatio) / 100, 2);
 			$payStatus = $purchase->pay_status ?? 'due';
@@ -352,8 +352,8 @@ class PurchaseController extends Controller
 				'expense_date'    => $purchase->inv_date,
 				'threshold_type'  => 'Single',
 				'mode_of_expense' => $purchase->mode_of_pay ?? 'Cash',
-				'expense_cat'     => 'indirect',
-				'expense_type'    => 'travel_conveyance',
+				'expense_cat'     => 'direct',
+				'expense_type'    => 'Freight / Carriage Inward',
 				'expense_amt'     => $expenseAmt,
 				'vendor_id'       => $purchase->inv_name,
 				'status'          => 1,
@@ -376,7 +376,7 @@ class PurchaseController extends Controller
 			//Update if already exists for this purchase
 			$expense = DB::table('expenses')
 				->where('exp_invno', $purchase->inv_num)
-				->where('expense_type', 'travel_conveyance')
+				->where('expense_type', 'Freight / Carriage Inward')
 				->first();
 
 			if ($expense) {
@@ -384,15 +384,48 @@ class PurchaseController extends Controller
 				DB::table('expenses')
 					->where('id', $expense->id)
 					->update($expenseData);
+				$expenseId = $expense->id;
 			} else {
 				$expenseData['exp_invno'] = $purchase->inv_num;
-				DB::table('expenses')->insert($expenseData);
+				$expenseId = DB::table('expenses')->insertGetId($expenseData);
 			}
 		}
-
+		// Journal Entry for shipping cost
+		$this->journalEntryExpense($expenseId); 
+		// Payment voucher for shipping cost
+		$data = [
+					'bank_id' => $request->bank_id ?? null
+				];
+		if ($expenseAmt > 0) {
+			$this->paymentVoucherService->storePaymentVoucherEntries($expenseId, 'Expense', $expenseAmt, $data);
+		}
 		$sales_values = $this->items_purchase_list($request->sId);
 		return view('User.ajax-purchase-invoice-display')->with([
 			'sales_values' => $sales_values,
+		]);
+	}
+	
+	public function journalEntryExpense($eId)
+	{
+		$expense = DB::table('expenses')->where('id', $eId)->first();
+		$this->journalService->storeExpenseJournalEntries([
+			'source'        => 'Expense',
+			'autoId'        => $expense->id,
+			'added_by'      => currentOwnerId(),
+			'propId'        => $expense->propId,
+			'date'          => $expense->expense_date,
+			'reference_no'  => $expense->exp_invno,
+			'entry_type'    => 'Expense',
+			'ledger'        => ucwords(str_replace(['_', '-'], ' ', $expense->expense_type)),
+			'party_name'    => $expense->approved_by,
+			'amount'        => $expense->expense_amt,
+			'payment_status'=> $expense->payment_status,
+			'tds_applicable'=> $expense->tds_applicable ?? 'no',
+			'tds_percent'   => $expense->tds_percentage ?? 0,
+			'tds_amt'       => $expense->tds_amount ?? 0,
+			'tds_id'        => $expense->tds_id ?? null,
+			'other_note'    => $expense->pur_of_expense,
+			'status'    	=> $expense->status,
 		]);
 	}
 
@@ -1715,8 +1748,8 @@ class PurchaseController extends Controller
 		if($data){
 			DB::table('expenses')
 				->where('exp_invno', $data->inv_num)
-				->where('expense_cat', 'indirect')
-				->where('expense_type', 'travel_conveyance')
+				->where('expense_cat', 'direct')
+				->where('expense_type', 'Freight / Carriage Inward')
 				->delete();
 		}
 		if($delInvoice){
@@ -1876,6 +1909,7 @@ class PurchaseController extends Controller
 			$array[$val->id]['cust_phone'] = isset($customerName[0]->cust_phone)?$customerName[0]->cust_phone:"";
 			$array[$val->id]['v_num'] = $val->v_num;
 			$array[$val->id]['note_type'] = $val->note_type;
+			$array[$val->id]['prod_serv_type'] = $val->prod_serv_type;
 			$array[$val->id]['status'] = $val->status;
 			$array[$val->id]['is_paid'] = $val->is_paid;
 			$array[$val->id]['total_amt'] = $val->total_amt;
@@ -2023,6 +2057,7 @@ class PurchaseController extends Controller
 			return Validator::make($data, [
 				'inv_num' => 'required',
 				'inv_date' => 'required',
+				'prod_serv_type' => 'required',
 				'cust_state' => 'required',
 				'cust_city' => 'required',
 				'cust_pin' => 'required',
@@ -2067,6 +2102,7 @@ class PurchaseController extends Controller
 			'v_name' => $data['v_name'],
 			'note_type' => $data['note_type'],
 			'note_date' => $data['note_date'],
+			'prod_serv_type' => $data['prod_serv_type'],
 			'reason_issuance' => $data['reason_issuance'],
 
 			'v_num' => $data['v_num'],
