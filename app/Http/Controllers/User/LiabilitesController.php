@@ -1792,24 +1792,47 @@ class LiabilitesController extends Controller
 		}
 
 		// Salary Payable
+		// if ($type == 'salary_payable') {
+
+		// 	$records = DB::table('user_payslip')
+		// 		->whereBetween('date', [$currentMonthStartDate, $currentMonthEndDate])
+		// 		->where(function ($query) {
+		// 				$query->whereNull('payment_status')
+		// 					  ->orWhere('payment_status', 'Pending');
+		// 			})
+		// 		->get();
+
+		// 	$amount = 0;
+
+		// 	foreach ($records as $row) {
+		// 		$data = json_decode($row->emp_salary_slip_response, true);
+		// 		// Match created_by from JSON
+		// 		if (($data['created_by'] ?? 0) == $userId) {
+		// 			$amount += $data['visible_data']['final_salary_calculation']['net_salary'] ?? 0;
+		// 		}
+		// 	}
+		// }
+
+		// Salary Payable
 		if ($type == 'salary_payable') {
 
 			$records = DB::table('user_payslip')
-				->whereBetween('date', [$currentMonthStartDate, $currentMonthEndDate])
+				->where('added_by', $userId)
 				->where(function ($query) {
-						$query->whereNull('payment_status')
-							  ->orWhere('payment_status', 'Pending');
-					})
+					$query->whereNull('payment_status')
+						->orWhere('payment_status', 'Pending');
+				})
 				->get();
 
 			$amount = 0;
 
 			foreach ($records as $row) {
+
 				$data = json_decode($row->emp_salary_slip_response, true);
-				// Match created_by from JSON
-				if (($data['created_by'] ?? 0) == $userId) {
-					$amount += $data['visible_data']['final_salary_calculation']['net_salary'] ?? 0;
-				}
+
+				$amount += (float) (
+					$data['visible_data']['final_salary_calculation']['net_salary'] ?? 0
+				);
 			}
 		}
 
@@ -1817,7 +1840,7 @@ class LiabilitesController extends Controller
 		if ($type == 'pf_payable') {
 
 			$records = DB::table('user_payslip')
-				->whereBetween('date', [$startDate, $endDate])
+				->where('added_by', $userId)
 				->where(function ($query) {
 						$query->whereNull('pf_payment_status')
 							  ->orWhere('pf_payment_status', 'Pending');
@@ -1839,7 +1862,7 @@ class LiabilitesController extends Controller
 		if ($type == 'esi_payable') {
 
 			$records = DB::table('user_payslip')
-				->whereBetween('date', [$startDate, $endDate])
+				->where('added_by', $userId)
 				->where(function ($query) {
 						$query->whereNull('esi_payment_status')
 							  ->orWhere('esi_payment_status', 'Pending');
@@ -1861,7 +1884,7 @@ class LiabilitesController extends Controller
 		if ($type == 'ptax_payable') {
 
 			$records = DB::table('user_payslip')
-				->whereBetween('date', [$startDate, $endDate])
+				->where('added_by', $userId)
 				->where(function ($query) {
 						$query->whereNull('ptax_payment_status')
 							  ->orWhere('ptax_payment_status', 'Pending');
@@ -1941,7 +1964,7 @@ class LiabilitesController extends Controller
 			
 			// Salary TDS Amount
 			$salaryData = DB::table('user_payslip')
-				->whereBetween('date', [$currentMonthStartDate, $currentMonthEndDate])
+				->where('added_by', $userId)
 				->where(function ($query) {
 						$query->whereNull('tds_deposit_status')
 							  ->orWhere('tds_deposit_status', 'Pending');
@@ -1960,7 +1983,7 @@ class LiabilitesController extends Controller
 			// Final Total
 			$amount = $incomeTdsAmount + $expenseTdsAmount + $assetTdsAmount + $salaryTdsAmount;
 		}
-		// ESI Payable
+		// Lwf Payable
 		if ($type == 'lwf_payable') {
 
 			$start = Carbon::parse($startDate);
@@ -1969,8 +1992,6 @@ class LiabilitesController extends Controller
 
 			$records = DB::table('user_payslip')
 				->where('added_by', $userId)
-				->where('financial_year', $financialYear)
-				->where('month', $month)
 				->where(function ($query) {
 						$query->whereNull('lwf_payment_status')
 							  ->orWhere('lwf_payment_status', 'Pending');

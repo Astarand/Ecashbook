@@ -46,7 +46,13 @@
 				return true;
 			}
 
+		@endphp
 
+		@php
+			$isProprietorship = DB::table('company_profiles')
+				->where('userId', Auth::id())
+				->where('comp_type', 'Proprietorship')
+				->exists();
 		@endphp
 
 		<div class="navbar-content">
@@ -86,8 +92,19 @@
 									</a>
 								</li>
 							@endif
-
-							@if(in_array('ALL', $userMenu) || in_array('Proprietorship Profile', $userMenu))
+							
+							{{-- Fetch Company Profile --}}
+							{{-- @if(in_array('ALL', $userMenu) || in_array('Proprietorship Profile', $userMenu))
+								<li class="pc-item">
+									<a href="{{ route('proprietorship.list') }}" class="pc-link">
+										<span class="pc-micon">
+											<i class="ph-duotone ph-warehouse"></i>
+										</span>
+										<span class="pc-mtext">Proprietorship Profile</span>
+									</a>
+								</li>
+							@endif --}}
+							@if((in_array('ALL', $userMenu) || in_array('Proprietorship Profile', $userMenu)) && $isProprietorship)
 								<li class="pc-item">
 									<a href="{{ route('proprietorship.list') }}" class="pc-link">
 										<span class="pc-micon">
@@ -97,6 +114,7 @@
 									</a>
 								</li>
 							@endif
+							{{-- Fetch Company Profile End --}}
 
 							@if(in_array('ALL', $userMenu) || in_array('Subscription & Billing', $userMenu))
 								<li class="pc-item">
@@ -2337,7 +2355,7 @@
 						</div>
 					</div>
 
-			</div>
+		</div>
 
 		<div class="card pc-user-card">
 			<div class="card-body">

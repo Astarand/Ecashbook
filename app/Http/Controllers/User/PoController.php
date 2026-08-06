@@ -256,7 +256,7 @@ class PoController extends Controller
 		checkCoreAccess('Biz Operations');
 		$invoiceNo = $this->create_po_invoice_number($userId);
 		$compData = DB::table('company_profiles')
-								->select(DB::raw('comp_name,comp_phone,comp_email,comp_pan_no,gst_no,comp_bill_pin,comp_bill_addone,comp_bill_addtwo,comp_bill_name,comp_bill_mobile_no,comp_bill_state,comp_bill_city'))
+								->select(DB::raw('comp_type,comp_name,comp_phone,comp_email,comp_pan_no,gst_no,comp_bill_pin,comp_bill_addone,comp_bill_addtwo,comp_bill_name,comp_bill_mobile_no,comp_bill_state,comp_bill_city'))
 								->where('company_profiles.userId','=',$userId)
 								->get();
 		$custData = DB::table('customers')
@@ -284,10 +284,22 @@ class PoController extends Controller
 		$states_ship = State::where('country_id', '=', isset($compDetails->comp_ship_country)?$compDetails->comp_ship_country:0)->get();
 		$cities_ship = City::where('state_id', '=', isset($compDetails->comp_ship_state)?$compDetails->comp_ship_state:0)->get();
 		
-		$proprietorships = DB::table('proprietorship_profiles')
-						->select('id','comp_name')
-						->where('userId',$userId)
-						->get();
+		// $proprietorships = DB::table('proprietorship_profiles')
+		// 				->select('id','comp_name')
+		// 				->where('userId',$userId)
+		// 				->get();
+		
+		$proprietorships = collect();
+
+					if (
+						isset($compData[0]) &&
+						$compData[0]->comp_type === 'Proprietorship'
+					) {
+						$proprietorships = DB::table('proprietorship_profiles')
+							->select('id', 'comp_name')
+							->where('userId', $userId)
+							->get();
+					}
 
         return view('User.po.create-po-invoice')->with([
 			'invoiceNo'=>$invoiceNo,

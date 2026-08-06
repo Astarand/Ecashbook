@@ -463,7 +463,7 @@ class SalesController extends Controller
 			->select(DB::raw('MAX(id) as id'))
 			->get();
 		$compData = DB::table('company_profiles')
-			->select(DB::raw('gst_reg,gst_no,comp_name,udyam_reg,udyam_reg_no,comp_phone,comp_email,comp_pan_no,comp_bill_addone,comp_bill_addtwo,comp_bill_pin,comp_bill_state,comp_bill_city'))
+			->select(DB::raw('comp_type,gst_reg,gst_no,comp_name,udyam_reg,udyam_reg_no,comp_phone,comp_email,comp_pan_no,comp_bill_addone,comp_bill_addtwo,comp_bill_pin,comp_bill_state,comp_bill_city'))
 			->where('company_profiles.userId', '=', $userId)
 			->get();
 		$custData = DB::table('customers')
@@ -505,10 +505,17 @@ class SalesController extends Controller
 
 		$invoice_create_status = $this->invoice_create_status();
 		
-		$proprietorships = DB::table('proprietorship_profiles')
-						->select('id','comp_name')
-						->where('userId',$userId)
-						->get();
+		$proprietorships = collect();
+
+		if (
+			isset($compData[0]) &&
+			$compData[0]->comp_type === 'Proprietorship'
+		) {
+			$proprietorships = DB::table('proprietorship_profiles')
+				->select('id', 'comp_name')
+				->where('userId', $userId)
+				->get();
+		}
 
 		return view('User.create-sales-invoice')->with([
 			'invoiceNo' => $invoiceNo,

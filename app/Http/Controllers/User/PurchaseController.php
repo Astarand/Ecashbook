@@ -436,7 +436,7 @@ class PurchaseController extends Controller
 		checkCoreAccess('Biz Operations');
 		$invoiceNo = $this->create_purchase_invoice_number($userId);
 		$compData = DB::table('company_profiles')
-								->select(DB::raw('comp_name,comp_phone,comp_email,comp_pan_no,gst_no,comp_bill_pin,comp_bill_addone,comp_bill_addtwo,comp_bill_name,comp_bill_mobile_no,comp_bill_state,comp_bill_city'))
+								->select(DB::raw('comp_type,comp_name,comp_phone,comp_email,comp_pan_no,gst_no,comp_bill_pin,comp_bill_addone,comp_bill_addtwo,comp_bill_name,comp_bill_mobile_no,comp_bill_state,comp_bill_city'))
 								->where('company_profiles.userId','=',$userId)
 								->get();
 		$custData = DB::table('customers')
@@ -470,10 +470,22 @@ class PurchaseController extends Controller
 					->select('id', 'inv_num')
 					->get();
 					
-		$proprietorships = DB::table('proprietorship_profiles')
-						->select('id','comp_name')
-						->where('userId',$userId)
-						->get();
+		// $proprietorships = DB::table('proprietorship_profiles')
+		// 				->select('id','comp_name')
+		// 				->where('userId',$userId)
+		// 				->get();
+
+		$proprietorships = collect();
+
+					if (
+						isset($compData[0]) &&
+						$compData[0]->comp_type === 'Proprietorship'
+					) {
+						$proprietorships = DB::table('proprietorship_profiles')
+							->select('id', 'comp_name')
+							->where('userId', $userId)
+							->get();
+					}
 					
         return view('User.create-purchase-invoice')->with([
 			'invoiceNo'=>$invoiceNo,
@@ -1901,12 +1913,12 @@ class PurchaseController extends Controller
 			$array[$val->id]['comp_name'] = $val->comp_name;
 			$array[$val->id]['inv_num'] = $val->inv_num;
 			$array[$val->id]['inv_date'] = $val->inv_date;
-			$customerName =  DB::table('customers')
-							->select(DB::raw('customers.cust_name,customers.cust_phone'))
+			$customerName =  DB::table('vendors')
+							->select(DB::raw('vendors.vendor_name,vendors.vendor_phone'))
 							->where('id', '=', $val->v_name)
 							->get();
-			$array[$val->id]['cust_name'] = isset($customerName[0]->cust_name)?$customerName[0]->cust_name:"";
-			$array[$val->id]['cust_phone'] = isset($customerName[0]->cust_phone)?$customerName[0]->cust_phone:"";
+			$array[$val->id]['cust_name'] = isset($customerName[0]->vendor_name)?$customerName[0]->vendor_name:"";
+			$array[$val->id]['cust_phone'] = isset($customerName[0]->vendor_phone)?$customerName[0]->vendor_phone:"";
 			$array[$val->id]['v_num'] = $val->v_num;
 			$array[$val->id]['note_type'] = $val->note_type;
 			$array[$val->id]['prod_serv_type'] = $val->prod_serv_type;

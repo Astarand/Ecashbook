@@ -61,7 +61,7 @@
                                     <div class="row">
                                         <div class="col">
                                             <h6 class="mb-1">{{ $sale->cust_name }}</h6>
-                                            <a class="text-muted f-12 text-hover-primary" href="tel:{{ $sale->cust_phone }}">+91-{{ $sale->cust_phone }}</a>
+                                            <a class="text-muted f-12 text-hover-primary" href="tel:{{ $sale->cust_phone }}">{{ $sale->cust_phone }}</a>
                                         </div>
                                     </div>
                                 </td>

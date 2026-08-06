@@ -91,6 +91,15 @@ class ProprietorshipProfileController extends Controller
 		$userId = currentOwnerId();
 		checkCoreAccess('Proprietorship Profile');
 
+		$isProprietorship = DB::table('company_profiles')
+			->where('userId', $userId)
+			->where('comp_type', 'Proprietorship')
+			->exists();
+
+		if (!$isProprietorship) {
+			abort(403, 'Unauthorized Access');
+		}
+
 		// Parent Company
 		$parentCompany = DB::table('company_profiles')
 			->where('userId', $userId)
