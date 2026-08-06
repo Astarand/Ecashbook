@@ -110,12 +110,12 @@
                             <div class="col-md-3">
                                 <label class="form-label fw-semibold text-muted">Ledger Group</label>
                                 <select class="form-select" name="ledger_group" id="ledgerGroup">
-                                    <option value="">Select Group</option>
-                                    <option value="Asset">Assets</option>
-									<option value="Liability">Liabilities</option>
+                                    <option value="">All</option>
+                                    <option value="Assets">Assets</option>
+									<option value="Liabilities">Liabilities</option>
 									<option value="Equity">Equity</option>
 									<option value="Income">Income</option>
-									<option value="Expense">Expenses</option>
+									<option value="Expenses">Expenses</option>
                                 </select>
                             </div>
 
@@ -306,20 +306,20 @@
 }
 
 .toggle-icon{
-    display:inline-flex !important;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    display:inline-flex;
     align-items:center;
     justify-content:center;
-    width:22px;
-    height:22px;
-    border-radius:50%;
-    background:#2563eb !important;
-    color:#fff !important;
-    font-size:18px;
+    background:#2563eb;
+    color:#fff;
     font-weight:bold;
-    line-height:22px;
-    text-align:center;
     margin-right:8px;
-    border:1px solid #2563eb;
+}
+
+.group-header:hover{
+    opacity:.9;
 }
 
 .toggle-icon.plus{
@@ -330,6 +330,65 @@
 .toggle-icon.minus{
     background:#dc2626 !important;
     color:#fff !important;
+}
+
+.asset-header{
+    background:#dbeafe !important;
+    color:#1e40af;
+    font-weight:700;
+}
+
+.liability-header{
+    background:#fee2e2 !important;
+    color:#991b1b;
+    font-weight:700;
+}
+
+.equity-header{
+    background:#ede9fe !important;
+    color:#5b21b6;
+    font-weight:700;
+}
+
+.income-header{
+    background:#dcfce7 !important;
+    color:#166534;
+    font-weight:700;
+}
+
+.expense-header{
+    background:#fef3c7 !important;
+    color:#92400e;
+    font-weight:700;
+}
+
+.sub-group{
+    background:#f8fafc;
+    font-weight:600;
+}
+
+.group-header td{
+    font-size:15px;
+    padding:12px !important;
+}
+
+.group-row td{
+    padding:8px 10px;
+}
+
+.group-row:hover{
+    background:#f9fafb;
+}
+
+tfoot tr{
+    background:#1f2937;
+    color:#fff;
+    font-size:15px;
+    font-weight:bold;
+}
+
+tfoot td{
+    border-color:#374151 !important;
 }
 
 </style>
@@ -434,93 +493,210 @@
 		return isValid;
 	}
 	
+	let allRows = [];
+	let currentPage = 1;
+	let rowsPerPage = 'all';
 	
+	$('#frmTrialBalance').on('submit', function (e) {
 
-
-	
-	$('#frmTrialBalance').on('submit', function(e) {
 		e.preventDefault();
+
 		if (!validateLedgerForm()) {
 			return false;
 		}
+
 		$("#loader").show();
+
 		$.ajax({
 			url: '/fatch-trial-balance-data',
 			type: 'POST',
 			data: $(this).serialize(),
-			success: function(res) {
+
+			success: function (res) {
+
 				$("#loader").hide();
-				trialRows = res || [];
-				currentPage = 1;
-				//renderTablePage();
-				
 				let html = '';
-				let totalDr = 0;
-				let totalCr = 0;
 
-				$.each(res.trial, function (group, subGroups) {
+				$.each(res.trial, function (mainGroup, groups) {
 
-					/* ===== GROUP HEADER ===== */
-					/*html += `
-						<tr class="table-primary-soft">
-							<td colspan="9"><strong>${group}</strong></td>
-						</tr>
-					`;*/
-					let groupId = group.replace(/[^a-zA-Z0-9]/g, '');
+					let mainId = mainGroup.replace(/[^a-zA-Z0-9]/g, '');
+					let headerClass='';
+					switch(mainGroup){
+						case 'Assets':
+							headerClass='asset-header';
+							break;
+						case 'Liabilities':
+							headerClass='liability-header';
+							break;
+						case 'Equity':
+							headerClass='equity-header';
+							break;
+						case 'Income':
+							headerClass='income-header';
+							break;
+						case 'Expenses':
+							headerClass='expense-header';
+							break;
+					}
 
 					html += `
-					<tr class="table-primary-soft group-header"
-						data-group="${groupId}"
-						style="cursor:pointer;">
-						<td colspan="9">
-							<span class="toggle-icon"
-								  style="display:inline-block;width:18px;text-align:center;
-										 border:1px solid #999;border-radius:2px;
-										 font-weight:bold;margin-right:8px;">−</span>
+						<tr class="${headerClass} group-header"
+							data-group="${mainId}"
+							style="cursor:pointer;">
+							<td colspan="7">
+								<span class="toggle-icon"
+									style="display:inline-block;
+										   width:18px;
+										   text-align:center;
+										   border:1px solid #999;
+										   border-radius:2px;
+										   font-weight:bold;
+										   margin-right:8px;">
+									−
+								</span>
 
-							<strong>${group}</strong>
-						</td>
-					</tr>
+								<strong>${mainGroup}</strong>
+							</td>
+						</tr>
 					`;
 
-					$.each(subGroups, function (subGroup, ledgers) {
+					$.each(groups, function (subGroup, ledgers) {
 
-						$.each(ledgers, function (ledgerName, v) {
+						if (subGroup) {
+							html += `
+								<tr class="group-row group-${mainId}">
+									<td></td>
+									<td colspan="6">
+										<h5>${subGroup}</h5>
+									</td>
+								</tr>
+							`;
+						}
 
-							totalDr += parseFloat(v.closing_dr) || 0;
-							totalCr += parseFloat(v.closing_cr) || 0;
+						$.each(ledgers, function (key, row) {
 
 							html += `
-								<tr class="group-row group-${groupId}">
+								<tr class="group-row group-${mainId}">
 									<td></td>
-									<td>${v.ledgername}</td>
-									<td class="text-end">${format(v.opening_dr)}</td>
-									<td class="text-end">${format(v.opening_cr)}</td>
-									<td class="text-end">${format(v.closing_dr)}</td>
-									<td class="text-end">${format(v.closing_cr)}</td>
-									<td>${formatText(subGroup)}</td>
+
+									<td style="padding-left:35px;">
+										${row.ledgername ?? row.ledger}
+									</td>
+
+									<td class="text-end">${format(row.opening_dr)}</td>
+									<td class="text-end">${format(row.opening_cr)}</td>
+
+									<td class="text-end">${format(row.closing_dr)}</td>
+									<td class="text-end">${format(row.closing_cr)}</td>
+
+									<td></td>
 								</tr>
 							`;
 						});
+
 					});
+
 				});
 
-				$('#trialBodyData').html(html);
-				$('#totalDr').text(format(totalDr));
-				$('#totalCr').text(format(totalCr));
+				$("#trialBodyData").html(html);
 				
-				// Collapse all groups,  Expand first group only
-				$('.group-row').hide();
-				$('.toggle-icon').text('+');
-				let firstHeader = $('.group-header').first();
+				allRows = $("#trialBodyData tr");
+				currentPage = 1;
+				renderPagination();
+
+				// Use totals from API
+				$("#totalDr").text(format(res.total_dr));
+				$("#totalCr").text(format(res.total_cr));
+
+				// Collapse all groups
+				$(".group-row").hide();
+				$(".toggle-icon").text("+");
+
+				// Expand first group
+				let firstHeader = $(".group-header").first();
+
 				if (firstHeader.length) {
-					let firstGroup = firstHeader.data('group');
-					$('.group-' + firstGroup).show();
-					firstHeader.find('.toggle-icon').text('−');
-				}	
+					let groupId = firstHeader.data("group");
+					$(".group-" + groupId).show();
+					firstHeader.find(".toggle-icon").text("−");
+				}
+			},
+
+			error: function () {
+
+				$("#loader").hide();
+
+				alert("Unable to load Trial Balance.");
 			}
 		});
+
 	});
+	
+	function renderPagination(){
+
+		if(rowsPerPage==="all"){
+
+			allRows.show();
+
+			$("#pageInfo").text("");
+
+			return;
+		}
+
+		let start=(currentPage-1)*rowsPerPage;
+		let end=start+parseInt(rowsPerPage);
+
+		allRows.hide();
+
+		allRows.slice(start,end).show();
+
+		let totalPages=Math.ceil(allRows.length/rowsPerPage);
+
+		$("#pageInfo").text(currentPage+" / "+totalPages);
+
+		$("#prevPage").prop("disabled",currentPage==1);
+
+		$("#nextPage").prop("disabled",currentPage>=totalPages);
+	}
+	
+	$("#rowsPerPage").change(function(){
+
+		rowsPerPage=$(this).val();
+
+		currentPage=1;
+
+		renderPagination();
+
+	});
+	
+	$("#prevPage").click(function(){
+
+		if(currentPage>1){
+
+			currentPage--;
+
+			renderPagination();
+
+		}
+
+	});
+	
+	$("#nextPage").click(function(){
+
+		if(rowsPerPage==="all") return;
+
+		let totalPages=Math.ceil(allRows.length/rowsPerPage);
+
+		if(currentPage<totalPages){
+
+			currentPage++;
+
+			renderPagination();
+
+		}
+
+	});
+
 	
 	function formatINR(amount) {
 		return Number(amount).toLocaleString('en-IN');
@@ -574,23 +750,16 @@
 		});
 	}
 	
-	$(document).on('click', '.group-header', function () {
+	// Expand / Collapse
+	$(document).on("click", ".group-header", function () {
 
-		$('.group-row').hide();
+		let groupId = $(this).data("group");
 
-		$('.toggle-icon')
-			.text('+')
-			.removeClass('minus')
-			.addClass('plus');
+		$(".group-" + groupId).toggle();
 
-		let group = $(this).data('group');
+		let icon = $(this).find(".toggle-icon");
 
-		$('.group-' + group).show();
-
-		$(this).find('.toggle-icon')
-			.text('−')
-			.removeClass('plus')
-			.addClass('minus');
+		icon.text(icon.text() === "+" ? "−" : "+");
 	});
 	
 	// Expand All

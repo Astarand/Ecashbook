@@ -77,10 +77,24 @@ class OtherIncomeController extends Controller
 		$compType = DB::table('company_profiles')
 						->where('userId', $userId)
 						->value('comp_type'); 
-		$proprietorships = DB::table('proprietorship_profiles')
-						->select('id','comp_name')
-						->where('userId',$userId)
-						->get();
+
+		// $proprietorships = DB::table('proprietorship_profiles')
+		// 				->select('id','comp_name')
+		// 				->where('userId',$userId)
+		// 				->get();
+
+		$proprietorships = collect();
+
+		if (
+			isset($compData[0]) &&
+			$compData[0]->comp_type === 'Proprietorship'
+		) {
+			$proprietorships = DB::table('proprietorship_profiles')
+				->select('id', 'comp_name')
+				->where('userId', $userId)
+				->get();
+		}
+
 		$purposes_of_tds = DB::table('tds_rules')
 								->where('module', 'Expenses')
 								->where('tds_section', '!=', '192')
