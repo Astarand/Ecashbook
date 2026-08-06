@@ -78,9 +78,9 @@
                     <div class="row">
                         <div class="col-auto my-1">
                             <ul class="list-inline footer-link mb-0">
-                                <li class="list-inline-item"><a href="https://ecashbook.in" target="_blank">Home</a></li>
-                                <li class="list-inline-item"><a href="https://ecashbook.in/features/dashboard" target="_blank">Documentation</a></li>
-                                <li class="list-inline-item"><a href="https://ecashbook.in/contact" target="_blank">Support</a></li>
+                                <li class="list-inline-item"><a href="https://methotx.com" target="_blank">Home</a></li>
+                                <li class="list-inline-item"><a href="https://www.methotx.com/coming-soon" target="_blank">Documentation</a></li>
+                                <li class="list-inline-item"><a href="https://methotx.com/contact" target="_blank">Support</a></li>
                             </ul>
                         </div>
                     </div>
@@ -299,7 +299,7 @@
 				<h6 class="fw-bold">10. Contact Information</h6>
 				<p>Clickngo Tech Service Pvt. Ltd.<br>Srijan Park, Tower-1, Sector-V, Salt Lake, Kolkata – 700091<br>Email: <a href="mailto:contact@clickngotech.in">contact@clickngotech.in</a></p>
 				</div>
-				
+
 				<p class="mt-4">
 					By clicking <strong>Accept & Continue</strong>, I confirm that I have read, understood, and agree to all the above terms and conditions.
 				</p>
@@ -471,8 +471,8 @@
                 <div class="mb-3">
                     <h6 class="fw-bold">Governing Law & Jurisdiction</h6>
                     <p>
-                        Governed by laws of India.  
-                        Jurisdiction: Courts of Kolkata, West Bengal.  
+                        Governed by laws of India.
+                        Jurisdiction: Courts of Kolkata, West Bengal.
                         Arbitration under Arbitration & Conciliation Act, 1996.
                     </p>
                 </div>
@@ -506,7 +506,7 @@
     </div>
 </div>
 
-	
+
 	<!-- CA Firm / Accountant Terms Modal -->
 	<div class="modal fade" id="caTermsModal" tabindex="-1">
 		<div class="modal-dialog modal-dialog-scrollable modal-lg">
@@ -531,7 +531,7 @@
 						</li>
 
 						<li>
-							I acknowledge that all accounting records, financial statements, MIS reports, and statutory returns (including GST, PF, ESI, TDS, and other compliances) generated or processed through this platform are either <strong>system-generated or user-initiated self-service outputs</strong>, based entirely on data and credentials provided by me or my clients.  
+							I acknowledge that all accounting records, financial statements, MIS reports, and statutory returns (including GST, PF, ESI, TDS, and other compliances) generated or processed through this platform are either <strong>system-generated or user-initiated self-service outputs</strong>, based entirely on data and credentials provided by me or my clients.
 							All professional judgment, statutory compliance decisions, filing responsibility, certification, and advisory responsibility remain solely with me or the appointed professional.
 						</li>
 
@@ -544,7 +544,7 @@
 						</li>
 
 						<li>
-							I acknowledge that the listing of professionals on the platform is provided only for <strong>client choice and convenience</strong>.  
+							I acknowledge that the listing of professionals on the platform is provided only for <strong>client choice and convenience</strong>.
 							The platform does <strong>not</strong> recommend, certify, guarantee, or assume responsibility for professional services rendered by any listed professional.
 						</li>
 
@@ -590,7 +590,7 @@
 <script>
 	let termsAccepted = false;
 	let pendingFormData = null;   // store form until user accepts
-	
+
     document.addEventListener('DOMContentLoaded', function() {
         const togglePasswordElements = document.querySelectorAll('#togglePassword1, #togglePassword2');
 
@@ -734,8 +734,8 @@
                 $("#signupform .message-container").html("");
             }
         });
-        
-		
+
+
 		$("#signupform").on("submit", function (e) {
 			e.preventDefault();
 
@@ -802,8 +802,8 @@
 				$('#caTermsModal').modal('show');    // CA Firm
 			}
 		});
-		
-		function submitRegistration() 
+
+		function submitRegistration()
 		{
 			if (!pendingFormData) return;
 
@@ -852,14 +852,14 @@
 			});
 		}
 
-		
+
 
 		// User Accept button
 		$("#userAccept").on("click", function () {
 			$('#termsModal').modal('hide');
 			submitRegistration();
 		});
-		
+
 		// CA Firm Accept button
 		$("#caAccept").on("click", function () {
 			$('#caTermsModal').modal('hide');
@@ -950,10 +950,10 @@
 
 
 
-        //----------- Fetch city -----------		
+        //----------- Fetch city -----------
 		const stateDropdown = document.getElementById('state');
 
-		function loadCities(stateId, selectedCity = null) 
+		function loadCities(stateId, selectedCity = null)
 		{
 			if (stateId) {
 				$.ajaxSetup({
@@ -994,8 +994,8 @@
 
 
     });
-	
-	
+
+
 	//Auto-load on page open
 	$(document).ready(function () {
 		let stateId = $("#state").val();

@@ -1,228 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Verify Your E-Cashbook Account</title>
+    <title>Verify Your MethotX Account</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
-            font-family: "Poppins", Arial, sans-serif !important;
-            font-weight: normal;
+            box-sizing: border-box;
+            font-family: 'Poppins', Arial, sans-serif !important;
         }
         body {
-            font-family: "Poppins", Arial, sans-serif !important;
+            font-family: 'Poppins', Arial, sans-serif !important;
             margin: 0;
             padding: 0;
-            background-color: #f7f9fc;
-            color: #333333;
-            font-weight: normal;
+            background-color: #f4f7fa;
+            color: #334155;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
         }
-        .container {
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #f4f7fa;
+            padding: 40px 0;
+        }
+        .main-card {
             max-width: 600px;
             margin: 0 auto;
             background-color: #ffffff;
-            border-radius: 0 0 8px 8px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            font-family: "Poppins", Arial, sans-serif !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .top-bar {
+            height: 6px;
+            background: linear-gradient(90deg, #0A86C6 0%, #00C2FF 100%);
         }
         .header {
-            padding: 30px 0;
+            padding: 35px 30px 20px;
             text-align: center;
             background-color: #ffffff;
         }
         .logo {
-            max-width: 180px;
+            max-width: 190px;
             height: auto;
-            margin: 0 auto;
-            display: block;
-        }
-        .main-heading {
-            text-align: center;
-            color: #313363;
-            font-size: 24px;
-            font-weight: 500;
-            margin: 40px 0 20px;
-            padding: 0 20px;
-            font-family: "Poppins", Arial, sans-serif !important;
-        }
-        .sub-heading {
-            text-align: center;
-            color: #5a5a73;
-            font-size: 15px;
-            line-height: 1.5;
-            margin: 0 0 40px;
-            padding: 0 30px;
-            font-family: "Poppins", Arial, sans-serif !important;
-            font-weight: normal;
+            display: inline-block;
         }
         .content {
-            padding: 0 30px 40px;
-            font-family: "Poppins", Arial, sans-serif !important;
-        }
-        .verify-button-container {
+            padding: 10px 35px 35px;
             text-align: center;
-            margin: 30px 0;
         }
-        .verify-button {
+        .main-heading {
+            color: #0A86C6;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 15px 0 10px;
+            line-height: 1.3;
+        }
+        .sub-heading {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0 0 25px;
+        }
+        .info-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #0A86C6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0 25px;
+            text-align: left;
+        }
+        .info-card-title {
+            color: #0A86C6;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 0 0 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .info-row {
+            font-size: 14px;
+            color: #475569;
+            margin: 6px 0;
+            line-height: 1.5;
+        }
+        .info-row strong {
+            color: #1e293b;
+        }
+        .btn-container {
+            margin: 30px 0 25px;
+            text-align: center;
+        }
+        .verify-btn {
             display: inline-block;
-            background-color: #673de6;
+            background-color: #0A86C6;
             color: #ffffff !important;
             text-decoration: none;
             text-align: center;
-            padding: 12px 28px;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 15px;
-            transition: background 0.3s;
-            box-shadow: 0 4px 10px rgba(103, 61, 230, 0.3);
-            font-family: "Poppins", Arial, sans-serif !important;
-        }
-        .verify-button:hover {
-            background-color: #5331c9;
-        }
-        .info-block {
-            background-color: #f7f9fc;
+            padding: 14px 34px;
             border-radius: 8px;
-            padding: 25px;
-            margin: 30px 0;
-            font-family: "Poppins", Arial, sans-serif !important;
+            font-weight: 600;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(10, 134, 198, 0.35);
+            transition: all 0.3s ease;
         }
-        .info-block-title {
-            color: #313363;
-            font-weight: 500;
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-family: "Poppins", Arial, sans-serif !important;
-            font-size: 16px;
+        .verify-btn:hover {
+            background-color: #086fa4;
+            box-shadow: 0 6px 20px rgba(10, 134, 198, 0.45);
         }
-        .info-text {
-            color: #5a5a73;
-            font-size: 14px;
+        .body-text {
+            font-size: 13px;
+            color: #64748b;
             line-height: 1.6;
-            margin: 0;
-            font-family: "Poppins", Arial, sans-serif !important;
-            font-weight: normal;
+            margin: 15px 0;
+        }
+        /* Social Icons - Centered Flex & Table fallback */
+        .social-section {
+            padding: 20px 0 15px;
+            text-align: center;
+            border-top: 1px solid #f1f5f9;
+        }
+        .social-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .social-table {
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+        .social-icon-btn {
+            display: inline-block;
+            width: 38px;
+            height: 38px;
+            line-height: 34px;
+            background-color: #ffffff;
+            border: 2px solid #0A86C6;
+            border-radius: 50%;
+            text-align: center;
+            text-decoration: none;
+            vertical-align: middle;
+            margin: 0 6px;
+            transition: all 0.2s ease;
+        }
+        .social-icon-btn img {
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            margin-top: -2px;
+            display: inline-block;
+        }
+        .social-icon-btn:hover {
+            background-color: #0A86C6;
+            border-color: #0A86C6;
         }
         .footer {
-            background-color: #f7f9fc;
-            padding: 25px;
+            background-color: #f8fafc;
+            padding: 20px 30px;
             text-align: center;
-            font-size: 13px;
-            color: #5a5a73;
-            border-top: 1px solid #e8eaf1;
-            font-family: "Poppins", Arial, sans-serif !important;
+            font-size: 12px;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
         }
         .footer p {
-            margin: 5px 0;
-            font-family: "Poppins", Arial, sans-serif !important;
-            font-weight: normal;
+            margin: 4px 0;
         }
-        .colored-bar {
-            height: 5px;
-            background: linear-gradient(90deg, #673de6 0%, #50b4f2 100%);
-        }
-        .support-link {
-            color: #673de6;
+        .footer a {
+            color: #0A86C6;
             text-decoration: none;
-            font-family: "Poppins", Arial, sans-serif !important;
+            font-weight: 500;
         }
-        .support-link:hover {
+        .footer a:hover {
             text-decoration: underline;
-        }
-        .social-icons {
-            margin: 20px 0;
-            text-align: center;
-        }
-        .social-icon {
-            display: inline-block;
-            width: 36px;
-            height: 36px;
-            background-color: #ffffff !important;
-            border: 2px solid #673de6;
-            border-radius: 50%;
-            margin: 0 8px;
-            text-align: center;
-            line-height: 36px;
-            text-decoration: none;
-            color: #ffffff;
-            font-size: 16px;
-            padding: 10px;
-            box-sizing: border-box;
-            vertical-align: middle;
-        }
-        .social-icon:hover {
-            background-color: #f0f0f0;
-            border-color: #5331c9;
-        }
-        .social-icon img {
-            width: 16px;
-            height: 16px;
-            display: block;
-            margin: 0 auto;
-        }
-        .account-info {
-            margin: 10px 0;
-        }
-        .account-info strong {
-            color: #313363;
         }
     </style>
 </head>
 <body>
-    <div class="colored-bar"></div>
-    <div class="container">
-        <div class="header">
-            <img src="{{ asset('assets/images/logo.png') }}" alt="E-Cashbook Logo" class="logo">
-        </div>
+    <div class="wrapper">
+        <div class="main-card">
+            <div class="top-bar"></div>
 
-        <h1 class="main-heading">Verify your email address</h1>
-        <p class="sub-heading">Thank you for creating an E-Cashbook account. Please verify your email to get started.</p>
+            <div class="header">
+                <img src="{{ asset('assets/images/logo.png') }}" alt="MethotX Logo" class="logo">
+            </div>
 
-        <div class="content">
-            <div class="info-block">
-                <h3 class="info-block-title">Account Information</h3>
-                <div class="account-info">
-                    <p class="info-text"><strong>Name:</strong> {{ $name }}</p>
-                    <p class="info-text"><strong>Email/Username:</strong> <a href="mailto:{{ $email }}" style="color: #673de6; text-decoration: none;">{{ $email }}</a></p>
+            <div class="content">
+                <h1 class="main-heading">Verify Your Email Address</h1>
+                <p class="sub-heading">Thank you for creating an MethotX account. Please verify your email address to complete your registration and get started.</p>
+
+                <div class="info-card">
+                    <div class="info-card-title">Account Details</div>
+                    <p class="info-row"><strong>Name:</strong> {{ $name }}</p>
+                    <p class="info-row"><strong>Email / Username:</strong> <a href="mailto:{{ $email }}" style="color: #0A86C6; text-decoration: none; font-weight: 500;">{{ $email }}</a></p>
+                </div>
+
+                <p class="body-text">
+                    MethotX works seamlessly across all your devices. Access your financial record books from your smartphone, tablet, or desktop web browser.
+                </p>
+
+                <div class="btn-container">
+                    <a href="{{ $verifyUrl }}" class="verify-btn">VERIFY MY EMAIL</a>
+                </div>
+
+                <p class="body-text" style="font-size: 12px; color: #94a3b8;">
+                    If you did not register for an MethotX account, you can safely ignore this email.
+                </p>
+
+                <!-- Social Icons Section (Center Aligned) -->
+                <div class="social-section">
+                    <div class="social-title">Connect With Us</div>
+                    <table class="social-table" align="center" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td align="center" valign="middle">
+                                <a href="#" class="social-icon-btn" title="Facebook">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook">
+                                </a>
+                                <a href="#" class="social-icon-btn" title="X (Twitter)">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/5968/5968958.png" alt="X">
+                                </a>
+                                <a href="#" class="social-icon-btn" title="LinkedIn">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/733/733561.png" alt="LinkedIn">
+                                </a>
+                                <a href="#" class="social-icon-btn" title="Instagram">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram">
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </div>
 
-            <p class="info-text">
-                E-Cashbook works on all your devices and email clients including Outlook, Gmail, Apple Mail, and Thunderbird.
-                You can access your account from your smartphone, tablet, or computer.
-            </p>
-
-            <div class="verify-button-container">
-                <a href="{{ $verifyUrl }}" class="verify-button">VERIFY MY EMAIL</a>
+            <div class="footer">
+                <p>Need help or have questions? <a href="mailto:support@methotx.com">Contact Support</a></p>
+                <p>© {{ date('Y') }} Clickngo Tech Service Pvt.Ltd. All rights reserved.</p>
             </div>
-
-            <p class="info-text">
-                If you did not create this account, please disregard this email or contact our support team if you have concerns.
-            </p>
-        </div>
-
-        <div class="social-icons">
-                  <a href="#" class="social-icon" title="Facebook">
-                    <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook">
-                  </a>
-                  <a href="#" class="social-icon" title="X (Twitter)">
-                    <img src="https://cdn-icons-png.flaticon.com/512/5968/5968958.png" alt="X Twitter">
-                  </a>
-                  <a href="#" class="social-icon" title="LinkedIn">
-                    <img src="https://cdn-icons-png.flaticon.com/512/733/733561.png" alt="LinkedIn">
-                  </a>
-                  <a href="#" class="social-icon" title="Instagram">
-                    <img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram">
-                  </a>
-                </div>
-
-        <div class="footer">
-            <p>Need help? <a href="mailto:support@ecashbook.in" class="support-link">Contact Support</a></p>
-            <p>Copyright © {{ date('Y') }} E-Cashbook. All rights reserved.</p>
         </div>
     </div>
 </body>

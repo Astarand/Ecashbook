@@ -60,9 +60,9 @@
                     <div class="row">
                         <div class="col-auto my-1">
                             <ul class="list-inline footer-link mb-0">
-                                <li class="list-inline-item"><a href="https://ecashbook.in" target="_blank">Home</a></li>
-                                <li class="list-inline-item"><a href="https://www.ecashbook.in/coming-soon" target="_blank">Documentation</a></li>
-                                <li class="list-inline-item"><a href="https://ecashbook.in/contact" target="_blank">Support</a></li>
+                                <li class="list-inline-item"><a href="https://methotx.com" target="_blank">Home</a></li>
+                                <li class="list-inline-item"><a href="https://www.methotx.com/coming-soon" target="_blank">Documentation</a></li>
+                                <li class="list-inline-item"><a href="https://methotx.com/contact" target="_blank">Support</a></li>
                             </ul>
                         </div>
                     </div>
