@@ -438,8 +438,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/attendance-list', [EmployeeManagemnet::class, 'AttendanceList'])->name('user.AttendanceList');
 	Route::post('/attendance-list-filter', [EmployeeManagemnet::class, 'AttendanceListFilter'])->name('user.AttendanceListFilter');
 	Route::post('/get_employee_attendance_log', [EmployeeManagemnet::class, 'getEmployeeAttendanceLog'])->name('user.getEmployeeAttendanceLog');
-	Route::post('get_user_attendance', [EmployeeManagemnet::class, 'getMonthlyAttendance'])->name('user.getMonthlyAttendance');
-	Route::get('get_user_attendance', [EmployeeManagemnet::class, 'getMonthlyAttendance'])->name('user.getMonthlyAttendance');
+	Route::match(['get', 'post'], 'get_user_attendance', [EmployeeManagemnet::class, 'getMonthlyAttendance'])->name('user.getMonthlyAttendance');
 	Route::post('/attendance-list-pdf', [EmployeeManagemnet::class, 'AttendanceListPDF'])->name('user.AttendanceListPDF');
 	Route::post('/export_employee_attendance', [EmployeeManagemnet::class, 'exportEmployeeAttendance'])->name('user.exportEmployeeAttendance');
 	Route::post('/export_employee_attendance_pdf', [EmployeeManagemnet::class, 'exportEmployeeAttendancePDF'])->name('user.exportEmployeeAttendancePDF');
@@ -462,7 +461,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::post('/save-payslip', [EmployeeManagemnet::class, 'savePayslip']);
 	Route::get('/download-payslip/{id}', [EmployeeManagemnet::class, 'downloadPayslip']);
 
-	
+
 
 
 	/* Employee Policies */
@@ -557,6 +556,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::post('/generate_GSTReports', [GSTController::class, 'generate_GSTReports'])->name('generate_GSTReports');
 	//Route::get('/gst-compliance-support', [GSTController::class, 'GSTComplianceSupport'])->name('User.GSTComplianceSupport');
 
+
 	/* Reports Management */
 	Route::get('/ledger', [ReportsController::class, 'Ledger'])->name('user.Ledger');
 	Route::get('/trail-balance', [ReportsController::class, 'TrailBalance'])->name('user.TrailBalance');
@@ -585,9 +585,6 @@ Route::middleware(['ensure.login'])->group(function () {
 Route::get('valuable-services', function () {
     return redirect()->away('https://360bizservice.com/services');
 })->name('valuable-services');
-Route::get('health-checkup', function () {
-    return redirect()->away('https://360bizservice.com/company-helth-checkup');
-})->name('health-checkup');
 Route::get('health-checkup', function () {
     return redirect()->away('https://360bizservice.com/company-helth-checkup');
 })->name('health-checkup');
@@ -646,7 +643,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::post('/Expenditure_store', [ClaimManagement::class, 'UserEmployeeExpenditureStore'])->name('userEmployeeExpenditure.store');
 	Route::post('/User_employee_expenditure_claims/update/{id}', [ClaimManagement::class, 'UserEmployeeExpenditureUpdate'])->name('User_employee_expenditure_claims/update');
 	Route::post('/user-employee-requisition/store', [ClaimManagement::class, 'UserEmployeeSupplyRequisitionsStore'])->name('UserEmployeeRequisition.store');
-	Route::post('/UserEmployee-supply-requisitions/update/{id}', [ClaimManagement::class, 'UserEmployeeSupplyRequisitionsUpdate'])->name('requisition.update');
+	Route::post('/UserEmployee-supply-requisitions/update/{id}', [ClaimManagement::class, 'UserEmployeeSupplyRequisitionsUpdate'])->name('UserEmployeeRequisition.update');
 
 	/* Leave Management */
 	Route::get('/leave-request-list', [UserLeaveManagement::class, 'LeaveRequestList'])->name('userEmployee.user-leave-request');
@@ -658,7 +655,7 @@ Route::middleware(['ensure.login'])->group(function () {
 
 	/* HR Letter */
 	Route::get('/hr-letters', [UserHRLetter::class, 'HRLetterList'])->name('userEmployee.hr-letters');
-	Route::get('/view-hr-letters', [UserHRLetter::class, 'ViewHRLetter'])->name('userEmployee.hr-letters-view');
+	Route::get('/view-hr-letters', [UserHRLetter::class, 'ViewHRLetter'])->name('userEmployee.hr-letters-view-all');
 	Route::get('/employee/hr-letters', [UserHRLetter::class, 'HRLetterList'])->name('userEmployee.hr-letters-list');
 	Route::get('/employee/hr-letters/view/{id}', [UserHRLetter::class, 'HRLetterView'])->name('userEmployee.hr-letters-view');
 
@@ -684,7 +681,6 @@ Route::middleware(['ensure.login'])->group(function () {
 
 
 	/* **************************************************CA Route***********************************************************************/
-	Route::get('/cahome', 'CaHomeController@Index');
 	//Route::get('/caprofile', 'CaProfileController@Index');
 	Route::get('/caprofile', [CaProfileController::class, 'caindex'])->name('ca.caindex');
 	/* **************************************************CA Route***********************************************************************/
@@ -920,7 +916,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/tds-returns-filing', [TdsPfEsiController::class, 'tds_returns_filing'])->name('user.tds_returns_filing');
 	Route::get('/pf-management-list', [TdsPfEsiController::class, 'pf_management_list'])->name('user.pf_management_list');
 	Route::get('/esi-management-list', [TdsPfEsiController::class, 'esi_management_list'])->name('user.esi_management_list');
-	
+
 	Route::get('/shop-registration', [TdsPfEsiController::class, 'shop_registration'])->name('user.shop_registration');
 	Route::get('/lwf-compliance', [TdsPfEsiController::class, 'lwf_compliance'])->name('user.lwf_compliance');
 	Route::get('/gratuity-compliance', [TdsPfEsiController::class, 'gratuity_compliance'])->name('user.gratuity_compliance');
@@ -978,7 +974,7 @@ Route::middleware(['ensure.login'])->group(function () {
 
 	//Quotation route
 	Route::get('/sales-quotation', [QuotationsController::class, 'quotationInvoiceIndex'])->name('user.SalesQuotation');
-	Route::get('/view-quotation-invoice/{sId}', [QuotationsController::class, 'view_quotation_invoice'])->name('view_sales_invoice');
+	Route::get('/view-quotation-invoice/{sId}', [QuotationsController::class, 'view_quotation_invoice'])->name('view_quotation_invoice');
 	Route::get('/create-quotation-invoices', [QuotationsController::class, 'CreateQuotationInvoices'])->name('user.CreateQuotationInvoices');
 	Route::post('/save_quotation_invoice', [QuotationsController::class, 'save_quotation_invoice'])->name('save_quotation_invoice');
 	Route::get('/edit-quotation-invoice/{sId}', [QuotationsController::class, 'edit_quotation_invoice'])->name('user.edit_quotation_invoice');
@@ -1232,7 +1228,7 @@ Route::middleware(['ensure.login'])->group(function () {
 
 
 	//---------- Admin Deductions Management ----------//
-	Route::resource('deduction-master', DeductionMasterController::class);
+	// Route::resource('deduction-master', DeductionMasterController::class);
 
 	Route::get('/balance-sheet-report', [BalanceSheetController::class, 'BalanceSheet'])->name('user.BalanceSheetReport');
 	Route::post('/fetch_balance_sheet_data', [BalanceSheetController::class, 'fetch_balance_sheet_data'])->name('balance_sheet_data');
@@ -1265,9 +1261,9 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::delete('/dropdown-values/delete/{id}', [DropdownValueController::class, 'destroy'])->name('dropdown.delete');
 
 	Route::post('/purchase_shipping_cost',[PurchaseController::class,'purchaseShippingCost']);
-	
+
 	Route::get('/payment-voucher/export',[PaymentVoucherController::class, 'exportPaymentVoucher'])->name('paymentVoucher.export');
-	
+
 	Route::get('/get-banks', [CommonController::class, 'getBankList']);
 
 	//-------- payroll report routes --------//
@@ -1296,7 +1292,6 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/payroll/bulk-payslip/employees', [PayrollReportController::class, 'getBulkPayslipEmployees'])->name('payroll.bulk.employees');
 	Route::post('/payroll/bulk-payslip/generate', [PayrollReportController::class, 'bulkGeneratePayslip'])->name('payroll.bulk.generate');
 
-	
 	Route::post('/get-tds-rule-liab', [CommonController::class, 'getTdsRuleLiability'])->name('get.tds.rule');
 	Route::post('/settlement/store',[SettlementController::class, 'store'])->name('settlement.store');
 	Route::get('/settlement/ledgers',[SettlementController::class, 'getSettlementLedgers'])->name('settlement.ledgers');
