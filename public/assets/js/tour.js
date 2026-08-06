@@ -1,4 +1,4 @@
-//-------- E-Cashbook Interactive Tour Guide --------//
+//-------- MethotX Interactive Tour Guide --------//
 $(document).ready(function() {
   function markTourCompleted() {
     if (typeof TOUR_COMPLETE_ROUTE !== 'undefined' && typeof CSRF_TOKEN !== 'undefined') {
@@ -16,7 +16,7 @@ $(document).ready(function() {
         }
       });
     }
-    localStorage.setItem('ecashbook_dashboard_tour', 'completed');
+    localStorage.setItem('methotx_dashboard_tour', 'completed');
   }
 
   function startIntroTour() {
@@ -37,92 +37,92 @@ $(document).ready(function() {
     introJs().setOptions({
       steps: [
         {
-          title: 'Welcome to E-Cashbook',
-          intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(0, 140, 173, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #008CAD;"><i class="ti ti-rocket" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Let\'s take a quick interactive tour to get familiar with the core features of your financial dashboard.</p></div>'
+          title: 'Welcome to MethotX Compliance Infrastructure Platform',
+          intro: '<div class="py-1"><div class="mb-3 d-flex align-items-center"><span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold"><i class="ti ti-rocket me-1"></i> Interactive Tour</span></div><h6 class="fw-bold text-dark mb-2" style="font-size: 1rem;">Explore Your Financial Dashboard</h6><p class="mb-0 text-muted small" style="line-height:1.6;">Let\'s walk through the primary tools, key performance indicators, and compliance modules available on your portal.</p></div>'
         },
         {
           element: '.tour-search',
-          title: 'Universal Search',
-          intro: 'Quickly search and find any menu, setting, or feature instantly across the application.'
+          title: 'Universal Search & Navigation',
+          intro: 'Instantly search and access any feature, ledger, or setting across the portal. Shortcut: <kbd class="bg-light text-dark border px-1 rounded">Ctrl + K</kbd>.'
         },
         {
           element: '.tour-assign-ca',
           title: 'Assign CA Firm',
-          intro: 'Link and assign your account to a registered Chartered Accountant (CA) firm for seamless audit & tax filings.'
+          intro: 'Connect your company profile with an accredited Chartered Accountant (CA) firm for real-time audit, advice, and tax filing.'
         },
         {
           element: '.tour-add-sales',
-          title: 'Record Sales',
-          intro: 'Create new sales invoices, track customer billings, and log business revenues here.'
+          title: 'Create Sales Invoices',
+          intro: 'Generate professional GST-compliant sales invoices, record customer payments, and track outstanding receivables.'
         },
         {
           element: '.tour-add-purchases',
-          title: 'Record Purchases',
-          intro: 'Easily record vendor purchase bills, credit notes, and business procurement expenses.'
+          title: 'Record Purchase Bills',
+          intro: 'Log vendor procurement bills, track accounts payable, and claim eligible Input Tax Credit (ITC).'
         },
         {
           element: '#slet_financial_year',
-          title: 'Financial Year Selector',
-          intro: 'Switch between financial years to filter all data, charts, and reports on the dashboard.'
+          title: 'Financial Year Filter',
+          intro: 'Switch financial assessment years to update all dashboard analytics, chart visualizations, and summary reports.'
         },
         {
           element: '.tour-receivables',
-          title: 'Total Receivables',
-          intro: 'Monitor your pending customer payments, including current and overdue receivables.'
+          title: 'Total Receivables Summary',
+          intro: 'Monitor customer outstandings, breakdown current vs. overdue receivables, and manage collection timelines.'
         },
         {
           element: '.tour-payables',
-          title: 'Total Payables',
-          intro: 'Keep track of what you owe to vendors and suppliers to manage your cash outflow efficiently.'
+          title: 'Total Payables Summary',
+          intro: 'Keep track of vendor obligations, credit balances, and cash outflow commitments.'
         },
         {
           element: '.tour-turnover',
-          title: 'Turnover Analysis',
-          intro: 'Visualize your monthly and quarterly sales turnover with interactive analytical charts.'
+          title: 'Turnover & Revenue Analytics',
+          intro: 'Analyze gross turnover trends across financial quarters with comparative performance charts.'
         },
         {
           element: '.tour-income-expenses',
-          title: 'Income & Expenses',
-          intro: 'Track and compare your business income, operating expenses, and net profit margins over time.'
+          title: 'Income vs. Operating Expenses',
+          intro: 'Evaluate net profit margins by comparing total gross income against categorized operating expenses.'
         },
         {
           element: '.tour-cashflow',
-          title: 'Cashflow Summary',
-          intro: 'Analyze cash inflows and outflows to evaluate net cash changes on a monthly or quarterly basis.'
+          title: 'Cash Flow Dynamics',
+          intro: 'Review net liquid cash movement and monthly operating cash flow performance.'
         },
         {
           element: '.tour-assets',
-          title: 'Asset Summary',
-          intro: 'Monitor the total current value of your business assets and access the complete asset ledger.'
+          title: 'Business Asset Portfolio',
+          intro: 'Track current fixed and liquid asset valuations across active business ledgers.'
         },
         {
           element: '.tour-liabilities',
-          title: 'Liabilities Summary',
-          intro: 'Keep track of outstanding business liabilities and debts that require repayment.'
+          title: 'Liabilities Breakdown',
+          intro: 'Overview statutory, short-term, and long-term liabilities requiring financial settlement.'
         },
         {
           element: '.tour-gst',
-          title: 'GST Summary',
-          intro: 'Real-time GST input tax credit (ITC) receivables and tax payables calculated based on invoices.'
+          title: 'GST Input & Output Tax Balance',
+          intro: 'Real-time reconciliation of Input Tax Credit (ITC) receivables and Output GST tax payables.'
         },
         {
           element: '.tour-attendance',
-          title: 'Employee Attendance',
-          intro: 'Review daily employee attendance stats, including present, late, on-time, and absent counts.'
+          title: 'Workforce Attendance Tracker',
+          intro: 'Monitor daily employee attendance metrics, on-time arrivals, late marks, and leave status.'
         },
         {
           element: '.tour-compliances',
-          title: 'Compliance & Communication',
-          intro: 'Track GSTR-1, TDS compliance deadlines, and directly chat with your assigned CA firm.'
+          title: 'Statutory Compliances & CA Communication',
+          intro: 'Stay updated on GSTR-1 & TDS filing deadlines and communicate directly with your assigned CA firm.'
         }
       ],
-      showBullets: true,
+      showBullets: false,
       showProgress: true,
-      helperElementPadding: 5,
+      helperElementPadding: 2,
       exitOnOverlayClick: false,
-      doneLabel: 'Done',
+      doneLabel: 'Complete Tour',
       nextLabel: 'Next',
-      prevLabel: 'Prev',
+      prevLabel: 'Back',
       skipLabel: 'Skip'
     }).start().oncomplete(function() {
       markTourCompleted();
@@ -133,11 +133,11 @@ $(document).ready(function() {
 
   // Auto start tour on first visit (checks database, localstorage, and session states)
   const isCompletedDb = typeof USER_TOUR_COMPLETED !== 'undefined' && USER_TOUR_COMPLETED;
-  const isCompletedLs = localStorage.getItem('ecashbook_dashboard_tour') === 'completed';
-  const isSeenSession = sessionStorage.getItem('ecashbook_dashboard_tour_seen') === 'true';
+  const isCompletedLs = localStorage.getItem('methotx_dashboard_tour') === 'completed' || localStorage.getItem('ecashbook_dashboard_tour') === 'completed';
+  const isSeenSession = sessionStorage.getItem('methotx_dashboard_tour_seen') === 'true';
 
   if (!isCompletedDb && !isCompletedLs && !isSeenSession) {
-    sessionStorage.setItem('ecashbook_dashboard_tour_seen', 'true');
+    sessionStorage.setItem('methotx_dashboard_tour_seen', 'true');
     
     const subModal = $('#subscriptionModal');
     const expModal = $('#expiredModal');

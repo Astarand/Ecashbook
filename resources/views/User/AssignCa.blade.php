@@ -502,8 +502,8 @@
     transition: all 0.2s ease !important;
   }
   .ecom-filter .form-control:focus {
-    border-color: #6f42c1 !important;
-    box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.1) !important;
+    border-color: #008CAD !important;
+    box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.1) !important;
     outline: none !important;
   }
   .ecom-filter .form-label {
@@ -523,12 +523,12 @@
     transition: all 0.2s ease !important;
   }
   .ecom-filter .form-check-input:checked {
-    background-color: #6f42c1 !important;
-    border-color: #6f42c1 !important;
+    background-color: #008CAD !important;
+    border-color: #008CAD !important;
   }
   .ecom-filter .form-check-input:focus {
-    box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15) !important;
-    border-color: #6f42c1 !important;
+    box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15) !important;
+    border-color: #008CAD !important;
   }
   .ecom-filter .form-check-label {
     cursor: pointer !important;
@@ -708,8 +708,8 @@
     color: #ffffff !important;
   }
   .user-card .assignCABtn[data-status="0"]:hover {
-    background-color: #2d1f6a !important;
-    border-color: #2d1f6a !important;
+    background-color: #006b85 !important;
+    border-color: #006b85 !important;
   }
   .user-card .assignCABtn[data-status="1"] {
     background-color: #fee2e2 !important;
@@ -739,8 +739,8 @@
     transition: all 0.2s ease !important;
   }
   .modal-body textarea.form-control:focus {
-    border-color: #6f42c1 !important;
-    box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15) !important;
+    border-color: #008CAD !important;
+    box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15) !important;
   }
   .modal-footer {
     border-top: 1px solid #f1f5f9 !important;
@@ -763,8 +763,8 @@
   }
   .ca-side-panel .form-control:focus,
   .ca-side-panel .form-select:focus {
-    border-color: #6f42c1 !important;
-    box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15) !important;
+    border-color: #008CAD !important;
+    box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15) !important;
     outline: none !important;
   }
   .ca-side-panel button[type="submit"] {
@@ -775,7 +775,7 @@
     transition: all 0.2s ease !important;
   }
   .ca-side-panel button[type="submit"]:hover {
-    background: #2d1f6a !important;
+    background: #006b85 !important;
   }
 </style>
 

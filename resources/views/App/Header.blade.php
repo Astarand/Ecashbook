@@ -19,9 +19,10 @@
             line-height: 1 !important;
         }
     </style>
-    <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
-        <div class="me-auto pc-mob-drp">
-            <ul class="list-unstyled">
+    <div class="header-wrapper">
+        <!-- [Mobile Media Block] start -->
+        <div class="me-auto pc-mob-drp d-flex align-items-center">
+            <ul class="list-unstyled d-flex align-items-center mb-0">
                 <!-- ======= Menu collapse Icon ===== -->
                 <li class="pc-h-item pc-sidebar-collapse">
                     <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
@@ -34,48 +35,50 @@
                     </a>
                 </li>
 
+                <!-- Search Options -->
+                <li class="pc-h-item d-none d-md-inline-flex ms-2 position-relative">
+                    <form class="form-search tour-search" onsubmit="return false;">
+                        <i class="ph-duotone ph-magnifying-glass icon-search"></i>
+                        <input type="search"
+                            class="form-control"
+                            placeholder="Search..."
+                            id="compo-menu-search"
+                            autocomplete="off">
+                        <button type="button" class="btn btn-search" style="padding: 0"><kbd>Ctrl+k</kbd></button>
+                    </form>
+
+                    <div id="sidebarSearchResults"
+                        class="dropdown-menu w-100 mt-1 shadow"
+                        style="display:none; max-height:240px; overflow-y:auto; position: absolute; top: 100%; left: 0;">
+                    </div>
+                </li>
             </ul>
         </div>
         <!-- [Mobile Media Block end] -->
         <div class="ms-auto">
-            {{-- Search Options --}}
-            <div class="form-search tour-search position-relative" style="width:250px;">
-                <i class="ph-duotone ph-magnifying-glass icon-search" style="color:#008CAD;"></i>
-                <input type="search"
-                    class="form-control"
-                    placeholder="Search..."
-                    id="compo-menu-search"
-                    autocomplete="off">
-
-                <div id="sidebarSearchResults"
-                    class="dropdown-menu w-100 mt-1 shadow"
-                    style="display:none; max-height:240px; overflow-y:auto;">
-                </div>
-            </div>
-
-
             <ul class="list-unstyled">
-                <!-- Theme Color Change -->
-                <li class="dropdown pc-h-item">
-                    <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                        <i class="ph-duotone ph-sun-dim"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
-                        <a href="#!" class="dropdown-item" onclick="layout_change('dark')">
-                            <i class="ph-duotone ph-moon"></i>
-                            <span>Dark</span>
-                        </a>
-                        <a href="#!" class="dropdown-item" onclick="layout_change('light')">
-                            <i class="ph-duotone ph-sun-dim"></i>
-                            <span>Light</span>
-                        </a>
-                        <a href="#!" class="dropdown-item" onclick="layout_change_default()">
-                            <i class="ph-duotone ph-cpu"></i>
-                            <span>Default</span>
-                        </a>
+                <li class="dropdown pc-h-item d-none d-md-inline-flex">
+                    <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
+                    aria-haspopup="false" aria-expanded="false"><i class="ph-duotone ph-circles-four"></i></a>
+                    <div class="dropdown-menu dropdown-qta dropdown-menu-end pc-h-dropdown">
+                    <div class="overflow-hidden">
+                        <div class="qta-links m-n1">
+                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-user-circle-plus"></i> <span>Assign CA</span></a>
+                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-scroll"></i> <span>Sales Invoice</span></a>
+                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-archive-tray"></i> <span>Purchase Invoice</span></a>
+
+                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-currency-circle-dollar"></i> <span>Plans</span> </a>
+                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-identification-badge"></i><span>Membership</span> </a>
+                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-books"></i> <span>Online Courses</span></a>
+
+                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-envelope-open"></i> <span>Mail</span></a>
+                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-chats-circle"></i> <span>Chat</span> </a>
+                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-user-circle"></i> <span>Users</span></a>
+                        </div>
+                    </div>
                     </div>
                 </li>
-                <!-- start User chat to CA -->
+            <!-- start User chat to CA -->
 				@if(Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
 				@php
 					$companyId = currentOwnerId();
@@ -156,7 +159,7 @@
 				</li>
 				@endif
 				<!-- end User chat to CA -->
-				
+
                 <!-- Notification -->
                 <li class="dropdown pc-h-item">
                     @if (Auth::user())
@@ -379,6 +382,14 @@
         if (results.innerHTML.trim()) {
             results.style.display = 'block';
         }
+        });
+
+        // Ctrl+K / Cmd+K shortcut listener
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                input.focus();
+            }
         });
     });
 </script>

@@ -15,7 +15,7 @@
         </div>
         <div class="col-md-9 col-sm-12">
           <div class="d-flex flex-nowrap align-items-center justify-content-md-end justify-content-center flex-md-nowrap flex-wrap gap-2 mt-md-0 mt-2 pe-md-2">
-            
+
             <button id="start-tour-btn" class="btn btn-outline-primary btn-sm flex-shrink-0 d-flex align-items-center" data-bs-toggle="tooltip" title="Take a Tour">
               <i class="ti ti-help me-1"></i> <span class="d-md-inline d-none">Guide Tour</span>
             </button>
@@ -39,8 +39,8 @@
   <!-- [ Main Content ] start -->
   <div class="row">
     <div class="col-lg-5">
-      <div class="col-md-12 col-xl-12 tour-receivables">
-        <div class="card statistics-card-1 overflow-hidden">
+      <div class="col-md-12 col-xl-12">
+        <div class="card statistics-card-1 overflow-hidden tour-receivables">
           <div class="card-body">
             <img src="../assets/images/widget/img-status-8.svg" alt="img" class="img-fluid img-bg">
             <div class="d-flex align-items-center">
@@ -83,8 +83,8 @@
           </div>
         </div>
       </div>
-      <div class="col-md-12 col-xl-12 tour-payables">
-        <div class="card statistics-card-1 overflow-hidden ">
+      <div class="col-md-12 col-xl-12">
+        <div class="card statistics-card-1 overflow-hidden tour-payables">
           <div class="card-body">
             <img src="../assets/images/widget/img-status-9.svg" alt="img" class="img-fluid img-bg">
             <div class="d-flex align-items-center">
@@ -130,8 +130,8 @@
       </div>
     </div>
 
-    <div class="col-lg-7 tour-turnover">
-      <div class="card">
+    <div class="col-lg-7">
+      <div class="card tour-turnover">
         <div class="card-header">
           <div class="d-flex align-items-center justify-content-between">
             <h4 class="mb-0">Turnover Details</h4>
@@ -392,8 +392,8 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-8 tour-compliances">
-          <div class="card table-card pb-2">
+        <div class="col-lg-8">
+          <div class="card table-card pb-2 tour-compliances">
             <div class="card-header d-flex align-items-center justify-content-between">
               <h5 class="mb-0">My Compliance Dashboard</h5>
               <a href="{{ route('ca.CompliancesList') }}" class="btn btn-sm btn-link-primary">View All</a>
@@ -452,7 +452,6 @@
   <!-- [ Main Content ] end -->
 </div>
 
-
 @endsection
 
 @section('page-script')
@@ -461,6 +460,7 @@
   const TOUR_COMPLETE_ROUTE = "{{ route('user.completeTour') }}";
   const CSRF_TOKEN = "{{ csrf_token() }}";
 </script>
+
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="{{ asset('assets/js/user-chart.js') }}"></script>
@@ -736,7 +736,7 @@
     fetchLiabilitiesSummary(currentMonthForAsset, $('#slet_financial_year').val());
   }, 800);
 
-  
+
 
   //-------- Cashflow Chart Script --------//
   cashflowChart = null;

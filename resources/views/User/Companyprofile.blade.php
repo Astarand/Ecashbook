@@ -106,7 +106,7 @@
                                     aria-selected="false">
                                     <span class="f-w-500"><i class="ph-duotone ph-user-plus m-r-10"></i>Assign CA Details</span>
                                 </a>
-                                
+
                                 <a class="nav-link list-group-item list-group-item-action" id="holidays-tab"
                                     data-bs-toggle="pill" href="#holidays" role="tab" aria-controls="holidays"
                                     aria-selected="false">
@@ -152,58 +152,33 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-sm-4">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Company GST Registered <span
-                                                                class="text-danger">*</span> <span id="gst_type_display"
-                                                                class="badge bg-info mt-2"></span></label>
-                                                        <select class="form-select" name="gst_reg" id="gst_reg"
-                                                            required>
-                                                            <option value="">Select</option>
-                                                            <option value="Yes" <?php echo isset($compDetails->gst_reg) && $compDetails->gst_reg == 'Yes' ? 'selected' : ''; ?>>Yes
-                                                            </option>
-                                                            <option value="No" <?php echo isset($compDetails->gst_reg) && $compDetails->gst_reg == 'No' ? 'selected' : ''; ?>>No
-                                                            </option>
-                                                        </select>
-
-                                                    </div>
+                                                <div class="col-sm-4 mb-3">
+                                                    <label class="form-label" for="gst_reg">Company GST Registered <span class="text-danger">*</span> <span id="gst_type_display" class="badge text-bg-info ms-1"></span></label>
+                                                    <select class="form-select" name="gst_reg" id="gst_reg" required>
+                                                        <option value="">Select</option>
+                                                        <option value="Yes" <?php echo isset($compDetails->gst_reg) && $compDetails->gst_reg == 'Yes' ? 'selected' : ''; ?>>Yes</option>
+                                                        <option value="No" <?php echo isset($compDetails->gst_reg) && $compDetails->gst_reg == 'No' ? 'selected' : ''; ?>>No</option>
+                                                    </select>
                                                 </div>
-                                                <div class="col-sm-4" id="gst_reg_no" style="display: none">
-                                                    <label class="form-label">GST Number <span
-                                                            class="text-danger">*</span></label>
-                                                    <div class="mb-3">
-                                                        <div class="input-group">
-                                                            <input type="text" class="form-control" name="gst_no"
-                                                                id="gst_no" style="text-transform:uppercase;"
-                                                                placeholder="Enter GST Number"
-                                                                value="{{ isset($compDetails->gst_no) ? $compDetails->gst_no : '' }}">
-
-                                                            <button class="btn btn-primary" type="button"
-                                                                id="get_gst_btn"><i
-                                                                    class="ti ti-cloud-download align-middle"></i> Get
-                                                                Details</button>
-                                                        </div>
-                                                        <span id="gstNoError" class="text-danger"
-                                                            style="display:none;">GST
-                                                            Number is required</span>
+                                                <div class="col-sm-4 mb-3" id="gst_reg_no" style="display: none">
+                                                    <label class="form-label" for="gst_no">GST Number <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control text-uppercase" name="gst_no" id="gst_no" placeholder="Enter GST Number" value="{{ isset($compDetails->gst_no) ? $compDetails->gst_no : '' }}">
+                                                        <button class="btn btn-primary d-inline-flex align-items-center px-3" type="button" id="get_gst_btn">
+                                                            <i class="ti ti-cloud-download me-1"></i> Get Details
+                                                        </button>
                                                     </div>
+                                                    <span id="gstNoError" class="text-danger small mt-1" style="display:none;">GST Number is required</span>
                                                 </div>
-                                                <div class="col-sm-4" id="gst_reg_tran" style="display: none">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">GST Transaction Type <span
-                                                                class="text-danger">*</span></label>
-                                                        <select class="form-control error" name="comp_tran_type"
-                                                            id="comp_tran_type">
-                                                            <option label="select"></option>
-                                                            <option value="Regular" <?php echo isset($compDetails->comp_tran_type) && $compDetails->comp_tran_type == 'Regular' ? 'selected' : ''; ?>>Regular</option>
-                                                            <option value="QRMP" <?php echo isset($compDetails->comp_tran_type) && $compDetails->comp_tran_type == 'QRMP' ? 'selected' : ''; ?>>QRMP</option>
-                                                            <option value="Composite" <?php echo isset($compDetails->comp_tran_type) && $compDetails->comp_tran_type == 'Composite' ? 'selected' : ''; ?>>Composite
-                                                            </option>
-                                                        </select>
-
-                                                        <span id="tranTypeError" class="text-danger"
-                                                            style="display:none;">GST Transaction Type is required</span>
-                                                    </div>
+                                                <div class="col-sm-4 mb-3" id="gst_reg_tran" style="display: none">
+                                                   <label class="form-label" for="comp_tran_type">GST Transaction Type <span class="text-danger">*</span></label>
+                                                    <select class="form-select" name="comp_tran_type" id="comp_tran_type">
+                                                        <option value="">Select</option>
+                                                        <option value="Regular" <?php echo isset($compDetails->comp_tran_type) && $compDetails->comp_tran_type == 'Regular' ? 'selected' : ''; ?>>Regular</option>
+                                                        <option value="QRMP" <?php echo isset($compDetails->comp_tran_type) && $compDetails->comp_tran_type == 'QRMP' ? 'selected' : ''; ?>>QRMP</option>
+                                                        <option value="Composite" <?php echo isset($compDetails->comp_tran_type) && $compDetails->comp_tran_type == 'Composite' ? 'selected' : ''; ?>>Composite</option>
+                                                    </select>
+                                                    <span id="tranTypeError" class="text-danger small mt-1" style="display:none;">GST Transaction Type is required</span>
                                                 </div>
                                                 <div class="col-sm-4">
                                                     <div class="mb-3">
@@ -262,7 +237,7 @@
                                                             placeholder="Enter P-Tax Enrolment Certificate No">
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-6">
+                                                <div class="col-lg-12">
                                                     <div class="mb-3">
                                                         <label class="form-label">P-Tax Registration Number </label>
                                                         <input type="text" id="comp_ptax" name="comp_ptax"
@@ -275,7 +250,7 @@
                                                 {{-- <div class="col-lg-6 mb-4">
                                                     <label class="form-label">Set Basic Salary Percentage <span class="text-danger">*</span></label>
                                                     <input type="number" required class="form-control" name="basic_percentage" value="{{ isset($compDetails->basic_percentage)?$compDetails->basic_percentage:""}}" id="basic_percentage" placeholder="Enter percentage">
-                                                    
+
                                                 </div> --}}
                                                 {{-- <div class="col-lg-6 mb-4">
                                                     <label class="form-label">Set Basic Salary Percentage <span class="text-danger">*</span></label>
@@ -537,7 +512,7 @@
                                                                 class="form-control"
                                                                 placeholder="Enter Contact Person Name"> --}}
                                                                 <input type="text" name="comp_ship_name"
-                                                                    id="comp_ship_name" 
+                                                                    id="comp_ship_name"
                                                                     value="{{ isset($compDetails->comp_ship_name) ? $compDetails->comp_ship_name : '' }}"
                                                                     class="form-control"
                                                                     placeholder="Enter Contact Person Name">
@@ -909,7 +884,7 @@
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody>                                                            
+                                                        <tbody>
 															<?php $i=1; ?>
 															@foreach($directorDetails as $d)
 																<tr id="row_{{ $d->id }}">
@@ -932,9 +907,9 @@
 																			>
 																			<i class="ti ti-eye"></i>
 																		</button>
-																		
+
 																		<button class="btn btn-danger btn-sm deleteBtn" data-id="{{ $d->id }}"><i class="ti ti-trash"></i></button>
-																		
+
 																	</td>
 																</tr>
 															@endforeach
@@ -993,7 +968,7 @@
 												</div>
 												<div class="card rounded-4 overflow-hidden" style="background-image: url(../assets/images/widget/img-card-bg.svg); background-size: cover;">
 													<div class="card-body">
-														
+
 														<div class="d-flex">
 															<div class="flex-grow-1 me-3">
 																<p class="text-white text-sm text-opacity-50 mb-0">Bank Name</p>
@@ -1071,7 +1046,7 @@
 													<div class="modal-body">
 
 														<!-- Bank Name -->
-														<div class="row">															
+														<div class="row">
 															<div class="col-md-4  mb-3">
 																<label for="bankName" class="form-label">Bank Name<span class="text-danger">*</span></label>
 																<input type="text" name="bank_name" id="bank_name{{ $val->id }}" value="{{ $val->bank_name }}" class="form-control" placeholder="Enter Bank Name" required>
@@ -1106,7 +1081,7 @@
 															</div>
                                                             <div class="col-md-4 mb-3">
                                                                 <label class="form-label">
-                                                                    Bank QR Code 
+                                                                    Bank QR Code
                                                                 </label>
 
                                                                 <input type="file"
@@ -1405,7 +1380,7 @@
                                                 </div>
                                             </div>
 
-                                            
+
                                             <div class="col-lg-4 col-sm-12">
                                                 <div class="card">
                                                     <div class="card-header">
@@ -1475,7 +1450,7 @@
                                                 </div>
                                             </div>
 
-                                            
+
                                             <div class="col-lg-4 col-sm-12">
                                                 <div class="card">
                                                     <div class="card-header">
@@ -1583,7 +1558,7 @@
                                             </div>
 
                                             <h5 class="my-4">Other Documents</h5>
-                                            
+
                                             <div class="col-lg-4 col-sm-12">
                                                 <div class="card">
                                                     <div class="card-header">
@@ -1644,7 +1619,7 @@
                                                         <label class="upload-area" for="other_logo_doc" style="cursor: pointer;">
                                                             <span class="upload-text" id="other_logo_doc_label">
                                                                 {{-- Logic: Toggle checkmark if file exists, else show upload prompt --}}
-                                                                
+
                                                                 @if(isset($docs['Company Logo']))
                                                                     <i class="fa fa-check-circle text-success"></i> Already Uploaded
                                                                 @else
@@ -1750,7 +1725,7 @@
 									</div>
 								</div>
 								@endif
-								
+
                                 @if ($ca_details)
                                     @foreach ($ca_details as $ca_id => $ca_detail)
                                         <div class="row">
@@ -2100,7 +2075,7 @@
                                 @endif
                             </div>
 
-                            
+
 
                             <div class="tab-pane fade" id="holidays" role="tabpanel" aria-labelledby="holidays-tab">
                                 <div class="card">
@@ -3700,7 +3675,7 @@
             </div>
         </div>
     </div>
-	
+
 	<div class="modal fade" id="proprietorshipModal">
 		<div class="modal-dialog">
 			<form id="proprietorshipForm">
@@ -3712,13 +3687,13 @@
 					<div class="modal-body">
 						<input type="text" name="company_name" id="company_name" class="form-control" placeholder="Enter Company Name" required>
 						<div id="companyNameError" class="text-danger mt-2"></div>
-						
+
 						<small class="mt-2 d-block" style="color:#003399; font-weight:500;">
-							Note: You can enter multiple company names for <b>Proprietorship</b>. 
+							Note: You can enter multiple company names for <b>Proprietorship</b>.
 							Simply submit the form again to add another company.
 						</small>
 					</div>
-					
+
 					<div class="modal-footer">
 						<button type="button" class="btn btn-primary" id="saveProprietorship">
 							Submit
@@ -3729,7 +3704,7 @@
 			</form>
 		</div>
 	</div>
-	
+
 	<div class="modal custom-modal fade" id="add-bank-modal" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-xl">
 			<div class="modal-content">
@@ -3794,7 +3769,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<!-- Delete Confirmation Modal -->
 	<div class="modal custom-modal fade" id="delete_modal" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-md">
@@ -3838,10 +3813,10 @@
 		//echo "<pre>";print_r($userMenu);exit;
 		$hasPermission = in_array('ALL', $userMenu) || in_array('Multi Proprietorships', $userMenu);
 	@endphp
-	
-    <script>	
+
+    <script>
 		var hasProprietorshipAccess = @json($hasPermission);
-		
+
 		$(document).ready(function(){
 
 			$('#comp_type').change(function(){
@@ -3852,7 +3827,7 @@
 			});
 
 		});
-		
+
 		$('#saveProprietorship').click(function(){
 			$("#loader").show();
 			$.ajax({
@@ -3880,7 +3855,7 @@
 				}
 			});
 		});
-     
+
         // GST Number Yes or No
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -3938,7 +3913,7 @@
 
 
             $(document).ready(function() {
-                
+
                 const billingState = "{{ $compDetails->comp_bill_state ?? '' }}";
                 const billingCity = "{{ $compDetails->comp_bill_city ?? '' }}";
                 const shippingState = "{{ $compDetails->comp_ship_state ?? '' }}";
@@ -4129,7 +4104,7 @@
                     return false; // stop ajax
                 }
 
-                // Company Pan No required 
+                // Company Pan No required
                 if (!compPan) {
                     showToast("Please Type The Company Pan No", "error");
                     $("#frmcompdet #comp_pan_no").focus();
@@ -4232,7 +4207,7 @@
                     shop_establishment_no: $("#frmcompdet #shop_establishment_no").val(),
                     fema_iec_no: $("#frmcompdet #fema_iec_no").val(),
                     state_excise_no: $("#frmcompdet #state_excise_no").val(),
-                    
+
                 };
 
                 $.ajax({
@@ -4441,7 +4416,7 @@
                 });
 
             });
-			
+
 			//------Add/Edit/View Director details
 			$('#addDirectorForm').submit(function(e){
 				e.preventDefault();
@@ -4479,7 +4454,7 @@
 					}
 				});
 			});
-			
+
 			$(document).on('click', '.deleteBtn', function() {
 				let id = $(this).data('id');
 
@@ -5259,7 +5234,7 @@
 
 						$('#comp_tran_type').val(gstType).trigger('change');
 
-						
+
 						// ================= Modal =================
 						let html = `
 							<p><strong>GSTIN:</strong> ${d.gstin}</p>
@@ -5382,7 +5357,7 @@
                 .then(data => {
                     if (data.status === 'success') {
                         const holiday = data.holiday;
-						
+
 						localStorage.setItem('activeTab', 'holidays');
                         // Populate form fields
                         document.getElementById('holidayId').value = holiday.id;
@@ -6017,12 +5992,12 @@
             document.getElementById('directorEmail').textContent = email || '-';
             document.getElementById('directorPhone').textContent = phone || '-';
             document.getElementById('directorDIN').textContent = din || '-';
-            
+
             // Handle signature image
             const signatureImg = document.getElementById('signatureImage');
             const noSignature = signatureImg.nextElementSibling;
-            
-            if (signature && signature !== '') {			
+
+            if (signature && signature !== '') {
                 signatureImg.src = signature; //'{{ asset("storage/") }}' + signature;
                 signatureImg.style.display = 'block';
                 noSignature.style.display = 'none';
@@ -6336,9 +6311,9 @@
             document.getElementById('mapSearchInput').value = '';
             document.getElementById('useLocationBtn').disabled = true;
         });
-		
-		
-	
+
+
+
 
     $(document).on('submit', '[id^="upadteBankForm"]', function(e) {
 
@@ -6381,7 +6356,7 @@
         e.preventDefault();
 
         var bankId = $("#bankId").val();
-        var bankurl = "/save_bank"; 
+        var bankurl = "/save_bank";
         // var bankData = $(this).serialize();
         var bankData = new FormData(this);
 
@@ -6406,7 +6381,7 @@
                         window.location.href = response.redirect;
                     }, 2000);
 
-                } 
+                }
                 else if (response.class == "validation") {
 
                     let errorMsg = '';
@@ -6416,7 +6391,7 @@
                     });
 
                     showToast(errorMsg, "error");
-                } 
+                }
                 else {
 
                     showToast(response.message || "Something went wrong", "error");
@@ -6441,7 +6416,7 @@
             }
         });
     });
-	
+
 
     // Handle the bank delete confirmation
     $(document).on('click', '.delete-btn', function () {
@@ -6450,7 +6425,7 @@
     });
 
     $('#confirmDelete').on('click', function() {
-		
+
 		let deleteId = $(this).data('id');
         alert(deleteId);
 
@@ -6482,9 +6457,9 @@
             });
         }
     });
-	
+
 	// Toggle CA Access Details sub-options
-	$(document).on('change', '.ca-access-toggle', function() {		
+	$(document).on('change', '.ca-access-toggle', function() {
 		let target = $(this).data('target');
         if($(this).is(':checked')){
             $('#' + target).slideDown();
@@ -6492,17 +6467,17 @@
             $('#' + target).slideUp();
             $('#' + target).find('.permission-checkbox').prop('checked', false);
         }
-		
+
 		showToast('Please scroll down & Click "Save Permissions" to apply updates','warning');
 	});
-	
+
 	// Auto enable main toggle if view/edit checked
     $('.permission-checkbox').change(function(){
         let parentBox = $(this).closest('.p-3');
-		
+
         let anyChecked = parentBox.find('.permission-checkbox:checked').length > 0;
         parentBox.find('.ca-access-toggle').prop('checked', anyChecked);
-		
+
 		showToast('Please scroll down & Click "Save Permissions" to apply updates','warning');
 
     });
@@ -6524,7 +6499,7 @@
 		}
 
 	});
-	
+
 
     $(document).on('click', '.toggleQrBtn', function () {
 
@@ -6550,219 +6525,216 @@
 </script>
 
 <script>
-		function startProfileTour() {
-			function launch() {
-				let tour = introJs().setOptions({
-					steps: [
-						{
-							title: 'Company Profile Guide',
-							intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(0, 140, 173, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #008CAD;"><i class="ti ti-building" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Let\'s walk through the profile section to configure your company details, bank accounts, CA access, and policies.</p></div>'
-						},
-						{
-							element: '#uploadedImage',
-							title: 'Company Logo',
-							intro: 'Click the pencil icon here to upload your company logo (max size 200 KB).',
-							tabId: 'company-details-tab'
-						},
-						{
-							element: '#gst_reg',
-							title: 'GST Registered Status',
-							intro: 'Select if this company is registered under GST. Choosing Yes enables GST number and transaction type setups.',
-							tabId: 'company-details-tab'
-						},
-						{
-							element: '#comp_name',
-							title: 'Company Name',
-							intro: 'Enter your business\'s registered legal name.',
-							tabId: 'company-details-tab'
-						},
-						{
-							element: '#comp_type',
-							title: 'Company Constitution Type',
-							intro: 'Select the legal structure of your business (e.g. Proprietorship, Partnership, PVT Ltd). Proprietorship allows adding multiple businesses under one user.',
-							tabId: 'company-details-tab'
-						},
-						{
-							element: '#billing-address-1',
-							title: 'Billing Address',
-							intro: 'Fill in your billing details here. You can also add dynamic billing addresses.',
-							tabId: 'company-details-tab'
-						},
-						{
-							element: '#business-details-tab',
-							title: 'Business & GST Details',
-							intro: 'Click next to view the Business Details tab for nature of business and invoice sequences.',
-							tabId: 'business-details-tab'
-						},
-						{
-							element: '#business',
-							title: 'Category of Business',
-							intro: 'Specify whether your business is Trading, Service, Professional, or Mixed.',
-							tabId: 'business-details-tab'
-						},
-						{
-							element: '#exact_comp_nature',
-							title: 'Exact Nature of Business',
-							intro: 'Provide a description of the products or services your company trades/provides.',
-							tabId: 'business-details-tab'
-						},
-						{
-							element: '#comp_inv_digits',
-							title: 'Invoice Series Prefixes',
-							intro: 'Set up prefixes (e.g., PI/2024-25/ for Proforma, SI/2024-25/ for Sales) to auto-generate sequence numbers.',
-							tabId: 'business-details-tab'
-						},
-						{
-							element: '#contact-details-tab',
-							title: 'Contact Details',
-							intro: 'Click next to manage contact details.',
-							tabId: 'contact-details-tab'
-						},
-						{
-							element: '#comp_phone',
-							title: 'Contact Information',
-							intro: 'Verify your company phone, email address, WhatsApp number, and official website URL.',
-							tabId: 'contact-details-tab'
-						},
-						{
-							element: '#director-details-tab',
-							title: 'Directors & Owners List',
-							intro: 'Manage partners, directors, or proprietors. You can add new ones, check DIN status, and upload digital signatures.',
-							tabId: 'director-details-tab'
-						},
-						{
-							element: '#bank-details-tab',
-							title: 'Bank Accounts Tab',
-							intro: 'Click here to view, register, and update bank account details for your organization.',
-							tabId: 'bank-details-tab'
-						},
-						{
-							element: '#bank-details a[data-bs-target="#add-bank-modal"]',
-							title: 'Add New Bank Account',
-							intro: 'Click here to record a new bank account with branch details, account number, IFSC code, and current balance.',
-							tabId: 'bank-details-tab'
-						},
-						{
-							element: '#bank-details .card',
-							title: 'Bank Account Card',
-							intro: 'Displays registered bank details, branch codes, Swift code, and current balance. You can view, edit, or delete accounts using the menu.',
-							tabId: 'bank-details-tab'
-						},
-						{
-							element: '#attachment-tab',
-							title: 'Locker & Attachments',
-							intro: 'Securely upload corporate certificates (PAN, Incorporation, Trade license, Signatures) for safe digital locker storage.',
-							tabId: 'attachment-tab'
-						},
-						
-						{
-							element: '#holidays-tab',
-							title: 'Company Holidays',
-							intro: 'Establish the yearly office holiday calendar, linking directly to automated attendance and payroll computations.',
-							tabId: 'holidays-tab'
-						},
-						{
-							element: '#schedule-tab',
-							title: 'Shift Timings & Day Schedule',
-							intro: 'Configure shifts, weekend offs, working hours, and grace times for automated employee logs.',
-							tabId: 'schedule-tab'
-						},
-						{
-							element: '#locations-tab',
-							title: 'Office Locations Tab',
-							intro: 'Click here to view, register, and update office locations and branches.',
-							tabId: 'locations-tab'
-						},
-						{
-							element: '#locations button[data-bs-target="#locationModal"]',
-							title: 'Add New Location',
-							intro: 'Click here to register a new branch or office location with latitude and longitude coordinates.',
-							tabId: 'locations-tab'
-						},
-						{
-							element: '#locations .row.mb-4.g-4',
-							title: 'Location Summary Statistics',
-							intro: 'Quickly review count summaries of operational Head Offices and Branch Offices.',
-							tabId: 'locations-tab'
-						},
-						{
-							element: '#locations .table-responsive',
-							title: 'Office Locations Table',
-							intro: 'Manage geofenced location entries. These are used to verify and secure employee attendance logs.',
-							tabId: 'locations-tab'
-						}
-					],
-					showBullets: true,
-					showProgress: true,
-					helperElementPadding: 5,
-					exitOnOverlayClick: false,
-					doneLabel: 'Done',
-					nextLabel: 'Next',
-					prevLabel: 'Prev',
-					skipLabel: 'Skip'
-				});
+    function startProfileTour() {
+        function launch() {
+            let tour = introJs().setOptions({
+                steps: [
+                    {
+                        title: 'Company Profile Guide',
+                        intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(0, 140, 173, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #008CAD;"><i class="ti ti-building" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Let\'s walk through the profile section to configure your company details, bank accounts, CA access, and policies.</p></div>'
+                    },
+                    {
+                        element: '#uploadedImage',
+                        title: 'Company Logo',
+                        intro: 'Click the pencil icon here to upload your company logo (max size 200 KB).',
+                        tabId: 'company-details-tab'
+                    },
+                    {
+                        element: '#gst_reg',
+                        title: 'GST Registered Status',
+                        intro: 'Select if this company is registered under GST. Choosing Yes enables GST number and transaction type setups.',
+                        tabId: 'company-details-tab'
+                    },
+                    {
+                        element: '#comp_name',
+                        title: 'Company Name',
+                        intro: 'Enter your business\'s registered legal name.',
+                        tabId: 'company-details-tab'
+                    },
+                    {
+                        element: '#comp_type',
+                        title: 'Company Constitution Type',
+                        intro: 'Select the legal structure of your business (e.g. Proprietorship, Partnership, PVT Ltd). Proprietorship allows adding multiple businesses under one user.',
+                        tabId: 'company-details-tab'
+                    },
+                    {
+                        element: '#billing-address-1',
+                        title: 'Billing Address',
+                        intro: 'Fill in your billing details here. You can also add dynamic billing addresses.',
+                        tabId: 'company-details-tab'
+                    },
+                    {
+                        element: '#business-details-tab',
+                        title: 'Business & GST Details',
+                        intro: 'Click next to view the Business Details tab for nature of business and invoice sequences.',
+                        tabId: 'business-details-tab'
+                    },
+                    {
+                        element: '#business',
+                        title: 'Category of Business',
+                        intro: 'Specify whether your business is Trading, Service, Professional, or Mixed.',
+                        tabId: 'business-details-tab'
+                    },
+                    {
+                        element: '#exact_comp_nature',
+                        title: 'Exact Nature of Business',
+                        intro: 'Provide a description of the products or services your company trades/provides.',
+                        tabId: 'business-details-tab'
+                    },
+                    {
+                        element: '#comp_inv_digits',
+                        title: 'Invoice Series Prefixes',
+                        intro: 'Set up prefixes (e.g., PI/2024-25/ for Proforma, SI/2024-25/ for Sales) to auto-generate sequence numbers.',
+                        tabId: 'business-details-tab'
+                    },
+                    {
+                        element: '#contact-details-tab',
+                        title: 'Contact Details',
+                        intro: 'Click next to manage contact details.',
+                        tabId: 'contact-details-tab'
+                    },
+                    {
+                        element: '#comp_phone',
+                        title: 'Contact Information',
+                        intro: 'Verify your company phone, email address, WhatsApp number, and official website URL.',
+                        tabId: 'contact-details-tab'
+                    },
+                    {
+                        element: '#director-details-tab',
+                        title: 'Directors & Owners List',
+                        intro: 'Manage partners, directors, or proprietors. You can add new ones, check DIN status, and upload digital signatures.',
+                        tabId: 'director-details-tab'
+                    },
+                    {
+                        element: '#bank-details-tab',
+                        title: 'Bank Accounts Tab',
+                        intro: 'Click here to view, register, and update bank account details for your organization.',
+                        tabId: 'bank-details-tab'
+                    },
+                    {
+                        element: '#bank-details a[data-bs-target="#add-bank-modal"]',
+                        title: 'Add New Bank Account',
+                        intro: 'Click here to record a new bank account with branch details, account number, IFSC code, and current balance.',
+                        tabId: 'bank-details-tab'
+                    },
+                    {
+                        element: '#bank-details .card',
+                        title: 'Bank Account Card',
+                        intro: 'Displays registered bank details, branch codes, Swift code, and current balance. You can view, edit, or delete accounts using the menu.',
+                        tabId: 'bank-details-tab'
+                    },
+                    {
+                        element: '#attachment-tab',
+                        title: 'Locker & Attachments',
+                        intro: 'Securely upload corporate certificates (PAN, Incorporation, Trade license, Signatures) for safe digital locker storage.',
+                        tabId: 'attachment-tab'
+                    },
 
-				tour.onbeforechange(function(targetElement) {
-					if (!targetElement) return;
+                    {
+                        element: '#holidays-tab',
+                        title: 'Company Holidays',
+                        intro: 'Establish the yearly office holiday calendar, linking directly to automated attendance and payroll computations.',
+                        tabId: 'holidays-tab'
+                    },
+                    {
+                        element: '#schedule-tab',
+                        title: 'Shift Timings & Day Schedule',
+                        intro: 'Configure shifts, weekend offs, working hours, and grace times for automated employee logs.',
+                        tabId: 'schedule-tab'
+                    },
+                    {
+                        element: '#locations-tab',
+                        title: 'Office Locations Tab',
+                        intro: 'Click here to view, register, and update office locations and branches.',
+                        tabId: 'locations-tab'
+                    },
+                    {
+                        element: '#locations button[data-bs-target="#locationModal"]',
+                        title: 'Add New Location',
+                        intro: 'Click here to register a new branch or office location with latitude and longitude coordinates.',
+                        tabId: 'locations-tab'
+                    },
+                    {
+                        element: '#locations .row.mb-4.g-4',
+                        title: 'Location Summary Statistics',
+                        intro: 'Quickly review count summaries of operational Head Offices and Branch Offices.',
+                        tabId: 'locations-tab'
+                    },
+                    {
+                        element: '#locations .table-responsive',
+                        title: 'Office Locations Table',
+                        intro: 'Manage geofenced location entries. These are used to verify and secure employee attendance logs.',
+                        tabId: 'locations-tab'
+                    }
+                ],
+                showBullets: true,
+                showProgress: true,
+                helperElementPadding: 5,
+                exitOnOverlayClick: false,
+                doneLabel: 'Done',
+                nextLabel: 'Next',
+                prevLabel: 'Prev',
+                skipLabel: 'Skip'
+            });
 
-					// Find closest tab-pane containing the target element
-					let tabPane = targetElement.closest('.tab-pane');
-					if (tabPane) {
-						let tabId = tabPane.getAttribute('id');
-						let tabTrigger = document.getElementById(tabId + '-tab');
-						if (tabTrigger && !tabTrigger.classList.contains('active')) {
-							let tab = new bootstrap.Tab(tabTrigger);
-							tab.show();
-						}
-					} else if (targetElement.classList.contains('nav-link') && targetElement.getAttribute('data-bs-toggle') === 'pill') {
-						let tab = new bootstrap.Tab(targetElement);
-						tab.show();
-					}
-				});
+            tour.onbeforechange(function(targetElement) {
+                if (!targetElement) return;
 
-				tour.start();
-			}
+                // Find closest tab-pane containing the target element
+                let tabPane = targetElement.closest('.tab-pane');
+                if (tabPane) {
+                    let tabId = tabPane.getAttribute('id');
+                    let tabTrigger = document.getElementById(tabId + '-tab');
+                    if (tabTrigger && !tabTrigger.classList.contains('active')) {
+                        let tab = new bootstrap.Tab(tabTrigger);
+                        tab.show();
+                    }
+                } else if (targetElement.classList.contains('nav-link') && targetElement.getAttribute('data-bs-toggle') === 'pill') {
+                    let tab = new bootstrap.Tab(targetElement);
+                    tab.show();
+                }
+            });
 
-			if (typeof introJs === 'function') {
-				launch();
-			} else {
-				// CSS
-				if (!document.getElementById('introjs-cdn-css')) {
-					let css = document.createElement('link');
-					css.id = 'introjs-cdn-css';
-					css.rel = 'stylesheet';
-					css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
-					document.head.appendChild(css);
-				}
+            tour.start();
+        }
 
-				// JS
-				let js = document.createElement('script');
-				js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
-				js.onload = function() {
-					launch();
-				};
-				document.body.appendChild(js);
-			}
-		}
+        if (typeof introJs === 'function') {
+            launch();
+        } else {
+            // CSS
+            if (!document.getElementById('introjs-cdn-css')) {
+                let css = document.createElement('link');
+                css.id = 'introjs-cdn-css';
+                css.rel = 'stylesheet';
+                css.href = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/introjs.min.css';
+                document.head.appendChild(css);
+            }
 
-		function bindProfileTour() {
-			const btn = document.getElementById('start-profile-tour');
-			if (btn) {
-				btn.addEventListener('click', function(e) {
-					e.preventDefault();
-					startProfileTour();
-				});
-			}
-		}
+            // JS
+            let js = document.createElement('script');
+            js.src = 'https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js';
+            js.onload = function() {
+                launch();
+            };
+            document.body.appendChild(js);
+        }
+    }
 
-		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', bindProfileTour);
-		} else {
-			bindProfileTour();
-		}
-    </script>
+    function bindProfileTour() {
+        const btn = document.getElementById('start-profile-tour');
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                startProfileTour();
+            });
+        }
+    }
 
-
-
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindProfileTour);
+    } else {
+        bindProfileTour();
+    }
+</script>
 
 @endsection

@@ -63,7 +63,7 @@ class GSTController extends Controller
 			$userId = getAccessCompanyId($request);
 		}
 		//end ca-accountant access
-		
+
 		if(Auth::user() && (Auth::user()->u_type != 3 && Auth::user()->u_type != 6)){
 			$getUserData =  DB::table('users')
 							->select(DB::raw('users.id as uid,users.*,company_profiles.*'))
@@ -184,7 +184,7 @@ class GSTController extends Controller
 			$userId = getAccessCompanyId($request);
 		}
 		//end ca-accountant access
-		
+
 		if(Auth::user() && (Auth::user()->u_type != 3 && Auth::user()->u_type != 6)){
 			$getUserData =  DB::table('users')
 							->select(DB::raw('users.id as uid,gst_logins.*'))
@@ -219,7 +219,7 @@ class GSTController extends Controller
 			$userId = getAccessCompanyId($request);
 		}
 		//end ca-accountant access
-		
+
 		if(Auth::user() && (Auth::user()->u_type != 3 && Auth::user()->u_type != 6)){
 			//echo "<pre>";print_r($_POST);exit;
 			$getUserData =  DB::table('users')
@@ -863,7 +863,7 @@ class GSTController extends Controller
 			//echo"<pre>";print_r($status);
 			return $status;
 	}
-	
+
 	public function getGstr9AutoCalDet($financialYear,$quarterSelect,$periodSelect,$mainReportType,$childReportType,$isNilReturn){
 		//echo "<pre>";print_r($request);exit;
 		$userId = currentOwnerId();
@@ -895,7 +895,7 @@ class GSTController extends Controller
 			//echo"<pre>";print_r($status);
 			return $status;
 	}
-	
+
 	public function getGstr9Details($financialYear,$quarterSelect,$periodSelect,$mainReportType,$childReportType,$isNilReturn){
 		//echo "<pre>";print_r($request);exit;
 		$userId = currentOwnerId();
@@ -929,7 +929,7 @@ class GSTController extends Controller
 	}
 
 	public function getPreviousMonthStartEnd($financialYear, $month,$type){
-				
+
 		$year = (int)($financialYear);
 		if (strtolower($type) === 'gstr9' || strtolower($type) === 'gstr9c') {
 			$startDate = $year . "-04-01";          // 1st April of financial year
@@ -995,7 +995,7 @@ class GSTController extends Controller
 			->value('gross_turnover_current_fy');
 		return round($grossTurnover, 2);
 	}
-	
+
 	function getLastQuarterRange($period)
 	{
 		$month = (int)substr($period, 0, 2);
@@ -1149,7 +1149,7 @@ class GSTController extends Controller
 							$cgst = $this->get_cgst($item->amount,$item->gst_rate);
 						}else{
 							$igst = $this->get_igst($item->amount,$item->gst_rate);
-						}						
+						}
 						$invoice['itms'][] = [
 							'num' => $index + 1,
 							'itm_det' => [
@@ -1359,7 +1359,7 @@ class GSTController extends Controller
             })
             ->groupBy('products.hsn_code','products.sac_code', 'products.base_unit','sales_values.gst_trans', 'sales_values.gst_rate')
             ->get()
-            ->map(function ($item, $index) {				
+            ->map(function ($item, $index) {
 				$igst = 0;
 				$sgst = 0;
 				$cgst = 0;
@@ -1489,7 +1489,7 @@ class GSTController extends Controller
 		$cgst = $igst / 2;
 		return $cgst;
 	}
-	
+
 	function getGstr9Period($ym) {
 		$year = intval(substr($ym, 2, 4));
 		return "03" . $year;
@@ -1519,7 +1519,7 @@ class GSTController extends Controller
 					->whereNotNull('ack_num')     // NOT NULL
 					->where('ack_num', '!=', '')  // NOT empty
 					->count();
-					
+
 			if ($exists) {
 				return response()->json([
 					'status_cd' => '0',
@@ -1528,8 +1528,8 @@ class GSTController extends Controller
 						'error_cd' => '0'
 					]
 				]);
-			} 
-		
+			}
+
 			$getUserData =  DB::table('users')
 							->select(DB::raw('users.id as uid,company_profiles.gst_no as gst_no,gst_logins.*'))
 							->leftJoin('company_profiles', 'users.id', '=', 'company_profiles.userId')
@@ -1594,13 +1594,13 @@ class GSTController extends Controller
 					"gstin" => $this->returnUserGstNo(),
 					"fp" => $this->getGstr9Period($period)//$this->getFP($financialYear, $periodSelect)
 				];
-				
+
 				// Decode UI payload JSON to array
 				$uiPayloadArr = json_decode($request->uipayload, true);
 				$merged = array_merge($merged, $uiPayloadArr);
 				//echo "<pre>";print_r($merged);exit;
 				//return response()->json($merged, 200, [], JSON_PRETTY_PRINT);
-			}else if($returnType =='gstr9c'){				
+			}else if($returnType =='gstr9c'){
 				$uiPayloadArr = json_decode($request->uipayload, true);
 				/* Ensure structure exists */
 				$uiPayloadArr['gstr9cdata']['audited_data'] = $uiPayloadArr['gstr9cdata']['audited_data'] ?? [];
@@ -1703,7 +1703,7 @@ class GSTController extends Controller
 
 		}
     }
-	
+
 	function extractTotals($arr)
 	{
 		return [

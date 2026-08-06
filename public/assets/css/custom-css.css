@@ -1554,7 +1554,7 @@ label.error {
     display: flex;
     flex-wrap: wrap;
     align-items: stretch;
-    width: 80%;
+    width: 100%;
 }
 
 /* 💎 Clean Premium Design System overrides (60-30-10 Rule) 💎 */
@@ -1621,20 +1621,19 @@ p.text-muted {
     border-color: #008CAD !important;
     color: #ffffff !important;
     font-weight: 500 !important;
-    border-radius: 6px !important;
     transition: all 0.2s ease;
 }
 
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active {
-    background-color: #2d1f6a !important;
-    border-color: #2d1f6a !important;
+    background-color: #006b85 !important;
+    border-color: #006b85 !important;
 }
 
 .btn-secondary {
-    background-color: #eae7f7 !important;
-    border-color: #eae7f7 !important;
+    background-color: #e6f4f8 !important;
+    border-color: #e6f4f8 !important;
     color: #008CAD !important;
     font-weight: 500 !important;
     border-radius: 6px !important;
@@ -1644,9 +1643,9 @@ p.text-muted {
 .btn-secondary:hover,
 .btn-secondary:focus,
 .btn-secondary:active {
-    background-color: #dcd7f2 !important;
-    border-color: #dcd7f2 !important;
-    color: #2d1f6a !important;
+    background-color: #d1ecf4 !important;
+    border-color: #d1ecf4 !important;
+    color: #006b85 !important;
 }
 
 /* Custom Search border logic */
@@ -1718,9 +1717,9 @@ p.text-muted {
 }
 
 .btn-outline-success:hover {
-    background-color: #f5f4fa !important;
+    background-color: #e6f4f8 !important;
     border-color: #cbd5e1 !important;
-    color: #2d1f6a !important;
+    color: #006b85 !important;
 }
 
 .relative {
@@ -1806,7 +1805,7 @@ p.text-muted {
 
 .account-pills.nav-pills .nav-link.active:hover {
     transform: none !important;
-    background-color: #2d1f6a !important;
+    background-color: #006b85 !important;
 }
 
 .upload-area {
