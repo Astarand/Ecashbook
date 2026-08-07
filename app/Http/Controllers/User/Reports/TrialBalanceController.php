@@ -123,7 +123,8 @@ class TrialBalanceController extends Controller
 		$ledgerFilter     = $r->ledger_name;
 		$ledgerGroup      = $r->ledger_group;
 		$trial = [];
-		
+		$prevToDate = date('Y-m-d', strtotime($fromDate.' -1 day'));
+		$prevFromDate = date('Y-m-d', strtotime($fromDate . ' -20 years'));
 		//Asset Head
 		$assetHeads = [
 			'Current Assets' => [
@@ -151,35 +152,20 @@ class TrialBalanceController extends Controller
 			foreach ($heads as $ledger) {
 
 				if ($group == 'Current Assets') {
-
-					$amount = $this->trialBalanceService->getCurrentAssetAmount(
-						$ledger,
-						$userId,
-						$fromDate,
-						$toDate
-					);
-
+					$current = $this->trialBalanceService->getCurrentAssetAmount($ledger,$userId,$fromDate,$toDate);
+					$opening = $this->trialBalanceService->getCurrentAssetAmount($ledger,$userId,$prevFromDate,$prevToDate);
 				} else {
-
-					$amount = $this->trialBalanceService->getNonCurrentAssetAmount(
-						$ledger,
-						$userId,
-						$fromDate,
-						$toDate
-					);
+					$current = $this->trialBalanceService->getNonCurrentAssetAmount($ledger,$userId,$fromDate,$toDate);
+					$opening = $this->trialBalanceService->getNonCurrentAssetAmount($ledger,$userId,$prevFromDate,$prevToDate);
 				}
 
 				$trial['Assets'][$group][$ledger] = [
-
 					'ledgername' => $ledger,
-
-					'opening_dr' => 0,
+					'opening_dr' => $opening,
 					'opening_cr' => 0,
-
-					'debit' => $amount,
+					'debit' => $current,
 					'credit' => 0,
-
-					'closing_dr' => $amount,
+					'closing_dr' => $current,
 					'closing_cr' => 0,
 				];
 			}
@@ -187,6 +173,7 @@ class TrialBalanceController extends Controller
 		//Equity head
 		$periodType = 'full-yearly';
 		$current_year_profit = $this->profitLossService->calculatePL($fromDate, $toDate, $userId, $periodType)['pbt'] ?? 0; 
+		$opening_year_profit = $this->profitLossService->calculatePL($prevFromDate,$prevToDate, $userId, $periodType)['pbt'] ?? 0; 
 		$equityHeads = [
 			'share_capital'        => 'Share Capital',
 			'reserves_surplus'     => 'Reserves & Surplus',
@@ -196,24 +183,21 @@ class TrialBalanceController extends Controller
 		foreach ($equityHeads as $type => $ledger) {
 
 			if ($type == 'current_year_profit') {
-				$amount = $current_year_profit;
+				$current = $current_year_profit;
+				$opening = $opening_year_profit;
 			} else {
-				$amount = $this->trialBalanceService->getEquityAmount(
-					$type,
-					$userId,
-					$fromDate,
-					$toDate
-				);
+				$current = $this->trialBalanceService->getEquityAmount($type,$userId,$fromDate,$toDate);
+				$opening = $this->trialBalanceService->getEquityAmount($type,$userId,$prevFromDate,$prevToDate);
 			}
 
 			$trial['Equity'][''][$ledger] = [
 				'ledgername'  => $ledger,
 				'opening_dr'  => 0,
-				'opening_cr'  => 0,
+				'opening_cr'  => $opening,
 				'debit'       => 0,
-				'credit'      => $amount,
+				'credit'      => $current,
 				'closing_dr'  => 0,
-				'closing_cr'  => $amount,
+				'closing_cr'  => $current,
 			];
 		}
 		
@@ -235,22 +219,18 @@ class TrialBalanceController extends Controller
 
 		foreach ($liabilityTypes as $type){
 
-			$amount = $this->trialBalanceService->getCurrentLiabilityAmount(
-				$type,
-				$userId,
-				$fromDate,
-				$toDate
-			);
+			$current = $this->trialBalanceService->getCurrentLiabilityAmount($type,$userId,$fromDate,$toDate);
+			$opening = $this->trialBalanceService->getCurrentLiabilityAmount($type,$userId,$prevFromDate,$prevToDate);
 
 			$trial['Liabilities']['Current Liabilities'][ucwords(str_replace('_',' ',$type))] = [
 
 				'ledger'      => ucwords(str_replace('_',' ',$type)),
 				'opening_dr'  => 0,
-				'opening_cr'  => 0,
+				'opening_cr'  => $opening,
 				'debit'       => 0,
-				'credit'      => $amount,
+				'credit'      => $current,
 				'closing_dr'  => 0,
-				'closing_cr'  => $amount
+				'closing_cr'  => $current
 			];
 		}
 		
@@ -265,101 +245,163 @@ class TrialBalanceController extends Controller
 
 		foreach ($nonCurrentLiabilityHeads as $type => $ledger) {
 
-			$amount = $this->trialBalanceService->getNonCurrentLiabilityAmount(
-				$type,
-				$userId,
-				$fromDate,
-				$toDate
-			);
+			$current = $this->trialBalanceService->getNonCurrentLiabilityAmount($type,$userId,$fromDate,$toDate);
+			$opening = $this->trialBalanceService->getNonCurrentLiabilityAmount($type,$userId,$prevFromDate,$prevToDate);
 
 			$trial['Liabilities']['Non-Current Liabilities'][$ledger] = [
 				'ledgername' => $ledger,
 				'opening_dr' => 0,
-				'opening_cr' => 0,
+				'opening_cr' => $opening,
 				'debit'      => 0,
-				'credit'     => $amount,
+				'credit'     => $current,
 				'closing_dr' => 0,
-				'closing_cr' => $amount,
+				'closing_cr' => $current,
 			];
 		}
 		//Income
-		$sales = DB::table('sales_values as sv')
-						->join('sales as s', 's.id', '=', 'sv.sid')
-						->where('s.added_by', $userId)
-						->where('s.status', 1)
-						->whereBetween('s.inv_date', [$fromDate, $toDate])
-						->sum('sv.amount');
+		$openingSales = DB::table('sales_values as sv')
+			->join('sales as s', 's.id', '=', 'sv.sid')
+			->where('s.added_by', $userId)
+			->where('s.status', 1)
+			->when($prevToDate, function ($q) use ($prevToDate) {
+				$q->whereDate('s.inv_date', '<=', $prevToDate);
+			})
+			->sum('sv.amount');
 
-		$salesCreditNote = DB::table('vouchers as v')
-						->where('v.added_by', $userId)
-						->where('v.note_type', 'Credit')
-						->whereBetween('v.inv_date', [$fromDate, $toDate])
-						->sum('v.taxable_value');
+		$openingSalesCreditNote = DB::table('vouchers')
+			->where('added_by', $userId)
+			->where('note_type', 'Credit')
+			->when($prevToDate, function ($q) use ($prevToDate) {
+				$q->whereDate('inv_date', '<=', $prevToDate);
+			})
+			->sum('taxable_value');
 
-		$revenueFromOperations = $sales - $salesCreditNote;
-		$otherIncome = DB::table('income')
-						->where('addBy', $userId)
-						->where('status',1)
-						->whereBetween('dateInput', [$fromDate, $toDate])
-						->sum('amount');
+		$openingRevenue = $openingSales - $openingSalesCreditNote;
+
+		$currentSales = DB::table('sales_values as sv')
+			->join('sales as s', 's.id', '=', 'sv.sid')
+			->where('s.added_by', $userId)
+			->where('s.status', 1)
+			->whereBetween('s.inv_date', [$fromDate, $toDate])
+			->sum('sv.amount');
+
+		$currentSalesCreditNote = DB::table('vouchers')
+			->where('added_by', $userId)
+			->where('note_type', 'Credit')
+			->whereBetween('inv_date', [$fromDate, $toDate])
+			->sum('taxable_value');
+
+		$currentRevenue = $currentSales - $currentSalesCreditNote;
+
+
+		// ================= Other Income =================
+		$openingOtherIncome = DB::table('income')
+			->where('addBy', $userId)
+			->where('status', 1)
+			->when($prevToDate, function ($q) use ($prevToDate) {
+				$q->whereDate('dateInput', '<=', $prevToDate);
+			})
+			->sum('amount');
+
+		$currentOtherIncome = DB::table('income')
+			->where('addBy', $userId)
+			->where('status', 1)
+			->whereBetween('dateInput', [$fromDate, $toDate])
+			->sum('amount');
+			
 		$trial['Income']['Income']['Revenue from Operations'] = [
 			'ledger'      => 'Revenue from Operations',
 			'opening_dr'  => 0,
-			'opening_cr'  => 0,
+			'opening_cr'  => $openingRevenue,
 			'debit'       => 0,
-			'credit'      => $revenueFromOperations,
+			'credit'      => $currentRevenue,
 		];
 
 		$trial['Income']['Income']['Other Income'] = [
 			'ledger'      => 'Other Income',
 			'opening_dr'  => 0,
-			'opening_cr'  => 0,
+			'opening_cr'  => $openingOtherIncome,
 			'debit'       => 0,
-			'credit'      => $otherIncome,
+			'credit'      => $currentOtherIncome,
 		];
 		//Expenses
-		$purchase = DB::table('purchase_values as pv')
+		// ================= Cost of Goods Sold =================
+		$currentPurchase = DB::table('purchase_values as pv')
 			->join('purchases as p','p.id','=','pv.sid')
 			->where('p.added_by',$userId)
 			->where('p.status',1)
 			->whereBetween('p.inv_date',[$fromDate,$toDate])
 			->sum('pv.amount');
 
-		$purchaseDebitNote = DB::table('voucher_purchases as vp')
-			->where('vp.added_by',$userId)
-			->where('vp.note_type','Debit')
-			->whereBetween('vp.inv_date',[$fromDate,$toDate])
-			->sum('vp.taxable_value');
+		$currentPurchaseDebitNote = DB::table('voucher_purchases')
+			->where('added_by',$userId)
+			->where('note_type','Debit')
+			->whereBetween('inv_date',[$fromDate,$toDate])
+			->sum('taxable_value');
 
-		$costOfGoodsSold = $purchase - $purchaseDebitNote;
+		$currentCOGS = $currentPurchase - $currentPurchaseDebitNote;
+
+		$openingPurchase = DB::table('purchase_values as pv')
+			->join('purchases as p','p.id','=','pv.sid')
+			->where('p.added_by',$userId)
+			->where('p.status',1)
+			->whereDate('p.inv_date','<=',$prevToDate)
+			->sum('pv.amount');
+
+		$openingPurchaseDebitNote = DB::table('voucher_purchases')
+			->where('added_by',$userId)
+			->where('note_type','Debit')
+			->whereDate('inv_date','<=',$prevToDate)
+			->sum('taxable_value');
+
+		$openingCOGS = $openingPurchase - $openingPurchaseDebitNote;
 		
-		//(DIRECT EXPENSES)
-		$directExpenses = DB::table('expenses')
-			->select('expense_type', DB::raw('SUM(expense_amt) as amount'))
-			->where('added_by', $userId)
-			->whereBetween('expense_date', [$fromDate, $toDate])
-			->where('expense_cat', 'direct')
+		//(DIRECT EXPENSES)		
+		$currentDirectExpenses = DB::table('expenses')
+			->select('expense_type', DB::raw('SUM(expense_amt) amount'))
+			->where('added_by',$userId)
+			->where('expense_cat','direct')
+			->whereBetween('expense_date',[$fromDate,$toDate])
 			->groupBy('expense_type')
-			->get();
+			->pluck('amount','expense_type');
 
-		foreach ($directExpenses as $exp) {
+		$openingDirectExpenses = DB::table('expenses')
+			->select('expense_type', DB::raw('SUM(expense_amt) amount'))
+			->where('added_by',$userId)
+			->where('expense_cat','direct')
+			->whereDate('expense_date','<=',$prevToDate)
+			->groupBy('expense_type')
+			->pluck('amount','expense_type');
 
-			$trial['Expenses']['Direct Expenses'][$exp->expense_type] = [
-				'ledger'      => ucwords(str_replace('_', ' ', $exp->expense_type)),
-				'opening_dr'  => 0,
+		$expenseTypes = collect($currentDirectExpenses)
+			->keys()
+			->merge($openingDirectExpenses->keys())
+			->unique();
+
+		foreach ($expenseTypes as $type) {
+
+			$trial['Expenses']['Direct Expenses'][$type] = [
+				'ledger'      => ucwords(str_replace('_',' ',$type)),
+				'opening_dr'  => $openingDirectExpenses[$type] ?? 0,
 				'opening_cr'  => 0,
-				'debit'       => $exp->amount,
+				'debit'       => $currentDirectExpenses[$type] ?? 0,
 				'credit'      => 0,
 			];
 		}
 			
 		//(INDIRECT EXPENSES) 
 		//Employee Benefit Expenses
-		$employeeBenefit = DB::table('expenses')
-				->where('added_by', $userId)
-				->whereBetween('expense_date', [$fromDate, $toDate])
-				->where('expense_type', 'employee_benefits')
-				->sum('expense_amt');
+		$currentEmployeeBenefit = DB::table('expenses')
+			->where('added_by',$userId)
+			->where('expense_type','employee_benefits')
+			->whereBetween('expense_date',[$fromDate,$toDate])
+			->sum('expense_amt');
+
+		$openingEmployeeBenefit = DB::table('expenses')
+			->where('added_by',$userId)
+			->where('expense_type','employee_benefits')
+			->whereDate('expense_date','<=',$prevToDate)
+			->sum('expense_amt');
 		//Administrative Expenses
 		$adminTypes = [
 			'rent_expense',
@@ -372,10 +414,16 @@ class TrialBalanceController extends Controller
 			'professional_fees'
 		];
 
-		$administrativeExpense = DB::table('expenses')
-			->where('added_by', $userId)
-			->whereBetween('expense_date', [$fromDate, $toDate])
-			->whereIn('expense_type', $adminTypes)
+		$currentAdministrativeExpense = DB::table('expenses')
+			->where('added_by',$userId)
+			->whereIn('expense_type',$adminTypes)
+			->whereBetween('expense_date',[$fromDate,$toDate])
+			->sum('expense_amt');
+
+		$openingAdministrativeExpense = DB::table('expenses')
+			->where('added_by',$userId)
+			->whereIn('expense_type',$adminTypes)
+			->whereDate('expense_date','<=',$prevToDate)
 			->sum('expense_amt');
 		//Finance Cost
 		$financeTypes = [
@@ -384,10 +432,16 @@ class TrialBalanceController extends Controller
 			'loan_interest'
 		];
 
-		$financeCost = DB::table('expenses')
-			->where('added_by', $userId)
-			->whereBetween('expense_date', [$fromDate, $toDate])
-			->whereIn('expense_type', $financeTypes)
+		$currentFinanceCost = DB::table('expenses')
+			->where('added_by',$userId)
+			->whereIn('expense_type',$financeTypes)
+			->whereBetween('expense_date',[$fromDate,$toDate])
+			->sum('expense_amt');
+
+		$openingFinanceCost = DB::table('expenses')
+			->where('added_by',$userId)
+			->whereIn('expense_type',$financeTypes)
+			->whereDate('expense_date','<=',$prevToDate)
 			->sum('expense_amt');
 		//Selling Expenses
 		$sellingTypes = [
@@ -397,9 +451,14 @@ class TrialBalanceController extends Controller
 			'freight_outward'
 		];
 		// Depreciation
-		$depreciation = DB::table('assets')
-			->where('added_by', $userId)
-			->whereBetween('date', [$fromDate, $toDate])
+		$currentDepreciation = DB::table('assets')
+			->where('added_by',$userId)
+			->whereBetween('date',[$fromDate,$toDate])
+			->sum('depreciation_value');
+
+		$openingDepreciation = DB::table('assets')
+			->where('added_by',$userId)
+			->whereDate('date','<=',$prevToDate)
 			->sum('depreciation_value');
 		//Other Expenses
 		$usedTypes = array_merge(
@@ -409,71 +468,84 @@ class TrialBalanceController extends Controller
 			$sellingTypes
 		);
 
-		$otherExpense = DB::table('expenses')
-			->where('added_by', $userId)
-			->whereBetween('expense_date', [$fromDate, $toDate])
-			->whereNotIn('expense_type', $usedTypes)
-			->where('expense_cat', 'indirect')
+		$currentOtherExpense = DB::table('expenses')
+			->where('added_by',$userId)
+			->whereNotIn('expense_type',$usedTypes)
+			->where('expense_cat','indirect')
+			->whereBetween('expense_date',[$fromDate,$toDate])
 			->sum('expense_amt');
 
-		$sellingExpense = DB::table('expenses')
-			->where('added_by', $userId)
-			->whereBetween('expense_date', [$fromDate, $toDate])
-			->whereIn('expense_type', $sellingTypes)
+		$openingOtherExpense = DB::table('expenses')
+			->where('added_by',$userId)
+			->whereNotIn('expense_type',$usedTypes)
+			->where('expense_cat','indirect')
+			->whereDate('expense_date','<=',$prevToDate)
+			->sum('expense_amt');
+
+		$currentSellingExpense = DB::table('expenses')
+			->where('added_by',$userId)
+			->whereIn('expense_type',$sellingTypes)
+			->whereBetween('expense_date',[$fromDate,$toDate])
+			->sum('expense_amt');
+
+		$openingSellingExpense = DB::table('expenses')
+			->where('added_by',$userId)
+			->whereIn('expense_type',$sellingTypes)
+			->whereDate('expense_date','<=',$prevToDate)
 			->sum('expense_amt');
 			
 		$trial['Expenses']['Expenses']['Cost of Goods Sold'] = [
 			'ledger'      => 'Cost of Goods Sold',
-			'opening_dr'  => 0,
+			'opening_dr'  => $openingCOGS,
 			'opening_cr'  => 0,
-			'debit'       => $costOfGoodsSold,
+			'debit'       => $currentCOGS,
 			'credit'      => 0,
 		];
 
 		$trial['Expenses']['Expenses']['Employee Benefit Expenses'] = [
 			'ledger'      => 'Employee Benefit Expenses',
-			'opening_dr'  => 0,
+			'opening_dr'  => $openingEmployeeBenefit,
 			'opening_cr'  => 0,
-			'debit'       => $employeeBenefit,
+			'debit'       => $currentEmployeeBenefit,
 			'credit'      => 0,
 		];
 		$trial['Expenses']['Expenses']['Finance Cost'] = [
 			'ledger'      => 'Finance Cost',
-			'opening_dr'  => 0,
+			'opening_dr'  => $openingFinanceCost,
 			'opening_cr'  => 0,
-			'debit'       => $financeCost,
+			'debit'       => $currentFinanceCost,
 			'credit'      => 0,
 		];
 
 		$trial['Expenses']['Expenses']['Depreciation'] = [
 			'ledger'      => 'Depreciation',
-			'opening_dr'  => 0,
+			'opening_dr'  => $openingDepreciation,
 			'opening_cr'  => 0,
-			'debit'       => $depreciation,
+			'debit'       => $currentDepreciation,
 			'credit'      => 0,
 		];
 
 		$trial['Expenses']['Expenses']['Administrative Expenses'] = [
 			'ledger'      => 'Administrative Expenses',
-			'opening_dr'  => 0,
+			'opening_dr'  => $openingAdministrativeExpense,
 			'opening_cr'  => 0,
-			'debit'       => $administrativeExpense,
+			'debit'       => $currentAdministrativeExpense,
 			'credit'      => 0,
 		];
 
 		$trial['Expenses']['Expenses']['Selling Expenses'] = [
 			'ledger'      => 'Selling Expenses',
-			'opening_dr'  => 0,
+			'opening_dr'  => $openingSellingExpense,
 			'opening_cr'  => 0,
-			'debit'       => $sellingExpense,
+			'debit'       => $currentSellingExpense,
 			'credit'      => 0,
 		];
 
 		$trial['Expenses']['Expenses']['Other Expenses'] = [
 			'ledger'      => 'Other Expenses',
-			'opening_dr'  => 0,
+			'opening_dr'  => $openingOtherExpense,
 			'opening_cr'  => 0,
-			'debit'       => $otherExpense,
+			'debit'       => $currentOtherExpense,
 			'credit'      => 0,
 		];
 		
@@ -517,28 +589,37 @@ class TrialBalanceController extends Controller
 			unset($subGroups, $ledgers);
 		}
 		
-		//Calculate closing
+		//Calculate closing		
+		$openingDrTotal = 0;
+		$openingCrTotal = 0;
 		$totalDr = 0;
 		$totalCr = 0;
 
 		foreach ($trial as &$groups) {
-
 			foreach ($groups as &$ledgers) {
-
 				foreach ($ledgers as &$row) {
 
-					$dr = $row['opening_dr'] + $row['debit'];
-					$cr = $row['opening_cr'] + $row['credit'];
+					$openingDr = max(0, (float)$row['opening_dr']);
+					$openingCr = max(0, (float)$row['opening_cr']);
 
-					if ($dr >= $cr) {
+					$debit  = max(0, (float)$row['debit']);
+					$credit = max(0, (float)$row['credit']);
 
+					$openingDrTotal += $openingDr;
+					$openingCrTotal += $openingCr;
+
+					$dr = $openingDr + $debit;
+					$cr = $openingCr + $credit;
+					
+					if ($dr > $cr) {
 						$row['closing_dr'] = round($dr - $cr, 2);
 						$row['closing_cr'] = 0;
-
-					} else {
-
+					} elseif ($cr > $dr) {
 						$row['closing_dr'] = 0;
 						$row['closing_cr'] = round($cr - $dr, 2);
+					} else {
+						$row['closing_dr'] = 0;
+						$row['closing_cr'] = 0;
 					}
 
 					$totalDr += $row['closing_dr'];
@@ -550,10 +631,11 @@ class TrialBalanceController extends Controller
 		return response()->json([
 			'success'    => true,
 			'trial'      => $trial,
-			'total_dr'   => round($totalDr, 2),
-			'total_cr'   => round($totalCr, 2),
-			'difference' => round(abs($totalDr - $totalCr), 2),
-			'diff_dc'    => $totalDr >= $totalCr ? 'Dr' : 'Cr',
+			'opening_dr' => round($openingDrTotal, 2),
+			'opening_cr' => round($openingCrTotal, 2),
+			'closing_dr' => round($totalDr, 2),
+			'closing_cr' => round($totalCr, 2),
+			'diff'   	 => round($totalCr, 2) - round($totalDr, 2),
 		]);
 		
 	}

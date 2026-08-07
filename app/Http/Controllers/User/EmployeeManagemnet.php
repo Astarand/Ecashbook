@@ -630,15 +630,32 @@ class EmployeeManagemnet extends Controller
 			$employee->total_working_days = $totalWorkingDays;
 		}
 
-		// echo '<pre>';
-		// print_r($employees);
-		// die();
+		$payload = $employees->map(function ($employee) {
+			return [
+				'id' => $employee->id,
+				'employee_id' => $employee->employee_id,
+				'name' => $employee->name,
+				'phone' => $employee->phone,
+				'status' => $employee->status,
+				'u_type' => $employee->u_type,
+				'dept_id' => $employee->dept_id,
+				'desig_id' => $employee->desig_id,
+				'email_id' => $employee->email_id,
+				'profile_img' => $employee->profile_img,
+				'dept_name' => $employee->dept_name ?? null,
+				'designation_name' => $employee->designation_name ?? null,
+				'total_present' => (int) $employee->total_present,
+				'total_ontime' => (int) $employee->total_ontime,
+				'total_late' => (int) $employee->total_late,
+				'total_leaves' => (int) $employee->total_leaves,
+				'total_absent' => (int) $employee->total_absent,
+				'total_working_days' => (int) $employee->total_working_days,
+			];
+		})->values();
 
-
-		return view('User.attendance-list')->with([
-			'employees' => $employees,
-			'startDate' => $startDate,
-			'endDate' => $today,
+		return response()->json([
+			'status' => 'success',
+			'data' => $payload,
 		]);
 	}
 

@@ -156,12 +156,14 @@ class TrialBalanceService
 				->where('added_by', $userId)
 				->where('payment_mode', 'Cash')
 				->where('credit_debit', 'Credit')
+				->whereBetween('date', [$startDate, $endDate])
 				->sum('amount');
 
 			$cashVoucherDebit = DB::table('payment_vouchers')
 				->where('added_by', $userId)
 				->where('payment_mode', 'Cash')
 				->where('credit_debit', 'Debit')
+				->whereBetween('date', [$startDate, $endDate])
 				->sum('amount');
 
 
@@ -186,6 +188,7 @@ class TrialBalanceService
 			$bankVoucher = DB::table('payment_vouchers')
 				->where('added_by', $userId)
 				->whereIn('payment_mode', ['Bank', 'UPI'])
+				->whereBetween('date', [$startDate, $endDate])
 				->selectRaw("
 					SUM(CASE WHEN credit_debit = 'Credit' THEN amount ELSE 0 END) as credit,
 					SUM(CASE WHEN credit_debit = 'Debit' THEN amount ELSE 0 END) as debit
@@ -392,7 +395,7 @@ class TrialBalanceService
 						'Vehicles',
 						'Intangible Assets',
 					])
-					->whereDate('date', '<=', $toDate)
+					->whereBetween('date', [$fromDate, $toDate])
 					->sum('invoice_value');
 
 			/*
@@ -409,7 +412,7 @@ class TrialBalanceService
 					})
 					->where('assetType', 'non-current')
 					->where('nonCurrentAssetType', 'Capital Work in Progress')
-					->whereDate('date', '<=', $toDate)
+					->whereBetween('date', [$fromDate, $toDate])
 					->sum('cwip_amount');
 
 			/*
@@ -426,7 +429,7 @@ class TrialBalanceService
 					})
 					->where('assetType', 'non-current')
 					->where('nonCurrentAssetType', 'Investments')
-					->whereDate('date', '<=', $toDate)
+					->whereBetween('date', [$fromDate, $toDate])
 					->sum('invoice_value');
 
 			/*
@@ -442,10 +445,10 @@ class TrialBalanceService
 						$q->where('propId', $propId);
 					})
 					->where('assetType', 'non-current')
-					->whereNotIn('nonCurrentAssetType', [
+					->whereIn('nonCurrentAssetType', [
 						'Other Non-Current Assets',
 					])
-					->whereDate('date', '<=', $toDate)
+					->whereBetween('date', [$fromDate, $toDate])
 					->sum('invoice_value');
 
 			default:

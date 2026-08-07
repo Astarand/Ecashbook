@@ -263,6 +263,32 @@
 							<button class="btn btn-sm btn-secondary ms-2" id="nextPage">Next</button>
 						</div>
 					</div>
+					
+					<!-- SUMMARY -->
+					<div class="row mt-4 trialSummary">
+						<div class="col-md-4 offset-md-8">
+							<table class="table table-bordered">
+								<tbody>									
+									<tr>
+										<th>Total Opening Debit</th>
+										<td class="summary-opening-dr">₹ 0.00</td>
+									</tr>
+									<tr>
+										<th>Total Opening Credit</th>
+										<td class="summary-opening-cr">₹ 0.00</td>
+									</tr>
+									<tr>
+										<th>Total Closing Debit</th>
+										<td class="summary-closing-dr">₹ 0.00</td>
+									</tr>
+									<tr>
+										<th>Total Closing Credit</th>
+										<td class="summary-closing-cr">₹ 0.00</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
 
                     <!-- ACTION BUTTONS -->
                     <div style="text-align:right; margin-top:12px;">
@@ -605,8 +631,13 @@ tfoot td{
 				renderPagination();
 
 				// Use totals from API
-				$("#totalDr").text(format(res.total_dr));
-				$("#totalCr").text(format(res.total_cr));
+				$("#totalDr").text(format(res.closing_dr));
+				$("#totalCr").text(format(res.closing_cr));
+				
+				$(".summary-opening-dr").text("₹ " + format(res.opening_dr));
+				$(".summary-opening-cr").text("₹ " + format(res.opening_cr));
+				$(".summary-closing-dr").text("₹ " + format(res.closing_dr));
+				$(".summary-closing-cr").text("₹ " + format(res.closing_cr));
 
 				// Collapse all groups
 				$(".group-row").hide();
@@ -725,6 +756,9 @@ tfoot td{
 	
 	function downloadTrialBalancePdf() {
 		let tableHtml = document.querySelector('.table-responsive').innerHTML;
+		let summaryHtml = document.querySelector('.trialSummary').innerHTML;
+		let htmlContent = tableHtml + summaryHtml;
+		
 		const from_date = formatDateDMY($("#from_date").val());
 		const to_date   = formatDateDMY($("#to_date").val());
 		const fileName = `Trial_Balance_${from_date}_to_${to_date}.pdf`;
@@ -734,7 +768,7 @@ tfoot td{
 			type: "POST",
 			data: {
 				_token: "{{ csrf_token() }}",
-				html: tableHtml
+				html: htmlContent
 			},
 			xhrFields: {
 				responseType: 'blob'

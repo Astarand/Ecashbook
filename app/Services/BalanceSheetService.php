@@ -353,12 +353,14 @@ class BalanceSheetService
 				->where('added_by', $userId)
 				->where('payment_mode', 'Cash')
 				->where('credit_debit', 'Credit')
+				->whereBetween('date', [$startDate, $endDate])
 				->sum('amount');
 
 			$cashVoucherDebit = DB::table('payment_vouchers')
 				->where('added_by', $userId)
 				->where('payment_mode', 'Cash')
 				->where('credit_debit', 'Debit')
+				->whereBetween('date', [$startDate, $endDate])
 				->sum('amount');
 
 
@@ -383,6 +385,7 @@ class BalanceSheetService
 			$bankVoucher = DB::table('payment_vouchers')
 				->where('added_by', $userId)
 				->whereIn('payment_mode', ['Bank', 'UPI'])
+				->whereBetween('date', [$startDate, $endDate])
 				->selectRaw("
 					SUM(CASE WHEN credit_debit = 'Credit' THEN amount ELSE 0 END) as credit,
 					SUM(CASE WHEN credit_debit = 'Debit' THEN amount ELSE 0 END) as debit

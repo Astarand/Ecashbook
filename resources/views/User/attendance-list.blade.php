@@ -156,24 +156,33 @@
                 <!-- [ Date Filter Section ] start -->
                 <div class="card-header">
                     <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h5 class="mb-0">Employee Attendance Records</h5>
-                        </div>
-                        <div class="col-md-4" id="date-filter-section">
-                            <div class="row g-2 align-items-end">
-                                <div class="col-md-6">
-                                    <label class="form-label mb-1">From Date</label>
-                                    <input type="date" class="form-control" id="fromDate"
-                                        value="{{ \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d') }}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label mb-1">To Date</label>
-                                    <input type="date" class="form-control" id="toDate"
-                                        value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="col-md-6">
+        <h5 class="mb-0">Employee Attendance Records</h5>
+    </div>
+
+    <div class="col-md-6">
+        <div class="d-flex gap-2 justify-content-end align-items-end">
+            <div>
+                <label class="form-label">From Date</label>
+                <input type="date" class="form-control" id="fromDate"
+                    value="{{ \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d') }}">
+            </div>
+
+            <div>
+                <label class="form-label">To Date</label>
+                <input type="date" class="form-control" id="toDate"
+                    value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+            </div>
+
+            <div>
+                <label class="form-label d-block">&nbsp;</label>
+                <button type="button" id="filterSubmit" class="btn btn-primary">
+                    <i class="ph-duotone ph-funnel me-1"></i> Filter
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
                 </div>
                 <!-- [ Date Filter Section ] end -->
                 <div class="card-body table-card py-3">
@@ -329,8 +338,10 @@
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
-                    if (response.status === 'success') {
-                        updateAttendanceTable(response.data);
+                    var employees = response && response.data ? response.data : response;
+
+                    if (Array.isArray(employees) && response && response.status === 'success') {
+                        updateAttendanceTable(employees);
                     } else {
                         showToast('Error filtering data', 'error');
                     }
