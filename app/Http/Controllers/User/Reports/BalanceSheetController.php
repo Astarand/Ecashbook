@@ -259,11 +259,11 @@ class BalanceSheetController extends Controller
 				
 		///current data
 		if ($previousYearData) {
+			$cYearData = $this->fetchBalanceSheetData($propId,$userId,$startDate,$endDate,$periodType);
 			$pYearData = $prevYearData;
-			$cYearData = $this->fetchBalanceSheetData($propId,$userId,$startDate,$endDate,$periodType);
 		} else {
-			$pYearData = $this->fetchBalanceSheetData($propId,$userId,$prevStartDate,$prevEndDate,$periodType);
 			$cYearData = $this->fetchBalanceSheetData($propId,$userId,$startDate,$endDate,$periodType);
+			$pYearData = $this->fetchBalanceSheetData($propId,$userId,$prevStartDate,$prevEndDate,$periodType);
 		}
 
         if ($prevYearData) {
@@ -436,9 +436,11 @@ class BalanceSheetController extends Controller
 
 			// Capital Work In Progress
 			if ($asset->nonCurrentAssetType == 'Capital Work in Progress') {
-				$value = ($asset->pay_status == 'Full') ? $asset->cwip_amount : $asset->cwip_advance_amt;
+				//$value = ($asset->pay_status == 'Full') ? $asset->cwip_amount : $asset->cwip_advance_amt;
+				$value = (float) ($asset->cwip_amount ?? 0);
 			} else {
-				$value = ($asset->pay_status == 'Full') ? $asset->invoice_value : $asset->advance_amt;
+				//$value = ($asset->pay_status == 'Full') ? $asset->invoice_value : $asset->advance_amt;
+				$value = (float) ($asset->invoice_value ?? 0);
 				// Calculate depreciation till report date
 				$depreciation = $this->balanceSheetService->calculateDepreciationByPeriod($asset,$fyStart,$endDate,$periodType);
 				// Net Book Value

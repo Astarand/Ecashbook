@@ -234,15 +234,11 @@
 							@endif
 
 							@if(in_array('ALL', $userMenu) || in_array('Asset Management', $userMenu))
-							<li class="pc-item pc-hasmenu">
-								<a href="#!" class="pc-link">
+							<li class="pc-item">
+								<a href="{{ route('user.AssetList') }}" class="pc-link">
 									<span class="pc-micon"><i class="ph-duotone ph-buildings"></i></span>
-									<span>Asset Management</span>
-									<span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+									<span class="pc-mtext">Asset Management</span>
 								</a>
-								<ul class="pc-submenu">
-									<li class="pc-item"><a class="pc-link" href="{{ route('user.AssetList') }}">Asset Details</a></li>
-								</ul>
 							</li>
 							@endif
 
@@ -1700,15 +1696,13 @@
 
 								{{-- Asset Management --}}
 								@if(canAccess('Asset Management', $userMenu, $permissions))
-								<li class="pc-item pc-hasmenu">
-									<a href="#!" class="pc-link">
-										<span class="pc-micon"><i class="ph-duotone ph-buildings"></i></span>
+								<li class="pc-item">
+									<a href="{{ route('user.AssetList') }}" class="pc-link">
+										<span class="pc-micon">
+											<i class="ph-duotone ph-buildings"></i>
+										</span>
 										<span>{{ $menuByCode['Asset Management']->menu_name }}</span>
-										<span class="pc-arrow"><i data-feather="chevron-right"></i></span>
 									</a>
-									<ul class="pc-submenu">
-										<li class="pc-item"><a class="pc-link" href="{{ route('user.AssetList') }}">Asset Details</a></li>
-									</ul>
 								</li>
 								@endif
 

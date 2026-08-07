@@ -328,6 +328,11 @@ class ExpensesController extends Controller
 			'party_name'    => $expense->approved_by,
 			'amount'        => $expense->expense_amt,
 			'payment_status'=> $expense->payment_status,
+			'gst_applicable'=> $expense->gst_applicable ?? 'no',
+			'gst_trans'   	=> $expense->gst_trans ?? '',
+			'gst_rate'      => $expense->gst_rate ?? 0,
+			'total_gst'    => $expense->total_gst ?? 0,
+			
 			'tds_applicable'=> $expense->tds_applicable ?? 'no',
 			'tds_percent'   => $expense->tds_percentage ?? 0,
 			'tds_amt'       => $expense->tds_amount ?? 0,

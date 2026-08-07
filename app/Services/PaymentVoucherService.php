@@ -386,7 +386,7 @@ class PaymentVoucherService
 					$transactionDetails = 'Expense Payment';
 				}
 				
-				if ($addFlag == 0 && $expense->payment_status == 'due') {
+				if ($addFlag == 1 && $expense->payment_status == 'due') {
 					return true; // don't create voucher
 				}
 				$creditDebit = 'Debit';
@@ -885,7 +885,6 @@ class PaymentVoucherService
 					return true;
 				}
 			}
-			
 			elseif ($source == 'Journal')
 			{
 				$journals = Journals::find($id);
@@ -944,35 +943,72 @@ class PaymentVoucherService
 				}
 			}
 			// ======================================================
-			// PAYROLL — single voucher from form data
+			// PAYROLL — separate voucher row per component
 			// ======================================================
 			elseif ($source == 'Payroll')
 			{
-				// $id            = payslip id used as f_id reference
-				// $currentPayment = amount from the form (amount_salary_input)
-				// $data keys: propId, date, reference_no, transaction_id,
-				//             party_name, payroll_month, added_by
+				// $id            = journal autoId (links voucher ↔ journal)
+				// $currentPayment = total net salary (unused here — each component has its own amount)
+				// $data keys: propId, date, reference_no, party_name, payroll_month, added_by
+				//             net_salary, pf, esi, tds, lwf, ptax, loan
 
-				$voucherType        = 'Payment Voucher';
-				$propId             = $data['propId']           ?? null;
-				$date               = $data['date']             ?? now()->toDateString();
-				$invoiceNo          = $id;
-				$partyType          = 'Employee';
-				$partyId            = null;
-				$partyName          = $data['party_name']       ?? 'Payroll';
-				$amount             = $currentPayment;
-				$transactionDetails = 'Salary Payment';
-				$creditDebit        = 'Debit';
-				$paymentMode        = 'Bank';
-				$bankId             = $data['bank_id']          ?? null;
-				$referenceId        = $data['reference_no']     ?? null;
-				$narration          = 'Payroll - ' . ($data['payroll_month'] ?? '');
-				$approved_by        = null;
+				$propId      = $data['propId']       ?? null;
+				$date        = $data['date']         ?? now()->toDateString();
+				$partyName   = $data['party_name']   ?? 'Bulk Payroll';
+				$referenceId = $data['reference_no'] ?? null;
+				$monthLabel  = $data['payroll_month'] ?? '';
+				$bankId      = $data['bank_id']      ?? null;
+				$approved    = auth()->user()->name  ?? null;
+
+				// Components: [ label, amount, transaction_details, voucher_type ]
+				$components = [
+					['Net Salary',       $data['net_salary'] ?? 0, 'Salary Payment', 'Payment Voucher'],  // PV — paying out salary
+					['PF Payable',       $data['pf']         ?? 0, 'PF Payment',     'Receipt Voucher'],  // RV — deducted from employee
+					['ESI Payable',      $data['esi']        ?? 0, 'ESI Payment',    'Receipt Voucher'],
+					['TDS Payable',      $data['tds']        ?? 0, 'TDS Payment',    'Receipt Voucher'],
+					['LWF Payable',      $data['lwf']        ?? 0, 'LWF Payment',    'Receipt Voucher'],
+					['Professional Tax', $data['ptax']       ?? 0, 'PT Payment',     'Receipt Voucher'],
+					['Loan Recovery',    $data['loan']       ?? 0, 'Loan Deduction', 'Receipt Voucher'],
+				];
+
+				foreach ($components as [$label, $amount, $txnDetails, $voucherType]) {
+					$amount = (float) $amount;
+					if ($amount <= 0) continue;
+
+					$voucherNo = $this->getVoucherNo($userId, $voucherType);
+
+					PaymentVoucher::create([
+						'source'              => 'Payroll',
+						'added_by'            => $userId,
+						'propId'              => $propId,
+						'f_id'                => $id,
+						'voucher_type'        => 'Payment Voucher',
+						'date'                => $date,
+						'voucher_no'          => $voucherNo,
+						'party_type'          => 'Employee',
+						'party_id'            => null,
+						'party_name'          => $partyName,
+						'transaction_details' => $txnDetails,
+						'invoice_no'          => $id,
+						'amount'              => round($amount, 2),
+						'credit_debit'        => 'Debit',
+						'payment_mode'        => 'Bank',
+						'bank_id'             => $bankId,
+						'reference_id'        => $referenceId,
+						'narration'           => $label . ' - ' . $monthLabel,
+						'approved_by'         => $approved,
+						'record_type'         => 'Posted',
+					]);
+				}
+
+				DB::commit();
+				return true;
 			}
 
 			// GET VOUCHER NO
-			$voucherNo = $this->getVoucherNo($userId, $voucherType);
-
+			$voucherNo = $this->getVoucherNo($userId,$voucherType);
+			
+			// Insert record
 			PaymentVoucher::create([
 
 				'source'       	 => $source,
@@ -983,7 +1019,7 @@ class PaymentVoucherService
 				'date'           => $date,
 				'voucher_no'     => $voucherNo,
 				'party_type'     => $partyType,
-				'party_id'       => $partyId,					
+				'party_id'       => $partyId,
 				'party_name'     => $partyName,
 				'transaction_details' => $transactionDetails,
 				'invoice_no'     => $invoiceNo,

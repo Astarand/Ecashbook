@@ -1634,10 +1634,25 @@ class ContraController extends Controller
 		/* -------------------------------------------------
 			PROPRIETORSHIP LIST
 		--------------------------------------------------*/
-		$proprietorships = DB::table('proprietorship_profiles')
-			->select('id', 'comp_name')
+		$compData = DB::table('company_profiles')
 			->where('userId', $userId)
 			->get();
+
+		$proprietorships = collect();
+		if (
+			isset($compData[0]) &&
+			$compData[0]->comp_type === 'Proprietorship'
+		) {
+			$proprietorships = DB::table('proprietorship_profiles')
+				->select('id', 'comp_name')
+				->where('userId', $userId)
+				->get();
+		}
+
+		// $proprietorships = DB::table('proprietorship_profiles')
+		// 	->select('id', 'comp_name')
+		// 	->where('userId', $userId)
+		// 	->get();
 			
 		$cash_in_hand = $total_cash_hand;
 
@@ -2278,11 +2293,27 @@ class ContraController extends Controller
 			$req_type = 1;
 		}
 		//end ca-accountant access
+
+		$compData = DB::table('company_profiles')
+			->where('userId', $added_by)
+			->get();
+
+		$proprietorships = collect();
+
+		if (
+			isset($compData[0]) &&
+			$compData[0]->comp_type === 'Proprietorship'
+		) {
+			$proprietorships = DB::table('proprietorship_profiles')
+				->select('id', 'comp_name')
+				->where('userId', $added_by)
+				->get();
+		}
 		
-		$proprietorships = DB::table('proprietorship_profiles')
-						->select('id','comp_name')
-						->where('userId',$added_by)
-						->get();
+		// $proprietorships = DB::table('proprietorship_profiles')
+		// 				->select('id','comp_name')
+		// 				->where('userId',$added_by)
+		// 				->get();
 		$banks = DB::table('banks')
             ->where('added_by', $added_by)
             ->orderBy('bank_name')

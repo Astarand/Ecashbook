@@ -969,10 +969,27 @@ class LiabilitesController extends Controller
 							->where('module', '=', 'Liabilities')
 							->get();
 		
-		$proprietorships = DB::table('proprietorship_profiles')
-						->select('id','comp_name')
-						->where('userId',$userId)
-						->get();
+		// Check company type
+		$compData = DB::table('company_profiles')
+			->where('userId', $userId)
+			->get();
+
+		$proprietorships = collect();
+
+		if (
+			isset($compData[0]) &&
+			$compData[0]->comp_type === 'Proprietorship'
+		) {
+			$proprietorships = DB::table('proprietorship_profiles')
+				->select('id', 'comp_name')
+				->where('userId', $userId)
+				->get();
+		}
+		
+		// $proprietorships = DB::table('proprietorship_profiles')
+		// 				->select('id','comp_name')
+		// 				->where('userId',$userId)
+		// 				->get();
 
 		// Fetch opening balance from company_profiles
 		$companyProfile = DB::table('company_profiles')
@@ -1994,7 +2011,7 @@ class LiabilitesController extends Controller
 				->where('added_by', $userId)
 				->where(function ($query) {
 						$query->whereNull('lwf_payment_status')
-							  ->orWhere('lwf_payment_status', 'Pending');
+							->orWhere('lwf_payment_status', 'Pending');
 					})
 				->get();
 

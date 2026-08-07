@@ -543,10 +543,26 @@ class ReportsController extends Controller
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 			$userId = getAccessCompanyId($request);
 		}
-		$proprietorships = DB::table('proprietorship_profiles')
-						->select('id','comp_name')
-						->where('userId',$userId)
-						->get();
+
+		$compData = DB::table('company_profiles')
+			->where('userId', $userId)
+			->get();
+
+		$proprietorships = collect();
+
+		if (
+			isset($compData[0]) &&
+			$compData[0]->comp_type === 'Proprietorship'
+		) {
+			$proprietorships = DB::table('proprietorship_profiles')
+				->select('id', 'comp_name')
+				->where('userId', $userId)
+				->get();
+		}
+		// $proprietorships = DB::table('proprietorship_profiles')
+		// 				->select('id','comp_name')
+		// 				->where('userId',$userId)
+		// 				->get();
 		return view('User.Reports.bank-reconciliation')->with([
 				'proprietorships' => $proprietorships
 			]);

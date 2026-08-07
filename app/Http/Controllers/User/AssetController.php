@@ -224,14 +224,31 @@ class AssetController extends Controller
         //$this->middleware('auth');
 		$userId = currentOwnerId();
 		checkCoreAccess('Asset Management');
+
+		// Check company type
+		$compData = DB::table('company_profiles')
+			->where('userId', $userId)
+			->get();
+
 		//$purposes_of_tds = DB::table('purposes_of_tds')->get();
 		$purposes_of_tds = DB::table('tds_rules')
 							->where('module', '=', 'Assets')
 							->get();
-		$proprietorships = DB::table('proprietorship_profiles')
-						->select('id','comp_name')
-						->where('userId',$userId)
-						->get();
+
+
+		$proprietorships = collect();
+
+		if (
+			isset($compData[0]) &&
+			$compData[0]->comp_type === 'Proprietorship'
+		) {
+			$proprietorships = DB::table('proprietorship_profiles')
+				->select('id', 'comp_name')
+				->where('userId', $userId)
+				->get();
+		}
+
+		
 		$vendors = DB::table('vendors')
 			->select('id', 'vendor_name', 'vendor_gstin')
 			->where('userId', $userId)
@@ -415,8 +432,9 @@ class AssetController extends Controller
 			$startDate = $assetData->depreciation_start_date ?? $assetData->purchaseDateAudit ?? $data['date'];
 			$toDate = now()->toDateString();
 			$invoiceValue = !$isWip ? ($data['invoice_value'] ?? 0) : 0;
-			$depreciation = !$isWip ? (($invoiceValue - $data['depreciation_value']) ?? 0) : 0;
-			if ($depreciation > 0) {
+			$currentDepreciation = (float)($assetData->depreciation_value ?? 0);
+			$depreciation = !$isWip ? (($invoiceValue - $currentDepreciation) ?? 0) : 0;
+			if ($currentDepreciation > 0) {
 				$isWip = (($assetData->assetType === 'non-current') &&($assetData->nonCurrentAssetType === 'Capital Work in Progress'));
 				$payStatus = $isWip ? ($assetData->cwip_pay_status ?? ''): ($assetData->pay_status ?? 0);
 				$party = $isWip ? ($assetData->cwip_vendor_id ?? '') : ($assetData->vendor_id ?? '');
@@ -1056,7 +1074,8 @@ class AssetController extends Controller
 			$vendorName = $party ? DB::table('vendors')->where('id', $party)->value('vendor_name') : '';
 			
 			$invoiceValue = !$isWip ? ($data['invoice_value'] ?? 0) : 0;
-			$depreciation = $hasDepreciation ? (($invoiceValue-$data['depreciation_value']) ?? 0) : 0;
+			$currentDepreciation = (float)($data['depreciation_value'] ?? 0);
+			$depreciation = $hasDepreciation ? (($invoiceValue - $currentDepreciation) ?? 0) : 0;
 			
 			$this->journalService->storeDepreciationJournal([
 				'added_by'=>$asset->added_by,

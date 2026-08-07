@@ -40,14 +40,21 @@
 			<input type="hidden" name="id" id="sId" value="{{ $sales->id }}">
 			@csrf
             <div class="row">
-                <div class="mb-3 col-md-6">
+                <div class="mb-3 col-md-4">
                     <label class="form-label" for="inputEmail4">Invoice Number <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" name="inv_num" id="inv_num" value="{{ $sales->inv_number }}" readonly required="">
                 </div>
-                <div class="mb-3 col-md-6">
+                <div class="mb-3 col-md-4">
                     <label class="form-label" for="inputEmail4">Date<span class="text-danger">*</span></label>
                     <input type="date" name="inv_date" id="inv_date" value="{{ $sales->inv_date }}" class="form-control" placeholder="Invoice Number" required="">
                 </div>
+				<div class="mb-3 col-md-4">
+					<label class="form-label" for="InvoiceaddressType">Product/Service<span class="text-danger">*</span></label>
+					<select class="form-control error" name="prod_serv_type" id="prod_serv_type" required>
+						<option value="product" <?php echo ($sales->prod_serv_type=='product')? "selected":"" ?>>Product</option>
+						<option value="service" <?php echo ($sales->prod_serv_type=='service')? "selected":"" ?>>Service</option>
+					</select>
+				</div>
             </div>
         </form>
         </div>

@@ -1434,7 +1434,7 @@ class SalesController extends Controller
 		$gstRate = (float) $voucher->gst_rate;
 		$totalAmount = (float) $voucher->total_amt;
 		$gstAmount = $gstRate > 0 ? round(($totalAmount * $gstRate) / 100, 2) : 0;
-		$baseAmount = $totalAmount - $gstAmount;
+		$baseAmount = (float) $voucher->taxable_value;
 
 		$this->journalService->storeSalesVoucherJournalEntries([
 			'source'        => 'Sales Voucher',
@@ -1454,6 +1454,9 @@ class SalesController extends Controller
 			'base_amount'   => $baseAmount,
 			'gst_amount'    => $gstAmount,
 			'gst_rate'      => $voucher->gst_rate,
+			'cgst_amount'      => $voucher->cgst_amount,
+			'sgst_amount'      => $voucher->sgst_amount,
+			'igst_amount'      => $voucher->igst_amount,
 			'gst_trans'     => 'intrastate',
 			'status'        => 1,
 		]);

@@ -148,7 +148,7 @@ class PayController extends Controller
 				} else if ($request->voucher_type == 'Purchase') {
 					$this->deletePurchasePaymentJournalEntries($sid);
 				}else if($request->voucher_type=='Expense'){
-					//$this->deleteExpensePaymentJournalEntries($sid);
+					$this->deleteExpensePaymentJournalEntries($sid);
 				}
 			}
 
@@ -214,6 +214,8 @@ class PayController extends Controller
 
 					$invoiceAmount =($invoice->amount ?? 0) + ($invoice->tax_amt ?? 0) + ($purchase->shipping_cost ?? 0);
 					$this->purchaseJournalEntry($sid,$uid,$invoiceAmount,'Due');
+				} else if ($request->voucher_type == 'Expense') {
+					$this->expenseJournalEntry($sid);
 				}
 			}
 			else 
@@ -231,6 +233,8 @@ class PayController extends Controller
 						//No journal entry
 					} else if ($request->voucher_type == 'Purchase') {
 						$this->purchaseJournalEntry($sid,$uid,$val['amount'],$payment_mode);
+					}else if ($request->voucher_type == 'Expense') {
+						$this->expenseJournalEntry($sid);
 					}
 				}
 			}
@@ -343,10 +347,10 @@ class PayController extends Controller
 				
 			$purchase = DB::table('purchases')
 									->where('id', $id)
-									->select('shipping_cost')
+									->select('shipping_cost', 'inv_num')
 									->first();
-
-			$total = getRoundedAmount($invoice->amount + $invoice->tax_amt + ($purchase->shipping_cost ?? 0));
+			$shipping_cost = $purchase->shipping_cost ?? 0;
+			$total = getRoundedAmount($invoice->amount + $invoice->tax_amt + $shipping_cost);
 
 			$paid = DB::table('payment_vouchers')
 				->where('f_id',$id)
@@ -378,6 +382,16 @@ class PayController extends Controller
 					'advance_amount'=>$advanceAmount,
 					'adjusted_amount'=>$paid,
 					'due_amount'=>max(0,$total-$paid)
+				]);
+				
+			// Update Expense if exp_invno matches purchase inv_num
+			DB::table('expenses')
+				->where('exp_invno', $purchase->inv_num)
+				->update([
+					'payment_status' => strtolower($status), // due, partial, full
+					'advance_amount' => 0,
+					'adjusted_now'   => $shipping_cost,
+					'balance_amount' => 0,
 				]);
 		}
 		else if($type=='Expense')
@@ -675,6 +689,35 @@ class PayController extends Controller
 			]);
 		}
 		
+	}
+	
+	public function expenseJournalEntry($eId)
+	{
+		$expense = DB::table('expenses')->where('id', $eId)->first();
+		$this->journalService->storeExpenseJournalEntries([
+			'source'        => 'Expense',
+			'autoId'        => $expense->id,
+			'added_by'      => currentOwnerId(),
+			'propId'        => $expense->propId,
+			'date'          => $expense->expense_date,
+			'reference_no'  => $expense->exp_invno,
+			'entry_type'    => 'Expense',
+			'ledger'        => ucwords(str_replace(['_', '-'], ' ', $expense->expense_type)),
+			'party_name'    => $expense->approved_by,
+			'amount'        => $expense->expense_amt,
+			'payment_status'=> $expense->payment_status,
+			'gst_applicable'=> $expense->gst_applicable ?? 'no',
+			'gst_trans'   	=> $expense->gst_trans ?? '',
+			'gst_rate'      => $expense->gst_rate ?? 0,
+			'total_gst'    => $expense->total_gst ?? 0,
+			
+			'tds_applicable'=> $expense->tds_applicable ?? 'no',
+			'tds_percent'   => $expense->tds_percentage ?? 0,
+			'tds_amt'       => $expense->tds_amount ?? 0,
+			'tds_id'        => $expense->tds_id ?? null,
+			'other_note'    => $expense->pur_of_expense,
+			'status'    	=> $expense->status,
+		]);
 	}
 	//End Journal Entry
 	

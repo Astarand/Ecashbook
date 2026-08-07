@@ -205,38 +205,46 @@ class TrialBalanceService
 		if ($type == 'Trade Receivables') {
 
 			// Sales Receivable
-			$salesReceivable = DB::table('sales as s')
-							->leftJoin('sales_values as sv', 'sv.sid', '=', 's.id')
-							->where('s.added_by', $userId)
-							->where('s.status', 1)
-							->whereBetween('s.inv_date', [$startDate, $endDate])
-							->groupBy('s.id', 's.advance_amount')
-							->selectRaw("
-								(
-									SUM(COALESCE(sv.amount, 0) + COALESCE(sv.tax_amt, 0))
-									- COALESCE(s.advance_amount, 0)
-								) AS receivable
-							")
-							->get()
-							->sum('receivable');
+			$salesReceivable = DB::table('sales')
+				->where('added_by', $userId)
+				->where('status', 1)
+				->whereBetween('inv_date', [$startDate, $endDate])
+				->whereIn('pay_status', ['Due', 'Partial'])
+				->selectRaw("
+					SUM(
+						CASE
+							WHEN pay_status = 'Due'
+								THEN COALESCE(total_amount, 0)
+
+							WHEN pay_status = 'Partial'
+								THEN COALESCE(due_amount, 0)
+
+							ELSE 0
+						END
+					) AS receivable
+				")
+				->value('receivable') ?? 0;
 
 			// Income Receivable
 			$incomeReceivable = DB::table('income')
-				->where('addBy', $userId)
-				->where('pay_status', '!=', 'Full')
-				->where('status', 1)
-				->whereBetween('dateInput', [$startDate, $endDate])
-				->selectRaw('
-					SUM(
-						GREATEST(
-							COALESCE(amount, 0)
-							+ COALESCE(gst_amt, 0)
-							- COALESCE(advance_amt, 0),
-							0
-						)
-					) AS receivable
-				')
-				->value('receivable') ?? 0;
+					->where('addBy', $userId)
+					->where('status', 1)
+					->whereBetween('dateInput', [$startDate, $endDate])
+					->whereIn('pay_status', ['Due', 'Advance'])
+					->selectRaw("
+						SUM(
+							CASE
+								WHEN pay_status = 'Due'
+									THEN COALESCE(amount,0) + COALESCE(gst_amt,0)
+
+								WHEN pay_status = 'Advance'
+									THEN COALESCE(receivable_amt,0)
+
+								ELSE 0
+							END
+						) AS receivable
+					")
+					->value('receivable') ?? 0;
 
 			// Sales Credit/Debit Notes
 			$voucherSalesTotals = DB::table('vouchers')
@@ -600,18 +608,13 @@ class TrialBalanceService
 		// Trade Payables
 		if ($type == 'trade_payables') {
 			 // Outstanding Purchase Amount (due->full)
-			$purchaseAmount = DB::table('purchases as p')
-							->leftJoin('purchase_values as pv', 'pv.sid', '=', 'p.id')
-							->where('p.added_by', $userId)
-							->where('p.status', 1)
-							->whereBetween('p.inv_date', [$startDate, $endDate])
-							->groupBy('p.id', 'p.advance_amount')
-							->selectRaw('
-								SUM(COALESCE(pv.amount, 0) + COALESCE(pv.tax_amt, 0))
-								- COALESCE(p.advance_amount, 0) AS payable
-							')
-							->get()
-							->sum('payable');
+			$purchaseAmount = DB::table('purchases')
+								->where('added_by', $userId)
+								->where('status', 1)
+								->whereBetween('inv_date', [$startDate, $endDate])
+								->whereIn('pay_status', ['Due', 'Partial'])
+								->selectRaw('SUM(total_amount - adjusted_amount) as payable')
+								->value('payable');
 							
 			// Purchase Credit/Debit Notes
 			$voucherPurchaseTotals = DB::table('voucher_purchases')
@@ -628,34 +631,65 @@ class TrialBalanceService
 			$expenseAmount = DB::table('expenses')
 								->where('added_by', $userId)
 								->whereBetween('expense_date', [$startDate, $endDate])
-								->selectRaw('
+								->selectRaw("
 									SUM(
-										GREATEST(
-											COALESCE(expense_amt, 0)
-											+ COALESCE(total_gst, 0)
-											- COALESCE(advance_amount, 0),
-											0
-										)
+										CASE
+											WHEN payment_status = 'due'
+												THEN COALESCE(expense_amt,0) + COALESCE(total_gst,0)
+
+											WHEN payment_status = 'partial'
+												THEN COALESCE(balance_amount,0)
+
+											WHEN payment_status = 'full'
+												THEN 0
+
+											ELSE 0
+										END
 									) AS payable
-								')
+								")
 								->value('payable') ?? 0;
 			// Outstanding Non-Current Asset Payables
 			$assetAmount = DB::table('assets')
 							->where('added_by', $userId)
 							->where('assetType', 'non-current')
 							->where('isActive', 1)
-							->where('pay_status', '!=', 'Full')
+							->whereIn('pay_status', ['Due', 'Advance'])
 							->whereBetween('date', [$startDate, $endDate])
-							->selectRaw('
+							->selectRaw("
 								SUM(
-									GREATEST(
-										COALESCE(invoice_value, 0)
-										- COALESCE(advance_amt, 0)
-										- COALESCE(adjusted_amt, 0),
-										0
-									)
+									CASE
+										-- Capital Work in Progress
+										WHEN nonCurrentAssetType = 'Capital Work in Progress' THEN
+											CASE
+												WHEN pay_status = 'Due'
+													THEN COALESCE(cwip_amount, 0)
+
+												WHEN pay_status = 'Advance'
+													THEN GREATEST(
+														COALESCE(cwip_amount, 0) - COALESCE(cwip_adjusted_amt, 0),
+														0
+													)
+
+												ELSE 0
+											END
+
+										-- Other Non-Current Assets
+										ELSE
+											CASE
+												WHEN pay_status = 'Due'
+													THEN COALESCE(invoice_value, 0)
+
+												WHEN pay_status = 'Advance'
+													THEN GREATEST(
+														COALESCE(invoice_value, 0) - COALESCE(adjusted_amt, 0),
+														0
+													)
+
+												ELSE 0
+											END
+									END
 								) AS payable
-							')
+							")
 							->value('payable') ?? 0;
 
 			$purchaseDebit  = $voucherPurchaseTotals->total_debit ?? 0;

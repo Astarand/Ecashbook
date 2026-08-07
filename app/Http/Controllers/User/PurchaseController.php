@@ -391,13 +391,13 @@ class PurchaseController extends Controller
 			}
 		}
 		// Journal Entry for shipping cost
-		$this->journalEntryExpense($expenseId); 
+ 
 		// Payment voucher for shipping cost
 		$data = [
 					'bank_id' => $request->bank_id ?? null
 				];
 		if ($expenseAmt > 0) {
-			$this->paymentVoucherService->storePaymentVoucherEntries($expenseId, 'Expense', $expenseAmt, $data);
+			//$this->paymentVoucherService->storePaymentVoucherEntries($expenseId, 'Expense', $expenseAmt, $data);
 		}
 		$sales_values = $this->items_purchase_list($request->sId);
 		return view('User.ajax-purchase-invoice-display')->with([
@@ -436,7 +436,7 @@ class PurchaseController extends Controller
 		checkCoreAccess('Biz Operations');
 		$invoiceNo = $this->create_purchase_invoice_number($userId);
 		$compData = DB::table('company_profiles')
-								->select(DB::raw('comp_type,comp_name,comp_phone,comp_email,comp_pan_no,gst_no,comp_bill_pin,comp_bill_addone,comp_bill_addtwo,comp_bill_name,comp_bill_mobile_no,comp_bill_state,comp_bill_city'))
+								->select(DB::raw('comp_name,comp_phone,comp_email,comp_pan_no,gst_no,comp_bill_pin,comp_bill_addone,comp_bill_addtwo,comp_bill_name,comp_bill_mobile_no,comp_bill_state,comp_bill_city'))
 								->where('company_profiles.userId','=',$userId)
 								->get();
 		$custData = DB::table('customers')
@@ -470,22 +470,10 @@ class PurchaseController extends Controller
 					->select('id', 'inv_num')
 					->get();
 					
-		// $proprietorships = DB::table('proprietorship_profiles')
-		// 				->select('id','comp_name')
-		// 				->where('userId',$userId)
-		// 				->get();
-
-		$proprietorships = collect();
-
-					if (
-						isset($compData[0]) &&
-						$compData[0]->comp_type === 'Proprietorship'
-					) {
-						$proprietorships = DB::table('proprietorship_profiles')
-							->select('id', 'comp_name')
-							->where('userId', $userId)
-							->get();
-					}
+		$proprietorships = DB::table('proprietorship_profiles')
+						->select('id','comp_name')
+						->where('userId',$userId)
+						->get();
 					
         return view('User.create-purchase-invoice')->with([
 			'invoiceNo'=>$invoiceNo,
@@ -943,7 +931,7 @@ class PurchaseController extends Controller
 		$gstRate = (float) $voucher->gst_rate;
 		$totalAmount = (float) $voucher->total_amt;
 		$gstAmount = $gstRate > 0 ? round(($totalAmount * $gstRate) / 100, 2) : 0;
-		$baseAmount = $totalAmount - $gstAmount;
+		$baseAmount = (float) $voucher->taxable_value;
 
 		$this->journalService->storePurchaseVoucherJournalEntries([
 			'source'        => 'Purchase Voucher',
@@ -963,6 +951,9 @@ class PurchaseController extends Controller
 			'base_amount'   => $baseAmount,
 			'gst_amount'    => $gstAmount,
 			'gst_rate'      => $voucher->gst_rate,
+			'cgst_amount'      => $voucher->cgst_amount,
+			'sgst_amount'      => $voucher->sgst_amount,
+			'igst_amount'      => $voucher->igst_amount,
 			'gst_trans'     => 'intrastate',
 			'status'        => 1,
 		]);

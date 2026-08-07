@@ -160,10 +160,24 @@ class EmployeeManagemnet extends Controller
 	public function AddEmployee()
     {
         $userId = currentOwnerId();
-        $proprietorships = DB::table('proprietorship_profiles')
-                        ->select('id','comp_name','basic_percentage')
-                        ->where('userId',$userId)
-                        ->get();
+        // $proprietorships = DB::table('proprietorship_profiles')
+        //                 ->select('id','comp_name','basic_percentage')
+        //                 ->where('userId',$userId)
+        //                 ->get();
+
+		$compType = DB::table('company_profiles')
+			->where('userId', $userId)
+			->value('comp_type');
+
+		$proprietorships = collect();
+
+		if ($compType == 'Proprietorship') {
+			$proprietorships = DB::table('proprietorship_profiles')
+				->select('id', 'comp_name', 'basic_percentage')
+				->where('userId', $userId)
+				->get();
+		}
+		
         $locations = Location::where('added_by', $userId)->orderBy('created_at', 'desc')->get();
         $states = State::where('country_id', '=', 101)->get();
 
