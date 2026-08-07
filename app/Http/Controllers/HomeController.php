@@ -12,8 +12,7 @@ use DB;
 use Auth;
 use Validator;
 use App\Models\User;
-// use App\Country;
-// use App\State;
+use App\Models\Lead;
 use App\Models\City;
 use App\Models\State;
 // use App\Statutorys;
@@ -387,6 +386,22 @@ class HomeController extends Controller
 		$user = $this->create($request->all());
 
 		if ($user) {
+			// If user subscribed to newsletter, save lead data
+			if ($request->filled('subscribe_newsletter') && ($request->subscribe_newsletter == 1 || $request->subscribe_newsletter == '1' || $request->subscribe_newsletter == true)) {
+				$stateObj = State::find($request->state_id);
+				$cityObj = City::find($request->city_id);
+
+				Lead::create([
+					'name' => $user->name,
+					'email' => $user->email,
+					'phone' => $user->phone,
+					'state' => $stateObj->name ?? null,
+					'city' => $cityObj->name ?? null,
+					'address' => null,
+					'subscribe_newsletter' => 1,
+				]);
+			}
+
 			$verifyUrl = url("/verify_email/" . base64_encode($user->id) . "/" . $user->email);
 
 			$emailBody = view('verify_email_template', [
