@@ -181,6 +181,7 @@ class TrialBalanceService
 			// ================= BANK MASTER BALANCE =================
 			$bankBalance = DB::table('banks')
 				->where('added_by', $userId)
+				->whereBetween('created_at', [$startDate, $endDate])
 				->sum('curr_bal');
 
 
