@@ -36,57 +36,340 @@ use Illuminate\Support\Facades\Cookie;
 
 class TdsPfEsiController extends Controller
 {
-    // public function tds_returns_filing(request $request)
+    
+	// public function tds_returns_filing(Request $request)
 	// {
 	// 	$userId = Auth::id();
-	// 	//start ca-accountant access
+
+	// 	// CA / CA Employee Accountant Access
 	// 	$req_type = 0;
 	// 	if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
 	// 		$userId = getAccessCompanyId($request);
 	// 		$req_type = 1;
 	// 	}
-	// 	//end ca-accountant access
-	// 	$currentMonth = now()->month;
-	// 	$currentYear  = now()->year;
 
-	// 	$employees = DB::table('employees')
-	// 		->join('users', 'users.id', '=', 'employees.empId')
+	// 	// User Employee Accountant Access
+	// 	if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5) {
+	// 		$userId = currentOwnerId();
+	// 	}
 
-	// 		// ✅ INNER JOIN – only employees with payslip this month
-	// 		->join('user_payslip', function ($join) use ($currentMonth, $currentYear) {
-	// 			$join->on('user_payslip.user_emp_id', '=', 'employees.empId')
-	// 				->whereMonth('user_payslip.date', $currentMonth)
-	// 				->whereYear('user_payslip.date', $currentYear);
-	// 		})
-
-	// 		// TDS slab (Salary)
-	// 		->leftJoin('tds_tax_slab', function ($join) {
-	// 			$join->where('tds_tax_slab.tds_slab_name', 'Salary');
-	// 		})
-
-	// 		->where('employees.added_by', $userId)
-	// 		->where('employees.tds_applicable', 1)
-
+	// 	/*
+	// 	|--------------------------------------------------------------------------
+	// 	| Employee TDS Records
+	// 	|--------------------------------------------------------------------------
+	// 	*/
+	// 	$employeeRecords = DB::table('employees as e')
+	// 		->leftJoin('users as u', 'u.id', '=', 'e.empId')
+	// 		->leftJoin('user_payslip as up', 'up.user_emp_id', '=', 'e.empId')
+	// 		->where('e.added_by', $userId)
+	// 		->where('e.tds_applicable', 1)
 	// 		->select(
-	// 			'employees.employee_id',
-	// 			'employees.pan_number',
-	// 			'employees.total_addition',
-	// 			'employees.tds',
-	// 			'users.name',
-	// 			'users.email',
-
-	// 			'user_payslip.date as payment_date',
-	// 			'user_payslip.payslip_no',
-
-	// 			'tds_tax_slab.tds_slab_section',
-	// 			'tds_tax_slab.tds_slab_rate'
+	// 			'e.*',
+	// 			'u.name',
+	// 			'u.email',
+	// 			'up.emp_salary_slip_response'
 	// 		)
-	// 		->get();
+	// 		->orderByDesc('up.id')
+	// 		->get()
+	// 		->map(function ($row) {
 
-	// 	return view('User.tds-returns-filing', compact('employees', 'req_type'));
+	// 			$response = !empty($row->emp_salary_slip_response)
+	// 				? json_decode($row->emp_salary_slip_response, true)
+	// 				: [];
+
+	// 			$row->payslip_no = data_get(
+	// 				$response,
+	// 				'visible_data.payslip_no'
+	// 			);
+
+	// 			$row->payment_date = data_get(
+	// 				$response,
+	// 				'visible_data.generate_date'
+	// 			);
+
+	// 			$row->total_addition = data_get(
+	// 				$response,
+	// 				'visible_data.salary_details.total_addition',
+	// 				$row->total_addition ?? 0
+	// 			);
+
+	// 			$row->tds_amount = data_get(
+	// 				$response,
+	// 				'visible_data.salary_details.tds',
+	// 				0
+	// 			);
+
+	// 			$row->pan_number = data_get(
+	// 				$response,
+	// 				'visible_data.employee_details.pan_number',
+	// 				$row->pan_number
+	// 			);
+
+	// 			// Required by Blade modal calculation
+	// 			$row->tds = $row->tds_slab_rate ?? 0;
+
+	// 			$row->quarter = $row->quarter ?? 'N/A';
+	// 			$row->payment_type = 'Salary';
+
+	// 			return $row;
+	// 		});
+
+	// 	/*
+	// 	|--------------------------------------------------------------------------
+	// 	| Vendor TDS Records expenses
+	// 	|--------------------------------------------------------------------------
+	// 	*/
+	// 	$vendorRecords = DB::table('expenses as ex')
+	// 		->leftJoin('vendors as v', 'v.id', '=', 'ex.vendor_id')
+	// 		->where('ex.added_by', $userId)
+	// 		->where('ex.tds_applicable', 'yes')
+	// 		->select(
+	// 			'ex.*',
+	// 			'v.vendor_name',
+	// 			'v.vendor_email',
+	// 			'v.vendor_pan',
+	// 			'v.vendor_id',
+	// 		)
+	// 		->get()
+	// 		->map(function ($row) {
+
+	// 			// Convert vendor data to employee-style fields
+	// 			$row->employee_id = $row->vendor_id;
+
+	// 			$row->name = $row->vendor_name;
+	// 			$row->email = $row->vendor_email;
+	// 			$row->pan_number = $row->vendor_pan;
+
+	// 			$row->tds_slab_section = $row->tds_section;
+	// 			$row->tds_slab_rate = $row->tds_rate;
+
+	// 			$row->total_addition = $row->expense_amt;
+
+	// 			$row->payment_date = $row->expense_date;
+
+	// 			$row->payslip_no = !empty($row->tds_id)
+	// 				? $row->tds_id
+	// 				: 'N/A';
+
+	// 			$row->quarter = 'N/A';
+
+	// 			$row->tds_amount = $row->tds_amount ?? 0;
+
+	// 			// Required by Blade modal calculation
+	// 			$row->tds = $row->tds_rate ?? 0;
+	// 			$row->payment_type = 'Expense';
+
+	// 			return $row;
+	// 		});
+
+	// 	/*
+	// 	|--------------------------------------------------------------------------
+	// 	| Liability TDS Records
+	// 	|--------------------------------------------------------------------------
+	// 	*/
+	// 	$liabilityRecords = DB::table('current_liabilities as cl')
+	// 		->leftJoin('company_profiles as cp', 'cp.userId', '=', 'cl.added_by')
+	// 		->where('cl.added_by', $userId)
+	// 		->where('cl.stl_tds_applicable', 'yes')
+	// 		->select(
+	// 			'cl.*',
+	// 			'cp.comp_name',
+	// 			'cp.comp_email',
+	// 			'cp.comp_pan_no'
+	// 		)
+	// 		->get()
+	// 		->map(function ($row) {
+
+	// 			// Map liability data to employee-style fields
+
+	// 			$row->employee_id = 'LIAB-' . $row->liabilities_id;
+
+	// 			$row->name = $row->stl_lender_name ?: ($row->comp_name ?? 'N/A');
+
+	// 			$row->email = $row->comp_email ?? null;
+
+	// 			$row->pan_number = $row->comp_pan_no ?? null;
+
+	// 			$row->tds_slab_section = $row->stl_tds_section;
+
+	// 			$row->tds_slab_rate = $row->stl_tds_rate;
+
+	// 			// Gross amount on which TDS is applicable
+	// 			$row->total_addition = $row->stl_interest_amount ?? $row->stl_amount_received ?? 0;
+
+	// 			$row->payment_date = $row->stl_disbursement_date
+	// 				?: $row->created_at;
+
+	// 			$row->payslip_no = $row->stl_reference ?: 'N/A';
+
+	// 			$row->quarter = 'N/A';
+
+	// 			$row->tds_amount = $row->stl_tds_amount ?? 0;
+
+	// 			// Required by existing Blade modal calculation
+	// 			$row->tds = $row->stl_tds_rate ?? 0;
+	// 			$row->payment_type = 'Liability';
+
+	// 			return $row;
+	// 		});
+
+	// 		/*
+	// 		|--------------------------------------------------------------------------
+	// 		| Asset TDS Records
+	// 		|--------------------------------------------------------------------------
+	// 		*/
+	// 		$assetRecords = DB::table('assets as a')
+	// 			->leftJoin('vendors as v', 'v.id', '=', 'a.vendor_id')
+	// 			->where('a.added_by', $userId)
+	// 			->where('a.tds_applicable', 'yes')
+	// 			->select(
+	// 				'a.*',
+	// 				'v.vendor_name',
+	// 				'v.vendor_email',
+	// 				'v.vendor_pan',
+	// 				'v.vendor_id'
+	// 			)
+	// 			->get()
+	// 			->map(function ($row) {
+
+	// 				// Asset/Vendor ID
+	// 				$row->employee_id = !empty($row->asset_id)
+	// 					? $row->asset_id
+	// 					: 'N/A';
+
+	// 				// Name
+	// 				$row->name = !empty($row->vendor_name)
+	// 					? $row->vendor_name
+	// 					: (!empty($row->asset_name) ? $row->asset_name : 'N/A');
+
+	// 				// Email
+	// 				$row->email = !empty($row->vendor_email)
+	// 					? $row->vendor_email
+	// 					: 'N/A';
+
+	// 				// PAN
+	// 				$row->pan_number = !empty($row->vendor_pan)
+	// 					? $row->vendor_pan
+	// 					: 'N/A';
+
+	// 				// Section
+	// 				$row->tds_slab_section = !empty($row->asset_category)
+	// 					? $row->asset_category
+	// 					: 'N/A';
+
+	// 				// TDS Rate
+	// 				$row->tds_slab_rate = !empty($row->tds_percent)
+	// 					? $row->tds_percent
+	// 					: 0;
+
+	// 				// Gross Amount
+	// 				$row->total_addition = !empty($row->invoice_value)
+	// 					? $row->invoice_value
+	// 					: 0;
+
+	// 				// Payment Date
+	// 				$row->payment_date = !empty($row->purchase_date)
+	// 					? $row->purchase_date
+	// 					: (!empty($row->invoice_date)
+	// 						? $row->invoice_date
+	// 						: $row->created_at);
+
+	// 				// Challan / TDS Ref
+	// 				$row->payslip_no = !empty($row->tds_id)
+	// 					? $row->tds_id
+	// 					: 'N/A';
+
+	// 				// Quarter
+	// 				$row->quarter = 'N/A';
+
+	// 				// TDS Amount
+	// 				$row->tds_amount = !empty($row->tds_amt)
+	// 					? $row->tds_amt
+	// 					: 0;
+
+	// 				// Required by existing Blade
+	// 				$row->tds = $row->tds_slab_rate;
+	// 				$row->payment_type = 'Asset';
+
+	// 				return $row;
+	// 			});
+
+	// 			/*
+	// 			|--------------------------------------------------------------------------
+	// 			| Income TDS Records
+	// 			|--------------------------------------------------------------------------
+	// 			*/
+	// 			$incomeRecords = DB::table('income')
+	// 				->where('addBy', $userId)
+	// 				->where('tds_applicable', 'yes')
+	// 				->where('status', 1)
+	// 				->get()
+	// 				->map(function ($row) {
+
+	// 					$row->employee_id = !empty($row->invoice_no)
+	// 						? $row->invoice_no
+	// 						: 'N/A';
+
+	// 					$row->name = !empty($row->customer_name)
+	// 						? $row->customer_name
+	// 						: (!empty($row->name) ? $row->name : 'N/A');
+
+	// 					$row->email = 'N/A';
+
+	// 					$row->pan_number = 'N/A';
+
+	// 					$row->tds_slab_section = !empty($row->incomeType)
+	// 						? $row->incomeType
+	// 						: 'N/A';
+
+	// 					$row->tds_slab_rate = !empty($row->tds_percentage)
+	// 						? $row->tds_percentage
+	// 						: 0;
+
+	// 					$row->total_addition = !empty($row->amount)
+	// 						? $row->amount
+	// 						: 0;
+
+	// 					$row->payment_date = !empty($row->dateInput)
+	// 						? $row->dateInput
+	// 						: $row->created_at;
+
+	// 					$row->payslip_no = !empty($row->tds_id)
+	// 						? $row->tds_id
+	// 						: 'N/A';
+
+	// 					$row->quarter = 'N/A';
+
+	// 					$row->tds_amount = !empty($row->tds_amount)
+	// 						? $row->tds_amount
+	// 						: 0;
+
+	// 					// Required by existing blade
+	// 					$row->tds = $row->tds_slab_rate;
+
+	// 					$row->payment_type = 'Other Income';
+
+	// 					return $row;
+	// 				});
+
+	// 	/*
+	// 	|--------------------------------------------------------------------------
+	// 	| Merge Employee + Vendor Records (Expenses) + Liability Records + Asset Records + Income Records
+	// 	|--------------------------------------------------------------------------
+	// 	*/
+	// 	$employees = $employeeRecords
+	// 		->concat($vendorRecords)
+	// 		->concat($liabilityRecords)
+	// 		->concat($assetRecords)
+	// 		->concat($incomeRecords)
+	// 		->sortByDesc('payment_date')
+	// 		->values();
+
+	// 	return view(
+	// 		'User.tds-returns-filing',
+	// 		compact('employees', 'req_type')
+	// 	);
 	// }
-
-
 
 	public function tds_returns_filing(Request $request)
 	{
@@ -104,321 +387,11 @@ class TdsPfEsiController extends Controller
 			$userId = currentOwnerId();
 		}
 
-		/*
-		|--------------------------------------------------------------------------
-		| Employee TDS Records
-		|--------------------------------------------------------------------------
-		*/
-		$employeeRecords = DB::table('employees as e')
-			->leftJoin('users as u', 'u.id', '=', 'e.empId')
-			->leftJoin('user_payslip as up', 'up.user_emp_id', '=', 'e.empId')
-			->where('e.added_by', $userId)
-			->where('e.tds_applicable', 1)
-			->select(
-				'e.*',
-				'u.name',
-				'u.email',
-				'up.emp_salary_slip_response'
-			)
-			->orderByDesc('up.id')
-			->get()
-			->map(function ($row) {
-
-				$response = !empty($row->emp_salary_slip_response)
-					? json_decode($row->emp_salary_slip_response, true)
-					: [];
-
-				$row->payslip_no = data_get(
-					$response,
-					'visible_data.payslip_no'
-				);
-
-				$row->payment_date = data_get(
-					$response,
-					'visible_data.generate_date'
-				);
-
-				$row->total_addition = data_get(
-					$response,
-					'visible_data.salary_details.total_addition',
-					$row->total_addition ?? 0
-				);
-
-				$row->tds_amount = data_get(
-					$response,
-					'visible_data.salary_details.tds',
-					0
-				);
-
-				$row->pan_number = data_get(
-					$response,
-					'visible_data.employee_details.pan_number',
-					$row->pan_number
-				);
-
-				// Required by Blade modal calculation
-				$row->tds = $row->tds_slab_rate ?? 0;
-
-				$row->quarter = $row->quarter ?? 'N/A';
-				$row->payment_type = 'Salary';
-
-				return $row;
-			});
-
-		/*
-		|--------------------------------------------------------------------------
-		| Vendor TDS Records expenses
-		|--------------------------------------------------------------------------
-		*/
-		$vendorRecords = DB::table('expenses as ex')
-			->leftJoin('vendors as v', 'v.id', '=', 'ex.vendor_id')
-			->where('ex.added_by', $userId)
-			->where('ex.tds_applicable', 'yes')
-			->select(
-				'ex.*',
-				'v.vendor_name',
-				'v.vendor_email',
-				'v.vendor_pan',
-				'v.vendor_id',
-			)
-			->get()
-			->map(function ($row) {
-
-				// Convert vendor data to employee-style fields
-				$row->employee_id = $row->vendor_id;
-
-				$row->name = $row->vendor_name;
-				$row->email = $row->vendor_email;
-				$row->pan_number = $row->vendor_pan;
-
-				$row->tds_slab_section = $row->tds_section;
-				$row->tds_slab_rate = $row->tds_rate;
-
-				$row->total_addition = $row->expense_amt;
-
-				$row->payment_date = $row->expense_date;
-
-				$row->payslip_no = !empty($row->tds_id)
-					? $row->tds_id
-					: 'N/A';
-
-				$row->quarter = 'N/A';
-
-				$row->tds_amount = $row->tds_amount ?? 0;
-
-				// Required by Blade modal calculation
-				$row->tds = $row->tds_rate ?? 0;
-				$row->payment_type = 'Expense';
-
-				return $row;
-			});
-
-		/*
-		|--------------------------------------------------------------------------
-		| Liability TDS Records
-		|--------------------------------------------------------------------------
-		*/
-		$liabilityRecords = DB::table('current_liabilities as cl')
-			->leftJoin('company_profiles as cp', 'cp.userId', '=', 'cl.added_by')
-			->where('cl.added_by', $userId)
-			->where('cl.stl_tds_applicable', 'yes')
-			->select(
-				'cl.*',
-				'cp.comp_name',
-				'cp.comp_email',
-				'cp.comp_pan_no'
-			)
-			->get()
-			->map(function ($row) {
-
-				// Map liability data to employee-style fields
-
-				$row->employee_id = 'LIAB-' . $row->liabilities_id;
-
-				$row->name = $row->stl_lender_name ?: ($row->comp_name ?? 'N/A');
-
-				$row->email = $row->comp_email ?? null;
-
-				$row->pan_number = $row->comp_pan_no ?? null;
-
-				$row->tds_slab_section = $row->stl_tds_section;
-
-				$row->tds_slab_rate = $row->stl_tds_rate;
-
-				// Gross amount on which TDS is applicable
-				$row->total_addition = $row->stl_interest_amount ?? $row->stl_amount_received ?? 0;
-
-				$row->payment_date = $row->stl_disbursement_date
-					?: $row->created_at;
-
-				$row->payslip_no = $row->stl_reference ?: 'N/A';
-
-				$row->quarter = 'N/A';
-
-				$row->tds_amount = $row->stl_tds_amount ?? 0;
-
-				// Required by existing Blade modal calculation
-				$row->tds = $row->stl_tds_rate ?? 0;
-				$row->payment_type = 'Liability';
-
-				return $row;
-			});
-
-			/*
-			|--------------------------------------------------------------------------
-			| Asset TDS Records
-			|--------------------------------------------------------------------------
-			*/
-			$assetRecords = DB::table('assets as a')
-				->leftJoin('vendors as v', 'v.id', '=', 'a.vendor_id')
-				->where('a.added_by', $userId)
-				->where('a.tds_applicable', 'yes')
-				->select(
-					'a.*',
-					'v.vendor_name',
-					'v.vendor_email',
-					'v.vendor_pan',
-					'v.vendor_id'
-				)
-				->get()
-				->map(function ($row) {
-
-					// Asset/Vendor ID
-					$row->employee_id = !empty($row->asset_id)
-						? $row->asset_id
-						: 'N/A';
-
-					// Name
-					$row->name = !empty($row->vendor_name)
-						? $row->vendor_name
-						: (!empty($row->asset_name) ? $row->asset_name : 'N/A');
-
-					// Email
-					$row->email = !empty($row->vendor_email)
-						? $row->vendor_email
-						: 'N/A';
-
-					// PAN
-					$row->pan_number = !empty($row->vendor_pan)
-						? $row->vendor_pan
-						: 'N/A';
-
-					// Section
-					$row->tds_slab_section = !empty($row->asset_category)
-						? $row->asset_category
-						: 'N/A';
-
-					// TDS Rate
-					$row->tds_slab_rate = !empty($row->tds_percent)
-						? $row->tds_percent
-						: 0;
-
-					// Gross Amount
-					$row->total_addition = !empty($row->invoice_value)
-						? $row->invoice_value
-						: 0;
-
-					// Payment Date
-					$row->payment_date = !empty($row->purchase_date)
-						? $row->purchase_date
-						: (!empty($row->invoice_date)
-							? $row->invoice_date
-							: $row->created_at);
-
-					// Challan / TDS Ref
-					$row->payslip_no = !empty($row->tds_id)
-						? $row->tds_id
-						: 'N/A';
-
-					// Quarter
-					$row->quarter = 'N/A';
-
-					// TDS Amount
-					$row->tds_amount = !empty($row->tds_amt)
-						? $row->tds_amt
-						: 0;
-
-					// Required by existing Blade
-					$row->tds = $row->tds_slab_rate;
-					$row->payment_type = 'Asset';
-
-					return $row;
-				});
-
-				/*
-				|--------------------------------------------------------------------------
-				| Income TDS Records
-				|--------------------------------------------------------------------------
-				*/
-				$incomeRecords = DB::table('income')
-					->where('addBy', $userId)
-					->where('tds_applicable', 'yes')
-					->where('status', 1)
-					->get()
-					->map(function ($row) {
-
-						$row->employee_id = !empty($row->invoice_no)
-							? $row->invoice_no
-							: 'N/A';
-
-						$row->name = !empty($row->customer_name)
-							? $row->customer_name
-							: (!empty($row->name) ? $row->name : 'N/A');
-
-						$row->email = 'N/A';
-
-						$row->pan_number = 'N/A';
-
-						$row->tds_slab_section = !empty($row->incomeType)
-							? $row->incomeType
-							: 'N/A';
-
-						$row->tds_slab_rate = !empty($row->tds_percentage)
-							? $row->tds_percentage
-							: 0;
-
-						$row->total_addition = !empty($row->amount)
-							? $row->amount
-							: 0;
-
-						$row->payment_date = !empty($row->dateInput)
-							? $row->dateInput
-							: $row->created_at;
-
-						$row->payslip_no = !empty($row->tds_id)
-							? $row->tds_id
-							: 'N/A';
-
-						$row->quarter = 'N/A';
-
-						$row->tds_amount = !empty($row->tds_amount)
-							? $row->tds_amount
-							: 0;
-
-						// Required by existing blade
-						$row->tds = $row->tds_slab_rate;
-
-						$row->payment_type = 'Other Income';
-
-						return $row;
-					});
-
-		/*
-		|--------------------------------------------------------------------------
-		| Merge Employee + Vendor Records (Expenses) + Liability Records + Asset Records + Income Records
-		|--------------------------------------------------------------------------
-		*/
-		$employees = $employeeRecords
-			->concat($vendorRecords)
-			->concat($liabilityRecords)
-			->concat($assetRecords)
-			->concat($incomeRecords)
-			->sortByDesc('payment_date')
-			->values();
+		//--------- Write Logic ---------
 
 		return view(
 			'User.tds-returns-filing',
-			compact('employees', 'req_type')
+			compact('req_type')
 		);
 	}
 
@@ -575,7 +548,6 @@ class TdsPfEsiController extends Controller
 			)
 			->get()
 			->map(function ($row) {
-
 				$row->employee_id = $row->asset_id ?? 'N/A';
 				$row->name = $row->vendor_name ?? $row->asset_name ?? 'N/A';
 				$row->email = $row->vendor_email ?? 'N/A';
@@ -583,16 +555,9 @@ class TdsPfEsiController extends Controller
 
 				$row->tds_slab_section = $row->asset_category ?? 'N/A';
 				$row->tds_slab_rate = $row->tds_percent ?? 0;
-
 				$row->total_addition = $row->invoice_value ?? 0;
-
-				$row->payment_date =
-					$row->purchase_date ??
-					$row->invoice_date ??
-					$row->created_at;
-
+				$row->payment_date = $row->purchase_date ?? $row->invoice_date ?? $row->created_at;
 				$row->payslip_no = $row->tds_id ?? 'N/A';
-
 				$row->quarter = 'N/A';
 				$row->tds_amount = $row->tds_amt ?? 0;
 				$row->tds = $row->tds_percent ?? 0;
@@ -645,6 +610,275 @@ class TdsPfEsiController extends Controller
 			->concat($incomeRecords)
 			->sortByDesc('payment_date')
 			->values();
+	}
+
+	public function getTdsSourceLabel($sourceType): string
+	{
+		if ($sourceType === 'expense' || $sourceType === 'Expense') {
+			return 'Expense';
+		}
+
+		if ($sourceType === 'liability' || $sourceType === 'Liability') {
+			return 'Liability';
+		}
+
+		return 'Payroll';
+	}
+
+	public function getTdsList(Request $request)
+	{
+		$ownerId = currentOwnerId();
+
+		$financialYear = $request->financial_year;
+		$filterType    = $request->filter_type;
+		$period        = $request->period;
+
+		$company = DB::table('company_profiles')
+			->where('userId', $ownerId)
+			->value('comp_tan');
+
+		$monthNames = [1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'];
+
+		$query = DB::table('user_payslip')
+			->leftJoin('employees', 'employees.empId', '=', 'user_payslip.user_emp_id')
+			->leftJoin('users', 'users.id', '=', 'user_payslip.user_emp_id')
+			->where('user_payslip.added_by', $ownerId)
+			->where('user_payslip.financial_year', $financialYear);
+
+		if ($filterType == 'monthly' && !empty($period)) {
+			$month = Carbon::parse('1 ' . $period)->month;
+			$query->where('user_payslip.month', $month);
+		} elseif ($filterType == 'quarterly' && !empty($period)) {
+			switch ($period) {
+				case 'Q1':
+					$months = [4, 5, 6];
+					break;
+				case 'Q2':
+					$months = [7, 8, 9];
+					break;
+				case 'Q3':
+					$months = [10, 11, 12];
+					break;
+				case 'Q4':
+					$months = [1, 2, 3];
+					break;
+				default:
+					$months = [];
+			}
+
+			if (!empty($months)) {
+				$query->whereIn('user_payslip.month', $months);
+			}
+		} elseif ($filterType == 'half-yearly' && !empty($period)) {
+			switch ($period) {
+				case 'H1':
+					$months = [4, 5, 6, 7, 8, 9];
+					break;
+				case 'H2':
+					$months = [10, 11, 12, 1, 2, 3];
+					break;
+				default:
+					$months = [];
+			}
+
+			if (!empty($months)) {
+				$query->whereIn('user_payslip.month', $months);
+			}
+		}
+
+		$query->whereRaw("CAST( JSON_UNQUOTE( JSON_EXTRACT( user_payslip.emp_salary_slip_response, '$.visible_data.final_salary_calculation.tds' ) ) AS DECIMAL(15,2) ) > 0");
+
+		$payslipSummary = $query->select(
+			'user_payslip.month',
+			'user_payslip.financial_year',
+			DB::raw("COUNT(DISTINCT user_payslip.user_emp_id) as employee_count"),
+			DB::raw("SUM(COALESCE(NULLIF(user_payslip.tds_amount, 0), CAST( JSON_UNQUOTE(JSON_EXTRACT( user_payslip.emp_salary_slip_response, '$.visible_data.final_salary_calculation.tds' )) AS DECIMAL(15,2) ))) as total_tds_amount"),
+			DB::raw("SUM(COALESCE(CAST( JSON_UNQUOTE(JSON_EXTRACT( user_payslip.emp_salary_slip_response, '$.visible_data.salary_details.gross_salary' )) AS DECIMAL(15,2) ), 0)) as total_gross_salary")
+		)
+		->groupBy('user_payslip.month', 'user_payslip.financial_year')
+		->orderBy('user_payslip.month')
+		->get();
+
+		$expenseQuery = DB::table('expenses as ex')
+			->leftJoin('vendors as v', 'v.id', '=', 'ex.vendor_id')
+			->where('ex.added_by', $ownerId)
+			->where('ex.tds_applicable', 'yes')
+			->where(function ($q) {
+				$q->where('ex.tds_amount', '>', 0)
+					->orWhere('ex.tds_rate', '>', 0);
+			});
+
+		if (!empty($financialYear)) {
+			[$startYear, $endYear] = explode('-', $financialYear);
+			$expenseQuery->whereBetween('ex.expense_date', [$startYear . '-04-01', $endYear . '-03-31']);
+		}
+
+		if ($filterType == 'monthly' && !empty($period)) {
+			$month = Carbon::parse('1 ' . $period)->month;
+			$expenseQuery->whereMonth('ex.expense_date', $month);
+		} elseif ($filterType == 'quarterly' && !empty($period)) {
+			switch ($period) {
+				case 'Q1':
+					$months = [4, 5, 6];
+					break;
+				case 'Q2':
+					$months = [7, 8, 9];
+					break;
+				case 'Q3':
+					$months = [10, 11, 12];
+					break;
+				case 'Q4':
+					$months = [1, 2, 3];
+					break;
+				default:
+					$months = [];
+			}
+
+			if (!empty($months)) {
+				$expenseQuery->whereIn(DB::raw('MONTH(ex.expense_date)'), $months);
+			}
+		} elseif ($filterType == 'half-yearly' && !empty($period)) {
+			switch ($period) {
+				case 'H1':
+					$months = [4, 5, 6, 7, 8, 9];
+					break;
+				case 'H2':
+					$months = [10, 11, 12, 1, 2, 3];
+					break;
+				default:
+					$months = [];
+			}
+
+			if (!empty($months)) {
+				$expenseQuery->whereIn(DB::raw('MONTH(ex.expense_date)'), $months);
+			}
+		}
+
+		$expenseRows = $expenseQuery->select(
+			'ex.id as expense_id',
+			'ex.expense_date',
+			'ex.expense_amt',
+			'ex.tds_amount',
+			'ex.tds_section',
+			'ex.tds_id',
+			'v.vendor_name',
+			DB::raw('MONTH(ex.expense_date) as month'),
+			DB::raw("CASE WHEN MONTH(ex.expense_date) >= 4 THEN CONCAT(YEAR(ex.expense_date), '-', YEAR(ex.expense_date) + 1) ELSE CONCAT(YEAR(ex.expense_date) - 1, '-', YEAR(ex.expense_date)) END as financial_year")
+		)
+		->orderBy('ex.expense_date')
+		->get();
+
+		$liabilityQuery = DB::table('current_liabilities as cl')
+			->leftJoin('company_profiles as cp', 'cp.userId', '=', 'cl.added_by')
+			->where('cl.added_by', $ownerId)
+			->where('cl.stl_tds_applicable', 'yes')
+			->where(function ($q) {
+				$q->where('cl.stl_tds_amount', '>', 0)
+					->orWhere('cl.stl_tds_rate', '>', 0);
+			});
+
+		if (!empty($financialYear)) {
+			[$startYear, $endYear] = explode('-', $financialYear);
+			$startDate = $startYear . '-04-01';
+			$endDate = $endYear . '-03-31';
+			$liabilityQuery->whereBetween(DB::raw('COALESCE(cl.stl_disbursement_date, cl.created_at)'), [$startDate, $endDate]);
+		}
+
+		if ($filterType == 'monthly' && !empty($period)) {
+			$month = Carbon::parse('1 ' . $period)->month;
+			$liabilityQuery->whereMonth(DB::raw('COALESCE(cl.stl_disbursement_date, cl.created_at)'), $month);
+		} elseif ($filterType == 'quarterly' && !empty($period)) {
+			switch ($period) {
+				case 'Q1':
+					$months = [4, 5, 6];
+					break;
+				case 'Q2':
+					$months = [7, 8, 9];
+					break;
+				case 'Q3':
+					$months = [10, 11, 12];
+					break;
+				case 'Q4':
+					$months = [1, 2, 3];
+					break;
+				default:
+					$months = [];
+			}
+
+			if (!empty($months)) {
+				$liabilityQuery->whereIn(DB::raw('MONTH(COALESCE(cl.stl_disbursement_date, cl.created_at))'), $months);
+			}
+		} elseif ($filterType == 'half-yearly' && !empty($period)) {
+			switch ($period) {
+				case 'H1':
+					$months = [4, 5, 6, 7, 8, 9];
+					break;
+				case 'H2':
+					$months = [10, 11, 12, 1, 2, 3];
+					break;
+				default:
+					$months = [];
+			}
+
+			if (!empty($months)) {
+				$liabilityQuery->whereIn(DB::raw('MONTH(COALESCE(cl.stl_disbursement_date, cl.created_at))'), $months);
+			}
+		}
+
+		$liabilityRows = $liabilityQuery->select(
+			'cl.id as liability_id',
+			'cl.stl_disbursement_date',
+			'cl.stl_interest_amount',
+			'cl.stl_amount_received',
+			'cl.stl_tds_amount',
+			'cl.stl_tds_section',
+			'cl.stl_reference',
+			'cl.stl_lender_name',
+			'cp.comp_name',
+			DB::raw('MONTH(COALESCE(cl.stl_disbursement_date, cl.created_at)) as month'),
+			DB::raw("CASE WHEN MONTH(COALESCE(cl.stl_disbursement_date, cl.created_at)) >= 4 THEN CONCAT(YEAR(COALESCE(cl.stl_disbursement_date, cl.created_at)), '-', YEAR(COALESCE(cl.stl_disbursement_date, cl.created_at)) + 1) ELSE CONCAT(YEAR(COALESCE(cl.stl_disbursement_date, cl.created_at)) - 1, '-', YEAR(COALESCE(cl.stl_disbursement_date, cl.created_at))) END as financial_year")
+		)
+		->orderBy(DB::raw('COALESCE(cl.stl_disbursement_date, cl.created_at)'))
+		->get();
+
+		$tds = collect();
+
+		foreach ($payslipSummary as $row) {
+			$row->comp_tan = $company ?? '—';
+			$row->month_name = $monthNames[$row->month] ?? $row->month;
+			$row->source_type = 'payslip';
+			$tds->push($row);
+		}
+
+		foreach ($expenseRows as $row) {
+			$row->comp_tan = $company ?? '—';
+			$row->month_name = $monthNames[$row->month] ?? $row->month;
+			$row->source_type = $this->getTdsSourceLabel('expense');
+			$row->employee_count = 1;
+			$row->total_tds_amount = (float) ($row->tds_amount ?? 0);
+			$row->total_gross_salary = (float) ($row->expense_amt ?? 0);
+			$row->display_name = $row->vendor_name ?: 'Expense Entry';
+			$row->display_subtitle = $row->tds_id ?: ('Expense #' . ($row->expense_id ?? 'N/A'));
+			$tds->push($row);
+		}
+
+		foreach ($liabilityRows as $row) {
+			$row->comp_tan = $company ?? '—';
+			$row->month_name = $monthNames[$row->month] ?? $row->month;
+			$row->source_type = $this->getTdsSourceLabel('liability');
+			$row->employee_count = 1;
+			$row->total_tds_amount = (float) ($row->stl_tds_amount ?? 0);
+			$row->total_gross_salary = (float) ($row->stl_interest_amount ?? $row->stl_amount_received ?? 0);
+			$row->display_name = $row->stl_lender_name ?: ($row->comp_name ?: 'Liability Entry');
+			$row->display_subtitle = $row->stl_reference ?: ('Liability #' . ($row->liability_id ?? 'N/A'));
+			$tds->push($row);
+		}
+
+		$tds = $tds->sortBy(function ($row) {
+			return (int) ($row->month ?? 0);
+		})->values();
+
+		return response()->json($tds);
 	}
 
 	public function download_tds_returns(Request $request)

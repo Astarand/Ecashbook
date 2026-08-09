@@ -97,43 +97,34 @@
     </div>
 
     <!-- [ Main Content ] start -->
-    <div class="row">
+    <div class=" row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
             <div class="card card-body table-card">
-                <div class="card-header bg-white border-bottom px-0 pb-3 mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-                    <div class="d-flex flex-wrap gap-2 align-items-center">
-                        <select id="tdsListFy" class="form-select form-select-sm" style="width: 180px;">
-                            @php
-                                $today = now();
-                                $fyStart = $today->month >= 4 ? $today->year : $today->year - 1;
-                            @endphp
-                            @for ($y = $fyStart - 1; $y <= $fyStart + 1; $y++)
-                                <option value="{{ $y }}-{{ $y + 1 }}" {{ $y === $fyStart ? 'selected' : '' }}>
-                                    FY {{ $y }}-{{ $y + 1 }}
-                                </option>
-                            @endfor
-                        </select>
-                        <select id="tdsListFilterType" class="form-select form-select-sm" style="width: 160px;">
-                            <option value="monthly">Monthly</option>
-                            <option value="quarterly">Quarterly</option>
-                            <option value="half-yearly">Half-Yearly</option>
-                            <option value="yearly" selected>Full Year</option>
-                        </select>
-                        <select id="tdsListFilterPeriod" class="form-select form-select-sm" style="width: 180px;"></select>
-                        <button type="button" class="btn btn-primary btn-sm px-3" onclick="loadTdsList()">
-                            <i class="ti ti-refresh me-1"></i> Load
-                        </button>
-                    </div>
-                </div>
                 <div class="table-responsive">
                     <table class="table tbl-product my-3" id="pc-dt-simple">
                         <thead>
+                            {{-- <tr style="background-color: #cbcbcb;">
+                                <th class="text-end">#</th>
+                                <th>Vendor/ Employee ID</th>
+                                <th>Name</th>
+                                <th>Pan</th>
+                                <th>Section</th>
+                                <th>Nature Of Payment</th>
+                                <th>Gross Amount</th>
+                                <th>TDS Rate (%)</th>
+                                <th>TDS Deduction</th>
+                                <th>Challan No</th>
+                                <th>Payment Date</th>
+                                <th>Return Quarter</th>
+                                <th>Remarks</th>
+                                <th>Action</th>
+                            </tr> --}}
                             <tr style="background-color: #cbcbcb;">
                                 <th class="text-end">#</th>
                                 <th>TAN</th>
                                 <th>PAN</th>
-                                <th>Employee Count / Month-Year</th>
+                                <th>Employee Name</th>
                                 <th>Salary Amount</th>
                                 <th>TDS Amount</th>
                                 <th>Nature of Payment</th>
@@ -146,12 +137,128 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="tdsListBody">
+                        <tbody>
                             <tr>
-                                <td colspan="14" class="text-center text-muted py-4">
-                                    Loading TDS records...
+                                <td colspan="14" class="text-center text-muted">
+                                    No TDS applicable records found
                                 </td>
                             </tr>
+                            {{-- @php $i = 1; @endphp
+
+                            @forelse($employees as $emp)
+                            <tr>
+                                <td class="text-end">{{ $i }}</td>
+
+                                <td>{{ $emp->employee_id ?? 'N/A' }}</td>
+
+                                <td>
+                                    <h6 class="mb-1">{{ $emp->name ?? 'N/A' }}</h6>
+                                    <small class="text-muted">{{ $emp->email ?? 'N/A' }}</small>
+                                </td>
+
+                                <td>{{ $emp->pan_number ?? 'N/A' }}</td>
+
+                                <td>{{ $emp->tds_slab_section ?? 'N/A' }}</td>
+
+                                <td>
+                                    {{ $emp->payment_type ?? 'N/A' }}
+                                </td>
+
+                                <td>₹ {{ number_format($emp->total_addition ?? 0, 2) }}</td>
+
+                                <td>
+                                    {{ isset($emp->tds_slab_rate) ? $emp->tds_slab_rate . '%' : 'N/A' }}
+                                </td>
+
+                                <td>
+                                    ₹ {{ number_format($emp->tds_amount ?? 0, 2) }}
+                                </td>
+
+                                <td>{{ $emp->payslip_no ?? 'N/A' }}</td>
+
+                                <td>
+                                    {{ $emp->payment_date
+                                        ? \Carbon\Carbon::parse($emp->payment_date)->format('d-m-Y')
+                                        : 'N/A' }}
+                                </td>
+
+                                <td>{{ $emp->quarter ?? 'N/A' }}</td>
+
+                                <td>Paid</td>
+
+                                <td>
+                                    <a href="javascript:void(0)"
+                                    class="avtar avtar-xs btn-link-secondary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#viewDetailsModal{{ $i }}">
+                                        <i class="ti ti-eye f-20"></i>
+                                    </a>
+                                </td>
+                            </tr>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="viewDetailsModal{{ $i }}" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">TDS Filing Details</h5>
+                                            <button class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+
+                                            <p>
+                                                <b>Invoice Date:</b>
+                                                {{ $emp->payment_date
+                                                    ? \Carbon\Carbon::parse($emp->payment_date)->format('d-m-Y')
+                                                    : 'NULL' }}
+                                            </p>
+
+                                            <p>
+                                                <b>Gross Amount:</b>
+                                                ₹ {{ number_format($emp->total_addition ?? 0, 2) }}
+                                            </p>
+
+                                            <p>
+                                                <b>Section:</b>
+                                                {{ $emp->tds_slab_section ?? 'NULL' }}
+                                            </p>
+
+                                            <p>
+                                                <b>TDS Rate:</b>
+                                                {{ $emp->tds_slab_rate ?? 0 }}%
+                                            </p>
+
+                                            <p>
+                                                <b>TDS Amount:</b>
+                                                ₹ {{ number_format($emp->tds_amount ?? 0, 2) }}
+                                            </p>
+
+                                            <p>
+                                                <b>CHALLAN NO/PAYSLIP NO:</b>
+                                                {{ $emp->payslip_no ?? 'NULL' }}
+                                            </p>
+
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @php $i++; @endphp
+
+                            @empty
+                            <tr>
+                                <td colspan="14" class="text-center text-muted">
+                                    No TDS applicable records found
+                                </td>
+                            </tr>
+                            @endforelse --}}
                         </tbody>
                     </table>
                 </div>
@@ -289,160 +396,44 @@
 			return new bootstrap.Tooltip(tooltipTriggerEl);
 		});
 
-        function renderTdsListPeriodOptions() {
-            const type = document.getElementById('tdsListFilterType').value;
-            const periodSelect = document.getElementById('tdsListFilterPeriod');
-            const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-            periodSelect.innerHTML = '';
-
-            if (type === 'monthly') {
-                months.forEach((month, index) => {
-                    const value = month;
-                    const option = new Option(month, value);
-                    periodSelect.appendChild(option);
-                });
-                periodSelect.disabled = false;
-            } else if (type === 'quarterly') {
-                ['Q1 (Apr - Jun)', 'Q2 (Jul - Sep)', 'Q3 (Oct - Dec)', 'Q4 (Jan - Mar)'].forEach((label, index) => {
-                    const option = new Option(label, ['Q1', 'Q2', 'Q3', 'Q4'][index]);
-                    periodSelect.appendChild(option);
-                });
-                periodSelect.disabled = false;
-            } else if (type === 'half-yearly') {
-                ['H1 (Apr - Sep)', 'H2 (Oct - Mar)'].forEach((label, index) => {
-                    const option = new Option(label, ['H1', 'H2'][index]);
-                    periodSelect.appendChild(option);
-                });
-                periodSelect.disabled = false;
-            } else {
-                periodSelect.disabled = true;
-            }
-        }
-
-        function toggleTdsFilterDropdowns() {
-            const value = document.querySelector('input[name="tdsPeriodType"]:checked')?.value || 'month';
-            const monthGroup = document.getElementById('filterTdsMonthGroup');
-            const quarterGroup = document.getElementById('filterTdsQuarterGroup');
-            const yearGroup = document.getElementById('filterTdsYearGroup');
-
-            monthGroup.classList.add('d-none');
-            quarterGroup.classList.add('d-none');
-            yearGroup.classList.add('d-none');
-
-            if (value === 'month') {
-                monthGroup.classList.remove('d-none');
-            } else if (value === 'quarter') {
-                quarterGroup.classList.remove('d-none');
-            } else if (value === 'year') {
-                yearGroup.classList.remove('d-none');
-            }
-        }
-
-        function loadTdsList() {
-            const fy = document.getElementById('tdsListFy').value;
-            const type = document.getElementById('tdsListFilterType').value;
-            const period = document.getElementById('tdsListFilterPeriod').value;
-            const body = document.getElementById('tdsListBody');
-
-            body.innerHTML = '<tr><td colspan="14" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Loading TDS records...</td></tr>';
-
-            $.get('{{ route("user.tds.list") }}', {
-                financial_year: fy,
-                filter_type: type,
-                period: type === 'yearly' ? '' : period
-            }).done(function(data) {
-                if (!data.length) {
-                    body.innerHTML = '<tr><td colspan="14" class="text-center text-muted py-4">No TDS applicable records found for the selected period.</td></tr>';
-                    return;
-                }
-
-                let html = '';
-                data.forEach((row, index) => {
-                    const gross = parseFloat(row.total_gross_salary || 0);
-                    const tdsAmount = parseFloat(row.total_tds_amount || 0);
-                    const tan = row.comp_tan || '—';
-                    const pan = '—';
-                    const employeeCount = parseInt(row.employee_count || 0);
-                    const monthLabel = row.month_name ? `${row.month_name} ${row.financial_year || ''}`.trim() : '';
-                    const sourceType = (row.source_type || 'Payroll').toString().toLowerCase();
-                    const sourceLabel = sourceType === 'expense' ? 'Expense' : (sourceType === 'liability' ? 'Liability' : 'Payroll');
-                    const detailTitle = sourceLabel === 'Expense'
-                        ? (row.display_name || 'Expense Entry')
-                        : (sourceLabel === 'Liability'
-                            ? (row.display_name || 'Liability Entry')
-                            : `${employeeCount} employee${employeeCount !== 1 ? 's' : ''}`);
-                    const detailSubtitle = sourceLabel === 'Expense' || sourceLabel === 'Liability'
-                        ? (row.display_subtitle || monthLabel)
-                        : monthLabel;
-                    const nature = sourceLabel === 'Expense'
-                        ? (row.tds_section || 'Expense TDS')
-                        : (sourceLabel === 'Liability' ? (row.tds_section || 'Liability TDS') : 'Section 192');
-                    const challanNo = 'N/A';
-                    const bsrCode = 'N/A';
-                    const depositDate = 'N/A';
-                    const tenderDate = 'N/A';
-                    const cin = 'N/A';
-                    const status = 'Pending';
-
-                    let statusBadge = '<span class="badge bg-light-warning text-warning">Pending</span>';
-                    if (tdsAmount > 0) {
-                        statusBadge = '<span class="badge bg-light-success text-success">Paid</span>';
-                    }
-
-                    html += `
-                        <tr>
-                            <td class="text-end">${index + 1}</td>
-                            <td>${tan}</td>
-                            <td>${pan}</td>
-                            <td>
-                                <div class="fw-semibold">${sourceLabel}</div>
-                                <div class="text-muted small">${detailTitle}</div>
-                                ${detailSubtitle ? `<div class="text-muted small">${detailSubtitle}</div>` : ''}
-                            </td>
-                            <td>₹${gross.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                            <td class="fw-bold text-danger">₹${tdsAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
-                            <td>${nature}</td>
-                            <td>${challanNo}</td>
-                            <td>${bsrCode}</td>
-                            <td>${depositDate}</td>
-                            <td>${tenderDate}</td>
-                            <td>${cin}</td>
-                            <td>${statusBadge}</td>
-                            <td>
-                                <a href="{{ route('payroll.payslip_update') }}#tds-section" class="btn btn-sm btn-outline-primary">
-                                    Update
-                                </a>
-                            </td>
-                        </tr>`;
-                });
-
-                body.innerHTML = html;
-            }).fail(function() {
-                body.innerHTML = '<tr><td colspan="14" class="text-center text-danger py-4">Failed to load TDS records.</td></tr>';
-            });
-        }
-
         document.addEventListener('DOMContentLoaded', function () {
+
+            const monthGroup   = document.getElementById('filterTdsMonthGroup');
+            const quarterGroup = document.getElementById('filterTdsQuarterGroup');
+            const yearGroup    = document.getElementById('filterTdsYearGroup');
 
             const radios = document.querySelectorAll('input[name="tdsPeriodType"]');
 
+            function toggleDropdowns() {
+                const value = document.querySelector('input[name="tdsPeriodType"]:checked')?.value || 'month';
+
+                monthGroup.classList.add('d-none');
+                quarterGroup.classList.add('d-none');
+                yearGroup.classList.add('d-none');
+
+                if (value === 'month') {
+                    monthGroup.classList.remove('d-none');
+                } 
+                else if (value === 'quarter') {
+                    quarterGroup.classList.remove('d-none');
+                } 
+                else if (value === 'year') {
+                    yearGroup.classList.remove('d-none');
+                }
+            }
+
             // Listen only to change (radio best practice)
             radios.forEach(radio => {
-                radio.addEventListener('change', toggleTdsFilterDropdowns);
+                radio.addEventListener('change', toggleDropdowns);
             });
 
-            document.getElementById('tdsListFilterType').addEventListener('change', renderTdsListPeriodOptions);
-
             // Initial load
-            toggleTdsFilterDropdowns();
-            renderTdsListPeriodOptions();
-            loadTdsList();
+            toggleDropdowns();
         });
 
         document.getElementById('tdsFilterReset').addEventListener('click', function () {
             document.getElementById('tdsPeriodMonth').checked = true;
-            setTimeout(toggleTdsFilterDropdowns, 0);
+            setTimeout(toggleDropdowns, 0);
         });
 
     </script>

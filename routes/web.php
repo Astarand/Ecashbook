@@ -926,6 +926,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/stats', [BusinessEarningController::class, 'getStats'])->name('get.stats');
 	Route::get('/subscriber-stats/{range}', [BusinessEarningController::class, 'getSubscriberStats']);
 	Route::get('/tds-returns-download', [TdsPfEsiController::class, 'download_tds_returns'])->name('user.tds_returns_download');
+	Route::get('/tds-returns-list', [TdsPfEsiController::class, 'getTdsList'])->name('user.tds.list');
 	Route::post('/download-pf-filing', [TdsPfEsiController::class, 'download_pf_filing'])->name('download.pf.filing');
 	// Route::get('/esi-management-list', [TdsPfEsiController::class, 'esi_management_list'])->name('user.esi_management_list');
     Route::post('/download-esi-filing', [TdsPfEsiController::class, 'download_esi_filing'])->name('download.esi.filing');

@@ -239,6 +239,20 @@
                                 </div>
 
                                 <div class="col-md-3">
+                                    <label class="form-label">Payment From Month</label>
+                                    <input type="month"
+                                        id="tds_payment_from_month_input"
+                                        class="form-control">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Payment To Month</label>
+                                    <input type="month"
+                                        id="tds_payment_to_month_input"
+                                        class="form-control">
+                                </div>
+
+                                <div class="col-md-3">
                                     <label class="form-label">Nature of Payment</label>
                                     <input type="text" id="tds_nature_payment_input" class="form-control" placeholder="e.g. 92B">
                                 </div>
@@ -293,17 +307,7 @@
                         <div class="table-responsive">
                             <table class="table table-bordered align-middle mb-0">
                                 <thead class="table-light">
-                                    {{-- <tr>
-                                        <th><input type="checkbox" id="select-all-tds"></th>
-                                        <th>Employee ID</th>
-                                        <th>Name</th>
-                                        <th>Financial Year</th>
-                                        <th>Filter Type</th>
-                                        <th>Period</th>
-                                        <th>UTR</th>
-                                        <th>Update Date</th>
-                                        <th>BSR Code</th>
-                                    </tr> --}}
+                                    
                                     <tr>
                                         <th><input type="checkbox" id="select-all-tds"></th>
                                         <th>Nature of Payment</th>
@@ -1639,6 +1643,8 @@
 
                 tds_tan: $('#tds_tan_input').val(),
                 tds_financial_year: $('#tds_financial_year').val(),
+                tds_payment_from_month: $('#tds_payment_from_month_input').val(),
+                tds_payment_to_month: $('#tds_payment_to_month_input').val(),
                 tds_nature_of_payment: $('#tds_nature_payment_input').val(),
                 tds_amount: $('#tds_amount_input').val(),
                 tds_cin: $('#tds_cin_input').val(),
