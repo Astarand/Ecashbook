@@ -1,37 +1,124 @@
-//-------- MethotX Interactive Tour Guide --------//
-$(document).ready(function() {
-  function markTourCompleted() {
-    if (typeof TOUR_COMPLETE_ROUTE !== 'undefined' && typeof CSRF_TOKEN !== 'undefined') {
+//-------- MethotX Interactive Tour Manager --------//
+
+window.MethotXTour = {
+  // Get Current Authenticated User ID
+  getUserId: function() {
+    if (typeof window.CURRENT_USER_ID !== 'undefined' && window.CURRENT_USER_ID) {
+      return window.CURRENT_USER_ID;
+    }
+    return 'default';
+  },
+
+  // Check if tour was already completed (by checking DB status or localStorage)
+  isCompletedOnDevice: function(pageKey) {
+    // 1. If database already marks this user as completed, never auto-show
+    if (typeof window.USER_TOUR_COMPLETED !== 'undefined' && window.USER_TOUR_COMPLETED === true) {
+      return true;
+    }
+
+    // 2. Check device/browser localStorage
+    var uid = this.getUserId();
+    var deviceKey = 'methotx_tour_' + pageKey + '_u' + uid;
+    
+    return localStorage.getItem(deviceKey) === 'completed' ||
+           localStorage.getItem('methotx_dashboard_tour') === 'completed' ||
+           localStorage.getItem('methotx_' + pageKey + '_tour') === 'completed' ||
+           localStorage.getItem('ecashbook_dashboard_tour') === 'completed';
+  },
+
+  // Mark tour as completed in both localStorage and database
+  markCompletedOnDevice: function(pageKey) {
+    var uid = this.getUserId();
+    var deviceKey = 'methotx_tour_' + pageKey + '_u' + uid;
+    localStorage.setItem(deviceKey, 'completed');
+    localStorage.setItem('methotx_dashboard_tour', 'completed');
+    window.USER_TOUR_COMPLETED = true;
+
+    // Persist to database so this user never sees auto-tour again across logins
+    if (typeof window.TOUR_COMPLETE_ROUTE !== 'undefined' && typeof window.CSRF_TOKEN !== 'undefined') {
       $.ajax({
-        url: TOUR_COMPLETE_ROUTE,
+        url: window.TOUR_COMPLETE_ROUTE,
         type: 'POST',
-        data: {
-          _token: CSRF_TOKEN
-        },
-        success: function(response) {
-          console.log('Tour status saved to database.');
-        },
-        error: function(xhr) {
-          console.error('Failed to save tour status to database.');
-        }
+        data: { _token: window.CSRF_TOKEN },
+        success: function() {},
+        error: function() {}
       });
     }
-    localStorage.setItem('methotx_dashboard_tour', 'completed');
-  }
+  },
 
-  function startIntroTour() {
-    // Only run tour if introJs function is defined
+  // Auto run tour once ONLY for newly registered users who haven't completed it
+  autoLaunch: function(pageKey, startFunction, delayMs) {
+    // If already completed in DB or localStorage, do NOT auto popup
+    if (this.isCompletedOnDevice(pageKey)) {
+      return;
+    }
+
+    var self = this;
+    var waitTime = typeof delayMs === 'number' ? delayMs : 2000;
+
+    $(document).ready(function() {
+      // Defer if subscription or expired modal exists
+      var subModal = $('#subscriptionModal');
+      var expModal = $('#expiredModal');
+      var todayStr = new Date().toDateString();
+
+      var willShowSub = subModal.length && (typeof SUBSCRIPTION_ACCESS_TYPE !== 'undefined' && SUBSCRIPTION_ACCESS_TYPE === 'trial' && typeof SUBSCRIPTION_TRIAL_DAYS !== 'undefined' && SUBSCRIPTION_TRIAL_DAYS > 0 && localStorage.getItem('subscription_popup_last') !== todayStr);
+      var willShowExp = expModal.length && (typeof SUBSCRIPTION_ACCESS_TYPE !== 'undefined' && SUBSCRIPTION_ACCESS_TYPE === 'expired' && localStorage.getItem('subscription_popup_last') !== todayStr);
+
+      if (willShowSub) {
+        subModal.one('hidden.bs.modal', function () {
+          setTimeout(function() {
+            if (!self.isCompletedOnDevice(pageKey)) {
+              self.markCompletedOnDevice(pageKey);
+              startFunction();
+            }
+          }, 600);
+        });
+      } else if (willShowExp) {
+        expModal.one('hidden.bs.modal', function () {
+          setTimeout(function() {
+            if (!self.isCompletedOnDevice(pageKey)) {
+              self.markCompletedOnDevice(pageKey);
+              startFunction();
+            }
+          }, 600);
+        });
+      } else {
+        setTimeout(function() {
+          // If another modal is currently active, wait until it closes
+          if ($('.modal.show').length > 0) {
+            $('.modal.show').one('hidden.bs.modal', function() {
+              setTimeout(function() {
+                if (!self.isCompletedOnDevice(pageKey)) {
+                  self.markCompletedOnDevice(pageKey);
+                  startFunction();
+                }
+              }, 600);
+            });
+          } else {
+            if (!self.isCompletedOnDevice(pageKey)) {
+              self.markCompletedOnDevice(pageKey);
+              startFunction();
+            }
+          }
+        }, waitTime);
+      }
+    });
+  }
+};
+
+// Dashboard Tour Logic
+$(document).ready(function() {
+  function startDashboardTour() {
     if (typeof introJs !== 'function') return;
-    
-    // Defer tour if any modal is currently visible on screen
+
     if ($('.modal.show').length > 0) {
       $('.modal.show').one('hidden.bs.modal', function() {
-        setTimeout(startIntroTour, 500);
+        setTimeout(startDashboardTour, 500);
       });
       return;
     }
-    
-    // Only run tour if elements exist on page (specifically for dashboard page tour)
+
     if (!document.getElementById('start-tour-btn') && !document.querySelector('.tour-search')) return;
 
     introJs().setOptions({
@@ -125,43 +212,23 @@ $(document).ready(function() {
       prevLabel: 'Back',
       skipLabel: 'Skip'
     }).start().oncomplete(function() {
-      markTourCompleted();
+      MethotXTour.markCompletedOnDevice('dashboard');
     }).onexit(function() {
-      markTourCompleted();
+      MethotXTour.markCompletedOnDevice('dashboard');
     });
   }
 
-  // Auto start tour on first visit (checks database, localstorage, and session states)
-  const isCompletedDb = typeof USER_TOUR_COMPLETED !== 'undefined' && USER_TOUR_COMPLETED;
-  const isCompletedLs = localStorage.getItem('methotx_dashboard_tour') === 'completed' || localStorage.getItem('ecashbook_dashboard_tour') === 'completed';
-  const isSeenSession = sessionStorage.getItem('methotx_dashboard_tour_seen') === 'true';
+  // Expose globally
+  window.startDashboardTour = startDashboardTour;
 
-  if (!isCompletedDb && !isCompletedLs && !isSeenSession) {
-    sessionStorage.setItem('methotx_dashboard_tour_seen', 'true');
-    
-    const subModal = $('#subscriptionModal');
-    const expModal = $('#expiredModal');
-    const todayStr = new Date().toDateString();
-    
-    const willShowSub = subModal.length && (typeof SUBSCRIPTION_ACCESS_TYPE !== 'undefined' && SUBSCRIPTION_ACCESS_TYPE === 'trial' && typeof SUBSCRIPTION_TRIAL_DAYS !== 'undefined' && SUBSCRIPTION_TRIAL_DAYS > 0 && localStorage.getItem('subscription_popup_last') !== todayStr);
-    const willShowExp = expModal.length && (typeof SUBSCRIPTION_ACCESS_TYPE !== 'undefined' && SUBSCRIPTION_ACCESS_TYPE === 'expired' && localStorage.getItem('subscription_popup_last') !== todayStr);
-
-    if (willShowSub) {
-      subModal.on('hidden.bs.modal', function () {
-        setTimeout(startIntroTour, 500);
-      });
-    } else if (willShowExp) {
-      expModal.on('hidden.bs.modal', function () {
-        setTimeout(startIntroTour, 500);
-      });
-    } else {
-      setTimeout(startIntroTour, 2000);
-    }
+  // Auto-launch only if new user & not completed
+  if (document.getElementById('start-tour-btn') || document.querySelector('.tour-search')) {
+    MethotXTour.autoLaunch('dashboard', startDashboardTour, 2000);
   }
 
-  // Button click trigger
-  $('#start-tour-btn').on('click', function(e) {
+  // Manual Button click ALWAYS launches tour anytime
+  $(document).on('click', '#start-tour-btn', function(e) {
     e.preventDefault();
-    startIntroTour();
+    startDashboardTour();
   });
 });

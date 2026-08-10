@@ -6695,6 +6695,16 @@
                 }
             });
 
+            tour.oncomplete(function() {
+                if (window.MethotXTour) {
+                    MethotXTour.markCompletedOnDevice('company_profile');
+                }
+            }).onexit(function() {
+                if (window.MethotXTour) {
+                    MethotXTour.markCompletedOnDevice('company_profile');
+                }
+            });
+
             tour.start();
         }
 
@@ -6721,12 +6731,18 @@
     }
 
     function bindProfileTour() {
+        // Condition 2: Button click trigger
         const btn = document.getElementById('start-profile-tour');
         if (btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 startProfileTour();
             });
+        }
+
+        // Condition 1 & 3: Auto-launch if new user or new device
+        if (window.MethotXTour) {
+            MethotXTour.autoLaunch('company_profile', startProfileTour, 2500);
         }
     }
 

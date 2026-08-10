@@ -21,10 +21,10 @@
         overflow: hidden;
     }
     .dashboard-card:hover {
-        box-shadow: 0 8px 24px rgba(110, 74, 252, 0.06);
+        box-shadow: 0 8px 24px rgba(10, 134, 198, 0.08);
     }
     .card-header-gradient {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%);
         color: #ffffff;
         padding: 14px 20px;
         border-bottom: none;
@@ -47,12 +47,12 @@
     }
     /* Profile Banner */
     .profile-banner {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%);
         border-radius: 16px;
         color: #ffffff;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.15);
+        box-shadow: 0 6px 20px rgba(10, 134, 198, 0.2);
     }
     .profile-banner::after {
         content: '';
@@ -93,7 +93,7 @@
     }
     .header-toggle-btn.active {
         background: #ffffff;
-        color: #764ba2;
+        color: #008CAD;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     /* Header Dropdowns */
@@ -114,7 +114,7 @@
     }
     .header-select:focus {
         background: #ffffff;
-        color: #764ba2;
+        color: #008CAD;
     }
     /* Stat Blocks */
     .stat-box-container {
@@ -236,7 +236,7 @@
     .bar-fill {
         height: 100%;
         border-radius: 30px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(90deg, #0A86C6 0%, #008CAD 100%);
     }
     /* Tasks Table */
     .tasks-table th {
@@ -281,7 +281,7 @@
         height: 14px;
         border-radius: 50%;
         background: #ffffff;
-        border: 3.5px solid #667eea;
+        border: 3.5px solid #0A86C6;
         top: 3px;
         z-index: 2;
     }
@@ -613,8 +613,8 @@
                                 <svg width="90" height="90" viewBox="0 0 90 90">
                                     <defs>
                                         <linearGradient id="gradientPerformance" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stop-color="#667eea" />
-                                            <stop offset="100%" stop-color="#764ba2" />
+                                            <stop offset="0%" stop-color="#0A86C6" />
+                                            <stop offset="100%" stop-color="#008CAD" />
                                         </linearGradient>
                                     </defs>
 
@@ -744,7 +744,7 @@
 
                         <!-- Review Comment -->
                         <div class="border rounded p-3 bg-light position-relative"
-                            style="border-left:4px solid #764ba2 !important;">
+                            style="border-left:4px solid #008CAD !important;">
 
                             <span
                                 class="position-absolute end-0 top-0 p-2 text-muted-50"
@@ -782,7 +782,7 @@
 
                             <!-- Today's Meetings -->
                             <div class="timeline-item">
-                                <div class="timeline-dot" style="border-color: #667eea;"></div>
+                                <div class="timeline-dot" style="border-color: #0A86C6;"></div>
                                 <div class="timeline-content-card">
                                     <div class="timeline-icon-box bg-primary-light text-primary">
                                         <i class="ph-bold ph-users-three"></i>
@@ -850,7 +850,7 @@
 <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg rounded-3">
-      <div class="modal-header bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+      <div class="modal-header bg-gradient text-white" style="background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%);">
         <h5 class="modal-title fw-bold" id="editTaskModalLabel">
           <i class="ti ti-edit-circle me-2"></i> Update Task Status
         </h5>
