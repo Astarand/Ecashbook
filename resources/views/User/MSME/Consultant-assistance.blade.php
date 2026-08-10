@@ -3,7 +3,7 @@
 @section('container')
 <div class="pc-content">
     {{-- PAGE HEADER --}}
-    <div class="page-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <div class="page-header" style="background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
@@ -151,9 +151,9 @@
     transition: all 0.2s ease;
 }
 .form-field-group:focus-within {
-    border-color: #667eea;
+    border-color: #008CAD;
     background-color: #ffffff !important;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15);
 }
 .uppercase-label {
     font-size: 0.7rem;

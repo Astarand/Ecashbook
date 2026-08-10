@@ -6,7 +6,7 @@
 
     {{-- PAGE TITLE --}}
     <div class="page-header" 
-		 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+		 style="background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%); 
 				border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
 		<div class="page-block">
 			<div class="row align-items-center">
@@ -610,10 +610,10 @@
 									
                                 </div>
 
-                                <div class="alert alert-info border-0 mt-3 mb-0" style="background-color: #e3f2fd; border-radius: 6px;">
+                                <div class="alert border-0 mt-3 p-3" style="background: rgba(10, 134, 198, 0.08); border-left: 4px solid #008CAD !important; border-radius: 10px;">
                                     <div class="d-flex align-items-start">
-                                        <i class="ph-duotone ph-info text-info fs-5 me-2 mt-1"></i>
-                                        <p class="mb-0 small text-dark">
+                                        <i class="ph-duotone ph-info fs-5 me-2 mt-0.5" style="color: #008CAD;"></i>
+                                        <p class="mb-0 small text-dark" style="line-height: 1.6;">
                                             <strong>Note:</strong> If upload option is available in Company Profile, then we have one
                                             attachment option here as a single PDF of remaining documents (with auto compress logic).
                                         </p>
@@ -623,19 +623,31 @@
                             </div>
 
                             {{-- STEP 1 SUBMIT BUTTON --}}
-                            <div class="mt-4 text-center">
+                            <div class="mt-4 mb-4 text-center">
                                 <button type="submit" 
-                                        class="btn btn-lg px-5 py-3 mb-5 fw-bold shadow" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px;">
-                                    <i class="ph-duotone ph-arrow-right me-2"></i>
+                                        class="btn btn-lg px-5 py-3 fw-bold shadow-sm" style="background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%); color: white; border: none; border-radius: 10px; font-size: 1rem; letter-spacing: 0.3px;">
+                                    <i class="ph-duotone ph-arrow-right me-2 fs-5"></i>
                                     Submit Company Details &amp; Continue
                                 </button>
                             </div>
-							<div class="mt-4 alert border-0 shadow-sm mb-0" style="background: linear-gradient(135deg, #ff7675 0%, #d63031 100%); color: white; border-radius: 8px;">
-                                <strong>Note :</strong> Same information (filled &amp; non-filled) will be shown in the
-                                admin section. Based on this, our CA / Accountant / Compliance Officer will provide the
-                                Final Review &amp; Recommendations as per the Company Health Check-up Summary, with name
-                                and designation.
+
+                            {{-- RED HIGHLIGHT NOTE SECTION WITH LEFT & RIGHT MARGINS AND SPACIOUS PADDING --}}
+                            <div class="alert border-0 shadow-sm text-white mx-1 mx-md-3 mb-4 mt-2" 
+                                 style="background: linear-gradient(135deg, #ff7675 0%, #d63031 100%); border-radius: 12px; padding: 1.25rem 1.5rem; box-shadow: 0 6px 20px rgba(214, 48, 49, 0.2) !important;">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" 
+                                         style="width: 38px; height: 38px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px);">
+                                        <i class="ph-duotone ph-info fs-4 text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-1 text-white" style="font-size: 0.98rem; letter-spacing: 0.2px;">Important Note:</h6>
+                                        <p class="mb-0 small" style="line-height: 1.6; font-size: 0.88rem; color: rgba(255, 255, 255, 0.95);">
+                                            Same information (filled &amp; non-filled) will be shown in the admin section. Based on this, our CA / Accountant / Compliance Officer will provide the Final Review &amp; Recommendations as per the Company Health Check-up Summary, with name and designation.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
+                            <div class="pb-3"></div>
 						</form>
                         </div> {{-- /step1Section --}}
 						
@@ -920,7 +932,7 @@
 <div class="modal fade" id="healthInfoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-gradient text-white py-3 border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="modal-header bg-gradient text-white py-3 border-0" style="background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%);">
                 <div class="d-flex align-items-center">
                     <i class="ph-duotone ph-warning-circle fs-2 me-3"></i>
                     <h5 class="modal-title fw-bold mb-0">Company Health Check-up – Important Information</h5>
@@ -983,7 +995,7 @@
                 </div>
             </div>
             <div class="modal-footer border-0 bg-light py-3">
-                <button type="button" class="btn btn-primary px-4 fw-semibold" data-bs-dismiss="modal" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                <button type="button" class="btn btn-primary px-4 fw-semibold" data-bs-dismiss="modal" style="background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%); border: none;">
                     <i class="ph-duotone ph-check me-1"></i> I Understand, Let's Proceed
                 </button>
             </div>

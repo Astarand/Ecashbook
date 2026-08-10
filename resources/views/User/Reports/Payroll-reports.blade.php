@@ -81,7 +81,7 @@
 </style>
 <div class="pc-content">
     {{-- PAGE HEADER --}}
-    <div class="page-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <div class="page-header" style="background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
@@ -236,7 +236,7 @@
                     <div>
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="text-secondary small fw-bold uppercase-label">TDS Liability</span>
-                            <i class="ph-duotone ph-receipt text-indigo fs-3" style="color: #6610f2 !important;"></i>
+                            <i class="ph-duotone ph-receipt fs-3" style="color: #008CAD !important;"></i>
                         </div>
                         <h3 class="fw-bold mb-1 text-dark" id="tdsLiability">₹0</h3>
                         <p class="text-muted small mb-0">Due date : 7th of the next month</p>
@@ -256,7 +256,7 @@
                     <div>
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="text-secondary small fw-bold uppercase-label">LWF Liability</span>
-                            <i class="ph-duotone ph-receipt text-indigo fs-3" style="color: #6610f2 !important;"></i>
+                            <i class="ph-duotone ph-receipt fs-3" style="color: #008CAD !important;"></i>
                         </div>
                         <h3 class="fw-bold mb-1 text-dark" id="lwfLiability">₹0</h3>
                         <p class="text-muted small mb-0">Due date : 7th of the next month</p>
@@ -442,9 +442,9 @@
                                         </button>
                                         <button onclick="selectSummary('tds_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center justify-content-between fw-semibold">
                                             <span class="d-flex align-items-center gap-2">
-                                                <i class="ph-duotone ph-receipt fs-4 text-indigo"></i> TDS Compliance Summary
+                                                <i class="ph-duotone ph-receipt fs-4" style="color: #008CAD;"></i> TDS Compliance Summary
                                             </span>
-                                            <span class="rounded-circle bg-indigo" style="width: 8px; height: 8px; background-color: #6610f2 !important;"></span>
+                                            <span class="rounded-circle" style="width: 8px; height: 8px; background-color: #008CAD !important;"></span>
                                         </button>
                                         <button onclick="selectSummary('lwf_summary')" class="list-group-item list-group-item-action py-3 d-flex align-items-center justify-content-between fw-semibold">
                                             <span class="d-flex align-items-center gap-2">
@@ -940,7 +940,7 @@
             transition: all 0.3s ease;
         }
         .bg-gradient-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%) !important;
         }
 
         /* Tab design overrides */
@@ -955,8 +955,8 @@
             border-color: transparent;
         }
         .nav-tabs .nav-link.active {
-            color: #667eea !important;
-            border-bottom-color: #667eea !important;
+            color: #008CAD !important;
+            border-bottom-color: #008CAD !important;
             background-color: transparent !important;
         }
 
@@ -1003,8 +1003,8 @@
         #attendanceTable + .datatable-bottom .datatable-pagination .datatable-active button,
         #attendanceTable + .datatable-bottom .datatable-pagination .active a,
         #attendanceTable + .datatable-bottom .datatable-pagination .active button {
-            background-color: #422f90 !important;
-            border-color: #422f90 !important;
+            background-color: #008CAD !important;
+            border-color: #008CAD !important;
             color: white !important;
         }
         #registerTable + .datatable-bottom, #attendanceTable + .datatable-bottom {
@@ -1051,11 +1051,11 @@
             transform: translateX(4px);
         }
         #summarySelectorList .list-group-item.active {
-            background-color: #f2f0fa !important;
-            border-color: #422f90 !important;
-            color: #422f90 !important;
+            background-color: #f0f9fb !important;
+            border-color: #008CAD !important;
+            color: #008CAD !important;
             font-weight: 700 !important;
-            box-shadow: 0 4px 12px rgba(66, 47, 144, 0.08) !important;
+            box-shadow: 0 4px 12px rgba(0, 140, 173, 0.08) !important;
         }
         #summarySelectorList .list-group-item.active::before {
             content: '';
@@ -1064,7 +1064,7 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background-color: #422f90;
+            background-color: #008CAD;
         }
 
         /* Print Report Container Styles */
