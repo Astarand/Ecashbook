@@ -140,7 +140,7 @@
                             </h2>
                             <div id="collapsePay" class="accordion-collapse collapse" aria-labelledby="headingPay" data-bs-parent="#helpCenterAccordion">
                                 <div class="accordion-body bg-white text-muted f-14">
-                                    All payments processed on E-Cashbook are updated instantly. Invoices are generated automatically and sent to your registered email, or can be downloaded under the **Payments / Billing** history tab.
+                                    All payments processed on {{ config('app.name') }} are updated instantly. Invoices are generated automatically and sent to your registered email, or can be downloaded under the **Payments / Billing** history tab.
                                 </div>
                             </div>
                         </div>

@@ -1102,6 +1102,77 @@ class PayrollReportController extends Controller
     }
 
     //------- Update TDS -------//
+    // public function updateTds(Request $request)
+    // {
+    //     $ownerId = currentOwnerId();
+
+    //     $ids = (array) $request->input('ids', []);
+
+    //     if (empty($ids)) {
+    //         return response()->json(['message' => 'No TDS IDs provided.'], 422);
+    //     }
+
+    //     $update = [];
+
+    //     if ($request->filled('tds_tan'))                { $update['tds_tan']                = $request->tds_tan; }
+    //     if ($request->filled('tds_financial_year'))     { $update['tds_financial_year']     = $request->tds_financial_year; }
+    //     if ($request->filled('tds_payment_from_month')) { $update['tds_payment_from_month'] = $request->tds_payment_from_month; }
+    //     if ($request->filled('tds_payment_to_month'))   { $update['tds_payment_to_month']   = $request->tds_payment_to_month; }
+    //     if ($request->filled('tds_nature_of_payment'))  { $update['tds_nature_of_payment']  = $request->tds_nature_of_payment; }
+    //     if ($request->filled('tds_amount'))             { $update['tds_amount']             = $request->tds_amount; }
+    //     if ($request->filled('tds_cin'))                { $update['tds_cin']                = $request->tds_cin; }
+    //     if ($request->filled('tds_challan_no'))         { $update['tds_challan_no']         = $request->tds_challan_no; }
+    //     if ($request->filled('tds_bsr_code'))           { $update['tds_bsr_code']           = $request->tds_bsr_code; }
+    //     if ($request->filled('tds_deposit_date'))       { $update['tds_deposit_date']       = $request->tds_deposit_date; }
+    //     if ($request->filled('tds_tender_date'))        { $update['tds_tender_date']        = $request->tds_tender_date; }
+
+    //     $update['tds_deposit_status'] = 'Done';
+
+    //     try {
+    //         $affected = DB::table('user_payslip')
+    //             ->whereIn('id', $ids)
+    //             ->where('added_by', $ownerId)
+    //             ->update($update);
+
+    //         // Single Receipt Voucher for TDS deposited amount
+    //         $tdsAmount = (float) $request->input('tds_amount', 0);
+    //         if ($tdsAmount > 0) {
+    //             $firstPayslip = DB::table('user_payslip as up')
+    //                 ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+    //                 ->where('up.id', $ids[0])
+    //                 ->where('up.added_by', $ownerId)
+    //                 ->select('up.id', 'up.payslip_no', 'up.date', 'e.propId')
+    //                 ->first();
+
+    //             $this->paymentVoucherService->storePaymentVoucherEntries(
+    //                 $firstPayslip->id ?? $ids[0],
+    //                 'Payroll',
+    //                 $tdsAmount,
+    //                 [
+    //                     'propId'        => $firstPayslip->propId ?? null,
+    //                     'date'          => $request->tds_deposit_date ?: ($firstPayslip->date ?? now()->toDateString()),
+    //                     'reference_no'  => $request->tds_challan_no ?: ($firstPayslip->payslip_no ?? null),
+    //                     'party_name'    => 'TDS Deposit (' . count($ids) . ' records)',
+    //                     'payroll_month' => '',
+    //                     'added_by'      => $ownerId,
+    //                     'net_salary'    => 0,
+    //                     'pf'            => 0,
+    //                     'esi'           => 0,
+    //                     'tds'           => $tdsAmount,
+    //                     'lwf'           => 0,
+    //                     'ptax'          => 0,
+    //                     'loan'          => 0,
+    //                 ]
+    //             );
+    //         }
+
+    //         return response()->json(['message' => "Updated {$affected} record(s)", 'updated' => $affected]);
+
+    //     } catch (\Exception $e) {
+    //         return response()->json(['message' => 'TDS update failed: ' . $e->getMessage()], 500);
+    //     }
+    // }
+
     public function updateTds(Request $request)
     {
         $ownerId = currentOwnerId();
@@ -1109,37 +1180,148 @@ class PayrollReportController extends Controller
         $ids = (array) $request->input('ids', []);
 
         if (empty($ids)) {
-            return response()->json(['message' => 'No TDS IDs provided.'], 422);
+            return response()->json([
+                'message' => 'No TDS IDs provided.'
+            ], 422);
         }
 
-        $update = [];
-
-        if ($request->filled('tds_tan'))                { $update['tds_tan']                = $request->tds_tan; }
-        if ($request->filled('tds_financial_year'))     { $update['tds_financial_year']     = $request->tds_financial_year; }
-        if ($request->filled('tds_nature_of_payment'))  { $update['tds_nature_of_payment']  = $request->tds_nature_of_payment; }
-        if ($request->filled('tds_amount'))             { $update['tds_amount']             = $request->tds_amount; }
-        if ($request->filled('tds_cin'))                { $update['tds_cin']                = $request->tds_cin; }
-        if ($request->filled('tds_challan_no'))         { $update['tds_challan_no']         = $request->tds_challan_no; }
-        if ($request->filled('tds_bsr_code'))           { $update['tds_bsr_code']           = $request->tds_bsr_code; }
-        if ($request->filled('tds_deposit_date'))       { $update['tds_deposit_date']       = $request->tds_deposit_date; }
-        if ($request->filled('tds_tender_date'))        { $update['tds_tender_date']        = $request->tds_tender_date; }
-
-        $update['tds_deposit_status'] = 'Done';
-
         try {
+
+            DB::beginTransaction();
+
+            /*
+            |--------------------------------------------------------------------------
+            | TDS Deposit Amount
+            |--------------------------------------------------------------------------
+            */
+            $tdsAmount = (float) $request->input('tds_amount', 0);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Save TDS Deposit Record
+            |--------------------------------------------------------------------------
+            */
+            $tdsDepositId = DB::table('tds_deposit_records')->insertGetId([
+                'added_by'               => $ownerId,
+
+                'tds_tan'                => $request->input('tds_tan'),
+
+                'tds_financial_year'     => $request->input('tds_financial_year'),
+
+                'tds_payment_from_month' => $request->input('tds_payment_from_month'),
+
+                'tds_payment_to_month'   => $request->input('tds_payment_to_month'),
+
+                'tds_nature_of_payment'  => $request->input('tds_nature_of_payment'),
+
+                'tds_amount'             => $tdsAmount,
+
+                'tds_cin'                => $request->input('tds_cin'),
+
+                'tds_utr'                => $request->input('tds_utr'),
+
+                'tds_deposit_date'       => $request->input('tds_deposit_date'),
+
+                'tds_bsr_code'           => $request->input('tds_bsr_code'),
+
+                'tds_challan_no'         => $request->input('tds_challan_no'),
+
+                'tds_tender_date'        => $request->input('tds_tender_date'),
+
+                'created_at'             => now(),
+                'updated_at'             => now(),
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update Selected Payslips
+            |--------------------------------------------------------------------------
+            */
+            $update = [];
+
+            if ($request->filled('tds_tan')) {
+                $update['tds_tan'] = $request->tds_tan;
+            }
+
+            if ($request->filled('tds_financial_year')) {
+                $update['tds_financial_year'] = $request->tds_financial_year;
+            }
+
+            if ($request->filled('tds_payment_from_month')) {
+                $update['tds_payment_from_month'] =
+                    $request->tds_payment_from_month;
+            }
+
+            if ($request->filled('tds_payment_to_month')) {
+                $update['tds_payment_to_month'] =
+                    $request->tds_payment_to_month;
+            }
+
+            if ($request->filled('tds_nature_of_payment')) {
+                $update['tds_nature_of_payment'] =
+                    $request->tds_nature_of_payment;
+            }
+
+            if ($request->filled('tds_amount')) {
+                $update['tds_amount'] =
+                    $request->tds_amount;
+            }
+
+            if ($request->filled('tds_cin')) {
+                $update['tds_cin'] =
+                    $request->tds_cin;
+            }
+
+            if ($request->filled('tds_challan_no')) {
+                $update['tds_challan_no'] =
+                    $request->tds_challan_no;
+            }
+
+            if ($request->filled('tds_bsr_code')) {
+                $update['tds_bsr_code'] =
+                    $request->tds_bsr_code;
+            }
+
+            if ($request->filled('tds_deposit_date')) {
+                $update['tds_deposit_date'] =
+                    $request->tds_deposit_date;
+            }
+
+            if ($request->filled('tds_tender_date')) {
+                $update['tds_tender_date'] =
+                    $request->tds_tender_date;
+            }
+
+            // TDS deposited
+            $update['tds_deposit_status'] = 'Done';
+
             $affected = DB::table('user_payslip')
                 ->whereIn('id', $ids)
                 ->where('added_by', $ownerId)
                 ->update($update);
 
-            // Single Receipt Voucher for TDS deposited amount
-            $tdsAmount = (float) $request->input('tds_amount', 0);
+            /*
+            |--------------------------------------------------------------------------
+            | Single Receipt Voucher for TDS Deposited Amount
+            |--------------------------------------------------------------------------
+            */
             if ($tdsAmount > 0) {
+
                 $firstPayslip = DB::table('user_payslip as up')
-                    ->leftJoin('employees as e', 'e.empId', '=', 'up.user_emp_id')
+                    ->leftJoin(
+                        'employees as e',
+                        'e.empId',
+                        '=',
+                        'up.user_emp_id'
+                    )
                     ->where('up.id', $ids[0])
                     ->where('up.added_by', $ownerId)
-                    ->select('up.id', 'up.payslip_no', 'up.date', 'e.propId')
+                    ->select(
+                        'up.id',
+                        'up.payslip_no',
+                        'up.date',
+                        'e.propId'
+                    )
                     ->first();
 
                 $this->paymentVoucherService->storePaymentVoucherEntries(
@@ -1147,29 +1329,60 @@ class PayrollReportController extends Controller
                     'Payroll',
                     $tdsAmount,
                     [
-                        'propId'        => $firstPayslip->propId ?? null,
-                        'date'          => $request->tds_deposit_date ?: ($firstPayslip->date ?? now()->toDateString()),
-                        'reference_no'  => $request->tds_challan_no ?: ($firstPayslip->payslip_no ?? null),
-                        'party_name'    => 'TDS Deposit (' . count($ids) . ' records)',
+                        'propId' =>
+                            $firstPayslip->propId ?? null,
+
+                        'date' =>
+                            $request->tds_deposit_date
+                            ?: ($firstPayslip->date
+                                ?? now()->toDateString()),
+
+                        'reference_no' =>
+                            $request->tds_challan_no
+                            ?: ($firstPayslip->payslip_no ?? null),
+
+                        'party_name' =>
+                            'TDS Deposit (' . count($ids) . ' records)',
+
                         'payroll_month' => '',
-                        'added_by'      => $ownerId,
-                        'net_salary'    => 0,
-                        'pf'            => 0,
-                        'esi'           => 0,
-                        'tds'           => $tdsAmount,
-                        'lwf'           => 0,
-                        'ptax'          => 0,
-                        'loan'          => 0,
+
+                        'added_by' => $ownerId,
+
+                        'net_salary' => 0,
+                        'pf'         => 0,
+                        'esi'        => 0,
+                        'tds'        => $tdsAmount,
+                        'lwf'        => 0,
+                        'ptax'       => 0,
+                        'loan'       => 0,
                     ]
                 );
             }
 
-            return response()->json(['message' => "Updated {$affected} record(s)", 'updated' => $affected]);
+            /*
+            |--------------------------------------------------------------------------
+            | Commit Transaction
+            |--------------------------------------------------------------------------
+            */
+            DB::commit();
+
+            return response()->json([
+                'message'        => "Updated {$affected} record(s)",
+                'updated'        => $affected,
+                'tds_deposit_id' => $tdsDepositId
+            ]);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'TDS update failed: ' . $e->getMessage()], 500);
+
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'TDS update failed: ' . $e->getMessage()
+            ], 500);
         }
     }
+
+    
 
     //------- TDS List -------//
 

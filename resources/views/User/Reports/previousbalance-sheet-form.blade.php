@@ -131,6 +131,21 @@
 								<label class="form-label">ESI Payable</label>
 								<input type="number" name="esi_payable" class="form-control" value="{{ old('esi_payable') }}">
 							</div>
+							
+							<div class="col-md-3">
+								<label class="form-label">PTAX Payable</label>
+								<input type="number" name="ptax_payable" class="form-control" value="{{ old('ptax_payable') }}">
+							</div>
+							
+							<div class="col-md-3">
+								<label class="form-label">LWF Payable</label>
+								<input type="number" name="lwf_payable" class="form-control" value="{{ old('lwf_payable') }}">
+							</div>
+							
+							<div class="col-md-3">
+								<label class="form-label">Output Gst </label>
+								<input type="number" name="output_gst" class="form-control" value="{{ old('output_gst') }}">
+							</div>
 
 							<div class="col-md-3">
 								<label class="form-label">Short-term Loans</label>
@@ -207,6 +222,14 @@
 								<input type="number"
 									   value="{{ old('capital_work_in_progress') }}"
 									   name="capital_work_in_progress"
+									   class="form-control">
+							</div>
+							
+							<div class="mb-3 col-md-6 col-lg-3">
+								<label class="form-label">Investments</label>
+								<input type="number"
+									   value="{{ old('investments') }}"
+									   name="investments"
 									   class="form-control">
 							</div>
 
@@ -492,10 +515,37 @@
 							<td></td>
 							<td class="text-start" id="curr-esi-payable"></td>
 						</tr>
-
+						
 						<tr>
 							<td></td>
 							<td class="text-center">i.</td>
+							<td class="text-start">PTAX Payable</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-ptax-payable"></td>
+						</tr>
+						
+						<tr>
+							<td></td>
+							<td class="text-center">j.</td>
+							<td class="text-start">LWF Payable</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-lwf-payable"></td>
+						</tr>
+						
+						<tr>
+							<td></td>
+							<td class="text-center">k.</td>
+							<td class="text-start">Output GST</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-output-gst"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">l.</td>
 							<td class="text-start">Short-term Loans</td>
 							<td></td>
 							<td></td>
@@ -504,7 +554,7 @@
 
 						<tr>
 							<td></td>
-							<td class="text-center">j.</td>
+							<td class="text-center">m.</td>
 							<td class="text-start">Interest Payable</td>
 							<td></td>
 							<td></td>
@@ -597,10 +647,19 @@
 							<td></td>
 							<td class="text-start" id="curr-capital-work-in-progress"></td>
 						</tr>
-
+						
 						<tr>
 							<td></td>
 							<td class="text-center">h.</td>
+							<td class="text-start">Investments</td>
+							<td></td>
+							<td></td>
+							<td class="text-start" id="curr-investments"></td>
+						</tr>
+
+						<tr>
+							<td></td>
+							<td class="text-center">i.</td>
 							<td class="text-start">Other Non-Current Assets</td>
 							<td></td>
 							<td></td>
@@ -814,8 +873,11 @@ $(function () {
 		let salary_payable = getVal('salary_payable');
 		let gst_payable = getVal('gst_payable');
 		let tds_payable = getVal('tds_payable');
-		let pf_payable = getVal('pf_payable');
+		let pf_payable = getVal('pf_payable'); 
 		let esi_payable = getVal('esi_payable');
+		let ptax_payable = getVal('ptax_payable');
+		let lwf_payable = getVal('lwf_payable');
+		let output_gst = getVal('output_gst');
 		let short_term_loans = getVal('short_term_loans');
 		let interest_payable = getVal('interest_payable');
 
@@ -828,6 +890,9 @@ $(function () {
 		setText('curr-tds-payable', tds_payable);
 		setText('curr-pf-payable', pf_payable);
 		setText('curr-esi-payable', esi_payable);
+		setText('curr-ptax-payable', ptax_payable);
+		setText('curr-lwf-payable', lwf_payable);
+		setText('curr-output-gst', output_gst);
 		setText('curr-short-term-loans', short_term_loans);
 		setText('curr-interest-payable', interest_payable);
 
@@ -841,6 +906,9 @@ $(function () {
 			tds_payable +
 			pf_payable +
 			esi_payable +
+			ptax_payable + 
+			lwf_payable + 
+			output_gst +
 			short_term_loans +
 			interest_payable;
 
@@ -861,6 +929,7 @@ $(function () {
 		let vehicles = getVal('vehicles');
 		let intangible = getVal('intangible_assets');
 		let cwp = getVal('capital_work_in_progress');
+		let investments = getVal('investments');
 		let other = getVal('other_non_current_assets');
 
 		setText('curr-ppe', ppe);
@@ -870,6 +939,7 @@ $(function () {
 		setText('curr-vehicles', vehicles);
 		setText('curr-intangible-assets', intangible);
 		setText('curr-capital-work-in-progress', cwp);
+		setText('curr-investments', investments);
 		setText('curr-other-non-current-assets', other);
 
 		let nonAssetTotal =
@@ -880,6 +950,7 @@ $(function () {
 			vehicles +
 			intangible +
 			cwp +
+			investments +
 			other;
 
 		setText('curr-nonassets-total', nonAssetTotal);

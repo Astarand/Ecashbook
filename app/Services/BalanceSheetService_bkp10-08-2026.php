@@ -138,42 +138,22 @@ class BalanceSheetService
 		if ($type == 'salary_payable') {
 
 			$records = DB::table('user_payslip')
-				->whereBetween('date', [$startDate, $endDate])
+				->whereBetween('date', [$currentMonthStartDate, $currentMonthEndDate])
 				->where(function ($query) {
 						$query->whereNull('payment_status')
 							  ->orWhere('payment_status', 'Pending');
 					})
 				->get();
 
-			$pendingSalary = 0;
+			$amount = 0;
+
 			foreach ($records as $row) {
 				$data = json_decode($row->emp_salary_slip_response, true);
-				// Only consider payslips created by the current user
+				// Match created_by from JSON
 				if (($data['created_by'] ?? 0) == $userId) {
-					$netSalary = (float) ($data['visible_data']['final_salary_calculation']['net_salary'] ?? 0);
-					$pendingSalary += $netSalary;
+					$amount += $data['visible_data']['final_salary_calculation']['net_salary'] ?? 0;
 				}
 			}
-
-			//Salary payments are now recorded in payment_vouchers.
-			$paidSalary = DB::table('payment_vouchers')
-				->where('added_by', $userId)
-				->whereBetween('date', [$startDate, $endDate])
-				->where('voucher_type', 'Payment Voucher')
-				->where('transaction_details', 'Salary Payment')
-				->where('credit_debit', 'Debit')
-				->where('record_type', 'Posted')
-				->sum('amount');
-
-			/*
-			|--------------------------------------------------------------------------
-			| Final Salary Payable
-			|--------------------------------------------------------------------------
-			| Pending Salary - Salary Already Paid
-			|
-			| Do not allow negative Salary Payable.
-			*/
-			$amount = max(0, $pendingSalary - (float) $paidSalary);
 		}
 
 		// PF Payable
@@ -187,25 +167,13 @@ class BalanceSheetService
 					})
 				->get();
 
-			$pendingPf = 0;
+			$amount = 0;
 			foreach ($records as $row) {
 				$data = json_decode($row->emp_salary_slip_response, true);
 				if (($data['created_by'] ?? 0) == $userId) {
-					$providentFund = (float) ($data['visible_data']['final_salary_calculation']['provident_fund'] ?? 0);
-					$pendingPf += $providentFund;
+					$amount += (float) ($data['visible_data']['final_salary_calculation']['provident_fund'] ?? 0);
 				}
 			}
-
-			$paidPf = DB::table('payment_vouchers')
-				->where('added_by', $userId)
-				->whereBetween('date', [$startDate, $endDate])
-				->where('voucher_type', 'Payment Voucher')
-				->where('transaction_details', 'PF Payment')
-				->where('credit_debit', 'Debit')
-				->where('record_type', 'Posted')
-				->sum('amount');
-
-			$amount = max(0, $pendingPf - (float) $paidPf);
 		}
 
 		// ESI Payable
@@ -219,25 +187,14 @@ class BalanceSheetService
 					})
 				->get();
 
-			$pendingEsi = 0;
+			$amount = 0;
+
 			foreach ($records as $row) {
 				$data = json_decode($row->emp_salary_slip_response, true);
 				if (($data['created_by'] ?? 0) == $userId) {
-					$esi = (float) ($data['visible_data']['final_salary_calculation']['esi'] ?? 0);
-					$pendingEsi += $esi;
+					$amount += (float) ($data['visible_data']['final_salary_calculation']['esi'] ?? 0);
 				}
 			}
-
-			$paidEsi = DB::table('payment_vouchers')
-				->where('added_by', $userId)
-				->whereBetween('date', [$startDate, $endDate])
-				->where('voucher_type', 'Payment Voucher')
-				->where('transaction_details', 'ESI Payment')
-				->where('credit_debit', 'Debit')
-				->where('record_type', 'Posted')
-				->sum('amount');
-
-			$amount = max(0, $pendingEsi - (float) $paidEsi);
 		}
 		
 		// PTAX Payable
@@ -251,25 +208,14 @@ class BalanceSheetService
 					})
 				->get();
 
-			$pendingPtax = 0;
+			$amount = 0;
+
 			foreach ($records as $row) {
 				$data = json_decode($row->emp_salary_slip_response, true);
 				if (($data['created_by'] ?? 0) == $userId) {
-					$ptax = (float) ($data['visible_data']['final_salary_calculation']['ptax'] ?? 0);
-					$pendingPtax += $ptax;
+					$amount += (float) ($data['visible_data']['final_salary_calculation']['ptax'] ?? 0);
 				}
 			}
-
-			$paidPtax = DB::table('payment_vouchers')
-				->where('added_by', $userId)
-				->whereBetween('date', [$startDate, $endDate])
-				->where('voucher_type', 'Payment Voucher')
-				->where('transaction_details', 'PT Payment')
-				->where('credit_debit', 'Debit')
-				->where('record_type', 'Posted')
-				->sum('amount');
-
-			$amount = max(0, $pendingPtax - (float) $paidPtax);
 		}
 		
 		// LWF Payable
@@ -283,25 +229,15 @@ class BalanceSheetService
 					})
 				->get();
 
-			$pendingLwf = 0;
+			$amount = 0;
+
 			foreach ($records as $row) {
 				$data = json_decode($row->emp_salary_slip_response, true);
 				if (($data['created_by'] ?? 0) == $userId) {
-					$lwfCompany = (float) ($data['visible_data']['final_salary_calculation']['lwf_company_contribution'] ?? 0);
-					$pendingLwf += $lwfCompany;
+					$lwfCompany = $data['visible_data']['final_salary_calculation']['lwf_company_contribution'] ?? 0;
+					$amount += (float) $lwfCompany;
 				}
 			}
-
-			$paidLwf = DB::table('payment_vouchers')
-				->where('added_by', $userId)
-				->whereBetween('date', [$startDate, $endDate])
-				->where('voucher_type', 'Payment Voucher')
-				->where('transaction_details', 'LWF Payment')
-				->where('credit_debit', 'Debit')
-				->where('record_type', 'Posted')
-				->sum('amount');
-
-			$amount = max(0, $pendingLwf - (float) $paidLwf);
 		}
 
 		// GST Payable
@@ -335,7 +271,7 @@ class BalanceSheetService
 			
 			// Salary TDS Amount
 			$salaryData = DB::table('user_payslip')
-				->whereBetween('date', [$startDate, $endDate])
+				->whereBetween('date', [$currentMonthStartDate, $currentMonthEndDate])
 				->where(function ($query) {
 						$query->whereNull('tds_deposit_status')
 							  ->orWhere('tds_deposit_status', 'Pending');
@@ -351,16 +287,8 @@ class BalanceSheetService
 				}
 			}
 
-			$totalTdsPayable = (float) $expenseTdsAmount + (float) $assetTdsAmount + (float) $salaryTdsAmount;
-			$paidTds = DB::table('payment_vouchers')
-				->where('added_by', $userId)
-				->whereBetween('date', [$startDate, $endDate])
-				->where('voucher_type', 'Payment Voucher')
-				->where('transaction_details', 'TDS Payment')
-				->where('credit_debit', 'Debit')
-				->where('record_type', 'Posted')
-				->sum('amount');
-			$amount = max(0, $totalTdsPayable - (float) $paidTds);
+			// Final Total
+			$amount = $expenseTdsAmount + $assetTdsAmount + $salaryTdsAmount;
 		}
 		if($type =='short_term_loans'){
 			$currLiab = DB::table('current_liabilities as cl')

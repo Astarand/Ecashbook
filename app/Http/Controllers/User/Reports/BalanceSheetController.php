@@ -744,9 +744,9 @@ class BalanceSheetController extends Controller
 				'tds_payable'           => (float) $request->tds_payable,
 				'pf_payable'            => (float) $request->pf_payable,
 				'esi_payable'           => (float) $request->esi_payable,
-				'ptax_payable'          => 0,
-				'lwf_payable'           => 0,
-				'output_gst'            => 0,
+				'ptax_payable'          => (float) $request->ptax_payable,
+				'lwf_payable'           => (float) $request->lwf_payable,
+				'output_gst'            => (float) $request->output_gst,
 				'short_term_loans'      => (float) $request->short_term_loans,
 				'interest_payable'      => (float) $request->interest_payable,
 			];
@@ -755,13 +755,14 @@ class BalanceSheetController extends Controller
 			   NON CURRENT ASSETS
 			========================= */
 			$nonCurrentAssets = [
-				'property_plant_equipment'                       => (float) $request->property_plant_equipment,
+				'property_plant_equipment'  => (float) $request->property_plant_equipment,
 				'furniture_fixtures'        => (float) $request->furniture_fixtures,
 				'computer_it_equipment'     => (float) $request->computer_it_equipment,
 				'machinery'                 => (float) $request->machinery,
 				'vehicles'                  => (float) $request->vehicles,
 				'intangible_assets'         => (float) $request->intangible_assets,
 				'capital_work_in_progress'  => (float) $request->capital_work_in_progress,
+				'investments'  				=> (float) $request->investments,
 				'other_non_current_assets'  => (float) $request->other_non_current_assets,
 			];
 

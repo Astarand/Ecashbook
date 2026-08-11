@@ -165,11 +165,12 @@
 								class="btn btn-sm btn-danger">
 							<i class="fa fa-minus-square"></i> Collapse All
 						</button>
-					</div>
+					</div>					
                 </div>
                 <div class="card-body p-4">
 
                     <div class="table-responsive">
+						<div class="trialBalanceStatus"></div>
                         <table class="table table-bordered table-sm text-nowrap"
                             style="font-size:13px; vertical-align:middle;">
 
@@ -266,6 +267,7 @@
 					
 					<!-- SUMMARY -->
 					<div class="row mt-4 trialSummary">
+						<div class="trialBalanceStatus"></div>
 						<div class="col-md-4 offset-md-8">
 							<table class="table table-bordered">
 								<tbody>									
@@ -638,6 +640,29 @@ tfoot td{
 				$(".summary-opening-cr").text("₹ " + format(res.opening_cr));
 				$(".summary-closing-dr").text("₹ " + format(res.closing_dr));
 				$(".summary-closing-cr").text("₹ " + format(res.closing_cr));
+				
+				const diff = parseFloat(res.diff || 0);
+				if (Math.abs(diff) < 0.01) {
+					$(".trialBalanceStatus").html(`
+						<div class="alert alert-success py-2 mb-3">
+							<i class="ti ti-circle-check me-1"></i>
+							<strong>Trial Balance is Balanced</strong>
+						</div>
+					`);
+				} else {
+					$(".trialBalanceStatus").html(`
+						<div class="alert alert-warning py-2 mb-3">
+							<i class="ti ti-alert-circle me-1"></i>
+							<strong>Trial Balance is Not Balanced</strong>
+							<span class="ms-2">
+								Difference: ₹${Math.abs(diff).toLocaleString('en-IN', {
+									minimumFractionDigits: 2,
+									maximumFractionDigits: 2
+								})}
+							</span>
+						</div>
+					`);
+				}
 
 				// Collapse all groups
 				$(".group-row").hide();
