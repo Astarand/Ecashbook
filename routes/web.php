@@ -59,6 +59,7 @@ use App\Http\Controllers\User\SettlementController;
 use App\Http\Controllers\User\Reports\ProfitLossController;
 use App\Http\Controllers\User\Reports\BalanceSheetController;
 use App\Http\Controllers\User\Reports\TrialBalanceController;
+use App\Http\Controllers\User\Reports\LedgerController;
 use App\Http\Controllers\User\DigitalSignedController;
 use App\Http\Controllers\User\MSMEBenefitHubController;
 use App\Http\Controllers\PayrollReportController;
@@ -559,7 +560,7 @@ Route::middleware(['ensure.login'])->group(function () {
 
 
 	/* Reports Management */
-	Route::get('/ledger', [ReportsController::class, 'Ledger'])->name('user.Ledger');
+	//Route::get('/ledger', [ReportsController::class, 'Ledger'])->name('user.Ledger');
 	Route::get('/bank-reconciliation', [ReportsController::class, 'BankReconciliation'])->name('user.BankReconciliation');
 	Route::post('/fatch-trial-balance-data', [ReportsController::class, 'fatch_trial_balance_data'])->name('trial_balance_data');
 	Route::get('/get-opening-balance', [ReportsController::class, 'getOpeningBalanceAjax'])->name('get.opening.balance');
@@ -1048,7 +1049,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/directors/{id}', [DirectorController::class, 'show'])->name('directors.show');
 	Route::post('/directors/update/{id}', [DirectorController::class, 'update'])->name('directors.update');
 	Route::delete('/director/delete/{id}', [DirectorController::class, 'delete'])->name('director.delete');
-	Route::post('/ledger/ajax', [ReportsController::class, 'ajaxLedgerData']);	
+	//Route::post('/ledger/ajax', [ReportsController::class, 'ajaxLedgerData']);	
 	Route::get('/company-profile-check/fetch', [BusinessHealthCheckupController::class, 'fetch']);
     Route::post('/company-profile-check/save', [BusinessHealthCheckupController::class, 'save']);
 	Route::get('/cashflow', [ReportsController::class, 'cashflow'])->name('user.cashflow');
@@ -1304,4 +1305,8 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/trail-balance-report', [TrialBalanceController::class, 'TrialBalance'])->name('user.TrialBalanceReport');
 	Route::post('/fatch-trial-balance-data', [TrialBalanceController::class, 'fatch_trial_balance_data'])->name('trial_balance_data');
 	Route::post('/download-trial-balance-pdf', [TrialBalanceController::class, 'downloadTrialBalanceSheetPdf'])->name('trialbalancesheet.download.pdf');
+	
+	Route::get('/ledger', [LedgerController::class, 'Ledger'])->name('user.Ledger');
+	Route::post('/ledger/ajax', [LedgerController::class, 'ajaxLedgerData']);	
+	
 });
