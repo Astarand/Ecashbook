@@ -100,6 +100,14 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <!-- Intro.js Tour JS & Custom Script -->
     <script src="{{ asset('assets/js/plugins/intro.min.js') }}"></script>
+    @auth
+    <script>
+        window.CURRENT_USER_ID = {{ Auth::id() }};
+        window.USER_TOUR_COMPLETED = {{ Auth::user()->tour_completed ? 'true' : 'false' }};
+        window.CSRF_TOKEN = "{{ csrf_token() }}";
+        window.TOUR_COMPLETE_ROUTE = "{{ route('user.completeTour') }}";
+    </script>
+    @endauth
     <script src="{{ asset('assets/js/tour.js') }}"></script>
 
     <!-- Additional Functionality - Lower Priority -->

@@ -631,92 +631,92 @@
                             <form action="javascript:void(0);" name="frmPartnerdet" id="frmPartnerdet" method="post">
                                 @csrf
                                 <div class="message-container"></div>
-								<?php  
-								if(!empty($partnerDetails)) { 
-								$j = 1;	
-										foreach($partnerDetails as $partnerData ) {
-								?>
-								<div class="form-group-customer customer-additional-form">
-									<div class="row">
-										<div class="col-lg-12 col-sm-12">
-											<div class="card bank-account">
-												<div class="card-header d-flex justify-content-between align-items-center">
-													<h5>Partner <?php echo $j;?> Details</h5>
-													<!--<span class="btn btn-primary" onclick="addPartner()">Add New Partner</span>-->
-												</div>
-												<div class="card-body">
-													<div class="row">
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Partner Name <span class="text-danger">*</span></label>
-															<input type="text" name="partner_name[]" value="{{ $partnerData->partner_name }}" class="form-control" placeholder="Partner Name">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Contact Number <span class="text-danger">*</span></label>
-															<input type="text" name="partner_no[]" value="{{ $partnerData->partner_no }}" class="form-control" placeholder="Enter Contact Number">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Email Address <span class="text-danger">*</span></label>
-															<input type="text" name="partner_email[]" value="{{ $partnerData->partner_email }}" class="form-control" placeholder="Enter Email Address">
-														</div>
-														<div class="col-sm-6 mb-3">
-															<label class="form-label">Tenure Of Practicing <span class="text-danger">*</span></label>
-															<input type="text" name="practicing[]" value="{{ $partnerData->practicing }}" class="form-control" placeholder="Enter Tenure Of Practicing">
-														</div>
-														<div class="col-sm-6 mb-3">
-															<label class="form-label">Role / Designation<span class="text-danger">*</span></label>
-															<input type="text" name="partner_role[]" value="{{ $partnerData->partner_role }}" class="form-control" placeholder="Enter IFSC Code ">
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<?php $j++;} }?>
-								<div class="form-group-customer customer-additional-form">
-									<div class="row">
-										<div class="col-lg-12 col-sm-12">
-											<div class="card bank-account">
-												<div class="card-header d-flex justify-content-between align-items-center">
-													<h5>Partner 1 Details</h5>
-													<!--<span class="btn btn-primary" onclick="addPartner()">Add New Partner</span>-->
-												</div>
-												<div class="card-body">
-													<div class="row">
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Partner Name <span class="text-danger">*</span></label>
-															<input type="text" name="partner_name[]" class="form-control" placeholder="Partner Name">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Contact Number <span class="text-danger">*</span></label>
-															<input type="text" name="partner_no[]" id="" class="form-control" placeholder="Enter Contact Number">
-														</div>
-														<div class="col-sm-4 mb-3">
-															<label class="form-label">Email Address <span class="text-danger">*</span></label>
-															<input type="text" name="partner_email[]"  class="form-control" placeholder="Enter Email Address">
-														</div>
-														<div class="col-sm-6 mb-3">
-															<label class="form-label">Tenure Of Practicing <span class="text-danger">*</span></label>
-															<input type="text" name="practicing[]" class="form-control" placeholder="Enter Tenure Of Practicing">
-														</div>
-														<div class="col-sm-6 mb-3">
-															<label class="form-label">Role / Designation<span class="text-danger">*</span></label>
-															<input type="text" name="partner_role[]" class="form-control" placeholder="Enter IFSC Code ">
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<span class="btn btn-primary" onclick="addPartner()">Add New Partner</span>
-								<div class="d-flex wizard justify-content-between mt-3">
-									
-									<div class="last">
-										<button type="submit" id="save_bankDetBtn" class="btn btn-primary next-btn d-flex align-items-center justify-content-center">Save Changes <i class="ti ti-arrow-right-circle ms-2"></i></button>
-									</div>
-								</div>
-							</form>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Partner Details</h5>
+                                    <a href="javascript:void(0);" class="btn btn-primary" onclick="addPartner()">
+                                        <i class="ti ti-square-plus f-20"></i> Add New Partner
+                                    </a>
+                                </div>
+                                <div id="partnerContainer" class="row">
+                                    <?php  
+                                    if(!empty($partnerDetails) && count($partnerDetails) > 0) { 
+                                        $j = 1;	
+                                        foreach($partnerDetails as $partnerData ) {
+                                    ?>
+                                    <div class="col-lg-12 col-sm-12 partner-account mb-3">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h5>Partner <?php echo $j;?> Details</h5>
+                                                <?php if($j > 1) { ?>
+                                                <span class="btn btn-danger btn-sm" onclick="removePartner(this)"><i class="ti ti-trash"></i></span>
+                                                <?php } ?>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Partner Name <span class="text-danger">*</span></label>
+                                                        <input type="text" name="partner_name[]" value="{{ $partnerData->partner_name }}" class="form-control" placeholder="Partner Name" required>
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Contact Number <span class="text-danger">*</span></label>
+                                                        <input type="text" name="partner_no[]" value="{{ $partnerData->partner_no }}" class="form-control" placeholder="Enter Contact Number" required>
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                                        <input type="email" name="partner_email[]" value="{{ $partnerData->partner_email }}" class="form-control" placeholder="Enter Email Address" required>
+                                                    </div>
+                                                    <div class="col-sm-6 mb-3">
+                                                        <label class="form-label">Tenure Of Practicing <span class="text-danger">*</span></label>
+                                                        <input type="text" name="practicing[]" value="{{ $partnerData->practicing }}" class="form-control" placeholder="Enter Tenure Of Practicing" required>
+                                                    </div>
+                                                    <div class="col-sm-6 mb-3">
+                                                        <label class="form-label">Role / Designation <span class="text-danger">*</span></label>
+                                                        <input type="text" name="partner_role[]" value="{{ $partnerData->partner_role }}" class="form-control" placeholder="Enter Role / Designation" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php $j++; } } else { ?>
+                                    <div class="col-lg-12 col-sm-12 partner-account mb-3">
+                                        <div class="card">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h5>Partner 1 Details</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Partner Name <span class="text-danger">*</span></label>
+                                                        <input type="text" name="partner_name[]" class="form-control" placeholder="Partner Name">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Contact Number <span class="text-danger">*</span></label>
+                                                        <input type="text" name="partner_no[]" class="form-control" placeholder="Enter Contact Number">
+                                                    </div>
+                                                    <div class="col-sm-4 mb-3">
+                                                        <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                                        <input type="email" name="partner_email[]" class="form-control" placeholder="Enter Email Address">
+                                                    </div>
+                                                    <div class="col-sm-6 mb-3">
+                                                        <label class="form-label">Tenure Of Practicing <span class="text-danger">*</span></label>
+                                                        <input type="text" name="practicing[]" class="form-control" placeholder="Enter Tenure Of Practicing">
+                                                    </div>
+                                                    <div class="col-sm-6 mb-3">
+                                                        <label class="form-label">Role / Designation <span class="text-danger">*</span></label>
+                                                        <input type="text" name="partner_role[]" class="form-control" placeholder="Enter Role / Designation">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php } ?>
+                                </div>
+                                <div class="d-flex wizard justify-content-between mt-3">
+                                    <div class="last">
+                                        <button type="submit" id="save_partnerDetBtn" class="btn btn-primary next-btn d-flex align-items-center justify-content-center">Save Changes <i class="ti ti-arrow-right-circle ms-2"></i></button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                         <div class="tab-pane fade" id="attachment" role="tabpanel" aria-labelledby="attachment-tab">
                             <div class="row">
@@ -2364,39 +2364,39 @@
     }
 
     //Partner Add/Remove
-    let partnerCount = 1;
+    let partnerCount = <?php echo (!empty($partnerDetails) && count($partnerDetails) > 0) ? count($partnerDetails) : 1; ?>;
     function addPartner() {
         partnerCount++;
-        const partnerContainer = document.querySelector("#partner-details .row");
+        const partnerContainer = document.getElementById("partnerContainer");
         const newPartner = document.createElement("div");
-        newPartner.classList.add("col-lg-12", "col-sm-12", "partner-account");
+        newPartner.classList.add("col-lg-12", "col-sm-12", "partner-account", "mb-3");
         newPartner.innerHTML = `
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5>Partner ${partnerCount} Details</h5>
-                    <span class="btn btn-danger" onclick="removePartner(this)"><i class="ti ti-trash"></i> Delete</span>
+                    <span class="btn btn-danger btn-sm" onclick="removePartner(this)"><i class="ti ti-trash"></i></span>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-sm-4 mb-3">
                             <label class="form-label">Partner Name <span class="text-danger">*</span></label>
-                            <input type="text" name="partner_name[]" class="form-control" placeholder="Partner Name">
+                            <input type="text" name="partner_name[]" class="form-control" placeholder="Partner Name" required>
                         </div>
                         <div class="col-sm-4 mb-3">
                             <label class="form-label">Contact Number <span class="text-danger">*</span></label>
-                            <input type="text" name="partner_no[]" class="form-control" placeholder="Enter Contact Number">
+                            <input type="text" name="partner_no[]" class="form-control" placeholder="Enter Contact Number" required>
                         </div>
                         <div class="col-sm-4 mb-3">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                            <input type="text" name="partner_email[]" class="form-control" placeholder="Enter Email Address">
+                            <input type="email" name="partner_email[]" class="form-control" placeholder="Enter Email Address" required>
                         </div>
                         <div class="col-sm-6 mb-3">
                             <label class="form-label">Tenure Of Practicing <span class="text-danger">*</span></label>
-                            <input type="text" name="practicing[]" class="form-control" placeholder="Enter Tenure Of Practicing">
+                            <input type="text" name="practicing[]" class="form-control" placeholder="Enter Tenure Of Practicing" required>
                         </div>
                         <div class="col-sm-6 mb-3">
                             <label class="form-label">Role / Designation <span class="text-danger">*</span></label>
-                            <input type="text" name="partner_role[]" class="form-control" placeholder="Enter Role / Designation">
+                            <input type="text" name="partner_role[]" class="form-control" placeholder="Enter Role / Designation" required>
                         </div>
                     </div>
                 </div>
@@ -2408,6 +2408,7 @@
         const partnerToRemove = element.closest(".col-lg-12.partner-account");
         if (partnerToRemove) {
             partnerToRemove.remove();
+            partnerCount--;
         }
     }
 

@@ -59,21 +59,70 @@
             <ul class="list-unstyled">
                 <li class="dropdown pc-h-item d-none d-md-inline-flex">
                     <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button"
-                    aria-haspopup="false" aria-expanded="false"><i class="ph-duotone ph-circles-four"></i></a>
+                    aria-haspopup="false" aria-expanded="false" title="Quick Access"><i class="ph-duotone ph-circles-four"></i></a>
                     <div class="dropdown-menu dropdown-qta dropdown-menu-end pc-h-dropdown">
                     <div class="overflow-hidden">
                         <div class="qta-links m-n1">
-                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-user-circle-plus"></i> <span>Assign CA</span></a>
-                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-scroll"></i> <span>Sales Invoice</span></a>
-                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-archive-tray"></i> <span>Purchase Invoice</span></a>
+                        @if(Auth::user()->u_type == 1)
+                            {{-- 1 = CA (Chartered Accountant) --}}
+                            <a href="{{ route('Ca.CompanyList') }}" class="dropdown-item"><i class="ph-duotone ph-buildings"></i> <span>Client List</span></a>
+                            <a href="{{ route('CA.CompanyAssignment') }}" class="dropdown-item"><i class="ph-duotone ph-user-plus"></i> <span>Assign Firm</span></a>
+                            <a href="{{ route('ca.CompliancesList') }}" class="dropdown-item"><i class="ph-duotone ph-shield-check"></i> <span>Compliances</span></a>
+                            <a href="{{ route('ca.TaskList') }}" class="dropdown-item"><i class="ph-duotone ph-check-square-offset"></i> <span>Task List</span></a>
+                            <a href="{{ route('ca.QuoteList') }}" class="dropdown-item"><i class="ph-duotone ph-receipt"></i> <span>Quotes</span></a>
+                            <a href="{{ route('ca.EarningDetails') }}" class="dropdown-item"><i class="ph-duotone ph-currency-circle-dollar"></i> <span>Earnings</span></a>
+                            <a href="{{ route('user.DocLocker') }}" class="dropdown-item"><i class="ph-duotone ph-folder-lock"></i> <span>Doc Locker</span></a>
+                            <a href="{{ route('CA.FirmInformation') }}" class="dropdown-item"><i class="ph-duotone ph-bank"></i> <span>Firm Profile</span></a>
+                            <a href="{{ route('CA.EmployeeList') }}" class="dropdown-item"><i class="ph-duotone ph-users-three"></i> <span>Staff Master</span></a>
 
-                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-currency-circle-dollar"></i> <span>Plans</span> </a>
-                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-identification-badge"></i><span>Membership</span> </a>
-                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-books"></i> <span>Online Courses</span></a>
+                        @elseif(Auth::user()->u_type == 2)
+                            {{-- 2 = User / Business Owner --}}
+                            <a href="{{ route('user.AssignCa') }}" class="dropdown-item"><i class="ph-duotone ph-user-circle-plus"></i> <span>Assign CA</span></a>
+                            <a href="{{ route('user.SalesInvoices') }}" class="dropdown-item"><i class="ph-duotone ph-scroll"></i> <span>Sales Invoice</span></a>
+                            <a href="{{ route('user.PurchaseInvoices') }}" class="dropdown-item"><i class="ph-duotone ph-archive-tray"></i> <span>Purchase Bills</span></a>
+                            <a href="{{ route('user.CustomerList') }}" class="dropdown-item"><i class="ph-duotone ph-users"></i> <span>Customers</span></a>
+                            <a href="{{ route('user.VendorList') }}" class="dropdown-item"><i class="ph-duotone ph-truck"></i> <span>Vendors</span></a>
+                            <a href="{{ route('user.ExpensesList') }}" class="dropdown-item"><i class="ph-duotone ph-wallet"></i> <span>Expenses</span></a>
+                            <a href="{{ route('user.EmployeeList') }}" class="dropdown-item"><i class="ph-duotone ph-user-list"></i> <span>Employees</span></a>
+                            <a href="{{ route('user.Plans') }}" class="dropdown-item"><i class="ph-duotone ph-credit-card"></i> <span>Plans</span></a>
+                            <a href="{{ route('User.GSTComplianceSupport') }}" class="dropdown-item"><i class="ph-duotone ph-chats-circle"></i> <span>Support</span></a>
 
-                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-envelope-open"></i> <span>Mail</span></a>
-                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-chats-circle"></i> <span>Chat</span> </a>
-                        <a href="#!" class="dropdown-item"><i class="ph-duotone ph-user-circle"></i> <span>Users</span></a>
+                        @elseif(Auth::user()->u_type == 3 || Auth::user()->u_type == 6)
+                            {{-- 3 = Admin --}}
+                            <a href="{{ route('admin.admin-customer-list') }}" class="dropdown-item"><i class="ph-duotone ph-users-three"></i> <span>User Master</span></a>
+                            <a href="{{ route('admin.ca-list') }}" class="dropdown-item"><i class="ph-duotone ph-user-square"></i> <span>CA Master</span></a>
+                            <a href="{{ route('admin.subscription-list') }}" class="dropdown-item"><i class="ph-duotone ph-credit-card"></i> <span>Subscriptions</span></a>
+                            <a href="{{ route('admin.coupon-codes') }}" class="dropdown-item"><i class="ph-duotone ph-tag"></i> <span>Coupons</span></a>
+                            <a href="{{ route('admin.business-earnings') }}" class="dropdown-item"><i class="ph-duotone ph-briefcase"></i> <span>Earnings</span></a>
+                            <a href="{{ route('admin.payment-management') }}" class="dropdown-item"><i class="ph-duotone ph-currency-dollar"></i> <span>Payments</span></a>
+                            <a href="{{ route('admin.ticket-management') }}" class="dropdown-item"><i class="ph-duotone ph-chats-circle"></i> <span>Tickets</span></a>
+                            <a href="{{ route('CA.Reminder') }}" class="dropdown-item"><i class="ph-duotone ph-bell-ringing"></i> <span>Reminders</span></a>
+                            <a href="{{ route('admin.AdminProfile') }}" class="dropdown-item"><i class="ph-duotone ph-user-circle"></i> <span>Profile</span></a>
+
+                        @elseif(Auth::user()->u_type == 4)
+                            {{-- 4 = CA Employee --}}
+                            <a href="{{ route('ca.TaskList') }}" class="dropdown-item"><i class="ph-duotone ph-scales"></i> <span>Tasks</span></a>
+                            <a href="{{ route('Ca.CompanyList') }}" class="dropdown-item"><i class="ph-duotone ph-buildings"></i> <span>Clients</span></a>
+                            <a href="{{ route('userEmployee.attendance_history') }}" class="dropdown-item"><i class="ph-duotone ph-calendar-check"></i> <span>Attendance</span></a>
+                            <a href="{{ url('/payslips') }}" class="dropdown-item"><i class="ph-duotone ph-receipt"></i> <span>Payslips</span></a>
+                            <a href="{{ route('userEmployee.user-leave-request') }}" class="dropdown-item"><i class="ph-duotone ph-mountains"></i> <span>Leaves</span></a>
+                            <a href="{{ route('userEmployee.ExpenditureClaimsList') }}" class="dropdown-item"><i class="ph-duotone ph-wallet"></i> <span>Claims</span></a>
+                            <a href="{{ route('userEmployee.SupplyRequisitionsList') }}" class="dropdown-item"><i class="ph-duotone ph-shopping-cart"></i> <span>Purchase Req</span></a>
+                            <a href="{{ route('userEmployee.hr-letters') }}" class="dropdown-item"><i class="ph-duotone ph-user-list"></i> <span>HR Letters</span></a>
+                            <a href="{{ route('userEmployee.performance-review') }}" class="dropdown-item"><i class="ph-duotone ph-chart-line-up"></i> <span>Review</span></a>
+
+                        @elseif(Auth::user()->u_type == 5)
+                            {{-- 5 = User Employee --}}
+                            <a href="{{ url('/') }}" class="dropdown-item"><i class="ph-duotone ph-gauge"></i> <span>Dashboard</span></a>
+                            <a href="{{ route('userEmployee.assign-task-list') }}" class="dropdown-item"><i class="ph-duotone ph-scales"></i> <span>My Tasks</span></a>
+                            <a href="{{ route('userEmployee.attendance_history') }}" class="dropdown-item"><i class="ph-duotone ph-calendar-check"></i> <span>Attendance</span></a>
+                            <a href="{{ url('/payslips') }}" class="dropdown-item"><i class="ph-duotone ph-receipt"></i> <span>Payslips</span></a>
+                            <a href="{{ route('userEmployee.user-leave-request') }}" class="dropdown-item"><i class="ph-duotone ph-mountains"></i> <span>Leaves</span></a>
+                            <a href="{{ route('userEmployee.ExpenditureClaimsList') }}" class="dropdown-item"><i class="ph-duotone ph-wallet"></i> <span>Claims</span></a>
+                            <a href="{{ route('userEmployee.SupplyRequisitionsList') }}" class="dropdown-item"><i class="ph-duotone ph-shopping-cart"></i> <span>Purchase Req</span></a>
+                            <a href="{{ route('userEmployee.hr-letters') }}" class="dropdown-item"><i class="ph-duotone ph-user-list"></i> <span>HR Letters</span></a>
+                            <a href="{{ route('userEmployee.policy-list') }}" class="dropdown-item"><i class="ph-duotone ph-user-circle-gear"></i> <span>Policies</span></a>
+                        @endif
                         </div>
                     </div>
                     </div>

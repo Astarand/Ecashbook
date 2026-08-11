@@ -438,7 +438,7 @@
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <button type="submit" class="btn btn-lg w-100 fw-bold" style="background: #6f42c1; color: white; border: none; padding: 12px; border-radius: 8px;">SUBMIT</button>
+                        <button type="submit" class="btn btn-lg w-100 fw-bold" style="background: #008CAD; color: white; border: none; padding: 12px; border-radius: 8px;">SUBMIT</button>
                     </div>
                 </div>
             </form>
@@ -539,17 +539,17 @@
 
   /* Clear All Button */
   #clearFiltersBtn {
-    background-color: #fcfaff !important;
-    border: 1px solid #e9d5ff !important;
-    color: #6f42c1 !important;
+    background-color: #f0f9fb !important;
+    border: 1px solid #c2e7ef !important;
+    color: #008CAD !important;
     border-radius: 8px !important;
     font-weight: 600 !important;
     padding: 10px !important;
     transition: all 0.2s ease !important;
   }
   #clearFiltersBtn:hover {
-    background-color: #6f42c1 !important;
-    border-color: #6f42c1 !important;
+    background-color: #008CAD !important;
+    border-color: #008CAD !important;
     color: #ffffff !important;
   }
 
@@ -565,7 +565,7 @@
   .ca-card .card.user-card:hover {
     transform: translateY(-4px) !important;
     box-shadow: 0 10px 25px rgba(0, 140, 173, 0.06) !important;
-    border-color: #ddd6fe !important;
+    border-color: #b3e5ef !important;
   }
   .ca-card .card-body {
     padding: 24px !important;
@@ -577,7 +577,7 @@
   }
   .ca-card .card.user-card:hover .chat-avtar img {
     transform: scale(1.05) !important;
-    border-color: #e9d5ff !important;
+    border-color: #b3e5ef !important;
   }
   .ca-card h6 {
     font-weight: 700 !important;
@@ -679,9 +679,9 @@
 
   /* Specialty Badge Overrides */
   .user-card .badge.bg-light-secondary {
-    background-color: #f5f3ff !important;
-    color: #6d28d9 !important;
-    border: 1px solid #ddd6fe !important;
+    background-color: #f0f9fb !important;
+    color: #008CAD !important;
+    border: 1px solid #c2e7ef !important;
     border-radius: 20px !important;
     font-weight: 500 !important;
     padding: 6px 12px !important;
@@ -689,9 +689,9 @@
     transition: all 0.2s ease !important;
   }
   .user-card .badge.bg-light-secondary:hover {
-    background-color: #6d28d9 !important;
+    background-color: #008CAD !important;
     color: #ffffff !important;
-    border-color: #6d28d9 !important;
+    border-color: #008CAD !important;
   }
 
   /* Button Overrides */
