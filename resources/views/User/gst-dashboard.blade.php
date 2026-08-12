@@ -253,9 +253,9 @@
                             <i class="ph-duotone ph-currency-inr fs-5"></i>
                         </div>
                     </div>
-                    <h3 class="mb-1 fw-bold text-primary" id="gstPayableStatus">₹0.00</h3>
-                    <span class="small text-muted font-12 fw-semibold">
-                        <span class="text-danger"><i class="ph-duotone ph-arrow-circle-up me-1"></i> Balance Tax Payable</span>
+                    <h3 class="mb-1 fw-bold text-primary" id="gstPayableRefund">₹0.00</h3>
+                    <span class="small text-muted font-12 fw-semibold" id="gstPayableText">
+                        <span class="text-danger"><i class="ph-duotone ph-arrow-circle-up me-1"></i> No GST Payable / Refund</span>
                     </span>
                 </div>
             </div>
@@ -1261,26 +1261,21 @@ $(document).ready(function () {
 		);
 
 		if (gstPayable > 0) {
-
-			$('#gstPayableStatus').html(`
+			$('#gstPayableText').html(`
 				<span class="text-danger">
 					<i class="ph-duotone ph-arrow-circle-up me-1"></i>
 					Balance Tax Payable
 				</span>
 			`);
-
 		} else if (gstPayable < 0) {
-
-			$('#gstPayableStatus').html(`
+			$('#gstPayableText').html(`
 				<span class="text-success">
 					<i class="ph-duotone ph-arrow-circle-down me-1"></i>
 					GST Refund / Credit Available
 				</span>
 			`);
-
 		} else {
-
-			$('#gstPayableStatus').html(`
+			$('#gstPayableText').html(`
 				<span class="text-muted">
 					No GST Payable / Refund
 				</span>
@@ -1298,11 +1293,6 @@ $(document).ready(function () {
 		$('#gstPaid').text('₹0.00');
 		$('#gstPayableRefund').text('₹0.00');
 
-		$('#gstPayableStatus').html(`
-			<span class="text-muted">
-				Select period
-			</span>
-		`);
 	}
 	
     /*

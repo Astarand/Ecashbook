@@ -172,45 +172,8 @@
                                 <div class="modal-dialog modal-dialog-centered modal-md">
                                     <div class="modal-content">
                                         <div class="modal-body">
-                                            {{-- <form id="resignationForm" action="{{ route('update.resignation') }}"
-                                                method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="form-header">
-                                                    <div class="row">
-                                                        <div class="col-sm-12 mb-3">
-                                                            <label class="form-label">Date of Resignation<span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="date" class="form-control" name="regdate"
-                                                                id="regdate" placeholder="Enter date of Resignation">
-                                                            <input type="hidden" name="empId" id="empId"
-                                                                value="{{ $employee->id }}">
-                                                        </div>
-                                                        <div class="col-sm-12 mb-3">
-                                                            <label class="form-label">Upload Resignation Letter<span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="file" class="form-control" name="reg_documet"
-                                                                id="reg_documet"
-                                                                placeholder="Enter date of Resignation">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-btn">
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <button type="submit" class="w-100 btn btn-success">
-                                                                Submit
-                                                            </button>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <button type="button" data-bs-dismiss="modal"
-                                                                class="w-100 btn btn-secondary paid-cancel-btn">
-                                                                Cancel
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </form> --}}
-                                            <form id="resignationForm" enctype="multipart/form-data">
+                                            
+                                            <form id="resignationForm{{ $employee->id }}" enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="form-header">
                                                     <div class="row">
@@ -237,12 +200,7 @@
                                                                 class="w-100 btn btn-success submit-resignation"
                                                                 data-id="{{ $employee->id }}">
                                                                 Submit
-                                                            </button>
-                                                            {{-- <button type="submit"
-                                                                class="w-100 btn btn-success submit-resignation"
-                                                                data-id="{{ preg_replace('/[^A-Za-z0-9]/', '', $encodedId) }}">
-                                                                Submit
-                                                            </button> --}}
+                                                            </button>                                                            
                                                         </div>
                                                         <div class="col-6">
                                                             <button type="button" data-bs-dismiss="modal"
@@ -361,7 +319,8 @@
             return;
         }
 
-        let form = $("#resignationForm"); // Select the form directly
+        let modal = $("#regine_modal" + encodedId);
+		let form = modal.find("form");
         if (!form.length) {
             showToast("Resignation form not found!", "error");
             return;

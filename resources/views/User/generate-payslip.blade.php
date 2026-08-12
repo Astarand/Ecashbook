@@ -506,8 +506,14 @@
             // const pf = basicSalary * 0.12;
             let pf = 0;
             if (parseNumber(salary.provident_fund) > 0) {
-                pf = basicSalary * 0.12;
+                pf = Math.min(
+                    parseFloat((basicSalary * 0.12).toFixed(2)),
+                    1800
+                );
             }
+            // if (parseNumber(salary.provident_fund) > 0) {
+            //     pf = basicSalary * 0.12;
+            // }
 
             // Adjust ESI and PT based on rules
             // const esiGrossCheck = baseGross + manualOvertime; // Only overtime affects ESI

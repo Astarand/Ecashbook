@@ -21,6 +21,7 @@ use App\Models\City;
 use App\Models\State;
 use App\Models\Gst_logins;
 use Helper;
+use App\Services\GstService;
 use App\Services\WhiteBooksGstService;
 use Illuminate\Support\Facades\Cookie;
 use DateTime;
@@ -31,10 +32,12 @@ class GstDashboardController extends Controller
 {
 
 	protected $gstService;
+	protected $whiteBooksGstService;
 
-	public function __construct(WhiteBooksGstService $gstService)
+	public function __construct(GstService $gstService, WhiteBooksGstService $whiteBooksGstService)
 	{
 		$this->gstService = $gstService;
+		$this->whiteBooksGstService = $whiteBooksGstService;
 	}
 
 	public function GstDashboard()
@@ -178,7 +181,7 @@ class GstDashboardController extends Controller
 		[$startDate, $endDate] = $this->getGstPeriodDates($request->financial_year,$request->period_frequency,$request->period);
 		$transactions = collect();
 		//SALES
-		$sales = DB::table('sales as s')
+		/*$sales = DB::table('sales as s')
 			->leftJoin('sales_values as sv','sv.sid','=','s.id')
 			->leftJoin('customers as c','c.id','=','s.inv_name')
 			->where('s.added_by', $uid)
@@ -199,7 +202,41 @@ class GstDashboardController extends Controller
 			->map(function ($row) {
 				$row->module = 'Sales';
 				return $row;
-			});
+			});*/
+		$sales = DB::table('sales as s')
+					->leftJoinSub(
+						DB::table('sales_values')
+							->select(
+								'sid',
+								DB::raw('SUM(COALESCE(amount, 0)) as taxable_amount'),
+								DB::raw('SUM(COALESCE(tax_amt, 0)) as gst_amount')
+							)
+							->groupBy('sid'),
+						'sv',
+						'sv.sid',
+						'=',
+						's.id'
+					)
+					->leftJoin('customers as c', 'c.id', '=', 's.inv_name')
+					->where('s.added_by', $uid)
+					->where('s.status', 1)
+					->whereBetween('s.inv_date', [$startDate, $endDate])
+					->select(
+						's.id',
+						's.inv_num as invoice_no',
+						's.inv_date as invoice_date',
+						'c.cust_name as party_name',
+						'c.cust_gst_no as gstin',
+						DB::raw('COALESCE(sv.taxable_amount, 0) as taxable_amount'),
+						DB::raw('COALESCE(sv.gst_amount, 0) as gst_amount'),
+						DB::raw('(COALESCE(sv.taxable_amount, 0) + COALESCE(sv.gst_amount, 0)) as invoice_total'),
+						's.pay_status as status'
+					)
+					->get()
+					->map(function ($row) {
+						$row->module = 'Sales';
+						return $row;
+					});
 
 		$transactions = $transactions->merge($sales);
 		
@@ -260,7 +297,7 @@ class GstDashboardController extends Controller
 
 
 		//PURCHASE
-		$purchases = DB::table('purchases as p')
+		/*$purchases = DB::table('purchases as p')
 			->leftJoin('purchase_values as pv','pv.sid','=','p.id')
 			->leftJoin('vendors as v','v.id','=','p.inv_name')
 			->where('p.added_by', $uid)
@@ -281,7 +318,41 @@ class GstDashboardController extends Controller
 			->map(function ($row) {
 				$row->module = 'Purchase';
 				return $row;
-			});
+			});*/
+		$purchases = DB::table('purchases as p')
+					->leftJoinSub(
+						DB::table('purchase_values')
+							->select(
+								'sid',
+								DB::raw('SUM(COALESCE(amount, 0)) as taxable_amount'),
+								DB::raw('SUM(COALESCE(tax_amt, 0)) as gst_amount')
+							)
+							->groupBy('sid'),
+						'pv',
+						'pv.sid',
+						'=',
+						'p.id'
+					)
+					->leftJoin('vendors as v', 'v.id', '=', 'p.inv_name')
+					->where('p.added_by', $uid)
+					->where('p.status', 1)
+					->whereBetween('p.inv_date', [$startDate, $endDate])
+					->select(
+						'p.id',
+						'p.inv_num as invoice_no',
+						'p.inv_date as invoice_date',
+						'v.vendor_name as party_name',
+						'v.vendor_gstin as gstin',
+						DB::raw('COALESCE(pv.taxable_amount, 0) as taxable_amount'),
+						DB::raw('COALESCE(pv.gst_amount, 0) as gst_amount'),
+						DB::raw('(COALESCE(pv.taxable_amount, 0) + COALESCE(pv.gst_amount, 0)) as invoice_total'),
+						'p.pay_status as status'
+					)
+					->get()
+					->map(function ($row) {
+						$row->module = 'Purchase';
+						return $row;
+					});
 
 		$transactions = $transactions->merge($purchases);
 
@@ -470,7 +541,7 @@ class GstDashboardController extends Controller
 		// Net GST Liability
 		$netGstLiability = $outputGst - $inputGst;
 		//GST PAID
-		$gstPaid = 0;
+		$gstPaid = $this->gstService->gstPaidByComp($startDate, $endDate, $uid);
 		//GST PAYABLE / REFUND
 		$gstPayable = $netGstLiability - $gstPaid;
 
@@ -536,9 +607,20 @@ class GstDashboardController extends Controller
 				}
 
 				$items = DB::table('sales_values as sv')
-					->where('sv.sid', $id)
-					->select('sv.*')
-					->get();
+						->leftJoin('products as p', 'p.id', '=', 'sv.prod_id')
+						->where('sv.sid', $id)
+						->select(
+							'sv.*',
+							DB::raw("CASE
+								WHEN p.item_type = 'service' THEN COALESCE(p.service_name, '-')
+								ELSE COALESCE(p.item_name, '-')
+							END as item_name"),
+							DB::raw("CASE
+								WHEN p.item_type = 'service' THEN COALESCE(p.sac_code, '-')
+								ELSE COALESCE(p.hsn_code, '-')
+							END as hsn_sac")
+						)
+						->get();
 
 				$totals = DB::table('sales_values')
 					->where('sid', $id)
@@ -748,9 +830,20 @@ class GstDashboardController extends Controller
 				}
 
 				$items = DB::table('purchase_values as pv')
-					->where('pv.sid', $id)
-					->select('pv.*')
-					->get();
+						->leftJoin('products as p', 'p.id', '=', 'pv.prod_id')
+						->where('pv.sid', $id)
+						->select(
+							'pv.*',
+							DB::raw("CASE
+								WHEN p.item_type = 'service' THEN COALESCE(p.service_name, '-')
+								ELSE COALESCE(p.item_name, '-')
+							END as item_name"),
+							DB::raw("CASE
+								WHEN p.item_type = 'service' THEN COALESCE(p.sac_code, '-')
+								ELSE COALESCE(p.hsn_code, '-')
+							END as hsn_sac")
+						)
+						->get();
 
 				$totals = DB::table('purchase_values')
 					->where('sid', $id)
