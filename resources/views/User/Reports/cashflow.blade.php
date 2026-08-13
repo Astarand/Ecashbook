@@ -56,7 +56,7 @@
                         <div class="row g-3">
 
                             <div class="col-md-3">
-								<label class="form-label">Proprietorship Company</label>
+								<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 								<select name="propId" id="propId" class="form-control">
 									<option value="">{{ parentCompanyName() }}</option>
 									@foreach($proprietorships as $company)

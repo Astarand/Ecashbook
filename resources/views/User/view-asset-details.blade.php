@@ -61,7 +61,7 @@
                                     <div class="card-body">
                                         <div class="row">
 											<div class="col-sm-6 mb-3">
-												<label class="form-label">Proprietorship Company</label>
+												<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 												<select name="propId" class="form-control">
 													<option value="">{{ parentCompanyName() }}</option>
 													@foreach($proprietorships as $company)

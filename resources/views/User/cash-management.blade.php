@@ -100,7 +100,9 @@
                         <thead>
                             <tr>
                                 <th class="text-end">#</th>
-								<th>PROPRIETORSHIP COMPANY</th>
+								@if($hasProprietorship)
+								<th>Proprietorship Company</th>
+								@endif
                                 <th>Date</th>
                                 <th>Transaction Type</th>
                                 <th>Particulars</th>
@@ -112,9 +114,11 @@
                             @foreach ($cash_trans_data as $key => $data)
                                 <tr class="{{ $data->cd_type == 'dr' ? 'bg-danger bg-opacity-25' : 'bg-success bg-opacity-25' }}">
                                     <td class="text-end">{{ $key + 1 }}</td>
+									@if($hasProprietorship)
 									<td><span class="text-muted text-hover-primary">
                                         {{ $data->comp_name }}</span>
                                     </td>
+									@endif
                                     <td><span class="text-muted text-hover-primary">{{ \Carbon\Carbon::parse($data->cd_date)->format('d-m-Y') }}</span></td>
                                     <td><a class="text-muted text-hover-primary" href="#">
                                         {{ $data->cd_type == 'dr' ? 'Debit' : 'Credit' }}</a>
@@ -167,7 +171,7 @@
                                                         <!-- Bank Name -->
                                                         <div class="row">
 															<div class="col-md-6  mb-3">
-																<label class="form-label">Proprietorship Company</label>
+																<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 																<select name="propId" class="form-control">
 																	<option value="">{{ parentCompanyName() }}</option>
 																	@foreach($proprietorships as $company)
@@ -228,7 +232,7 @@
                                                         <!-- Bank Name -->
                                                         <div class="row">
 															<div class="col-md-6  mb-3">
-																<label class="form-label">Proprietorship Company</label>
+																<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 																<select name="propId" class="form-control">
 																	<option value="">{{ parentCompanyName() }}</option>
 																	@foreach($proprietorships as $company)
@@ -303,7 +307,7 @@
                         <!-- Bank Name -->
                         <div class="row">
 							<div class="col-md-6  mb-3">
-								<label class="form-label">Proprietorship Company</label>
+								<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 								<select name="propId" class="form-control">
 									<option value="">{{ parentCompanyName() }}</option>
 									@foreach($proprietorships as $company)

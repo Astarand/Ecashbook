@@ -62,7 +62,7 @@
 						<div class="row g-3">
 							<!-- Company -->
 							<div class="col-lg-3 col-md-6">
-								<label class="form-label">Company</label>
+								<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 								<select name="prop_Id" class="form-select">
 									<option value="">{{ parentCompanyName() }}</option>
 
@@ -447,7 +447,7 @@
                     <div class="row" id="voucherFieldsSection">
 					
 						<div class="col-md-6 mb-2">
-							<label class="form-label">Proprietorship Company</label>
+							<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 							<select name="propId" id="propId" class="form-select">
 								<option value="">{{ parentCompanyName() }}</option>
 								@foreach($proprietorships as $company)

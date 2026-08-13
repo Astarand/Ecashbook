@@ -40,7 +40,7 @@
                     <input type="text" name="inv_num" id="inv_num" class="form-control" placeholder="e.g. PO/25-26/0001" required="">
                 </div>
 				<div class="mb-4 col-md-4">
-					<label class="form-label">Proprietorship Company</label>
+					<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 					<select name="propId" class="form-control">
 						<option value="">{{ parentCompanyName() }}</option>
 						@foreach($proprietorships as $company)

@@ -273,8 +273,8 @@ class LedgerController extends Controller
 			$rows = array_merge($rows, $assetRows);
 		}
 		if (empty($ledgerGroup) || $ledgerGroup === 'Liability') {
-			//$liabilitiesRows = $this->getLiabilityLedgerRows($propId,$userId,$from,$to,$ledger,$partyName);
-			//$rows = array_merge($rows, $liabilitiesRows);
+			$liabilitiesRows = $this->getLiabilityLedgerRows($propId,$userId,$from,$to,$ledger,$partyName);
+			$rows = array_merge($rows, $liabilitiesRows);
 		}
 		
 		return $rows;
@@ -2512,6 +2512,377 @@ class LedgerController extends Controller
 					];
 				}
 			}
+		}
+		
+		/*
+		|--------------------------------------------------------------------------
+		| Current Liabilities
+		|--------------------------------------------------------------------------
+		*/
+		$currentLiabilitiesQuery = DB::table('current_liabilities as cl')
+			->join('liabilities as l', 'l.id', '=', 'cl.liabilities_id')
+			->where('l.liabilities_type', 'current_liabilities')
+			->where('l.status', 1)
+			->whereBetween('l.added_date', [$from, $to]);
+
+		if (!empty($propId)) {
+			$currentLiabilitiesQuery->where('l.propId', $propId);
+		} else {
+			$currentLiabilitiesQuery->where('l.added_by', $userId);
+		}
+
+		$currentLiabilities = $currentLiabilitiesQuery
+			->select(
+				'cl.*',
+				'l.added_by as liability_added_by',
+				'l.propId as liability_propId',
+				'l.liabilities_type',
+				'l.added_date as liability_added_date',
+				'l.status as liability_status'
+			)
+			->orderBy('l.added_date', 'asc')
+			->orderBy('cl.id', 'asc')
+			->get();
+
+
+		foreach ($currentLiabilities as $item) {
+
+			$liabilityType = strtolower(trim((string) ($item->CurrentLiabilitiesType ?? '')));
+
+			//Only Short Term Loan & Interest Payable
+			if ($liabilityType !== 'short_term_loans' && $liabilityType !== 'interest_payable') {
+				continue;
+			}
+
+			$amount = 0;
+			$liabilityLedger = '';
+			$partyNameValue = '';
+			$voucherNo = '-';
+			$date = $item->liability_added_date;
+			$narration = '';
+			$paymentStatus = 'Due';
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| Short Term Loan
+			|--------------------------------------------------------------------------
+			*/
+			if ($liabilityType === 'short_term_loans') {
+
+				$amount = (float) ($item->stl_sanction_amount ?? $item->stl_amount_received ?? $item->amount?? 0);
+
+				$liabilityLedger = 'Short Term Loans';
+				$partyNameValue = trim((string) ($item->stl_lender_name ?? $item->party_name ?? $item->lender_details ?? ''));
+				$voucherNo = $item->invoice_no ?? $item->stl_reference ?? '-';
+				$date = $item->liability_added_date;
+				$narration = $item->stl_remarks ?? $item->notes ?? $liabilityLedger;
+				$paymentStatus = $item->ip_payment_status ?? $item->ip_payment_status ?? 'Due';
+			}
+			else {
+
+				$amount = (float) ($item->ip_interest_amount ?? $item->amount ?? 0);
+				$liabilityLedger = 'Interest Payable';
+				$partyNameValue = trim((string) ($item->ip_lender_name ?? $item->party_name ?? $item->lender_details ?? '' ));
+				$voucherNo = $item->invoice_no ?? $item->ip_reference ?? '-';
+				$date = $item->liability_added_date;
+				$narration = $item->ip_narration ?? $item->notes ?? $liabilityLedger;
+				$paymentStatus = $item->ip_payment_status ?? 'Due';
+			}
+
+			if ($amount <= 0) {
+				continue;
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| Selected Ledger / Party
+			|--------------------------------------------------------------------------
+			*/
+
+			$selectedLedger = strtolower(trim((string) $ledger));
+
+			$liabilityLedgerLower = strtolower(
+				trim((string) $liabilityLedger)
+			);
+
+			$partyNameLower = strtolower(
+				trim((string) $partyNameValue)
+			);
+
+			/*
+			|--------------------------------------------------------------------------
+			| Match Liability Ledger
+			|--------------------------------------------------------------------------
+			| Example:
+			| Short Term Loans
+			| Interest Payable
+			|--------------------------------------------------------------------------
+			*/
+			$isLiabilityLedger = (
+				!empty($selectedLedger) &&
+				$selectedLedger === $liabilityLedgerLower
+			);
+
+			/*
+			|--------------------------------------------------------------------------
+			| Match Lender / Party
+			|--------------------------------------------------------------------------
+			| Example:
+			| ANIL RANA(LOAN)
+			|--------------------------------------------------------------------------
+			*/
+			$isParty = (
+				!empty($selectedLedger) &&
+				!empty($partyNameLower) &&
+				$selectedLedger === $partyNameLower
+			);
+
+			/*
+			|--------------------------------------------------------------------------
+			| Match Bank Account
+			|--------------------------------------------------------------------------
+			*/
+			$isBank = false;
+
+			if ($liabilityType === 'short_term_loans') {
+
+				$bankAccount = strtolower(
+					trim((string) ($item->stl_bank_account ?? ''))
+				);
+
+				if (
+					!empty($selectedLedger) &&
+					!empty($bankAccount) &&
+					$selectedLedger === $bankAccount
+				) {
+					$isBank = true;
+				}
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Match Interest Expense
+			|--------------------------------------------------------------------------
+			*/
+			$isInterestExpense = (
+				$liabilityType === 'interest_payable' &&
+				$selectedLedger === 'interest expense'
+			);
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| Skip unrelated ledger
+			|--------------------------------------------------------------------------
+			*/
+			if (
+				!empty($ledger) &&
+				!$isLiabilityLedger &&
+				!$isParty &&
+				!$isBank &&
+				!$isInterestExpense
+			) {
+				continue;
+			}
+
+
+			$debit = 0;
+			$credit = 0;
+
+			/*
+			|--------------------------------------------------------------------------
+			| Default / All Ledger View
+			|--------------------------------------------------------------------------
+			*/
+			if (empty($ledger) && empty($partyName)) {
+
+				$credit = $amount;
+
+			}
+			/*
+			|--------------------------------------------------------------------------
+			| Bank Ledger
+			|--------------------------------------------------------------------------
+			*/
+			elseif ($isBank) {
+
+				// Bank Dr
+				$debit = $amount;
+
+			}
+			/*
+			|--------------------------------------------------------------------------
+			| Interest Expense
+			|--------------------------------------------------------------------------
+			*/
+			elseif ($isInterestExpense) {
+
+				// Interest Expense Dr
+				$debit = $amount;
+
+			}
+			/*
+			|--------------------------------------------------------------------------
+			| Lender / Liability Ledger
+			|--------------------------------------------------------------------------
+			*/
+			elseif ($isParty || $isLiabilityLedger) {
+
+				// Liability / Lender Cr
+				$credit = $amount;
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| Skip if no Debit / Credit
+			|--------------------------------------------------------------------------
+			*/
+			if ($debit == 0 && $credit == 0) {
+				continue;
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| Expanded Details
+			|--------------------------------------------------------------------------
+			*/
+			$details = [];
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| Short Term Loan
+			|--------------------------------------------------------------------------
+			*/
+			if ($liabilityType === 'short_term_loans') {
+
+				//$bankName = trim((string) ($item->stl_bank_account ?? 'Bank / Cash'));
+				$bankName = 'Bank  '.trim((string) ($item->stl_bank_account));
+
+				/*
+				| Bank Dr
+				*/
+				$details[] = [
+					'ledger' => $bankName,
+					'debit' => round($amount, 2),
+					'credit' => 0,
+				];
+
+				/*
+				| Short Term Loan Cr
+				*/
+				$details[] = [
+					'ledger' => $liabilityLedger,
+					'debit' => 0,
+					'credit' => round($amount, 2),
+				];
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| Interest Payable
+			|--------------------------------------------------------------------------
+			*/
+			elseif ($liabilityType === 'interest_payable') {
+
+				/*
+				| Interest Expense Dr
+				*/
+				$details[] = [
+					'ledger' => 'Interest Expense',
+					'debit' => round($amount, 2),
+					'credit' => 0,
+				];
+
+				/*
+				| Interest Payable Cr
+				*/
+				$details[] = [
+					'ledger' => $liabilityLedger,
+					'debit' => 0,
+					'credit' => round($amount, 2),
+				];
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| Debit Ledger Name
+			|--------------------------------------------------------------------------
+			*/
+			$debitLedgerName = '';
+
+			if ($debit > 0) {
+
+				if ($isBank) {
+
+					$debitLedgerName = $item->stl_bank_account
+						?? 'Bank / Cash';
+
+				} elseif ($isInterestExpense) {
+
+					$debitLedgerName = 'Interest Expense';
+
+				} else {
+
+					$debitLedgerName = $ledger
+						?? $liabilityLedger;
+				}
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| Credit Ledger Name
+			|--------------------------------------------------------------------------
+			*/
+			$creditLedgerName = '';
+
+			if ($credit > 0) {
+
+				if ($isParty) {
+
+					$creditLedgerName = $partyNameValue;
+
+				} else {
+
+					$creditLedgerName = $liabilityLedger;
+				}
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| Main Row
+			|--------------------------------------------------------------------------
+			*/
+			$rows[] = [
+				'date' => $date,
+				'voucher' => $voucherNo,
+				'type' => 'Current Liability',
+				'source' => $source,
+				'transaction_details' => $liabilityLedger,
+				'ledgername' => $ledger ?? '',
+				'counter' => $partyNameValue,
+				'debit_ledger' => $debitLedgerName,
+				'credit_ledger' => $creditLedgerName,
+				'narration' => $narration,
+				'cgst' => 0,
+				'sgst' => 0,
+				'igst' => 0,
+				'shipping_cost' => 0,
+				'debit' => round($debit, 2),
+				'credit' => round($credit, 2),
+				'balance' => 0,
+				'payment_status' => $paymentStatus,
+				'status' => $item->liability_status ?? 'Posted',
+				'details' => $details,
+			];
 		}
 
 		return $rows;

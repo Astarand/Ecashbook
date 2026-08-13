@@ -505,7 +505,7 @@
 										
 										@if(Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Proprietorship Company</label>
+                                                <label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
                                                 <select name="propId" id="propId" class="form-control">
                                                     <option value="">{{ parentCompanyName() }}</option>
                                                     @foreach($proprietorships as $company)

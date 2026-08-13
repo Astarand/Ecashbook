@@ -44,7 +44,7 @@
                 <input type="hidden" name="liabId" id="liabId" value="{{ $liability->id }}">
                 <div class="row">
 					<div class="col-xl-4 mb-3">
-						<label class="form-label">Proprietorship Company</label>
+						<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 						<select name="propId" class="form-control">
 							<option value="">{{ parentCompanyName() }}</option>
 							@foreach($proprietorships as $company)

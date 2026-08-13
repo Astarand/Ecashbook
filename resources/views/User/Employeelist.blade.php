@@ -46,7 +46,7 @@
                             <tr>
                                 <th class="text-end">#</th>
 								@if(Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
-                                <th>PROPRIETORSHIP COMPANY</th>
+                                <th>{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</th>
 								@endif
                                 <th>Employee Name</th>
                                 <th>Contact Number</th>

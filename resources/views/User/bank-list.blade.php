@@ -129,9 +129,9 @@
                             <!-- Bank Name -->
                             <div class="row">
 								<div class="mb-3 col-md-3">
-									<label class="form-label">Proprietorship Company</label>
+									<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 									<select name="propId" class="form-control">
-										<option value="">Select Company</option>
+										<option value="">{{ parentCompanyName() }}</option>
 										@foreach($val->proprietorships as $company)
 											<option value="{{ $company->id }}" <?=($val->propId == $company->id) ? 'selected' : '' ?>>
 												{{ $company->comp_name }}
@@ -203,9 +203,9 @@
                     <!-- Bank Name -->
                     <div class="row">
 						<div class="col-md-4  mb-3">
-							<label class="form-label">Proprietorship Company</label>
+							<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 							<select name="propId" class="form-control">
-								<option value="">Select Company</option>
+								<option value="">{{ parentCompanyName() }}</option>
 								@foreach($proprietorships as $company)
 									<option value="{{ $company->id }}">
 										{{ $company->comp_name }}

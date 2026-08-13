@@ -577,8 +577,9 @@ class Helper{
 	{
 		$userId = currentOwnerId();
 
-		return DB::table('proprietorship_profiles')
+		return DB::table('company_profiles')
 			->where('userId', $userId)
+			->where('comp_type', 'Proprietorship')
 			->exists();
 	}
 }
