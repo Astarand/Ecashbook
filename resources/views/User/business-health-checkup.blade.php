@@ -5,14 +5,14 @@
 <div class="pc-content">
 
     {{-- PAGE TITLE --}}
-    <div class="page-header" 
-		 style="background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%); 
+    <div class="page-header"
+		 style="background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%);
 				border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
 		<div class="page-block">
 			<div class="row align-items-center">
 				<div class="col-md-12">
 					<div class="d-flex justify-content-between align-items-center text-white">
-						
+
 						<!-- Left: Title -->
 						<div class="d-flex align-items-center">
 							<i class="ph-duotone ph-heart-straight fs-1 me-3"></i>
@@ -26,7 +26,7 @@
 
 						<!-- Right: Back Button -->
 						<div>
-							<a href="{{ route('admin.company.checks') }}" 
+							<a href="{{ route('admin.company.checks') }}"
 							   class="btn btn-light fw-semibold">
 								<i class="ph ph-arrow-left me-1"></i> Back
 							</a>
@@ -496,7 +496,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="trade_chk" id="trade_chk" data-target="trade_doc">
                                                 <label class="form-check-label" for="trade_chk">Trade License</label>
-												<div id="trade_doc_link"></div>									
+												<div id="trade_doc_link"></div>
                                             </div>
                                             <input type="file" name="trade_doc" id="trade_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -504,7 +504,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="shop_est_chk" id="shop_est_chk" data-target="shop_est_doc">
                                                 <label class="form-check-label" for="shop_est_chk">Shop &amp; Establishment</label>
-												<div id="shop_est_doc_link"></div>									
+												<div id="shop_est_doc_link"></div>
 											</div>
                                             <input type="file" name="shop_est_doc" id="shop_est_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -512,7 +512,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="ptax_chk" id="ptax_chk" data-target="ptax_doc">
                                                 <label class="form-check-label" for="ptax_chk">Professional Tax Registration</label>
-												<div id="ptax_doc_link"></div>									
+												<div id="ptax_doc_link"></div>
 											</div>
                                             <input type="file" name="ptax_doc" id="ptax_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -520,7 +520,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="gst_chk" id="gst_chk" data-target="gst_doc">
                                                 <label class="form-check-label" for="gst_chk">Company GST Certificate</label>
-												<div id="gst_doc_link"></div>									
+												<div id="gst_doc_link"></div>
                                             </div>
                                             <input type="file" name="gst_doc" id="gst_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -528,7 +528,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="tan_chk" id="tan_chk" data-target="tan_doc">
                                                 <label class="form-check-label" for="tan_chk">TAN Registration</label>
-												<div id="tan_doc_link"></div>									
+												<div id="tan_doc_link"></div>
                                             </div>
                                             <input type="file" name="tan_doc" id="tan_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -536,7 +536,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="msme_chk" id="msme_chk" data-target="msme_doc">
                                                 <label class="form-check-label" for="msme_chk">MSME Certificate</label>
-												<div id="msme_doc_link"></div>									
+												<div id="msme_doc_link"></div>
                                             </div>
                                             <input type="file" name="msme_doc" id="msme_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -546,7 +546,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="epf_chk" id="epf_chk" data-target="epf_doc">
                                                 <label class="form-check-label" for="epf_chk">EPF Certificate</label>
-												<div id="epf_doc_link"></div>									
+												<div id="epf_doc_link"></div>
                                             </div>
                                             <input type="file" name="epf_doc" id="epf_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -554,7 +554,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="esi_chk" id="esi_chk" data-target="esi_doc">
                                                 <label class="form-check-label" for="esi_chk">ESI No Certificate</label>
-												<div id="esi_doc_link"></div>									
+												<div id="esi_doc_link"></div>
                                             </div>
                                             <input type="file" name="esi_doc" id="esi_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -562,7 +562,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="ind_chk" id="ind_chk" data-target="ind_doc">
                                                 <label class="form-check-label" for="ind_chk">Industry Certifications</label>
-												<div id="ind_doc_link"></div>									
+												<div id="ind_doc_link"></div>
                                             </div>
                                             <input type="file" name="ind_doc" id="ind_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -570,7 +570,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="fssai_chk" id="fssai_chk" data-target="fssai_doc">
                                                 <label class="form-check-label" for="fssai_chk">FSSAI License</label>
-												<div id="fssai_doc_link"></div>									
+												<div id="fssai_doc_link"></div>
                                             </div>
                                             <input type="file" name="fssai_doc" id="fssai_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -578,7 +578,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="poll_chk" id="poll_chk" data-target="poll_doc">
                                                 <label class="form-check-label" for="poll_chk">Pollution Certificate</label>
-												<div id="poll_doc_link"></div>									
+												<div id="poll_doc_link"></div>
                                             </div>
                                             <input type="file" name="poll_doc" id="poll_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -586,7 +586,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="import_chk" id="import_chk" data-target="import_doc">
                                                 <label class="form-check-label" for="import_chk">Import Export Code (IEC)</label>
-												<div id="import_doc_link"></div>									
+												<div id="import_doc_link"></div>
 											</div>
                                             <input type="file" name="import_doc" id="import_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -594,7 +594,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input doc-checkbox" type="checkbox" name="fact_chk" id="fact_chk" data-target="fact_doc">
                                                 <label class="form-check-label" for="fact_chk">Factory License / Registration</label>
-												<div id="fact_doc_link"></div>									
+												<div id="fact_doc_link"></div>
 											</div>
                                             <input type="file" name="fact_doc" id="fact_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
@@ -607,7 +607,7 @@
                                             <input type="file" name="fire_doc" id="fire_doc" class="form-control form-control-sm mt-1 doc-upload" style="display: none;">
                                         </div>
                                     </div>
-									
+
                                 </div>
 
                                 <div class="alert border-0 mt-3 p-3" style="background: rgba(10, 134, 198, 0.08); border-left: 4px solid #008CAD !important; border-radius: 10px;">
@@ -624,7 +624,7 @@
 
                             {{-- STEP 1 SUBMIT BUTTON --}}
                             <div class="mt-4 mb-4 text-center">
-                                <button type="submit" 
+                                <button type="submit"
                                         class="btn btn-lg px-5 py-3 fw-bold shadow-sm" style="background: linear-gradient(135deg, #0A86C6 0%, #008CAD 100%); color: white; border: none; border-radius: 10px; font-size: 1rem; letter-spacing: 0.3px;">
                                     <i class="ph-duotone ph-arrow-right me-2 fs-5"></i>
                                     Submit Company Details &amp; Continue
@@ -632,10 +632,10 @@
                             </div>
 
                             {{-- RED HIGHLIGHT NOTE SECTION WITH LEFT & RIGHT MARGINS AND SPACIOUS PADDING --}}
-                            <div class="alert border-0 shadow-sm text-white mx-1 mx-md-3 mb-4 mt-2" 
+                            <div class="alert border-0 shadow-sm text-white mx-1 mx-md-3 mb-4 mt-2"
                                  style="background: linear-gradient(135deg, #ff7675 0%, #d63031 100%); border-radius: 12px; padding: 1.25rem 1.5rem; box-shadow: 0 6px 20px rgba(214, 48, 49, 0.2) !important;">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" 
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                                          style="width: 38px; height: 38px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px);">
                                         <i class="ph-duotone ph-info fs-4 text-white"></i>
                                     </div>
@@ -650,10 +650,10 @@
                             <div class="pb-3"></div>
 						</form>
                         </div> {{-- /step1Section --}}
-						
+
 						@endif
-						
-						
+
+
                         {{-- STEP 2: SUMMARY + FINAL REVIEW (IMAGE 3 & 4) --}}
 						@if(Auth::user()->u_type == 3 || Auth::user()->u_type == 6)
                         <div id="step2Section" class="mt-4">
@@ -869,7 +869,7 @@
                                 </div>
                                 </div>
                             </div>
-							
+
 							<div class="card border-0 shadow-sm mb-4" style="border-radius: 8px;">
 								<div class="card-body p-4">
 									<p class="fw-bold mb-3 text-dark d-flex align-items-center">
@@ -882,14 +882,14 @@
 											<label class="form-label fw-semibold">Status</label>
 											<select name="admin_status" class="form-select" required style="border-radius: 6px;">
 												<option value="0">Pending</option>
-												<option value="1">Approve</option>												
+												<option value="1">Approve</option>
 											</select>
 										</div>
 
 										<div class="col-md-4">
 											<label class="form-label fw-semibold">Remark</label>
-											<textarea name="admin_remark" 
-													  class="form-control" 
+											<textarea name="admin_remark"
+													  class="form-control"
 													  placeholder="Enter remark"
 													  style="border-radius: 6px; min-height: 38px;"></textarea>
 										</div>
@@ -917,7 +917,7 @@
                                     Generate the Final Review &amp; Recommendations
                                 </button>
                             </div>
-                            
+
 							</form>
                         </div> {{-- /step2Section --}}
 						@endif
@@ -947,14 +947,14 @@
                         <div>
                             <h6 class="fw-bold mb-2">Why This Information Matters</h6>
                             <p class="mb-0 small">
-                                The information below is crucial for accurate assessment. Without comprehensive details, 
-                                the company's health check-up cannot be completed accurately. Incomplete data may cause 
+                                The information below is crucial for accurate assessment. Without comprehensive details,
+                                the company's health check-up cannot be completed accurately. Incomplete data may cause
                                 unreliable results, so please provide all available information.
                             </p>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="row g-3 mt-2">
                     <div class="col-md-6">
                         <div class="d-flex align-items-start">
@@ -1030,7 +1030,7 @@
             radio.addEventListener('change', function() {
                 const targetId = this.getAttribute('data-target');
                 const targetInput = document.getElementById(targetId);
-                
+
                 if (targetInput) {
                     if (this.value === 'yes' && this.checked) {
                         // Show input when Yes is selected
@@ -1066,7 +1066,7 @@
             checkbox.addEventListener('change', function() {
                 const targetId = this.getAttribute('data-target');
                 const uploadInput = document.getElementById(targetId);
-                
+
                 if (uploadInput) {
                     if (this.checked) {
                         // Show upload input when checkbox is checked
@@ -1082,7 +1082,7 @@
     });
 
 	$(document).ready(function () {
-		
+
 		function getQueryParam(param) {
 			const urlParams = new URLSearchParams(window.location.search);
 			return urlParams.get(param);
@@ -1149,7 +1149,7 @@
 			}
 		});
 
-		
+
 		// SAVE DATA
 		$('#companyHealthForm').on('submit', function (e) {
 
@@ -1205,7 +1205,7 @@
 				}
 			});
 		});
-		
+
 		$('#companyHealthForm2').on('submit', function (e) {
 			e.preventDefault();
 			let formData = new FormData(this);
@@ -1236,8 +1236,8 @@
 		});
 
 
-	});	
-	
+	});
+
 </script>
 
 @endsection
