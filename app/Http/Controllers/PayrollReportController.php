@@ -587,7 +587,7 @@ class PayrollReportController extends Controller
         $pf = 0;
 
         if ($employee->epf_applicable) {
-            $pf = $basicSalary * 0.12;
+            $pf = min($basicSalary * 0.12, 1800);
         }
 
         /*
@@ -687,88 +687,528 @@ class PayrollReportController extends Controller
     }
 
     //------- Payroll Register Report -------//
+
     public function payrollRegister(Request $request)
     {
-        $ownerId = currentOwnerId();
+        $ownerId   = currentOwnerId();
         $authUserId = auth()->id();
 
         $month = $request->month;
-        $fy = $request->fy;
+        $fy    = $request->fy;
 
+        // =========================================================
         // Month Name => Month Number
+        // =========================================================
         $months = [
-            'January' => 1,
-            'February' => 2,
-            'March' => 3,
-            'April' => 4,
-            'May' => 5,
-            'June' => 6,
-            'July' => 7,
-            'August' => 8,
+            'January'   => 1,
+            'February'  => 2,
+            'March'     => 3,
+            'April'     => 4,
+            'May'       => 5,
+            'June'      => 6,
+            'July'      => 7,
+            'August'    => 8,
             'September' => 9,
-            'October' => 10,
-            'November' => 11,
-            'December' => 12,
+            'October'   => 10,
+            'November'  => 11,
+            'December'  => 12,
         ];
 
-        $currentMonth = $months[$month];
+        $currentMonth = $months[$month] ?? date('n');
 
         [$fyStart, $fyEnd] = explode('-', $fy);
 
-        // Previous Month
+        // =========================================================
+        // Previous Payroll Month
+        // =========================================================
         $previousMonth = $currentMonth - 1;
-        $previousFY = $fy;
+        $previousFY    = $fy;
 
         if ($previousMonth == 0) {
             $previousMonth = 12;
             $previousFY = ($fyStart - 1) . '-' . ($fyEnd - 1);
         }
 
+        // =========================================================
+        // Previous Payroll Month Date Range
+        // =========================================================
+        [$previousFYStart, $previousFYEnd] = explode('-', $previousFY);
+
+        $previousYear = ($previousMonth >= 4)
+            ? $previousFYStart
+            : $previousFYEnd;
+
+        $payrollStart = Carbon::create(
+            $previousYear,
+            $previousMonth,
+            1
+        )->startOfMonth();
+
+        $payrollEnd = $payrollStart->copy()->endOfMonth();
+
+        // =========================================================
+        // Employees
+        //
+        // Employee should be included if:
+        //
+        // 1. Joined on or before payroll month end
+        //
+        // 2. If resigned/terminated:
+        //    resignation date must be on/after payroll month start
+        //
+        // 3. Confirmed / In Probation employees are included
+        // =========================================================
         $employees = DB::table('employees as e')
             ->leftJoin('users as u', 'u.id', '=', 'e.empId')
             ->leftJoin('designations as d', 'd.id', '=', 'e.desig_id')
+
             ->where(function ($query) use ($ownerId, $authUserId) {
+
                 if ($ownerId !== null) {
                     $query->where('e.added_by', $ownerId);
                 }
+
                 if ($authUserId !== null) {
                     $query->orWhere('e.added_by', $authUserId);
                 }
+
                 if ($ownerId === null && $authUserId === null) {
                     $query->whereRaw('1 = 0');
                 }
             })
-            ->select(
-                'e.empId',
-                'e.employee_id',
-                'u.name',
-                'd.designation_name',
-                'e.joining_date',
-                'e.total_addition',
-                'e.net_sal',
 
-                DB::raw("CASE WHEN e.epf_applicable=1 THEN e.provident_fund ELSE 0 END as provident_fund"),
-                DB::raw("CASE WHEN e.esic_applicable=1 THEN e.esi ELSE 0 END as esi"),
-                DB::raw("CASE WHEN e.ptax_applicable=1 THEN e.ptax ELSE 0 END as ptax"),
-                DB::raw("CASE WHEN e.tds_applicable=1 THEN e.tds ELSE 0 END as tds")
+            // =====================================================
+            // Joining Date
+            // Employee must have joined before/during this month
+            // =====================================================
+            ->where(function ($q) use ($payrollEnd) {
+
+                $q->whereNull('e.joining_date')
+                    ->orWhereDate('e.joining_date', '<=', $payrollEnd);
+            })
+
+            // =====================================================
+            // Employee Status
+            // =====================================================
+            ->where(function ($q) use ($payrollStart) {
+
+                // Normal active employees
+                $q->whereIn('e.emp_status', [
+                    'Confirmed',
+                    'In Probation'
+                ])
+
+                // Resigned / Terminated employees
+                // are included if they worked during this month
+                ->orWhere(function ($qq) use ($payrollStart) {
+
+                    $qq->whereIn('e.emp_status', [
+                        'Resigned',
+                        'Terminated'
+                    ])
+                    ->whereNotNull('e.regine_date')
+                    ->whereDate(
+                        'e.regine_date',
+                        '>=',
+                        $payrollStart
+                    );
+                });
+            })
+
+            ->select(
+                'e.*',
+                'u.name',
+                'd.designation_name'
             )
             ->get();
 
+        // =========================================================
+        // Existing Payslips
+        //
+        // Get all payslips for this payroll month at once
+        // instead of querying inside every employee loop.
+        // =========================================================
+        $existingPayslips = DB::table('user_payslip')
+            ->where(function ($query) use ($ownerId, $authUserId) {
+
+                if ($ownerId !== null) {
+                    $query->where('added_by', $ownerId);
+                }
+
+                if ($authUserId !== null) {
+                    $query->orWhere('added_by', $authUserId);
+                }
+
+                if ($ownerId === null && $authUserId === null) {
+                    $query->whereRaw('1 = 0');
+                }
+            })
+            ->where('financial_year', $previousFY)
+            ->where('month', $previousMonth)
+            ->get()
+            ->keyBy('user_emp_id');
+
+        // =========================================================
+        // Final Payroll Register
+        // =========================================================
         foreach ($employees as $employee) {
 
-            $paid = DB::table('user_payslip')
-                ->where('user_emp_id', $employee->empId)
-                ->where('financial_year', $previousFY)
-                ->where('month', $previousMonth)
-                ->exists();
+            // Default values
+            $employee->gross_salary       = 0;
+            $employee->basic_salary       = 0;
+            $employee->net_salary         = 0;
 
-            $employee->advance = 0;
-            $employee->loan_deduction = 0;
-            $employee->payment_status = $paid ? 'Salary Done' : 'Payment Pending';
+            $employee->provident_fund     = 0;
+            $employee->esi                = 0;
+            $employee->ptax               = 0;
+            $employee->tds                = 0;
+            $employee->lwf                = 0;
+            $employee->lop                = 0;
+
+            $employee->advance            = 0;
+            $employee->loan_deduction     = 0;
+
+            $employee->total_deductions   = 0;
+
+            $employee->overtime_hours     = 0;
+            $employee->absent_days        = 0;
+
+            $employee->payment_status     = 'Payment Pending';
+
+            // =====================================================
+            // CASE A
+            // Payslip Already Generated
+            // =====================================================
+            if (isset($existingPayslips[$employee->empId])) {
+
+                $payslip = $existingPayslips[$employee->empId];
+
+                $response = json_decode(
+                    $payslip->emp_salary_slip_response,
+                    true
+                );
+
+                $salary = $response['visible_data']['final_salary_calculation']
+                    ?? [];
+
+                // -------------------------------------------------
+                // Salary values from generated payslip
+                // -------------------------------------------------
+                $employee->basic_salary = (float) (
+                    $salary['basic_salary'] ?? 0
+                );
+
+                $employee->gross_salary = (float) (
+                    $salary['gross_salary']
+                    ?? $salary['basic_salary']
+                    ?? 0
+                );
+
+                $employee->net_salary = (float) (
+                    $salary['net_salary'] ?? 0
+                );
+
+                // -------------------------------------------------
+                // Deductions
+                // -------------------------------------------------
+                $employee->provident_fund = (float) (
+                    $salary['provident_fund'] ?? 0
+                );
+
+                $employee->esi = (float) (
+                    $salary['esi'] ?? 0
+                );
+
+                $employee->ptax = (float) (
+                    $salary['ptax'] ?? 0
+                );
+
+                $employee->tds = (float) (
+                    $salary['tds'] ?? 0
+                );
+
+                $employee->lwf = (float) (
+                    $salary['lwf'] ?? 0
+                );
+
+                $employee->lop = (float) (
+                    $salary['lop'] ?? 0
+                );
+
+                $employee->total_deductions = (float) (
+                    $salary['total_deductions'] ?? 0
+                );
+
+                $employee->overtime_hours = (float) (
+                    $salary['overtime_hours'] ?? 0
+                );
+
+                $employee->absent_days = (float) (
+                    $salary['absent_days'] ?? 0
+                );
+
+                // -------------------------------------------------
+                // Advance / Loan
+                // -------------------------------------------------
+                $employee->advance = (float) (
+                    $salary['advance']
+                    ?? $payslip->advance
+                    ?? 0
+                );
+
+                $employee->loan_deduction = (float) (
+                    $salary['loan']
+                    ?? $salary['loan_deduction']
+                    ?? $payslip->loan_deduction
+                    ?? 0
+                );
+
+                // -------------------------------------------------
+                // Payment Status
+                // -------------------------------------------------
+                $employee->payment_status =
+                    ($payslip->payment_status ?? '') === 'Done'
+                        ? 'Salary Done'
+                        : 'Payment Pending';
+
+                $employee->payslip_generated = true;
+                $employee->payslip_id = $payslip->id ?? null;
+            }
+
+            // =====================================================
+            // CASE B
+            // Payslip NOT Generated
+            // Calculate using existing calculateEmployeeSalary()
+            // =====================================================
+            else {
+
+                $salary = $this->calculateEmployeeSalary(
+                    $employee,
+                    $previousMonth,
+                    $previousFY
+                );
+
+                // -------------------------------------------------
+                // Salary
+                // -------------------------------------------------
+                $employee->gross_salary = (float) (
+                    $salary['gross_salary'] ?? 0
+                );
+
+                $employee->basic_salary = (float) (
+                    $salary['basic_salary'] ?? 0
+                );
+
+                $employee->net_salary = (float) (
+                    $salary['net_salary'] ?? 0
+                );
+
+                // -------------------------------------------------
+                // Deductions
+                // -------------------------------------------------
+                $employee->provident_fund = (float) (
+                    $salary['pf'] ?? 0
+                );
+
+                $employee->esi = (float) (
+                    $salary['esi'] ?? 0
+                );
+
+                $employee->ptax = (float) (
+                    $salary['pt'] ?? 0
+                );
+
+                $employee->tds = (float) (
+                    $salary['tds'] ?? 0
+                );
+
+                $employee->lwf = (float) (
+                    $salary['lwf'] ?? 0
+                );
+
+                $employee->lop = (float) (
+                    $salary['lop'] ?? 0
+                );
+
+                $employee->total_deductions = (float) (
+                    $salary['total_deductions'] ?? 0
+                );
+
+                $employee->overtime_hours = (float) (
+                    $salary['overtime_hours'] ?? 0
+                );
+
+                $employee->absent_days = (float) (
+                    $salary['absent_days'] ?? 0
+                );
+
+                // -------------------------------------------------
+                // Advance
+                // -------------------------------------------------
+                $employee->advance = (float) (
+                    $employee->advance ?? 0
+                );
+
+                // -------------------------------------------------
+                // Loan
+                // -------------------------------------------------
+                $employee->loan_deduction = (float) (
+                    $employee->loan_deduction ?? 0
+                );
+
+                // -------------------------------------------------
+                // No payslip = Payment Pending
+                // -------------------------------------------------
+                $employee->payment_status = 'Payment Pending';
+
+                $employee->payslip_generated = false;
+                $employee->payslip_id = null;
+            }
+
+            // =====================================================
+            // Round Values
+            // =====================================================
+            $employee->gross_salary =
+                round($employee->gross_salary, 2);
+
+            $employee->basic_salary =
+                round($employee->basic_salary, 2);
+
+            $employee->net_salary =
+                round($employee->net_salary, 2);
+
+            $employee->provident_fund =
+                round($employee->provident_fund, 2);
+
+            $employee->esi =
+                round($employee->esi, 2);
+
+            $employee->ptax =
+                round($employee->ptax, 2);
+
+            $employee->tds =
+                round($employee->tds, 2);
+
+            $employee->lwf =
+                round($employee->lwf, 2);
+
+            $employee->lop =
+                round($employee->lop, 2);
+
+            $employee->advance =
+                round($employee->advance, 2);
+
+            $employee->loan_deduction =
+                round($employee->loan_deduction, 2);
+
+            $employee->total_deductions =
+                round($employee->total_deductions, 2);
+
+            $employee->overtime_hours =
+                round($employee->overtime_hours, 2);
+
+            // =====================================================
+            // Useful Register Information
+            // =====================================================
+            $employee->payroll_month = $previousMonth;
+            $employee->payroll_financial_year = $previousFY;
+
+            $employee->joining_date =
+                $employee->joining_date
+                    ? Carbon::parse($employee->joining_date)->format('Y-m-d')
+                    : null;
+
+            $employee->regine_date =
+                $employee->regine_date
+                    ? Carbon::parse($employee->regine_date)->format('Y-m-d')
+                    : null;
         }
 
         return response()->json($employees);
     }
+    
+    // public function payrollRegister(Request $request)
+    // {
+    //     $ownerId = currentOwnerId();
+    //     $authUserId = auth()->id();
+
+    //     $month = $request->month;
+    //     $fy = $request->fy;
+
+    //     // Month Name => Month Number
+    //     $months = [
+    //         'January' => 1,
+    //         'February' => 2,
+    //         'March' => 3,
+    //         'April' => 4,
+    //         'May' => 5,
+    //         'June' => 6,
+    //         'July' => 7,
+    //         'August' => 8,
+    //         'September' => 9,
+    //         'October' => 10,
+    //         'November' => 11,
+    //         'December' => 12,
+    //     ];
+
+    //     $currentMonth = $months[$month];
+
+    //     [$fyStart, $fyEnd] = explode('-', $fy);
+
+    //     // Previous Month
+    //     $previousMonth = $currentMonth - 1;
+    //     $previousFY = $fy;
+
+    //     if ($previousMonth == 0) {
+    //         $previousMonth = 12;
+    //         $previousFY = ($fyStart - 1) . '-' . ($fyEnd - 1);
+    //     }
+
+    //     $employees = DB::table('employees as e')
+    //         ->leftJoin('users as u', 'u.id', '=', 'e.empId')
+    //         ->leftJoin('designations as d', 'd.id', '=', 'e.desig_id')
+    //         ->where(function ($query) use ($ownerId, $authUserId) {
+    //             if ($ownerId !== null) {
+    //                 $query->where('e.added_by', $ownerId);
+    //             }
+    //             if ($authUserId !== null) {
+    //                 $query->orWhere('e.added_by', $authUserId);
+    //             }
+    //             if ($ownerId === null && $authUserId === null) {
+    //                 $query->whereRaw('1 = 0');
+    //             }
+    //         })
+    //         ->select(
+    //             'e.empId',
+    //             'e.employee_id',
+    //             'u.name',
+    //             'd.designation_name',
+    //             'e.joining_date',
+    //             'e.total_addition',
+    //             'e.net_sal',
+
+    //             DB::raw("CASE WHEN e.epf_applicable=1 THEN e.provident_fund ELSE 0 END as provident_fund"),
+    //             DB::raw("CASE WHEN e.esic_applicable=1 THEN e.esi ELSE 0 END as esi"),
+    //             DB::raw("CASE WHEN e.ptax_applicable=1 THEN e.ptax ELSE 0 END as ptax"),
+    //             DB::raw("CASE WHEN e.tds_applicable=1 THEN e.tds ELSE 0 END as tds")
+    //         )
+    //         ->get();
+
+    //     foreach ($employees as $employee) {
+
+    //         $paid = DB::table('user_payslip')
+    //             ->where('user_emp_id', $employee->empId)
+    //             ->where('financial_year', $previousFY)
+    //             ->where('month', $previousMonth)
+    //             ->exists();
+
+    //         $employee->advance = 0;
+    //         $employee->loan_deduction = 0;
+    //         $employee->payment_status = $paid ? 'Salary Done' : 'Payment Pending';
+    //     }
+
+    //     return response()->json($employees);
+    // }
 
     public function attendanceRegister(Request $request)
     {

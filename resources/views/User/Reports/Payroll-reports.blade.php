@@ -342,6 +342,7 @@
                                             <th class="py-3">ESI Amount</th>
                                             <th class="py-3">P-Tax</th>
                                             <th class="py-3">TDS Amount</th>
+                                            <th class="py-3">LWF Amount</th>
                                             <th class="py-3">Advance</th>
                                             <th class="py-3">Loan Ded.</th>
                                             <th class="pe-3 py-3">Payment Status</th>
