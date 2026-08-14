@@ -2342,7 +2342,7 @@
 			@endif
 
 					<div class="card nav-action-card bg-brand-color-4">
-						<div class="card-body" style="background-image: url('../assets/images/layout/nav-card-bg.svg')">
+						<div class="card-body" style="background-image: url('{{ asset('assets/images/layout/nav-card-bg.svg') }}')">
 							<h5 class="text-dark">Help Center</h5>
 							<p class="text-dark text-opacity-75">Please contact us for more questions.</p>
 							<a href="{{ route('help-center') }}" class="btn btn-primary" target="_blank">Help Center</a>
@@ -2355,7 +2355,7 @@
 			<div class="card-body">
 				<div class="d-flex align-items-center">
 					<div class="flex-shrink-0">
-						<img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar wid-45 rounded-circle" />
+						<img src="{{ asset('assets/images/user/avatar-2.jpg') }}" alt="user-image" class="user-avtar wid-45 rounded-circle" />
 					</div>
 					<div class="flex-grow-1 ms-3">
 						<div class="dropdown">

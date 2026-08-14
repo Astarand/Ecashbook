@@ -568,11 +568,7 @@ class PayrollReportController extends Controller
         $medicalAllowance = 1250;
         $conveyance = 1600;
 
-        $basicPercentage = isset($employee->basic_percentage)
-            ? (float) $employee->basic_percentage
-            : 50;
-
-        $basicSalary = $baseGross * ($basicPercentage / 100);
+        $basicSalary = $baseGross * 0.50;
 
         $hra = $basicSalary * 0.50;
 
@@ -1130,7 +1126,7 @@ class PayrollReportController extends Controller
 
         return response()->json($employees);
     }
-
+    
     // public function payrollRegister(Request $request)
     // {
     //     $ownerId = currentOwnerId();
