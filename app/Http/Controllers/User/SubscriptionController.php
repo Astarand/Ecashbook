@@ -29,8 +29,9 @@ class SubscriptionController extends Controller
 			checkCoreAccess('Subscription & Billing');
 		}
         $plans = DB::table('subscription_plans')
-            ->whereIn('userId', [1, 3])
-            ->get();
+					->where('status', 1)
+					->whereIn('userId', [1, 3])
+					->get();
 
         // Fetch features for these plans
         $planIds = $plans->pluck('id');
