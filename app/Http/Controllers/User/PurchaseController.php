@@ -83,6 +83,7 @@ class PurchaseController extends Controller
 			$array[$val->id]['branch_name'] = $val->branch_name;
 			$array[$val->id]['inv_date'] = $val->inv_date;
 			$array[$val->id]['mode_of_pay'] = $val->mode_of_pay;
+			$array[$val->id]['advance_amount'] = $val->advance_amount;
 			$array[$val->id]['due_amount'] = $val->due_amount;
 			$array[$val->id]['other_payment'] = $val->other_payment;
 			$array[$val->id]['pay_status'] = $val->pay_status;
@@ -1563,7 +1564,7 @@ class PurchaseController extends Controller
 			$other_dispa_det = "";
 		}
 		return Validator::make($data, [
-			'mode_of_pay' => 'required',
+			'mode_of_pay' => 'required_if:pay_status,Partial,Full',
 			'pay_status' => 'required',
 			//'total_amount' => 'numeric',
 			//'advance_amount' => 'numeric',

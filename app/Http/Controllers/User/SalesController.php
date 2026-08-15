@@ -68,6 +68,7 @@ class SalesController extends Controller
 					'sales.inv_name',
 					'sales.inv_date',
 					'sales.mode_of_pay',
+					'sales.advance_amount',
 					'sales.due_amount',
 					'sales.other_payment',
 					'sales.pay_status',
@@ -109,6 +110,7 @@ class SalesController extends Controller
 					'sales.inv_name',
 					'sales.inv_date',
 					'sales.mode_of_pay',
+					'sales.advance_amount',
 					'sales.due_amount',
 					'sales.other_payment',
 					'sales.pay_status',
@@ -141,6 +143,7 @@ class SalesController extends Controller
 			$array[$val->id]['prop_name'] = $val->prop_name ?? '';
 			$array[$val->id]['inv_num'] = $val->inv_num;
 			$array[$val->id]['inv_date'] = $val->inv_date;
+			$array[$val->id]['advance_amount'] = $val->advance_amount;
 			$array[$val->id]['due_amount'] = $val->due_amount;
 			$array[$val->id]['mode_of_pay'] = $val->mode_of_pay;
 			$array[$val->id]['other_payment'] = $val->other_payment;
@@ -1592,17 +1595,12 @@ class SalesController extends Controller
 	protected function validatorOther(array $data)
 	{
 		//echo "<pre>"; print_r($data);exit;
-		if ($data['disp_through'] == 'Other') {
-			$other_dispa_det = "required";
-		} else {
-			$other_dispa_det = "";
-		}
+		 $other_dispa_det = ($data['disp_through'] ?? '') == 'Other' ? 'required' : 'nullable';
+
 		return Validator::make($data, [
-			'mode_of_pay' => 'required',
+			'mode_of_pay' => 'required_if:pay_status,Partial,Full',
 			'pay_status' => 'required',
 			'total_amount' => 'numeric',
-			//'order_date' => 'required',
-			//'disp_through' => 'required',
 			'other_dispa_det' => $other_dispa_det,
 		]);
 	}

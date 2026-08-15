@@ -336,7 +336,7 @@
                                                     @foreach ($sales_values as $value)
                                                     <tr>
                                                         <td>{{ $i = $i+1 }}</td>
-                                                        <td>{{ $value->item_name }}</td>
+                                                        <td style="width:25%; max-width:25%; white-space:normal; overflow-wrap:anywhere;">{{ $value->item_name }}</td>
                                                         <td>{{ ($value->sac_code!="")?$value->sac_code:$value->hsn_code }}</td>
                                                         <td><input type="text" class="form-control" id="quantity_<?php echo $value->id; ?>" data-id="{{ $value->id }}" data-sid="{{ $value->sid }}" data-prod_id="{{ $value->prod_id }}" class="form-control quantity" placeholder="Quantity" value="{{ $value->quantity }}" onChange="changeQuantity(this);" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')"></td>
                                                         <td><input type="text" class="form-control" name="rate" id="rate_<?php echo $value->id; ?>" data-id="{{ $value->id }}" data-sid="{{ $value->sid }}" onChange="changeRate(this);" class="form-control rate" placeholder="Item Price" value="{{ $value->rate }}" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')"></td>

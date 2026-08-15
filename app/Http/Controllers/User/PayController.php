@@ -48,17 +48,15 @@ class PayController extends Controller
 	{
 		if($type == 'Sales')
 		{
-			$invoice = DB::table('sales_values')
-				->where('sid',$id)
-				->first();
-
-			$invoiceTotal = getRoundedAmount($invoice->amount + $invoice->tax_amt + $invoice->ser_pay + $invoice->gov_pay);
+			$invoiceTotal = DB::table('sales_values')
+							->where('sid', $id)
+							->selectRaw('SUM(amount + tax_amt + ser_pay + gov_pay) as total')
+							->value('total');
 		}else if($type == 'Proforma'){
-			$invoice = DB::table('proformas_values')
-				->where('sid',$id)
-				->first();
-
-			$invoiceTotal = getRoundedAmount($invoice->amount + $invoice->tax_amt + $invoice->ser_pay + $invoice->gov_pay);
+			$invoiceTotal = DB::table('proformas_values')
+							->where('sid', $id)
+							->selectRaw('SUM(amount + tax_amt + ser_pay + gov_pay) as total')
+							->value('total');
 		}else if($type=='Expense'){
 			$expense = DB::table('expenses')
 				->where('id',$id)
@@ -96,15 +94,15 @@ class PayController extends Controller
 		}else{			
 			$invoice = DB::table('purchase_values as pv')
 							->leftJoin('purchases as p', 'p.id', '=', 'pv.sid')
-							->select(
-								'pv.amount',
-								'pv.tax_amt',
-								'p.shipping_cost'
-							)
 							->where('pv.sid', $id)
+							->selectRaw('
+								SUM(COALESCE(pv.amount, 0)) as amount,
+								SUM(COALESCE(pv.tax_amt, 0)) as tax_amt,
+								COALESCE(MAX(p.shipping_cost), 0) as shipping_cost
+							')
 							->first();
 
-			$invoiceTotal = getRoundedAmount(($invoice->amount ?? 0) +($invoice->tax_amt ?? 0) +($invoice->shipping_cost ?? 0));
+			$invoiceTotal = getRoundedAmount(($invoice->amount ?? 0) + ($invoice->tax_amt ?? 0) + ($invoice->shipping_cost ?? 0));
 		}
 
 		$payments = DB::table('payment_vouchers')

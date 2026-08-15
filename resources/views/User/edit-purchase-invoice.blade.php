@@ -58,28 +58,28 @@
                 <div class="card-body p-3">
                     <ul class="nav nav-pills nav-justified">
                         <li class="nav-item" data-target-form="#sellerDetailForm">
-                            <a href="#buyerDetail" id="tab-A" data-bs-toggle="tab" data-toggle="tab" class="nav-link active">
+                            <a href="javascript:void(0);" id="tab-A"  class="nav-link active tab-disabled">
                                 <i class="ph-duotone ph-user-circle"></i>
                                 <span class="d-none d-sm-inline">Purchaser / Buyer Details</span>
                             </a>
                         </li>
                         <!-- end nav item -->
                         <li class="nav-item" data-target-form="#customerDetailForm">
-                            <a href="#sellerDetails" id="tab-B" data-bs-toggle="tab" data-toggle="tab" class="nav-link icon-btn">
+                            <a href="javascript:void(0);" id="tab-B"  class="nav-link icon-btn tab-disabled">
                                 <i class="ti ti-user-plus"></i>
                                 <span class="d-none d-sm-inline">Seller / Vendor Details</span>
                             </a>
                         </li>
                         <!-- end nav item -->
                         <li class="nav-item" data-target-form="#itemDetailForm">
-                            <a href="#itemDetails" id="tab-C" data-bs-toggle="tab" data-toggle="tab" class="nav-link icon-btn">
+                            <a href="javascript:void(0);" id="tab-C"  class="nav-link icon-btn tab-disabled">
                                 <i class="ph-duotone ph-archive-box"></i>
                                 <span class="d-none d-sm-inline">Product / Service Details</span>
                             </a>
                         </li>
                         <!-- end nav item -->
                         <li class="nav-item">
-                            <a href="#others" id="tab-D"  data-bs-toggle="tab" data-toggle="tab" class="nav-link icon-btn">
+                            <a href="javascript:void(0);" id="tab-D"   class="nav-link icon-btn tab-disabled">
                                 <i class="ti ti-accessible"></i>
                                 <span class="d-none d-sm-inline">Payments & Other</span>
                             </a>
@@ -458,7 +458,7 @@
                                                 @foreach ($sales_values as $value)
                                                     <tr>
                                                         <td>{{ $i = $i+1 }}</td>
-                                                        <td>{{ $value->item_name }}</td>
+                                                        <td style="width:25%; max-width:25%; white-space:normal; overflow-wrap:anywhere;">{{ $value->item_name }}</td>
                                                         <td>{{ ($value->sac_code
                                                             !="")?$value->sac_code:$value->hsn_code }}</td>
                                                         <td><input type="text" name="quantity" id="quantity_<?php echo $value->id; ?>" data-id="{{ $value->id }}" data-sid="{{ $value->sid }}" data-prod_id="{{ $value->prod_id }}" value="{{ $value->quantity }}" onChange="changeQuantityPurchase(this)" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')" class="form-control" placeholder="Quantity" value="8"></td>
@@ -913,6 +913,11 @@
 
 <script>
 	$('#tab-B, #tab-C, #tab-D').addClass('disabled');
+	
+	$(document).on("click", ".tab-disabled", function(e) {
+		e.preventDefault();
+		return false;
+	});
 	
 	$("#addProductService").on("click", function () {
 		$("#productServiceModal").modal("show");

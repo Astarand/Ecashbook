@@ -224,7 +224,7 @@
                     <div class="row">
                         <div class="mb-3 col-md-6">
                             <label class="form-label" for="inputEmail4">Service Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="service_name" id="service_name" placeholder="Enter Product Name">
+                            <input type="text" class="form-control" name="service_name" id="service_name" placeholder="Enter Service Name">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">SAC Code<span class="text-danger">*</span></label>

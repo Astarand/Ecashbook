@@ -2166,9 +2166,11 @@ $("form#addPurchaseFrmThree").bind("submit", function () {
 
 var addPurchaseFrmFour = $("#addPurchaseFrmFour").validate({
     rules: {
-        mode_of_pay: {
-            required: true,
-        },
+         mode_of_pay: {
+			required: function () {
+				return $("#pay_status").val() !== "Due";
+			},
+		},
         pay_status: {
             required: true,
         },

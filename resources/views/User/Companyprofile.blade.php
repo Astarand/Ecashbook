@@ -1637,7 +1637,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="d-flex mt-1 justify-content-between">
+                                        <!--<div class="d-flex mt-1 justify-content-between">
                                             <div class="form-check">
                                                 <input class="form-check-input input-primary" type="checkbox"
                                                     id="checkbox" name="checkbox"
@@ -1653,15 +1653,13 @@
                                                         Conditions</a>
                                                 </label>
                                             </div>
-                                        </div>
+                                        </div>-->
                                         <div class="text-end btn-page">
                                             <a href="javascript:void(0);" id="cancel_attaBtn"
                                                 class="btn btn-outline-secondary">Cancel</a>
                                             <button type="submit" id="save_attaBtn" class="btn btn-primary">Save
                                                 Changes</button>
-                                            {{-- <button type="submit" id="save_attaBtn"
-                                            onclick="if(!this.form.checkbox.checked){alert('You must agree to Terms and Conditions.');return false}"
-                                            class="btn btn-primary">Save Changes</button> --}}
+                                            
                                         </div>
                                         <div class="modal fade" id="termsModal" tabindex="-1" role="dialog"
                                             aria-labelledby="termsModalLabel" aria-hidden="true">
@@ -3859,14 +3857,12 @@
         // GST Number Yes or No
         document.addEventListener("DOMContentLoaded", function() {
 
-            //---------- Modal js -----------
-
-            const termsLink = document.getElementById('termsLink');
+            //---------- Terms Modal js -----------
+            /*const termsLink = document.getElementById('termsLink');
             const termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
-
             termsLink.addEventListener('click', function() {
                 termsModal.show();
-            });
+            });*/
 
 
             // GST Registration dropdown handler
@@ -4550,14 +4546,11 @@
             $("form#frmattadet").bind("submit", function() {
                 //if (frmattadet.form()) {
 
-                if (!document.getElementById('checkbox').checked) {
-                    // Prevent the form from submitting
+                /*if (!document.getElementById('checkbox').checked) {
                     event.preventDefault();
-
-                    // Show the toast message
                     showToast("You must agree to Terms and Conditions.", "error");
                     return false;
-                }
+                }*/
 
                 let inc_certificate = $("#frmattadet #inc_certificate").prop(
                     "files"
@@ -4584,7 +4577,7 @@
                 let other_logo_doc = $("#frmattadet #other_logo_doc").prop("files")[0];
                 let signature_doc = $("#frmattadet #signature_doc").prop("files")[0];
                 let stamp_doc = $("#frmattadet #stamp_doc").prop("files")[0];
-                let chk_agree = $('input[name="checkbox"]:checked').val();
+                let chk_agree = 1; //$('input[name="checkbox"]:checked').val();
 
                 let comp_atta_data = new FormData();
 

@@ -77,7 +77,7 @@
                                         ?>
                                                 <tr>
                                                     <td>{{ $k }}</td>
-                                                    <td>{{ $value->item_name }}</td>
+                                                    <td style="width:25%; max-width:25%; white-space:normal; overflow-wrap:anywhere;">{{ $value->item_name }}</td>
                                                     <td>{{ ($value->sac_code!="")?$value->sac_code:$value->hsn_code }}</td>
                                                     <td>{{ $value->quantity }}</td>
                                                     <td>₹{{ $value->rate }}</td>

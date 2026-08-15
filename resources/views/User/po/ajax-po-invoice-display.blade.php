@@ -29,7 +29,7 @@
                                                 @foreach ($sales_values as $value)
                                                     <tr>
                                                         <td>{{ $i = $i+1 }}</td>
-                                                        <td>{{ $value->item_name }}</td>
+                                                        <td style="width:25%; max-width:25%; white-space:normal; overflow-wrap:anywhere;">{{ $value->item_name }}</td>
                                                         <td>{{ ($value->sac_code
                                                             !="")?$value->sac_code:$value->hsn_code }}</td>
                                                         <td><input type="text" name="quantity" id="quantity_<?php echo $value->id; ?>" data-id="{{ $value->id }}" data-sid="{{ $value->sid }}" data-prod_id="{{ $value->prod_id }}" value="{{ $value->quantity }}" onChange="changeQuantityPo(this)" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')" class="form-control" placeholder="Quantity" value="8"></td>

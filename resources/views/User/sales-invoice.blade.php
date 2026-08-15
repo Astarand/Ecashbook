@@ -251,7 +251,7 @@
 								</td>
 								<td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->taxable_value }}</span></td>
 								<td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->total_amount }}</span></td>
-								<td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->due_amount ?? 0 }}</span></td>
+								<td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->pay_status == 'Full' ? 0 : ($sale->total_amount-$sale->advance_amount ?? 0) }}</span></td>
 								<td>
 									@if ($sale->signed_pdf_status == 1)
 										<span class="badge bg-success">

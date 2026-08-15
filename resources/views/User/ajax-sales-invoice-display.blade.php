@@ -30,7 +30,7 @@
                     @foreach ($sales_values as $value)
                     <tr>
                         <td>{{ $i = $i+1 }}</td>
-                        <td>
+                        <td style="width:25%; max-width:25%; white-space:normal; overflow-wrap:anywhere;">
                             
                                 {{ $value->item_name }}
                             

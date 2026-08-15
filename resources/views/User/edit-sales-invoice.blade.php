@@ -49,28 +49,28 @@
                 <div class="card-body p-3">
                     <ul class="nav nav-pills nav-justified">
                         <li class="nav-item" data-target-form="#sellerDetailForm">
-                            <a href="javascript:void(0);" id="tab-A" data-bs-toggle="tab" data-toggle="tab" aria-expanded="false" aria-selected="false" class="nav-link active" tabindex="-1">
+                            <a href="javascript:void(0);" id="tab-A"   aria-expanded="false" aria-selected="false" class="nav-link active tab-disabled" tabindex="-1">
                                 <i class="ph-duotone ph-user-circle"></i>
                                 <span class="d-none d-sm-inline">Seller Details</span>
                             </a>
                         </li>
                         <!-- end nav item -->
                         <li class="nav-item" data-target-form="#customerDetailForm">
-                            <a href="javascript:void(0);" id="tab-B" data-bs-toggle="tab" data-toggle="tab" aria-expanded="true" aria-selected="true" class="nav-link icon-btn">
+                            <a href="javascript:void(0);" id="tab-B"   aria-expanded="true" aria-selected="true" class="nav-link icon-btn tab-disabled">
                                 <i class="ti ti-user-plus"></i>
                                 <span class="d-none d-sm-inline">Customer Details</span>
                             </a>
                         </li>
                         <!-- end nav item -->
                         <li class="nav-item" data-target-form="#itemDetailForm">
-                            <a href="javascript:void(0);" id="tab-C" data-bs-toggle="tab" data-toggle="tab" aria-expanded="false" aria-selected="false" class="nav-link icon-btn" tabindex="-1">
+                            <a href="javascript:void(0);" id="tab-C"  aria-expanded="false" aria-selected="false" class="nav-link icon-btn tab-disabled" tabindex="-1">
                                 <i class="ph-duotone ph-archive-box"></i>
                                 <span class="d-none d-sm-inline">Product / Service Details</span>
                             </a>
                         </li>
                         <!-- end nav item -->
                         <li class="nav-item">
-                            <a href="#others" id="tab-D" data-bs-toggle="tab" data-toggle="tab" aria-expanded="false" aria-selected="false" class="nav-link icon-btn" tabindex="-1">
+                            <a href="#others" id="tab-D"  aria-expanded="false" aria-selected="false" class="nav-link icon-btn tab-disabled" tabindex="-1">
                                 <i class="ti ti-accessible"></i>
                                 <span class="d-none d-sm-inline">Payments & Other</span>
                             </a>
@@ -469,7 +469,7 @@
                                                     @foreach ($sales_values as $value)
                                                     <tr>
                                                         <td>{{ $i = $i+1 }}</td>
-                                                        <td>{{ $value->item_name }}</td>
+                                                        <td style="width:25%; max-width:25%; white-space:normal; overflow-wrap:anywhere;">{{ $value->item_name }}</td>
                                                         <td>{{ ($value->sac_code!="")?$value->sac_code:$value->hsn_code }}</td>
                                                         <td><input type="text" class="form-control" id="quantity_<?php echo $value->id; ?>" data-id="{{ $value->id }}" data-sid="{{ $value->sid }}" data-prod_id="{{ $value->prod_id }}" class="form-control quantity" placeholder="Quantity" value="{{ $value->quantity }}" onChange="changeQuantity(this);" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')"></td>
                                                         <td><input type="text" class="form-control" name="rate" id="rate_<?php echo $value->id; ?>" data-id="{{ $value->id }}" data-sid="{{ $value->sid }}" onChange="changeRate(this);" class="form-control rate" placeholder="Item Price" value="{{ $value->rate }}" onkeyup="if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,'')"></td>
@@ -1386,6 +1386,12 @@
             });
             //}
         });
+		
+		$(document).on("click", ".tab-disabled", function(e) {
+			e.preventDefault();
+			return false;
+		});
+		
         $("form#addSalesFrm #nextBtnSeller").on("click", function() {
             // alert('Hello');
             $("#tab-A").removeClass("active");
@@ -1557,15 +1563,10 @@
                     
                         showToast(response.message, "error");
                     } else {
-                        
-                        showToast("An unexpected error occurred. Please try again.", "error");
+                        let errorMessage = Object.values(response).flat().join("\n");
+						showToast(errorMessage, "error");
                     }
                 },
-                // error: function(xhr, status, error) {
-                //     // Handle AJAX error
-                //     $("#editSalesLoader").hide();
-                //     showToast("An unexpected error occurred. Please try again.", "error");
-                // }
             });
         });
 

@@ -194,7 +194,7 @@
                                 </td>
                                 <td><span class="text-muted text-hover-primary">₹{{ $sale->taxable_value }}</span></td>
                                 <td><span class="text-muted text-hover-primary">₹{{ $sale->grandTotal }}</span></td>
-                                <td><span class="text-muted text-hover-primary">₹{{ $sale->due_amount ?? 0 }}</span></td>
+                                <td><span class="text-muted text-hover-primary">₹{{ $sale->pay_status == 'Full' ? 0 : (($sale->grandTotal - $sale->advance_amount) ?? 0) }}</span></td>
                                 <td>
                                     @if ($sale->pay_status == 'Full')
                                     <span class="badge bg-success">Full</span>
