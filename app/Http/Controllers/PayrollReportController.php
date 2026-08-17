@@ -3251,7 +3251,8 @@ class PayrollReportController extends Controller
                 $totalWorkingDays++;
             }
         }
-        $totalWorkingDays = max($totalWorkingDays - 1, 0);
+        $totalWorkingDays = max($totalWorkingDays, 0);
+        // $totalWorkingDays = max($totalWorkingDays - 1, 0);
 
         $lateDeduct = intdiv($totalLate, 3);
         $totalEarlyLogoutDeduct = intdiv($totalEarlyLogout, 3);
@@ -3268,30 +3269,32 @@ class PayrollReportController extends Controller
         $medicalAllowance = 1250;
         $specialAllowance = max($baseGross - ($basicSalary + $hra + $medicalAllowance + $conveyance), 0);
 
-        $pf = $employee->epf_applicable ? min(round(($basicSalary * 0.12), 2), 1800) : 0;
+        // PF: compute dynamically like single payslip JS — stored value is FLAG only (>0 = applicable)
+        $pf = ($employee->epf_applicable && (float)($employee->provident_fund ?? 0) > 0)
+            ? min(round($basicSalary * 0.12, 2), 1800.0)
+            : 0;
+
+        // ESI: compute dynamically like single payslip JS
         $esi = 0;
         if ($employee->esic_applicable && (float)($employee->esi ?? 0) > 0) {
             $esiBase = $baseGross + $overtime;
-            $esi = $esiBase <= 21000 ? round($esiBase * 0.0075, 2) : 0;
+            $esi = ($esiBase <= 21000) ? round($esiBase * 0.0075, 2) : 0;
         }
 
+        // PT: compute dynamically like single payslip JS
         $pt = 0;
         if ($employee->ptax_applicable && (float)($employee->ptax ?? 0) > 0) {
             $ptBase = $baseGross + $bonus + $overtime;
-            if ($ptBase > 10000 && $ptBase <= 15000) {
-                $pt = 110;
-            } elseif ($ptBase > 15000 && $ptBase <= 25000) {
-                $pt = 130;
-            } elseif ($ptBase > 25000 && $ptBase <= 40000) {
-                $pt = 150;
-            } elseif ($ptBase > 40000) {
-                $pt = 200;
-            }
+            if ($ptBase > 10000 && $ptBase <= 15000)      $pt = 110;
+            elseif ($ptBase > 15000 && $ptBase <= 25000)  $pt = 130;
+            elseif ($ptBase > 25000 && $ptBase <= 40000)  $pt = 150;
+            elseif ($ptBase > 40000)                       $pt = 200;
         }
 
-        $tds = $employee->tds_applicable ? (float)($employee->tds ?? 0) : 0;
+        // TDS, Loan, LWF: use stored values (same as single payslip)
+        $tds  = $employee->tds_applicable  ? (float)($employee->tds ?? 0) : 0;
         $loan = (float)($employee->loan_deduction ?? 0);
-        $lwf = $employee->lwf_applicable ? (float)($employee->lwf_deduct ?? 0) : 0;
+        $lwf  = $employee->lwf_applicable  ? (float)($employee->lwf_deduct ?? 0) : 0;
 
         $totalEarnings = $basicSalary + $hra + $conveyance + $medicalAllowance + $specialAllowance + $bonus + $overtime;
         $totalDeductions = $pf + $esi + $pt + $tds + $loan + $lwf;
@@ -3454,9 +3457,15 @@ class PayrollReportController extends Controller
             $emp->overtime           = 0;
         }
 
+        // Use per-employee working days (from computeBulkPayslipValuesForEmployee)
+        // so the displayed value matches single payslip exactly
+        $displayWorkingDays = $employees->isNotEmpty()
+            ? (int) $employees->first()->total_working_days
+            : $totalWorkingDays;
+
         return response()->json([
             'employees'         => $employees,
-            'total_working_days'=> $totalWorkingDays,
+            'total_working_days'=> $displayWorkingDays,
             'month'             => $month,
             'financial_year'    => $financialYear,
         ]);
@@ -3531,12 +3540,20 @@ class PayrollReportController extends Controller
 
             try {
                 $employee = DB::table('employees as e')
-                    ->leftJoin('users as u', 'u.id', '=', 'e.empId')
+                    ->leftJoin('users as u',         'u.id',  '=', 'e.empId')
+                    ->leftJoin('depertments as d',   'd.id',  '=', 'e.dept_id')
+                    ->leftJoin('designations as des','des.id','=', 'e.desig_id')
                     ->where('e.empId', $empId)
                     ->select(
                         'e.empId',
                         'e.employee_id',
                         'u.name as employee_name',
+                        'u.email as employee_email',
+                        'u.phone as employee_phone',
+                        // Department & Designation
+                        'd.dept_name',
+                        'des.designation_name',
+                        // Salary
                         'e.total_addition',
                         'e.basic_sal',
                         'e.basic_percentage',
@@ -3551,10 +3568,33 @@ class PayrollReportController extends Controller
                         'e.loan_deduction',
                         'e.lwf_applicable',
                         'e.lwf_deduct',
+                        'e.lwf_company_contribution',
                         'e.epf_applicable',
                         'e.esic_applicable',
                         'e.ptax_applicable',
-                        'e.tds_applicable'
+                        'e.tds_applicable',
+                        'e.epf_no',
+                        'e.esic_no',
+                        // Bank
+                        'e.bank_name',
+                        'e.bank_branch',
+                        'e.ifsc',
+                        'e.swift_code',
+                        'e.account_holder_name',
+                        'e.account_number',
+                        'e.upi_id',
+                        // Personal
+                        'e.pan_number',
+                        'e.aadhaar_number',
+                        'e.joining_date',
+                        'e.dob',
+                        'e.gender',
+                        'e.marital_status',
+                        'e.qualification',
+                        'e.email_id',
+                        'e.emp_status',
+                        'e.emp_type',
+                        'e.work_location'
                     )
                     ->first();
 
@@ -3584,123 +3624,159 @@ class PayrollReportController extends Controller
                 $net        = $calc['net_salary'];
 
                 // Payslip number — matches the format used in checkPayslip
-                $payslipNo = 'PS/' . ($row['employee_id'] ?? $empId) . '/' . str_pad($monthNum, 2, '0', STR_PAD_LEFT) . $year;
+                $payslipNo = 'PS/' . ($employee->employee_id ?? $empId) . '/' . str_pad($monthNum, 2, '0', STR_PAD_LEFT) . $year;
+
+                $lwfCompanyContrib = round((float)($employee->lwf_company_contribution ?? 0), 2);
+                $perDaySalary      = round($calc['per_day_salary'], 2);
+                $totalAbsent       = (int)$calc['total_absent'];
+                $lateDeductDays    = (int)$calc['late_deduction_days'];
+                $earlyLogoutDays   = (int)$calc['total_early_logout_deduction_days'];
+                $monthName         = $monthNames[$monthNum] ?? '';
 
                 // -------------------------------------------------------
-                // Build the SAME structure as generate-payslip.blade.php
-                // savePayslip stores: { visible_data: finalSalaryJson, raw_api_response: empResponse, ... }
-                // finalSalaryJson = fullPayslipJson from JS which has all sections at top level
+                // Build EXACTLY the same JSON structure as savePayslip
+                // (single payslip) stores — key names must match 1-to-1
                 // -------------------------------------------------------
-                $finalSalaryJson = [
-                    // Meta
-                    'payslip_no'     => $payslipNo,
-                    'financial_year' => $financialYear,
-                    'month'          => $monthNum,
-                    'generate_date'  => now()->toDateString(),
-                    'notes'          => '',
-                    'created_at'     => now()->toISOString(),
 
-                    // Employee details (matches generate-payslip employee object)
-                    'employee_details' => [
-                        'name'               => $row['name']        ?? '',
-                        'employee_id'        => $row['employee_id'] ?? '',
-                        'empId'              => $empId,
-                        'dept_name'          => '',
-                        'designation_name'   => $row['designation_name'] ?? '',
-                        'joining_date'       => '',
-                        'epf_no'             => '',
-                        'bank_name'          => '',
-                        'bank_branch'        => '',
-                        'ifsc'               => '',
-                        'account_holder_name'=> '',
-                        'account_number'     => '',
-                        'pan_number'         => '',
-                        'aadhaar_number'     => '',
-                    ],
-
-                    // Month details
-                    'month_details' => [
-                        'total_days'         => $firstDay->daysInMonth,
-                        'total_working_days' => $totalWorkingDays,
-                        'total_holidays'     => $totalHolidays,
-                        'total_weekends'     => $totalWeekends,
-                        'month_name'         => $monthNames[$monthNum] ?? '',
-                        'financial_year'     => $financialYear,
-                    ],
-
-                    // Attendance details (no per-employee attendance in bulk)
-                    'attendance_details' => [
-                        'total_present'             => 0,
-                        'total_present_on_time'     => 0,
-                        'total_present_late'        => 0,
-                        'total_early_logout'        => 0,
-                        'total_absent'              => 0,
-                        'total_leave_approved'      => 0,
-                        'total_holiday'             => $totalHolidays,
-                        'total_office_weekend'      => $totalWeekends,
-                        'total_overtime_hours'      => '00:00:00',
-                        'totalEarlyLogoutDeductionDays' => 0,
-                    ],
-
-                    // Salary details (matches salaryDetails from checkPayslip response)
-                    'salary_details' => [
-                        'gross_salary'       => $gross,
-                        'base_salary'        => $basic,
-                        'hra'                => $hra,
-                        'conveyance'         => $conveyance,
-                        'medical_allowance'  => $medAllowance,
-                        'special_bonus'      => $specialAllowance,
-                        'total_addition'     => $totalEarnings,
-                        'provident_fund'     => $pf,
-                        'esi'                => $esi,
-                        'ptax'               => $pt,
-                        'tds'                => $tds,
-                        'loan'               => $loan,
-                        'advance_amount'     => 0,
-                        'per_day_salary'     => round($calc['per_day_salary'], 2),
-                        'lateDeductionDays'  => $calc['late_deduction_days'],
-                        'lwf_applicable'     => $lwf > 0 ? 1 : 0,
-                        'lwf_deduct'         => $lwf,
-                        'lwf_company_contribution' => 0,
-                    ],
-
-                    // Final salary calculation — the key section read by all report queries
-                    'final_salary_calculation' => [
-                        'basic_salary'           => $basic,
-                        'gross_salary'           => $gross,
-                        'hra'                    => $hra,
-                        'conveyance'             => $conveyance,
-                        'medical_allowance'      => $medAllowance,
-                        'special_allowance'      => $specialAllowance,
-                        'performance_bonus'      => $perfBonus,
-                        'overtime_payment'       => $overtime,
-                        'total_earnings'         => $totalEarnings,
-                        'provident_fund'         => $pf,
-                        'esi'                    => $esi,
-                        'ptax'                   => $pt,
-                        'tds'                    => $tds,
-                        'loan'                   => $loan,
-                        'lop'                    => $lop,
-                        'lwf_applicable'         => $lwf > 0 ? 1 : 0,
-                        'lwf_deduct'             => $lwf,
-                        'lwf_company_contribution' => 0,
-                        'total_deductions'       => $totalDeductions,
-                        'net_salary'             => $net,
-                        'in_words'               => '',
-                        'generated_at'           => now()->toISOString(),
-                    ],
+                // employee_details — same shape as checkPayslip returns under 'employee'
+                $employeeDetails = [
+                    'empId'               => (string)$empId,
+                    'name'                => $employee->employee_name         ?? '',
+                    'email'               => $employee->email_id              ?? '',
+                    'phone'               => $employee->employee_phone        ?? '',
+                    'employee_id'         => $employee->employee_id           ?? '',
+                    'joining_date'        => $employee->joining_date          ?? '',
+                    'dept_name'           => $employee->dept_name             ?? '',
+                    'designation_name'    => $employee->designation_name      ?? '',
+                    'epf_no'              => $employee->epf_no                ?? '',
+                    'bank_name'           => $employee->bank_name             ?? '',
+                    'bank_branch'         => $employee->bank_branch           ?? '',
+                    'ifsc'                => $employee->ifsc                  ?? '',
+                    'account_holder_name' => $employee->account_holder_name   ?? '',
+                    'account_number'      => $employee->account_number        ?? '',
+                    'pan_number'          => $employee->pan_number            ?? '',
+                    'aadhaar_number'      => $employee->aadhaar_number        ?? '',
                 ];
 
-                // Outer wrapper — matches what savePayslip stores
+                // bank_details — separate section (matches single payslip)
+                $bankDetails = [
+                    'bank_name'           => $employee->bank_name             ?? '',
+                    'branch'              => $employee->bank_branch           ?? '',
+                    'ifsc'                => $employee->ifsc                  ?? '',
+                    'account_holder_name' => $employee->account_holder_name   ?? '',
+                    'account_number'      => $employee->account_number        ?? '',
+                ];
+
+                // month_details — matches checkPayslip monthDetails
+                $monthDetails = [
+                    'total_days'         => $firstDay->daysInMonth,
+                    'total_working_days' => $totalWorkingDays,
+                    'total_holidays'     => $totalHolidays,
+                    'total_weekends'     => $totalWeekends,
+                ];
+
+                // attendance_details — matches checkPayslip attendanceDetails
+                $attendanceDetails = [
+                    'total_present'                  => 0,
+                    'total_present_on_time'          => 0,
+                    'total_present_late'             => 0,
+                    'total_early_logout'             => 0,
+                    'total_absent'                   => $totalAbsent,
+                    'total_leave_approved'           => 0,
+                    'total_holiday'                  => $totalHolidays,
+                    'total_office_weekend'           => $totalWeekends,
+                    'total_overtime_hours'           => '00:00:00',
+                    'totalEarlyLogoutDeductionDays'  => $earlyLogoutDays,
+                ];
+
+                // salary_details — matches checkPayslip salaryDetails key names EXACTLY
+                $salaryDetails = [
+                    'gross_salary'               => (float)($employee->total_addition ?? 0),
+                    'base_salary'                => $basic,
+                    'hra'                        => $hra,
+                    'conveyance'                 => $conveyance,
+                    'medical_allowance'          => $medAllowance,
+                    'special_bonus'              => $specialAllowance,
+                    'total_addition'             => (float)($employee->total_addition ?? 0),
+                    'provident_fund'             => $pf,
+                    'esi'                        => $esi,
+                    'ptax'                       => $pt,
+                    'tds'                        => $tds,
+                    'lwf_applicable'             => $lwf > 0 ? 1 : 0,
+                    'lwf_deduct'                 => $lwf,
+                    'lwf_company_contribution'   => $lwfCompanyContrib,
+                    'loan'                       => $loan,
+                    'total_absent_days_for_salary' => $totalAbsent + $lateDeductDays,
+                    'lateDeductionDays'          => $lateDeductDays,
+                    'per_day_salary'             => $perDaySalary,
+                    'advance_amount'             => 0,
+                ];
+
+                // final_salary_calculation — matches the JS finalSalaryJson key names EXACTLY
+                $finalSalaryCalc = [
+                    'basic_salary'             => $basic,
+                    'gross_salary'             => $gross,
+                    'hra'                      => $hra,
+                    'conveyance'               => $conveyance,
+                    'medical_allowance'        => $medAllowance,
+                    'special_allowance'        => $specialAllowance,
+                    'performance_bonus'        => $perfBonus,
+                    'overtime_payment'         => $overtime,
+                    'total_earnings'           => $totalEarnings,
+                    'provident_fund'           => $pf,
+                    'esi'                      => $esi,
+                    'ptax'                     => $pt,
+                    'tds'                      => $tds,
+                    'loan'                     => $loan,
+                    'lop'                      => $lop,
+                    'lwf_applicable'           => $lwf > 0 ? 1 : 0,
+                    'lwf_deduct'               => $lwf,
+                    'lwf_company_contribution' => $lwfCompanyContrib,
+                    'total_deductions'         => $totalDeductions,
+                    'net_salary'               => $net,
+                    'in_words'                 => '',
+                    'generated_at'             => now()->toISOString(),
+                ];
+
+                // visible_data — the full UI-visible snapshot (same as fullPayslipJson from JS)
+                $visibleData = [
+                    'payslip_no'               => $payslipNo,
+                    'financial_year'           => $financialYear,
+                    'month'                    => (string)$monthNum,
+                    'generate_date'            => now()->toDateString(),
+                    'notes'                    => '',
+                    'employee_details'         => $employeeDetails,
+                    'bank_details'             => $bankDetails,
+                    'month_details'            => $monthDetails,
+                    'attendance_details'       => $attendanceDetails,
+                    'salary_details'           => $salaryDetails,
+                    'final_salary_calculation' => $finalSalaryCalc,
+                    'created_at'               => now()->toISOString(),
+                ];
+
+                // raw_api_response — mirrors checkPayslip response shape exactly
+                $rawApiResponse = [
+                    'status'           => 'new',
+                    'payslipNo'        => ['payslip_no' => $payslipNo],
+                    'employee'         => $employeeDetails,
+                    'salaryDetails'    => $salaryDetails,
+                    'monthDetails'     => $monthDetails,
+                    'attendanceDetails'=> $attendanceDetails,
+                    'financialYear'    => $financialYear,
+                    'month'            => $monthNum,
+                    'month_name'       => $monthName,
+                ];
+
+                // Outer wrapper — matches what savePayslip stores at root level
                 $payslipData = [
                     'payslip_no'       => $payslipNo,
-                    'employee_id'      => $empId,
+                    'employee_id'      => (string)$empId,
                     'financial_year'   => $financialYear,
-                    'month'            => $monthNum,
+                    'month'            => (string)$monthNum,
                     'generate_date'    => now()->toDateString(),
-                    'notes'            => '',
-                    'visible_data'     => $finalSalaryJson,  // same key as savePayslip
-                    'raw_api_response' => [],
+                    'notes'            => null,
+                    'visible_data'     => $visibleData,
+                    'raw_api_response' => $rawApiResponse,
                     'created_by'       => auth()->id(),
                     'created_at'       => now()->toISOString(),
                 ];
