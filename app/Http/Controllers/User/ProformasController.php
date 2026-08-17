@@ -53,6 +53,7 @@ class ProformasController extends Controller
 							'proformas.inv_date',
 							'proformas.status',
 							'proformas.pay_status',
+							'proformas.advance_amount',
 							'proformas.due_amount',
 							'proformas.signed_pdf',
 							'proformas.signed_pdf_status',
@@ -73,6 +74,7 @@ class ProformasController extends Controller
 							'proformas.inv_date',
 							'proformas.status',
 							'proformas.pay_status',
+							'proformas.advance_amount',
 							'proformas.due_amount',
 							'proformas.signed_pdf',
 							'proformas.signed_pdf_status',
@@ -123,6 +125,7 @@ class ProformasController extends Controller
 			$array[$val->id]['inv_date'] = $val->inv_date;
 			$array[$val->id]['total_qty'] = $val->total_qty;
 			$array[$val->id]['total_amount'] = getRoundedAmount($val->total_amount);
+			$array[$val->id]['advance_amount'] = $val->advance_amount;
 			$array[$val->id]['due_amount'] = $val->due_amount;
 			$array[$val->id]['status'] = $val->status;
 			$array[$val->id]['pay_status'] = $val->pay_status;
@@ -1302,13 +1305,11 @@ class ProformasController extends Controller
 			$other_dispa_det = "";
 		}
 		return Validator::make($data, [
-			'mode_of_pay' => 'required',
+			'mode_of_pay' => 'required_if:pay_status,Partial,Full',
 			'pay_status' => 'required',
 			'total_amount' => 'numeric',
-			// 'advance_amount' => 'numeric',
-			// 'due_amount' => 'numeric',
-			'order_date' => 'required',
-			'disp_through' => 'required',
+			//'order_date' => 'required',
+			//'disp_through' => 'required',
 			'other_dispa_det' => $other_dispa_det,
 		]);
 	}
@@ -1354,7 +1355,7 @@ class ProformasController extends Controller
 						'due_amount' => $dueAmount,
 						'adjusted_amount' => $adjustedAmount,
 						'buyer_orderno' => isset($request->buyer_orderno) ? $request->buyer_orderno : "",
-						'order_date' => isset($request->order_date) ? $request->order_date : "",
+						'order_date' => isset($request->order_date) ? $request->order_date : null,
 						'supplier_refno' => isset($request->supplier_refno) ? $request->supplier_refno : "",
 						'other_refno' => isset($request->other_refno) ? $request->other_refno : "",
 						'dispa_docno_one' => isset($request->dispa_docno_one) ? $request->dispa_docno_one : "",
@@ -1372,6 +1373,17 @@ class ProformasController extends Controller
 			);
 			return response()->json($msg);
 		}
+	}
+	
+	public function getInvoiceTotal($id)
+	{
+		$total_amount = DB::table('proformas_values')
+			->where('sid', $id)
+			->sum(DB::raw('amount + tax_amt + gov_pay + ser_pay'));
+
+		return response()->json([
+			'total' => getRoundedAmount($total_amount)
+		]);
 	}
 
 	public function delProformaInvoice(Request $request)

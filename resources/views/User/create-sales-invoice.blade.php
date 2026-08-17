@@ -58,9 +58,9 @@
 						</select>
 					</div>
 					<div class="mb-3 col-md-3">
-                        <label class="form-label" for="inv_num">Quotation Ref Number</label>
+                        <label class="form-label" for="inv_num">Quotation / Proforma Invoice No</label>
                         <select name="quotation_ref_num" id="quotation_ref_num" class="form-control">
-                            <option value="">Select Quotation Ref Number</option>
+                            <option value="">Select Ref Number</option>
                             @foreach($quotations as $quotation)
 								<option value="{{ $quotation->inv_num }}">
 									{{ $quotation->inv_num }}

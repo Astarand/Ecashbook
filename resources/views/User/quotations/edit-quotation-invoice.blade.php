@@ -737,7 +737,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <div class="form-group ">
-                                            <label>Order Date<span class="text-danger">*</span></label>
+                                            <label>Order Date</label>
                                             <input type="date" name="order_date" id="order_date"
                                                 value="{{ $sales->order_date }}" class="form-control">
                                         </div>
@@ -768,7 +768,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <div class="form-group">
-                                            <label>Dispatch through<span class="text-danger">*</span></label>
+                                            <label>Dispatch through</label>
                                             <div class="form-group">
                                                 <select class="form-select" name="disp_through" id="disp_through">
                                                     <option value="">Select</option>
@@ -1355,15 +1355,10 @@
                     
                         showToast(response.message, "error");
                     } else {
-                        
-                        showToast("An unexpected error occurred. Please try again.", "error");
+                        let errorMessage = Object.values(response).flat().join("\n");
+						showToast(errorMessage, "error");
                     }
                 },
-                // error: function(xhr, status, error) {
-                //     // Handle AJAX error
-                //     $("#editSalesLoader").hide();
-                //     showToast("An unexpected error occurred. Please try again.", "error");
-                // }
             });
         });
 

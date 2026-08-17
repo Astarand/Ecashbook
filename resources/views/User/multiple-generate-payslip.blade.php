@@ -163,348 +163,371 @@
 
 @section('page-script')
 <script>
-// ================================================================
-// FY & Month selector init
-// ================================================================
-document.addEventListener('DOMContentLoaded', function () {
-    const fySelect = document.getElementById('select_financial_year');
-    const today    = new Date();
-    const cyear    = today.getFullYear();
-    const cmonth   = today.getMonth(); // 0-based
-    const fyStart  = cmonth >= 3 ? cyear : cyear - 1;
+    // ================================================================
+    // FY & Month selector init
+    // ================================================================
+    document.addEventListener('DOMContentLoaded', function () {
+        const fySelect = document.getElementById('select_financial_year');
+        const today    = new Date();
+        const cyear    = today.getFullYear();
+        const cmonth   = today.getMonth(); // 0-based
+        const fyStart  = cmonth >= 3 ? cyear : cyear - 1;
 
-    for (let y = fyStart - 1; y <= fyStart + 1; y++) {
-        const opt = document.createElement('option');
-        opt.value = `${y}-${y + 1}`;
-        opt.text  = `FY ${y}-${y + 1}`;
-        if (y === fyStart) opt.selected = true;
-        fySelect.appendChild(opt);
-    }
+        for (let y = fyStart - 1; y <= fyStart + 1; y++) {
+            const opt = document.createElement('option');
+            opt.value = `${y}-${y + 1}`;
+            opt.text  = `FY ${y}-${y + 1}`;
+            if (y === fyStart) opt.selected = true;
+            fySelect.appendChild(opt);
+        }
 
-    // Default to previous month
-    const prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-        .toLocaleString('default', { month: 'long' });
-    document.getElementById('monthSelect').value = prevMonth;
-});
+        // Default to previous month
+        const prevMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+            .toLocaleString('default', { month: 'long' });
+        document.getElementById('monthSelect').value = prevMonth;
+    });
 
-// ================================================================
-// Employee data store
-// ================================================================
-let employees = [];
+    // ================================================================
+    // Employee data store
+    // ================================================================
+    let employees = [];
 
-// ================================================================
-// Load employees
-// ================================================================
-document.getElementById('checkPayslipBtn').addEventListener('click', loadEmployees);
+    // ================================================================
+    // Load employees
+    // ================================================================
+    document.getElementById('checkPayslipBtn').addEventListener('click', loadEmployees);
 
-function loadEmployees() {
-    const fy    = document.getElementById('select_financial_year').value;
-    const month = document.getElementById('monthSelect').value;
+    function loadEmployees() {
+        const fy    = document.getElementById('select_financial_year').value;
+        const month = document.getElementById('monthSelect').value;
 
-    if (!fy || !month) {
-        showToast('Please select both Financial Year and Month.', 'warning');
-        return;
-    }
-
-    // =========================================================
-    // Future Month Validation Logic
-    // =========================================================
-    const monthsMap = {
-        'January': 1, 'February': 2, 'March': 3, 'April': 4,
-        'May': 5, 'June': 6, 'July': 7, 'August': 8,
-        'September': 9, 'October': 10, 'November': 11, 'December': 12
-    };
-
-    // Convert month string to integer (1-12)
-    const selectedMonthNum = isNaN(month) ? monthsMap[month] : parseInt(month, 10);
-
-    if (selectedMonthNum) {
-        const [fyStartStr, fyEndStr] = fy.split('-');
-        const fyStart = parseInt(fyStartStr, 10);
-        const fyEnd   = parseInt(fyEndStr, 10);
-
-        // In an Indian FY (Apr-Mar), Jan-Mar belong to fyEnd, Apr-Dec belong to fyStart
-        const selectedYear = (selectedMonthNum <= 3) ? fyEnd : fyStart;
-
-        const now = new Date();
-        const currentYear  = now.getFullYear();
-        const currentMonth = now.getMonth(); // JS months are 0-indexed (0 = Jan)
-
-        // Check if selected period is strictly in the future
-        const isFuture = (selectedYear > currentYear) || 
-                         (selectedYear === currentYear && selectedMonthNum > currentMonth);
-
-        if (isFuture) {
-            showToast('Future month cannot be selected.', 'warning');
+        if (!fy || !month) {
+            showToast('Please select both Financial Year and Month.', 'warning');
             return;
         }
-    }
 
-    const btn = document.getElementById('checkPayslipBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading…';
+        // =========================================================
+        // Future Month Validation Logic
+        // =========================================================
+        const monthsMap = {
+            'January': 1, 'February': 2, 'March': 3, 'April': 4,
+            'May': 5, 'June': 6, 'July': 7, 'August': 8,
+            'September': 9, 'October': 10, 'November': 11, 'December': 12
+        };
 
-    $.get('{{ route("payroll.bulk.employees") }}', { financial_year: fy, month: month })
-        .done(function(res) {
-            employees = res.employees || [];
-            renderTable(employees, month, fy, res.total_working_days);
+        // Convert month string to integer (1-12)
+        const selectedMonthNum = isNaN(month) ? monthsMap[month] : parseInt(month, 10);
 
-            document.getElementById('periodLabel').textContent = month + ' · ' + fy;
-        })
-        .fail(function() {
-            alert('Failed to load employees. Please try again.');
-        })
-        .always(function() {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="ph-duotone ph-magnifying-glass fs-5"></i> Load Employees';
-        });
-}
+        if (selectedMonthNum) {
+            const [fyStartStr, fyEndStr] = fy.split('-');
+            const fyStart = parseInt(fyStartStr, 10);
+            const fyEnd   = parseInt(fyEndStr, 10);
 
-// ================================================================
-// Render table
-// ================================================================
-function renderTable(data, month, fy, workingDays) {
-    document.getElementById('resultSection').classList.add('d-none');
-    document.getElementById('emptyState').classList.add('d-none');
+            // In an Indian FY (Apr-Mar), Jan-Mar belong to fyEnd, Apr-Dec belong to fyStart
+            const selectedYear = (selectedMonthNum <= 3) ? fyEnd : fyStart;
 
-    if (!data.length) {
-        document.getElementById('emptyState').classList.remove('d-none');
-        return;
-    }
+            const now = new Date();
+            const currentYear  = now.getFullYear();
+            const currentMonth = now.getMonth(); // JS months are 0-indexed (0 = Jan)
 
-    document.getElementById('resultBadge').textContent = data.length + ' Employee' + (data.length !== 1 ? 's' : '');
-    document.getElementById('resultSection').classList.remove('d-none');
+            // Check if selected period is strictly in the future
+            const isFuture = (selectedYear > currentYear) || 
+                            (selectedYear === currentYear && selectedMonthNum > currentMonth);
 
-    let html = '';
-    data.forEach((emp, idx) => {
-        // Build status badge
-        const isResigned    = emp.emp_status === 'Resigned';
-        const isTerminated  = emp.emp_status === 'Terminated';
-        let statusBadge;
-        if (isResigned || isTerminated) {
-            const dateStr = emp.regine_date
-                ? new Date(emp.regine_date).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })
-                : '';
-            const label   = isResigned ? 'Resigned' : 'Terminated';
-            const color   = isResigned ? 'warning' : 'danger';
-            statusBadge   = `<span class="badge bg-light-${color} text-${color} d-block mb-1">${label}</span>`
-                          + (dateStr ? `<small class="text-muted">${dateStr}</small>` : '');
-        } else {
-            statusBadge = `<span class="badge bg-light-success text-success">${emp.emp_status || 'Active'}</span>`;
-        }
-
-        html += `<tr data-idx="${idx}">
-            <td class="ps-3">
-                <input type="checkbox" class="form-check-input row-check" data-idx="${idx}" onchange="updateGenerateBtn()" checked>
-            </td>
-            <td class="text-muted">${idx + 1}</td>
-            <td class="fw-bold text-dark">${emp.employee_id || '—'}</td>
-            <td class="fw-bold text-dark">${emp.name || '—'}</td>
-            <td>${statusBadge}</td>
-            <td>₹${fmt(emp.basic_salary)}</td>
-            <td>₹${fmt(emp.gross_salary)}</td>
-            <td class="text-center">${workingDays}</td>
-            <td>
-                <input type="number" min="0" step="0.01" class="editable-cell bonus-input"
-                    data-idx="${idx}" value="0"
-                    onchange="recalcNet(${idx})" oninput="recalcNet(${idx})">
-            </td>
-            <td>
-                <input type="number" min="0" step="0.01" class="editable-cell ot-input"
-                    data-idx="${idx}" value="0"
-                    onchange="recalcNet(${idx})" oninput="recalcNet(${idx})">
-            </td>
-            <td>
-                <input type="number" min="0" step="0.01" class="editable-cell loan-input"
-                    data-idx="${idx}" value="${emp.loan_ded || 0}"
-                    onchange="recalcNet(${idx})" oninput="recalcNet(${idx})">
-            </td>
-            <td class="net-cell" id="net-${idx}">₹${fmt(emp.net_salary)}</td>
-        </tr>`;
-    });
-
-    document.getElementById('bulkPayslipBody').innerHTML = html;
-    renderFooter(data);
-    updateGenerateBtn();
-}
-
-function renderFooter(data) {
-    const totalGross = data.reduce((s, e) => s + (e.gross_salary || 0), 0);
-    const totalNet   = data.reduce((s, e) => s + (e.net_salary   || 0), 0);
-    document.getElementById('bulkPayslipFoot').innerHTML = `
-        <tr>
-            <td colspan="5" class="ps-3 py-2 text-end text-dark">Total (${data.length} employees)</td>
-            <td></td>
-            <td>₹${fmt(totalGross)}</td>
-            <td colspan="3"></td>
-            <td></td>
-            <td class="net-cell">₹${fmt(totalNet)}</td>
-        </tr>`;
-}
-
-// ================================================================
-// Recalculate net salary when editable cell changes
-// ================================================================
-function recalcNet(idx) {
-    const emp     = employees[idx];
-    const bonus   = parseFloat(document.querySelector(`.bonus-input[data-idx="${idx}"]`).value) || 0;
-    const ot      = parseFloat(document.querySelector(`.ot-input[data-idx="${idx}"]`).value)    || 0;
-    const loan    = parseFloat(document.querySelector(`.loan-input[data-idx="${idx}"]`).value)  || 0;
-
-    const gross   = (emp.gross_salary || 0);
-    const pf      = (emp.pf           || 0);
-    const esi     = (emp.esi_amount   || 0);
-    const pt      = (emp.ptax_amount  || 0);
-    const tds     = (emp.tds_amount   || 0);
-    const lwf     = (emp.lwf_amount   || 0);
-
-    const net = gross + bonus + ot - pf - esi - pt - tds - loan - lwf;
-    const netRounded = Math.max(net, 0);
-
-    // Update display
-    document.getElementById(`net-${idx}`).textContent = '₹' + fmt(netRounded);
-
-    // Store back
-    emp._bonus   = bonus;
-    emp._ot      = ot;
-    emp._loan    = loan;
-    emp._net     = netRounded;
-
-    // Refresh footer
-    const totalNet = employees.reduce((s, e, i) => {
-        const n = e._net !== undefined ? e._net : (e.net_salary || 0);
-        return s + n;
-    }, 0);
-    const totalGross = employees.reduce((s, e) => s + (e.gross_salary || 0), 0);
-
-    document.getElementById('bulkPayslipFoot').innerHTML = `
-        <tr>
-            <td colspan="5" class="ps-3 py-2 text-end text-dark">Total (${employees.length} employees)</td>
-            <td></td>
-            <td>₹${fmt(totalGross)}</td>
-            <td colspan="3"></td>
-            <td></td>
-            <td class="net-cell">₹${fmt(totalNet)}</td>
-        </tr>`;
-}
-
-// ================================================================
-// Select all / master toggle
-// ================================================================
-function toggleSelectAll() {
-    const checkboxes = document.querySelectorAll('.row-check');
-    const allChecked = [...checkboxes].every(c => c.checked);
-    checkboxes.forEach(c => c.checked = !allChecked);
-    updateSelectAllButtonState();
-    updateGenerateBtn();
-}
-
-function masterToggle(master) {
-    document.querySelectorAll('.row-check').forEach(c => c.checked = master.checked);
-    updateSelectAllButtonState();
-    updateGenerateBtn();
-}
-
-function updateSelectAllButtonState() {
-    const checkboxes = document.querySelectorAll('.row-check');
-    const masterCheck = document.getElementById('masterCheck');
-    const selectAllBtn = document.getElementById('selectAllBtn');
-
-    if (!checkboxes.length) {
-        masterCheck.checked = false;
-        selectAllBtn.innerHTML = '<i class="ph ph-check-square me-1"></i> Select All';
-        return;
-    }
-
-    const allChecked = [...checkboxes].every(c => c.checked);
-    masterCheck.checked = allChecked;
-    selectAllBtn.innerHTML = allChecked
-        ? '<i class="ph ph-check-square me-1"></i> Deselect All'
-        : '<i class="ph ph-check-square me-1"></i> Select All';
-}
-
-function updateGenerateBtn() {
-    const count = document.querySelectorAll('.row-check:checked').length;
-    const btn   = document.getElementById('generateBtn');
-    btn.disabled = count === 0;
-    btn.innerHTML = count
-        ? `<i class="ph-duotone ph-file-plus me-1 fs-5"></i> Generate ${count} Payslip${count !== 1 ? 's' : ''}`
-        : `<i class="ph-duotone ph-file-plus me-1 fs-5"></i> Generate Selected Payslips`;
-    updateSelectAllButtonState();
-}
-
-// ================================================================
-// Generate selected
-// ================================================================
-function generateSelected() {
-    const fy    = document.getElementById('select_financial_year').value;
-    const month = document.getElementById('monthSelect').value;
-    const monthNum = new Date(`1 ${month} 2000`).getMonth() + 1;
-
-    const selected = [];
-    document.querySelectorAll('.row-check:checked').forEach(chk => {
-        const idx = parseInt(chk.dataset.idx);
-        const emp = employees[idx];
-        selected.push({
-            emp_id:            emp.empId,
-            employee_id:       emp.employee_id,
-            name:              emp.name,
-            basic_salary:      emp.basic_salary  || 0,
-            gross_salary:      emp.gross_salary  || 0,
-            pf:                emp.pf            || 0,
-            esi:               emp.esi_amount    || 0,
-            ptax:              emp.ptax_amount   || 0,
-            tds:               emp.tds_amount    || 0,
-            loan:              emp._loan !== undefined ? emp._loan : (emp.loan_ded || 0),
-            lwf:               emp.lwf_amount    || 0,
-            performance_bonus: emp._bonus        || 0,
-            overtime:          emp._ot           || 0,
-            net_salary:        emp._net !== undefined ? emp._net : (emp.net_salary || 0),
-            total_working_days:emp.total_working_days || 0,
-        });
-    });
-
-    if (!selected.length) return;
-
-    document.getElementById('generateProgress').textContent = `Generating ${selected.length} payslip(s)…`;
-    const modal = new bootstrap.Modal(document.getElementById('generateModal'));
-    modal.show();
-
-    $.ajax({
-        url:  '{{ route("payroll.bulk.generate") }}',
-        type: 'POST',
-        data: {
-            _token:         '{{ csrf_token() }}',
-            financial_year: fy,
-            month:          monthNum,
-            employees:      selected,
-        },
-        success: function(res) {
-            modal.hide();
-            if (res.success) {
-                Swal.fire({
-                    icon:             'success',
-                    title:            'Done!',
-                    text:             res.message,
-                    confirmButtonText:'OK',
-                    confirmButtonColor:'#198754',
-                }).then(() => loadEmployees());
-            } else {
-                Swal.fire('Error', res.message || 'Generation failed.', 'error');
+            if (isFuture) {
+                showToast('Future month cannot be selected.', 'warning');
+                return;
             }
-        },
-        error: function() {
-            modal.hide();
-            Swal.fire('Error', 'Server error. Please try again.', 'error');
         }
-    });
-}
 
-// ================================================================
-// Format helper
-// ================================================================
-function fmt(n) {
-    return parseFloat(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
+        const btn = document.getElementById('checkPayslipBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading…';
+
+        $.get('{{ route("payroll.bulk.employees") }}', { financial_year: fy, month: month })
+            .done(function(res) {
+
+            console.log('========== BULK EMPLOYEE RESPONSE ==========');
+            console.log('Raw Response:', res);
+            console.log('JSON Response:', JSON.stringify(res, null, 2));
+            console.log('Employees:', res.employees);
+            console.log('Total Working Days:', res.total_working_days);
+            console.log('============================================');
+
+
+                employees = res.employees || [];
+                renderTable(employees, month, fy, res.total_working_days);
+
+                document.getElementById('periodLabel').textContent = month + ' · ' + fy;
+            })
+            .fail(function() {
+                alert('Failed to load employees. Please try again.');
+            })
+            .always(function() {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ph-duotone ph-magnifying-glass fs-5"></i> Load Employees';
+            });
+    }
+
+    // ================================================================
+    // Render table
+    // ================================================================
+    function renderTable(data, month, fy, workingDays) {
+        document.getElementById('resultSection').classList.add('d-none');
+        document.getElementById('emptyState').classList.add('d-none');
+
+        if (!data.length) {
+            document.getElementById('emptyState').classList.remove('d-none');
+            return;
+        }
+
+        document.getElementById('resultBadge').textContent = data.length + ' Employee' + (data.length !== 1 ? 's' : '');
+        document.getElementById('resultSection').classList.remove('d-none');
+
+        let html = '';
+        data.forEach((emp, idx) => {
+            // Build status badge
+            const isResigned    = emp.emp_status === 'Resigned';
+            const isTerminated  = emp.emp_status === 'Terminated';
+            let statusBadge;
+            if (isResigned || isTerminated) {
+                const dateStr = emp.regine_date
+                    ? new Date(emp.regine_date).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })
+                    : '';
+                const label   = isResigned ? 'Resigned' : 'Terminated';
+                const color   = isResigned ? 'warning' : 'danger';
+                statusBadge   = `<span class="badge bg-light-${color} text-${color} d-block mb-1">${label}</span>`
+                            + (dateStr ? `<small class="text-muted">${dateStr}</small>` : '');
+            } else {
+                statusBadge = `<span class="badge bg-light-success text-success">${emp.emp_status || 'Active'}</span>`;
+            }
+
+            html += `<tr data-idx="${idx}">
+                <td class="ps-3">
+                    <input type="checkbox" class="form-check-input row-check" data-idx="${idx}" onchange="updateGenerateBtn()" checked>
+                </td>
+                <td class="text-muted">${idx + 1}</td>
+                <td class="fw-bold text-dark">${emp.employee_id || '—'}</td>
+                <td class="fw-bold text-dark">${emp.name || '—'}</td>
+                <td>${statusBadge}</td>
+                <td>₹${fmt(emp.basic_salary)}</td>
+                <td>₹${fmt(emp.gross_salary)}</td>
+                <td class="text-center">${workingDays}</td>
+                <td>
+                    <input type="number" min="0" step="0.01" class="editable-cell bonus-input"
+                        data-idx="${idx}" value="0"
+                        onchange="recalcNet(${idx})" oninput="recalcNet(${idx})">
+                </td>
+                <td>
+                    <input type="number" min="0" step="0.01" class="editable-cell ot-input"
+                        data-idx="${idx}" value="0"
+                        onchange="recalcNet(${idx})" oninput="recalcNet(${idx})">
+                </td>
+                <td>
+                    <input type="number" min="0" step="0.01" class="editable-cell loan-input"
+                        data-idx="${idx}" value="${emp.loan_ded || 0}"
+                        onchange="recalcNet(${idx})" oninput="recalcNet(${idx})">
+                </td>
+                <td class="net-cell" id="net-${idx}">₹${fmt(emp.net_salary)}</td>
+            </tr>`;
+        });
+
+        document.getElementById('bulkPayslipBody').innerHTML = html;
+        renderFooter(data);
+        updateGenerateBtn();
+    }
+
+    function renderFooter(data) {
+        const totalGross = data.reduce((s, e) => s + (e.gross_salary || 0), 0);
+        const totalNet   = data.reduce((s, e) => s + (e.net_salary   || 0), 0);
+        document.getElementById('bulkPayslipFoot').innerHTML = `
+            <tr>
+                <td colspan="5" class="ps-3 py-2 text-end text-dark">Total (${data.length} employees)</td>
+                <td></td>
+                <td>₹${fmt(totalGross)}</td>
+                <td colspan="3"></td>
+                <td></td>
+                <td class="net-cell">₹${fmt(totalNet)}</td>
+            </tr>`;
+    }
+
+    // ================================================================
+    // Recalculate net salary when editable cell changes
+    // ================================================================
+    function recalcNet(idx) {
+        const emp     = employees[idx];
+        const bonus   = parseFloat(document.querySelector(`.bonus-input[data-idx="${idx}"]`).value) || 0;
+        const ot      = parseFloat(document.querySelector(`.ot-input[data-idx="${idx}"]`).value)    || 0;
+        const loan    = parseFloat(document.querySelector(`.loan-input[data-idx="${idx}"]`).value)  || 0;
+
+        const gross   = Number(emp.gross_salary || 0);
+        const perDay  = Number(emp.per_day_salary || 0);
+        const absent  = Number(emp.total_absent || 0);
+        const lateDed = Number(emp.late_deduction_days || 0);
+        const earlyOutDed = Number(emp.total_early_logout_deduction_days || 0);
+        const pf      = Number(emp.pf || 0);
+        const esi     = Number(emp.esi_amount || 0);
+        const pt      = Number(emp.ptax_amount || 0);
+        const tds     = Number(emp.tds_amount || 0);
+        const lwf     = Number(emp.lwf_amount || 0);
+        const basicPct = Number(emp.basic_percentage ?? 50);
+
+        const lopDeduction = perDay * (absent + lateDed + earlyOutDed);
+        const baseGross = Math.max(gross - lopDeduction, 0);
+        const basic = baseGross * (basicPct / 100);
+        const hra = basic * 0.5;
+        const conveyance = 1600;
+        const medicalAllowance = 1250;
+        const specialAllowance = Math.max(baseGross - (basic + hra + medicalAllowance + conveyance), 0);
+        const totalEarnings = basic + hra + conveyance + medicalAllowance + specialAllowance + bonus + ot;
+        const totalDeductions = pf + esi + pt + tds + loan + lwf;
+        const net = totalEarnings - totalDeductions;
+        const netRounded = Math.max(net, 0);
+
+        // Update display
+        document.getElementById(`net-${idx}`).textContent = '₹' + fmt(netRounded);
+
+        // Store back
+        emp._bonus   = bonus;
+        emp._ot      = ot;
+        emp._loan    = loan;
+        emp._net     = netRounded;
+
+        // Refresh footer
+        const totalNet = employees.reduce((s, e, i) => {
+            const n = e._net !== undefined ? e._net : (e.net_salary || 0);
+            return s + n;
+        }, 0);
+        const totalGross = employees.reduce((s, e) => s + (e.gross_salary || 0), 0);
+
+        document.getElementById('bulkPayslipFoot').innerHTML = `
+            <tr>
+                <td colspan="5" class="ps-3 py-2 text-end text-dark">Total (${employees.length} employees)</td>
+                <td></td>
+                <td>₹${fmt(totalGross)}</td>
+                <td colspan="3"></td>
+                <td></td>
+                <td class="net-cell">₹${fmt(totalNet)}</td>
+            </tr>`;
+    }
+
+    // ================================================================
+    // Select all / master toggle
+    // ================================================================
+    function toggleSelectAll() {
+        const checkboxes = document.querySelectorAll('.row-check');
+        const allChecked = [...checkboxes].every(c => c.checked);
+        checkboxes.forEach(c => c.checked = !allChecked);
+        updateSelectAllButtonState();
+        updateGenerateBtn();
+    }
+
+    function masterToggle(master) {
+        document.querySelectorAll('.row-check').forEach(c => c.checked = master.checked);
+        updateSelectAllButtonState();
+        updateGenerateBtn();
+    }
+
+    function updateSelectAllButtonState() {
+        const checkboxes = document.querySelectorAll('.row-check');
+        const masterCheck = document.getElementById('masterCheck');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+
+        if (!checkboxes.length) {
+            masterCheck.checked = false;
+            selectAllBtn.innerHTML = '<i class="ph ph-check-square me-1"></i> Select All';
+            return;
+        }
+
+        const allChecked = [...checkboxes].every(c => c.checked);
+        masterCheck.checked = allChecked;
+        selectAllBtn.innerHTML = allChecked
+            ? '<i class="ph ph-check-square me-1"></i> Deselect All'
+            : '<i class="ph ph-check-square me-1"></i> Select All';
+    }
+
+    function updateGenerateBtn() {
+        const count = document.querySelectorAll('.row-check:checked').length;
+        const btn   = document.getElementById('generateBtn');
+        btn.disabled = count === 0;
+        btn.innerHTML = count
+            ? `<i class="ph-duotone ph-file-plus me-1 fs-5"></i> Generate ${count} Payslip${count !== 1 ? 's' : ''}`
+            : `<i class="ph-duotone ph-file-plus me-1 fs-5"></i> Generate Selected Payslips`;
+        updateSelectAllButtonState();
+    }
+
+    // ================================================================
+    // Generate selected
+    // ================================================================
+    function generateSelected() {
+        const fy    = document.getElementById('select_financial_year').value;
+        const month = document.getElementById('monthSelect').value;
+        const monthNum = new Date(`1 ${month} 2000`).getMonth() + 1;
+
+        const selected = [];
+        document.querySelectorAll('.row-check:checked').forEach(chk => {
+            const idx = parseInt(chk.dataset.idx);
+            const emp = employees[idx];
+            selected.push({
+                emp_id:            emp.empId,
+                employee_id:       emp.employee_id,
+                name:              emp.name,
+                basic_salary:      emp.basic_salary  || 0,
+                gross_salary:      emp.gross_salary  || 0,
+                pf:                emp.pf            || 0,
+                esi:               emp.esi_amount    || 0,
+                ptax:              emp.ptax_amount   || 0,
+                tds:               emp.tds_amount    || 0,
+                loan:              emp._loan !== undefined ? emp._loan : (emp.loan_ded || 0),
+                lwf:               emp.lwf_amount    || 0,
+                performance_bonus: emp._bonus        || 0,
+                overtime:          emp._ot           || 0,
+                net_salary:        emp._net !== undefined ? emp._net : (emp.net_salary || 0),
+                total_working_days:emp.total_working_days || 0,
+            });
+        });
+
+        if (!selected.length) return;
+
+        document.getElementById('generateProgress').textContent = `Generating ${selected.length} payslip(s)…`;
+        const modal = new bootstrap.Modal(document.getElementById('generateModal'));
+        modal.show();
+
+        $.ajax({
+            url:  '{{ route("payroll.bulk.generate") }}',
+            type: 'POST',
+            data: {
+                _token:         '{{ csrf_token() }}',
+                financial_year: fy,
+                month:          monthNum,
+                employees:      selected,
+            },
+            success: function(res) {
+                modal.hide();
+                if (res.success) {
+                    Swal.fire({
+                        icon:             'success',
+                        title:            'Done!',
+                        text:             res.message,
+                        confirmButtonText:'OK',
+                        confirmButtonColor:'#198754',
+                    }).then(() => loadEmployees());
+                } else {
+                    Swal.fire('Error', res.message || 'Generation failed.', 'error');
+                }
+            },
+            error: function() {
+                modal.hide();
+                Swal.fire('Error', 'Server error. Please try again.', 'error');
+            }
+        });
+    }
+
+    // ================================================================
+    // Format helper
+    // ================================================================
+    function fmt(n) {
+        return parseFloat(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 </script>
 @endsection

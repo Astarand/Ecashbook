@@ -295,12 +295,12 @@
 									</a>
 								</li>
 
-								<li class="pc-item">
+								<!--<li class="pc-item">
 									<a class="pc-link" href="{{ route('user.expenses_inventory') }}">
 										<i class="ph-duotone ph-receipt"></i>
 										<span>Inventory Expenses</span>
 									</a>
-								</li>
+								</li>-->
 							</ul>
 						</li>
 					@endif
@@ -1253,6 +1253,7 @@
 								<span class="pc-arrow mt-1"><i data-feather="chevron-right"></i></span>
 							</a>
 							<ul class="pc-submenu">
+								<li class="pc-item"><a class="pc-link" href="{{ route('hsnSac.index') }}">HSN & SAC Set</a></li>
 								<li class="pc-item"><a class="pc-link" href="{{ route('dropdown.index') }}">Dropdown Value Set</a></li>
 								<li class="pc-item"><a class="pc-link" href="{{ route('admin.tds-tax-slab-list') }}">TDS Tax Slabs Set</a></li>
 								<li class="pc-item"><a class="pc-link" href="{{ route('admin.compliance-reminder-list') }}">Compliance Reminder Set</a>
@@ -1778,12 +1779,12 @@
 									</a>
 								</li>
 
-								<li class="pc-item">
+								<!--<li class="pc-item">
 									<a class="pc-link" href="{{ route('user.expenses_inventory') }}">
 										<i class="ph-duotone ph-receipt"></i>
 										<span>Inventory Expenses</span>
 									</a>
-								</li>
+								</li>-->
 							</ul>
 						</li>
 					@endif

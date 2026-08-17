@@ -3154,6 +3154,174 @@ class PayrollReportController extends Controller
         return view('User.multiple-generate-payslip');
     }
 
+    private function computeBulkPayslipValuesForEmployee($employee, int $year, int $monthNum, int $ownerId, float $bonus = 0, float $overtime = 0): array
+    {
+        $grossSalary = (float)($employee->total_addition ?? 0);
+        $perDaySalary = round($grossSalary / 30, 2);
+
+        $firstDay = Carbon::create($year, $monthNum, 1)->startOfMonth();
+        $lastDay  = $firstDay->copy()->endOfMonth();
+
+        $weeklySchedule = DB::table('weekly_schedules')
+            ->where('added_by', $ownerId)
+            ->pluck('status', 'day')
+            ->mapWithKeys(fn($v, $k) => [strtolower(trim($k)) => $v])
+            ->toArray();
+
+        $holidays = DB::table('holidays')
+            ->where('added_by', $ownerId)
+            ->whereBetween('holidayDate', [$firstDay, $lastDay])
+            ->pluck('holidayDate')
+            ->map(fn($d) => Carbon::parse($d)->format('Y-m-d'))
+            ->toArray();
+
+        $totalPresent = 0;
+        $totalPresentOnTime = 0;
+        $totalPresentLate = 0;
+        $totalEarlyLogout = 0;
+        $totalLate = 0;
+        $totalOvertimeSeconds = 0;
+
+        $attendanceRecords = DB::table('attendance')
+            ->where('userId', $employee->empId)
+            ->whereYear('present_date', $year)
+            ->whereMonth('present_date', $monthNum)
+            ->get();
+
+        foreach ($attendanceRecords as $record) {
+            $dayName = strtolower(Carbon::parse($record->present_date)->format('l'));
+            $dateStr = Carbon::parse($record->present_date)->format('Y-m-d');
+            $isWeekend = isset($weeklySchedule[$dayName]) && strtolower($weeklySchedule[$dayName]) === 'closed';
+            $isHoliday = in_array($dateStr, $holidays, true);
+
+            if ($isWeekend || $isHoliday) {
+                continue;
+            }
+
+            $totalPresent++;
+            $schedule = DB::table('weekly_schedules')
+                ->where('added_by', $ownerId)
+                ->where('day', $dayName)
+                ->first();
+
+            if ($schedule && strtolower($schedule->status) === 'open') {
+                if (!empty($schedule->opening_time) && !empty($record->in_time)) {
+                    $scheduledStart = Carbon::parse($schedule->opening_time);
+                    $actualLogin = Carbon::parse($record->in_time);
+                    $graceTime = $scheduledStart->copy()->addMinutes(5);
+                    if ($actualLogin->lte($graceTime)) {
+                        $totalPresentOnTime++;
+                    } else {
+                        $totalPresentLate++;
+                        $totalLate++;
+                    }
+                }
+
+                if (!empty($schedule->closing_time) && !empty($record->out_time)) {
+                    $scheduledEnd = Carbon::parse($schedule->closing_time);
+                    $actualLogout = Carbon::parse($record->out_time);
+                    if ($actualLogout->lt($scheduledEnd)) {
+                        $totalEarlyLogout++;
+                    }
+
+                    if ($actualLogout->gt($scheduledEnd)) {
+                        $totalOvertimeSeconds += $actualLogout->diffInSeconds($scheduledEnd);
+                    }
+                }
+            }
+        }
+
+        $leaves = DB::table('leaves')
+            ->where('emp_id', $employee->empId)
+            ->where('status', 'approved')
+            ->where(function ($q) use ($monthNum, $year) {
+                $q->whereMonth('start_date', $monthNum)->whereYear('start_date', $year)
+                    ->orWhereMonth('end_date', $monthNum)->whereYear('end_date', $year);
+            })
+            ->get();
+
+        $totalLeave = (float)$leaves->sum('total_days');
+
+        $totalWorkingDays = 0;
+        for ($d = $firstDay->copy(); $d->lte($lastDay); $d->addDay()) {
+            $dayName = strtolower($d->format('l'));
+            $dateStr = $d->format('Y-m-d');
+            $isWeekend = isset($weeklySchedule[$dayName]) && strtolower($weeklySchedule[$dayName]) === 'closed';
+            if (!$isWeekend && !in_array($dateStr, $holidays, true)) {
+                $totalWorkingDays++;
+            }
+        }
+        $totalWorkingDays = max($totalWorkingDays - 1, 0);
+
+        $lateDeduct = intdiv($totalLate, 3);
+        $totalEarlyLogoutDeduct = intdiv($totalEarlyLogout, 3);
+        $totalAbsent = max($totalWorkingDays - ($totalPresent + $totalLeave), 0);
+        $lopDeduction = $perDaySalary * ($totalAbsent + $lateDeduct + $totalEarlyLogoutDeduct);
+
+        $baseGross = max($grossSalary - $lopDeduction, 0);
+        $basicPercentage = isset($employee->basic_percentage)
+            ? (float) $employee->basic_percentage
+            : 50;
+        $basicSalary = round($baseGross * ($basicPercentage / 100), 2);
+        $hra = round($basicSalary * 0.50, 2);
+        $conveyance = 1600;
+        $medicalAllowance = 1250;
+        $specialAllowance = max($baseGross - ($basicSalary + $hra + $medicalAllowance + $conveyance), 0);
+
+        $pf = $employee->epf_applicable ? min(round(($basicSalary * 0.12), 2), 1800) : 0;
+        $esi = 0;
+        if ($employee->esic_applicable && (float)($employee->esi ?? 0) > 0) {
+            $esiBase = $baseGross + $overtime;
+            $esi = $esiBase <= 21000 ? round($esiBase * 0.0075, 2) : 0;
+        }
+
+        $pt = 0;
+        if ($employee->ptax_applicable && (float)($employee->ptax ?? 0) > 0) {
+            $ptBase = $baseGross + $bonus + $overtime;
+            if ($ptBase > 10000 && $ptBase <= 15000) {
+                $pt = 110;
+            } elseif ($ptBase > 15000 && $ptBase <= 25000) {
+                $pt = 130;
+            } elseif ($ptBase > 25000 && $ptBase <= 40000) {
+                $pt = 150;
+            } elseif ($ptBase > 40000) {
+                $pt = 200;
+            }
+        }
+
+        $tds = $employee->tds_applicable ? (float)($employee->tds ?? 0) : 0;
+        $loan = (float)($employee->loan_deduction ?? 0);
+        $lwf = $employee->lwf_applicable ? (float)($employee->lwf_deduct ?? 0) : 0;
+
+        $totalEarnings = $basicSalary + $hra + $conveyance + $medicalAllowance + $specialAllowance + $bonus + $overtime;
+        $totalDeductions = $pf + $esi + $pt + $tds + $loan + $lwf;
+        $netSalary = $totalEarnings - $totalDeductions;
+
+        return [
+            'gross_salary' => round($baseGross, 2),
+            'basic_salary' => round($basicSalary, 2),
+            'hra' => round($hra, 2),
+            'conveyance' => round($conveyance, 2),
+            'medical_allowance' => round($medicalAllowance, 2),
+            'special_allowance' => round($specialAllowance, 2),
+            'pf' => round($pf, 2),
+            'esi' => round($esi, 2),
+            'ptax' => round($pt, 2),
+            'tds' => round($tds, 2),
+            'loan' => round($loan, 2),
+            'lwf' => round($lwf, 2),
+            'lop' => round($lopDeduction, 2),
+            'per_day_salary' => round($perDaySalary, 2),
+            'total_absent' => (int) $totalAbsent,
+            'late_deduction_days' => (int) $lateDeduct,
+            'total_early_logout_deduction_days' => (int) $totalEarlyLogoutDeduct,
+            'total_working_days' => (int) $totalWorkingDays,
+            'total_earnings' => round($totalEarnings, 2),
+            'total_deductions' => round($totalDeductions, 2),
+            'net_salary' => round($netSalary, 2),
+        ];
+    }
+
     // ------- Bulk Payslip: get employees without payslip for a given month/FY -------//
     public function getBulkPayslipEmployees(Request $request)
     {
@@ -3214,6 +3382,7 @@ class PayrollReportController extends Controller
                 'e.emp_status',
                 'e.regine_date',
                 'e.basic_sal',
+                'e.basic_percentage',
                 'e.hra',
                 'e.convayance',
                 'e.medical_allowance',
@@ -3265,26 +3434,22 @@ class PayrollReportController extends Controller
         $totalWorkingDays = max($totalWorkingDays - 1, 0);
 
         foreach ($employees as $emp) {
-            $gross    = (float)($emp->total_addition ?? 0);
-            $basic    = (float)($emp->basic_sal      ?? 0);
-            $pf       = $emp->epf_applicable   ? (float)($emp->provident_fund ?? 0) : 0;
-            $esi      = $emp->esic_applicable  ? (float)($emp->esi            ?? 0) : 0;
-            $pt       = $emp->ptax_applicable  ? (float)($emp->ptax           ?? 0) : 0;
-            $tds      = $emp->tds_applicable   ? (float)($emp->tds            ?? 0) : 0;
-            $loan     = (float)($emp->loan_deduction ?? 0);
-            $lwf      = $emp->lwf_applicable   ? (float)($emp->lwf_deduct     ?? 0) : 0;
-            $net      = $gross - $pf - $esi - $pt - $tds - $loan - $lwf;
+            $calc = $this->computeBulkPayslipValuesForEmployee($emp, $year, $month, $ownerId, 0, 0);
 
-            $emp->gross_salary       = round($gross, 2);
-            $emp->basic_salary       = round($basic, 2);
-            $emp->pf                 = round($pf, 2);
-            $emp->esi_amount         = round($esi, 2);
-            $emp->ptax_amount        = round($pt, 2);
-            $emp->tds_amount         = round($tds, 2);
-            $emp->loan_ded           = round($loan, 2);
-            $emp->lwf_amount         = round($lwf, 2);
-            $emp->net_salary         = round($net, 2);
-            $emp->total_working_days = $totalWorkingDays;
+            $emp->gross_salary       = $calc['gross_salary'];
+            $emp->basic_salary       = $calc['basic_salary'];
+            $emp->pf                 = $calc['pf'];
+            $emp->esi_amount         = $calc['esi'];
+            $emp->ptax_amount        = $calc['ptax'];
+            $emp->tds_amount         = $calc['tds'];
+            $emp->loan_ded           = $calc['loan'];
+            $emp->lwf_amount         = $calc['lwf'];
+            $emp->net_salary         = $calc['net_salary'];
+            $emp->total_working_days = $calc['total_working_days'];
+            $emp->per_day_salary     = $calc['per_day_salary'];
+            $emp->total_absent       = $calc['total_absent'];
+            $emp->late_deduction_days = $calc['late_deduction_days'];
+            $emp->total_early_logout_deduction_days = $calc['total_early_logout_deduction_days'];
             $emp->performance_bonus  = 0;
             $emp->overtime           = 0;
         }
@@ -3365,23 +3530,58 @@ class PayrollReportController extends Controller
             if ($exists) { $skipped++; continue; }
 
             try {
-                $gross      = (float)($row['gross_salary']      ?? 0);
-                $basic      = (float)($row['basic_salary']       ?? 0);
-                $pf         = (float)($row['pf']                 ?? 0);
-                $esi        = (float)($row['esi']                ?? 0);
-                $pt         = (float)($row['ptax']               ?? 0);
-                $tds        = (float)($row['tds']                ?? 0);
-                $loan       = (float)($row['loan']               ?? 0);
-                $lwf        = (float)($row['lwf']                ?? 0);
-                $perfBonus  = (float)($row['performance_bonus']  ?? 0);
-                $overtime   = (float)($row['overtime']           ?? 0);
-                $net        = (float)($row['net_salary']         ?? 0);
-                $hra        = round($basic * 0.5, 2);
-                $conveyance = 1600;
-                $medAllowance = 1250;
-                $specialAllowance = max($gross - ($basic + $hra + $medAllowance + $conveyance), 0);
-                $totalEarnings = $basic + $hra + $conveyance + $medAllowance + $specialAllowance + $perfBonus + $overtime;
-                $totalDeductions = $pf + $esi + $pt + $tds + $loan + $lwf;
+                $employee = DB::table('employees as e')
+                    ->leftJoin('users as u', 'u.id', '=', 'e.empId')
+                    ->where('e.empId', $empId)
+                    ->select(
+                        'e.empId',
+                        'e.employee_id',
+                        'u.name as employee_name',
+                        'e.total_addition',
+                        'e.basic_sal',
+                        'e.basic_percentage',
+                        'e.hra',
+                        'e.convayance',
+                        'e.medical_allowance',
+                        'e.special_bonus',
+                        'e.provident_fund',
+                        'e.esi',
+                        'e.ptax',
+                        'e.tds',
+                        'e.loan_deduction',
+                        'e.lwf_applicable',
+                        'e.lwf_deduct',
+                        'e.epf_applicable',
+                        'e.esic_applicable',
+                        'e.ptax_applicable',
+                        'e.tds_applicable'
+                    )
+                    ->first();
+
+                if (!$employee) {
+                    throw new \Exception('Employee not found for bulk payslip generation.');
+                }
+
+                $perfBonus  = (float)($row['performance_bonus'] ?? 0);
+                $overtime   = (float)($row['overtime'] ?? 0);
+                $calc = $this->computeBulkPayslipValuesForEmployee($employee, $year, $monthNum, $ownerId, $perfBonus, $overtime);
+
+                $gross      = $calc['gross_salary'];
+                $basic      = $calc['basic_salary'];
+                $pf         = $calc['pf'];
+                $esi        = $calc['esi'];
+                $pt         = $calc['ptax'];
+                $tds        = $calc['tds'];
+                $loan       = $calc['loan'];
+                $lwf        = $calc['lwf'];
+                $lop        = $calc['lop'];
+                $hra        = $calc['hra'];
+                $conveyance = $calc['conveyance'];
+                $medAllowance = $calc['medical_allowance'];
+                $specialAllowance = $calc['special_allowance'];
+                $totalEarnings = $calc['total_earnings'];
+                $totalDeductions = $calc['total_deductions'];
+                $net        = $calc['net_salary'];
 
                 // Payslip number — matches the format used in checkPayslip
                 $payslipNo = 'PS/' . ($row['employee_id'] ?? $empId) . '/' . str_pad($monthNum, 2, '0', STR_PAD_LEFT) . $year;
@@ -3449,16 +3649,16 @@ class PayrollReportController extends Controller
                         'hra'                => $hra,
                         'conveyance'         => $conveyance,
                         'medical_allowance'  => $medAllowance,
-                        'special_bonus'      => $perfBonus,
+                        'special_bonus'      => $specialAllowance,
                         'total_addition'     => $totalEarnings,
-                        'provident_fund'     => $pf,   // read by PF list: $.visible_data.salary_details.provident_fund
+                        'provident_fund'     => $pf,
                         'esi'                => $esi,
                         'ptax'               => $pt,
                         'tds'                => $tds,
                         'loan'               => $loan,
                         'advance_amount'     => 0,
-                        'per_day_salary'     => round($gross / 30, 2),
-                        'lateDeductionDays'  => 0,
+                        'per_day_salary'     => round($calc['per_day_salary'], 2),
+                        'lateDeductionDays'  => $calc['late_deduction_days'],
                         'lwf_applicable'     => $lwf > 0 ? 1 : 0,
                         'lwf_deduct'         => $lwf,
                         'lwf_company_contribution' => 0,
@@ -3480,7 +3680,7 @@ class PayrollReportController extends Controller
                         'ptax'                   => $pt,
                         'tds'                    => $tds,
                         'loan'                   => $loan,
-                        'lop'                    => 0,
+                        'lop'                    => $lop,
                         'lwf_applicable'         => $lwf > 0 ? 1 : 0,
                         'lwf_deduct'             => $lwf,
                         'lwf_company_contribution' => 0,

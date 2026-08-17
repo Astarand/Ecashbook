@@ -1192,23 +1192,11 @@ class PoController extends Controller
 			$other_dispa_det = "";
 		}
 		return Validator::make($data, [
-			'mode_of_pay' => 'required',
+			'mode_of_pay' => 'required_if:pay_status,Partial,Full',
 			'pay_status' => 'required',
-			//'total_amount' => 'numeric',
-			//'advance_amount' => 'numeric',
-			//'due_amount' => 'numeric',
 			'order_date' => 'required',
 			'disp_through' => 'required',
 			'other_dispa_det' => $other_dispa_det,
-			//'bankname' => $imps_rtgs_neft,
-			//'ifsc_code' => $imps_rtgs_neft,
-			//'bank_ac' => $imps_rtgs_neft,
-			//'ac_type' => $imps_rtgs_neft,
-			//'upi_holder_name' => $upi,
-			//'upi_id' => $upi,
-			//'card_type' => $card,
-			//'card_no' => $card,
-			//'card_bank_name' => $card,
 		]);
 
     }

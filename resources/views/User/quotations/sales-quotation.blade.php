@@ -93,6 +93,7 @@
                                 <th>Quantity</th>
                                 <th>Grand Total</th>
 								<th>Digital Signature</th>
+                                <th>Payment Status</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -134,6 +135,15 @@
 										</span>
 									@endif
 								</td>
+								<td>
+                                    @if ($sale->pay_status == 'Full')
+                                    <span class="badge bg-success">Full Payment</span>
+                                    @elseif ($sale->pay_status == 'Partial')
+                                    <span class="badge bg-warning text-dark">Advance</span>
+                                    @else
+                                    <span class="badge bg-danger">Due</span>
+                                    @endif
+                                </td>
 								<td>
                                      @if ($sale->status == '0')
 										<span class="badge bg-secondary">Partial Draft</span>

@@ -111,6 +111,7 @@ use App\Http\Controllers\Admin\DeductionMasterController;
 use App\Http\Controllers\Admin\TaxDeductionController;
 use App\Http\Controllers\Admin\HRLetterTemplateController;
 use App\Http\Controllers\Admin\DropdownValueController;
+use App\Http\Controllers\Admin\HsnSacController;
 
 use Illuminate\Support\Facades\File;
 
@@ -1308,5 +1309,15 @@ Route::middleware(['ensure.login'])->group(function () {
 	
 	Route::get('/ledger', [LedgerController::class, 'Ledger'])->name('user.Ledger');
 	Route::post('/ledger/ajax', [LedgerController::class, 'ajaxLedgerData']);	
+
+	Route::prefix('hsn-sac')->name('hsnSac.')->group(function () {
+		Route::get('/', [HsnSacController::class, 'index'])->name('index');
+		Route::post('/store', [HsnSacController::class, 'store'])->name('store');
+		Route::get('/show/{id}', [HsnSacController::class, 'show'])->name('show');
+		Route::post('/update/{id}', [HsnSacController::class, 'update'])->name('update');
+		Route::delete('/delete/{id}', [HsnSacController::class, 'destroy'])->name('delete');
+		Route::post('/upload', [HsnSacController::class, 'upload'])->name('upload');
+		Route::post('/status/{id}', [HsnSacController::class, 'status'])->name('status');
+	});
 	
 });

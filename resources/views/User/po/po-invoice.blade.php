@@ -117,7 +117,7 @@
                                     @elseif ($sale->pay_status == 'Partial')
                                     <span class="badge bg-warning text-dark">Advance</span>                                    
                                     @else
-                                    <span class="badge bg-secondary">Incomplete</span>
+                                    <span class="badge bg-danger">Due</span>
                                     @endif
                                 </td>
                                 <td>

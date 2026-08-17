@@ -124,7 +124,7 @@
                                         strtotime($sale->inv_date)) }}</a></td>
                                 <td><span class="text-muted text-hover-primary">{{ $sale->total_qty ?? 0  }}</span></td>
                                 <td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->total_amount ?? 0  }}</span></td>
-                                <td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->due_amount ?? 0  }}</span></td>
+                                <td><span class="text-muted text-hover-primary">₹&nbsp; {{ $sale->pay_status == 'Full' ? 0 : ($sale->total_amount-$sale->advance_amount ?? 0) }}</span></td>
                                 <td>
 									@if ($sale->signed_pdf_status == 1)
 										<span class="badge bg-success text-dark">

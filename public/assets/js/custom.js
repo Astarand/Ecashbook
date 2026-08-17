@@ -2166,7 +2166,7 @@ $("form#addPurchaseFrmThree").bind("submit", function () {
 
 var addPurchaseFrmFour = $("#addPurchaseFrmFour").validate({
     rules: {
-         mode_of_pay: {
+        mode_of_pay: {
 			required: function () {
 				return $("#pay_status").val() !== "Due";
 			},
@@ -2981,8 +2981,10 @@ $("form#addPoFrmThree").bind("submit", function () {
 var addPoFrmFour = $("#addPoFrmFour").validate({
     rules: {
         mode_of_pay: {
-            required: true,
-        },
+			required: function () {
+				return $("#pay_status").val() !== "Due";
+			},
+		},
         pay_status: {
             required: true,
         },

@@ -188,12 +188,12 @@
     let statusId = null;
     let statusData = null;
 
-    $('.status_update').on('click', function() {
-        statusId = $(this).data('id');
-        statusData = $(this).data('status');
+    $(document).on('click', '.status-change', function () {
+		statusId = $(this).attr('data-id');
+		statusData = $(this).attr('data-status');
     });
 
-    $('#status_update_vendor').on('click', function() {
+    $(document).on('click', '#status_update_vendor', function () {
         if (statusId !== null && statusData !== null) {
             $.ajaxSetup({
                 headers: {

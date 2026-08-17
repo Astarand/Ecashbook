@@ -701,30 +701,47 @@
                                         </div>
                                     </div>
                                     <!-- Payment Section -->
-									<div class="row" id="paymentSection" style="display:none;">
+									<!--<div class="row" id="paymentSection" style="display:none;">
 										<div class="col-md-4 mb-3">
 											<label>Total Amount</label>
 											<input type="text" name="total_amount" id="total_amount" class="form-control">
 										</div>
 
-										<!-- Advance Only -->
+
 										<div class="col-md-4 mb-3 d-none" id="advanceBox">
 											<label>Advance Amount</label>
 											<input type="text"  name="advance_amount" id="advance_amount" value="{{ $sales->advance_amount }}" class="form-control">
 										</div>
 
-										<!-- Due Only -->
+
 										<div class="col-md-4 mb-3 d-none" id="dueBox">
 											<label>Balance Receivable</label>
 											<input type="text" name="due_amount" id="due_amount" class="form-control" readonly>
 										</div>
 
-										<!-- Adjusted Only -->
+
 										<div class="col-md-4 mb-3 d-none" id="adjustedBox">
 											<label>Adjusted Amount</label>
 											<input type="text" name="adjusted_amount" id="adjusted_amount" value="{{ $sales->adjusted_amount }}" class="form-control">
 										</div>
 
+										<div class="col-md-4 mb-3 d-flex align-items-end">
+											<button
+												type="button"
+												class="btn btn-primary paymentModalBtn"
+												data-id="{{ $sales->id }}"
+												data-type="Proforma">
+												Click to Update Payment
+											</button>
+										</div>
+									</div>-->
+									
+									<div class="row align-items-end" id="paymentSection">
+										<div class="col-md-4 mb-3">
+											<label>Total Amount</label>
+											<input type="text" name="total_amount" id="total_amount" readonly class="form-control">
+										</div>
+										
 										<div class="col-md-4 mb-3 d-flex align-items-end">
 											<button
 												type="button"
@@ -746,7 +763,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <div class="form-group ">
-                                            <label>Order Date<span class="text-danger">*</span></label>
+                                            <label>Order Date</label>
                                             <input type="date" name="order_date" id="order_date"
                                                 value="{{ $sales->order_date }}" class="form-control">
                                         </div>
@@ -777,7 +794,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <div class="form-group">
-                                            <label>Dispatch through<span class="text-danger">*</span></label>
+                                            <label>Dispatch through</label>
                                             <div class="form-group">
                                                 <select class="form-select" name="disp_through" id="disp_through">
                                                     <option value="">Select</option>
@@ -1255,11 +1272,6 @@
             });
         });
 
-
-
-
-
-
         window.changeProductType = function() {
             // alert('hello');
             //var base_url = $("#base_url").val();
@@ -1413,6 +1425,7 @@
                 success: function(response) {
                     $("#loader").hide();
                     if (response.class == "succ") {
+						loadGrandTotal();
                         $("#addProformaFrmThree .message-container").html(
                             '<div class="' +
                             response.class +
@@ -1439,6 +1452,23 @@
             });
             //}
         });
+		
+		function loadGrandTotal() 
+		{
+			let invoiceId = $("#sId").val();
+			let payStatus = $("#pay_status").val();
+			if (invoiceId !== "") {
+				$.get('/get-proform-invoice-total/' + invoiceId, function (res) {
+					$("#total_amount").val(res.total.toFixed(2));
+				});
+			}
+		}
+		
+		$(document).ready(function () {
+			$("#pay_status").on("change", function () {
+				loadGrandTotal();
+			});
+		});
 
         $("form#addProformaFrmFour").on("submit", function(e) {
             e.preventDefault();
@@ -1482,14 +1512,10 @@
 							window.location.href = response.redirect;
 						}, 3000);
 					} else {
-						showToast(response.message || "Something went wrong.", "error");
+						let errorMessage = Object.values(response).flat().join("\n");
+						showToast(errorMessage, "error");
 					}
                 },
-                // error: function(xhr, status, error) {
-                //     // Handle AJAX error
-                //     $("#editSalesLoader").hide();
-                //     showToast("An unexpected error occurred. Please try again.", "error");
-                // }
             });
         });
 
@@ -1555,111 +1581,7 @@
 		}
 	}
 
-    /*document.addEventListener("DOMContentLoaded", function() {
-		
-		const payStatus = document.getElementById("pay_status");
-
-		const paymentSection = document.getElementById("paymentSection");
-		const totalAmount = document.getElementById("total_amount");
-
-		const advanceBox = document.getElementById("advanceBox");
-		const dueBox = document.getElementById("dueBox");
-		const adjustedBox = document.getElementById("adjustedBox");
-
-		const advanceAmount = document.getElementById("advance_amount");
-		const dueAmount = document.getElementById("due_amount");
-		const adjustedAmount = document.getElementById("adjusted_amount");
-
-		const grandTotalElement = document.getElementById("grand_total_amount");
-
-		// ✅ Detect edit mode
-		let isEditMode = advanceAmount.value !== "" || dueAmount.value !== "";
-
-		// Set total amount
-		if (grandTotalElement && totalAmount) {
-			let amt = grandTotalElement.textContent.replace(/[₹,]/g, '').trim();
-			totalAmount.value = parseFloat(amt || 0).toFixed(2);
-		}
-
-		function resetFields() {
-			advanceAmount.value = "";
-			dueAmount.value = "";
-			adjustedAmount.value = "";
-		}
-
-		function togglePaymentUI(reset = false) {
-
-			let status = payStatus.value;
-
-			if (!status) {
-				paymentSection.style.display = "none";
-				return;
-			}
-
-			paymentSection.style.display = "flex";
-
-			// Hide all
-			advanceBox.classList.add("d-none");
-			dueBox.classList.add("d-none");
-			adjustedBox.classList.add("d-none");
-
-			// ✅ Reset ONLY when user changes
-			if (reset) {
-				resetFields();
-			}
-
-			if (status === "Full") {
-
-				adjustedBox.classList.remove("d-none");
-
-				let total = parseFloat(totalAmount.value) || 0;
-
-				// Only overwrite if not edit mode
-				if (reset || !isEditMode) {
-					adjustedAmount.value = total.toFixed(2);
-				}
-
-				adjustedAmount.readOnly = true;
-
-			} else if (status === "Partial") {
-
-				advanceBox.classList.remove("d-none");
-				dueBox.classList.remove("d-none");
-
-				adjustedAmount.readOnly = false;
-
-				// Only calculate if empty
-				if (!dueAmount.value) {
-					calculateDue();
-				}
-			}
-		}
-
-		function calculateDue() {
-
-			let total = parseFloat(totalAmount.value) || 0;
-			let advance = parseFloat(advanceAmount.value) || 0;
-
-			if (advance > total) {
-				advanceAmount.value = total.toFixed(2);
-				advance = total;
-			}
-
-			let due = total - advance;
-
-			dueAmount.value = due.toFixed(2);
-		}
-
-		// ✅ When user changes → reset values
-		payStatus.addEventListener("change", function () {
-			isEditMode = false; // now user changed manually
-			togglePaymentUI(true);
-		});
-
-		advanceAmount.addEventListener("input", calculateDue);
-		togglePaymentUI(false);
-		
-    });*/
+    
 
     document.addEventListener("DOMContentLoaded", function() {
         // Existing code...
