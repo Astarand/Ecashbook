@@ -429,6 +429,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/check-company-policies', [EmployeeManagemnet::class, 'checkCompanyPolicies'])->name('check.company.policies');
 	Route::post('/user-calculate-tds', [EmployeeManagemnet::class, 'calculateTDSAjax'])->name('user.calculate_tds');
 	Route::get('/employee_hr_letter/{id?}', [EmployeeManagemnet::class, 'employeeHrLetter'])->name('user.employee_hr_letter');
+	Route::get('/employee_hr_letter_download/{empId}/{letterId}', [EmployeeManagemnet::class, 'downloadEmployeeHrLetterPdf'])->name('user.employee_hr_letter_pdf');
 	Route::get('/employee-leaves/{id}', [EmployeeManagemnet::class, 'EmployeeLeaves'])->name('employee.leaves');
 	Route::get('/performace-review/{id}', [EmployeeManagemnet::class, 'Performace'])->name('user.performace-review');
 	Route::post('/employee/save-rating', [EmployeeManagemnet::class, 'saveRating'])->name('employee.saveRating');
@@ -660,6 +661,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/view-hr-letters', [UserHRLetter::class, 'ViewHRLetter'])->name('userEmployee.hr-letters-view-all');
 	Route::get('/employee/hr-letters', [UserHRLetter::class, 'HRLetterList'])->name('userEmployee.hr-letters-list');
 	Route::get('/employee/hr-letters/view/{id}', [UserHRLetter::class, 'HRLetterView'])->name('userEmployee.hr-letters-view');
+	Route::get('/employee/hr-letters/pdf/{id}', [UserHRLetter::class, 'downloadLetterPdf'])->name('userEmployee.hr-letters-pdf');
 
 	/* Attendance Management*/
 	Route::get('/employee/tasks', [UserEmployeeController::class, 'getEmployeeTasks'])->name('employee.tasks');

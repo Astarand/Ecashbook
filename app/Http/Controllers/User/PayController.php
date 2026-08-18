@@ -62,7 +62,7 @@ class PayController extends Controller
 				->where('id',$id)
 				->first();
 
-			$invoiceTotal = getRoundedAmount(($expense->expense_amt ?? 0));
+			$invoiceTotal = getRoundedAmount(($expense->expense_amt ?? 0) + ($expense->total_gst ?? 0));
 		}else if($type=='Income'){
 			$income = DB::table('income')
 				->where('id',$id)
