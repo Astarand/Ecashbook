@@ -140,7 +140,7 @@
 													<input type="text" name="asset_name" id="asset_name" class="form-control">
 												</div>
 
-												<div class="col-xl-4 mb-3">
+												<!--<div class="col-xl-4 mb-3">
 													<label class="form-label">Asset Category <span class="text-danger">*</span></label>
 													<select name="asset_category" class="form-select">
 														<option value="">Select</option>
@@ -155,7 +155,7 @@
 														<option value="Leasehold Improvements">Leasehold Improvements</option>
 														<option value="Other">Other</option>
 													</select>
-												</div>
+												</div>-->
 
 												<div class="col-xl-4 mb-3">
 													<label class="form-label"  id="assetCodeLabel">Asset Code / ID <span class="text-danger">*</span></label>

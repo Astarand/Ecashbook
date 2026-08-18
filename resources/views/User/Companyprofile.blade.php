@@ -686,9 +686,22 @@
                                                                 placeholder="Select Date">
                                                         </div>
                                                     </div>
+													<!-- Opening Balance Setup -->
+													<div class="col-sm-12 mb-3">
+														<div class="d-flex align-items-center px-3 py-2 rounded-2 border border-info-subtle"
+															 style="background:#f0f9ff; border-left:4px solid #0dcaf0 !important;">
+															<i class="ti ti-wallet text-info me-3" style="font-size:22px;"></i>
+															<div>
+																<h5 class="mb-0 fw-semibold">Opening Balance Setup</h5>
+																<small class="text-muted">
+																	Fill with proper financial reports
+																</small>
+															</div>
+														</div>
+													</div>
                                                     <div class="col-sm-4">
                                                         <div class="mb-3">
-                                                            <label class="form-label">Business Turnover (Last Financial Year)</label>
+                                                            <label class="form-label">Previous FY Turnover</label>
                                                             <input type="number" class="form-control"
                                                                 name="turnover_last_year" id="turnover_last_year"
                                                                 value="{{ isset($compDetails->turnover_last_year) ? $compDetails->turnover_last_year : '' }}"
@@ -697,7 +710,7 @@
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <div class="mb-3">
-                                                            <label class="form-label">Opening Balance (Last Financial Year)</label>
+                                                            <label class="form-label">Opening Balance (This FY)</label>
                                                             <input type="number" class="form-control"
                                                                 name="opening_balance" id="opening_balance"
                                                                 value="{{ isset($compDetails->opening_balance) ? $compDetails->opening_balance : '' }}"
@@ -722,6 +735,17 @@
                                                                 placeholder="Enter Opening Balance Dr">
                                                         </div>
                                                     </div>
+													<!-- Invoice Series Setup -->
+													<div class="col-sm-12 mb-3 mt-2">
+														<div class="d-flex align-items-center px-3 py-2 rounded-2 border border-primary-subtle"
+															 style="background:#f5f8ff; border-left:4px solid #0d6efd !important;">
+
+															<i class="ti ti-file-invoice text-primary me-3" style="font-size:22px;"></i>
+															<div>
+																<h5 class="mb-0 fw-semibold">Invoice Series Setup</h5>
+															</div>
+														</div>
+													</div>
                                                     <div class="col-sm-4">
                                                         <div class="mb-3">
                                                             <label class="form-label">Quotation Invoice Series Setup</label>

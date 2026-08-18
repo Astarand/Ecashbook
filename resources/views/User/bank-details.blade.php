@@ -174,10 +174,108 @@
         </div>
         <div class="col-md-8 col-xxl-8">
             <div class="card table-card" id="transaction-history-card">
-                <div class="card-header d-flex align-items-center justify-content-between">
+                <!--<div class="card-header d-flex align-items-center justify-content-between">
                     <h5 class="mb-0">Transaction History</h5>
                     <button class="btn btn-sm btn-link-primary">View All</button>
-                </div>
+                </div>-->
+				<div class="card-header">
+					<div class="row align-items-center">
+
+						<div class="col-md-4">
+							<h5 class="mb-0">Transaction History</h5>
+						</div>
+
+						<div class="col-md-8">
+							<form method="GET" action="{{ url()->current() }}">
+								<div class="row g-2 justify-content-end">
+
+									<div class="col-md-4">
+										<select name="duration"
+												id="duration"
+												class="form-select form-select-sm">
+											<option value="all" {{ request('duration', 'all') == 'all' ? 'selected' : '' }}>
+												All Transactions
+											</option>
+
+											<option value="monthly" {{ request('duration') == 'monthly' ? 'selected' : '' }}>
+												Monthly
+											</option>
+
+											<option value="quarterly" {{ request('duration') == 'quarterly' ? 'selected' : '' }}>
+												Quarterly
+											</option>
+
+											<option value="yearly" {{ request('duration') == 'yearly' ? 'selected' : '' }}>
+												Yearly
+											</option>
+
+											<option value="custom" {{ request('duration') == 'custom' ? 'selected' : '' }}>
+												Custom Period
+											</option>
+										</select>
+									</div>
+
+									<div class="col-auto">
+										<button type="submit" class="btn btn-sm btn-primary">
+											<i class="ti ti-filter"></i>
+											Search
+										</button>
+									</div>
+
+								</div>
+
+								<div class="row g-2 mt-1 custom-date-fields"
+									 style="{{ request('duration') == 'custom' ? '' : 'display:none;' }}">
+
+									<div class="col-md-4 offset-md-4">
+										<input type="date"
+											   name="from_date"
+											   class="form-control form-control-sm"
+											   value="{{ request('from_date') }}"
+											   placeholder="From Date">
+									</div>
+
+									<div class="col-md-4">
+										<input type="date"
+											   name="to_date"
+											   class="form-control form-control-sm"
+											   value="{{ request('to_date') }}"
+											   placeholder="To Date">
+									</div>
+
+								</div>
+							</form>
+						</div>
+
+					</div>
+				</div>
+				@if(request('duration', 'all') != 'all')
+
+					<div class="px-3 pt-2">
+						<div class="alert alert-light border d-flex align-items-center mb-0 py-2">
+
+							<i class="ti ti-calendar-event me-2 text-primary"></i>
+
+							<div>
+								<strong>Showing:</strong>
+
+								@if(request('duration') == 'monthly')
+									Current Month
+								@elseif(request('duration') == 'quarterly')
+									Current Quarter
+								@elseif(request('duration') == 'yearly')
+									Current Year
+								@elseif(request('duration') == 'custom')
+									{{ request('from_date') ? date('d-m-Y', strtotime(request('from_date'))) : '-' }}
+									to
+									{{ request('to_date') ? date('d-m-Y', strtotime(request('to_date'))) : '-' }}
+								@endif
+							</div>
+
+						</div>
+					</div>
+
+				@endif
                 <div class="card-body table-card">
                     <div class="table-responsive">
                         <table class="table tbl-product my-3" id="pc-dt-simple">
@@ -187,8 +285,7 @@
                                     <th>Date/Time</th>
 									<th>Amount</th>
                                     <th>Type</th>
-                                    <th>Description</th>
-									<th>Purpose</th>
+                                    <th>Purpose</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -214,10 +311,6 @@
                                     </td>
                                     <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $val->purpose }}">
 										{{ \Illuminate\Support\Str::limit($val->purpose, 20) }}
-									</td>
-									
-									<td>
-									{{ !empty($val->reference) ? $val->reference : '' }}
 									</td>
                                     <td>
                                     <span><i class="ti ti-dots-vertical f-20"></i></span>
@@ -535,6 +628,19 @@
 
 @section('page-script')
 <script>
+
+	$(document).on('change', '#duration', function () {
+
+		if ($(this).val() === 'custom') {
+			$('.custom-date-fields').slideDown();
+		} else {
+			$('.custom-date-fields').slideUp();
+
+			$('input[name="from_date"]').val('');
+			$('input[name="to_date"]').val('');
+		}
+
+	});
 
 	document.addEventListener("DOMContentLoaded", function() {
 		var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

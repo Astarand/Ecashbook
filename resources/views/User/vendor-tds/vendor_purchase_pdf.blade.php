@@ -109,7 +109,10 @@
 </head>
 
 <body>
-
+@php
+    $logoPath = public_path('assets/images/logo-small.png');
+    $logoData = base64_encode(file_get_contents($logoPath));
+@endphp
 <div class="container">
 
     <!-- HEADER -->
@@ -117,8 +120,8 @@
         <table class="header-table">
             <tr>
                 <td class="logo" style="width:120px; padding:5px;">
-					<img src="file://{{ public_path('assets/images/logo-small.png') }}"
-						 alt="E-cashbook"
+					<img src="data:image/png;base64,{{ $logoData }}"
+						 alt="{{ config('app.name') }}"
 						 style="width:110px; height:40px; object-fit:contain;">
 				</td>
 

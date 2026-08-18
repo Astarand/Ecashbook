@@ -446,11 +446,11 @@ class ContraController extends Controller
 		}
 	}
 
-    public function BankDetails($bankId)
+    public function BankDetails(Request $request,$bankId)
     {
 		$title = 'Banks';
 		$userId = currentOwnerId();
-		$toDate = now()->toDateString();
+		$todayDate = now()->toDateString();
 		checkCoreAccess('Cash & Banking');
 
 		$req_type = 0;
@@ -463,10 +463,38 @@ class ContraController extends Controller
 		}
 
 		$bankId = base64_decode($bankId);
-		/*$bank = DB::table('banks')
-								->where('id', '=', $bankId)
-								->get();
-		$bank = $bank[0];*/
+
+		$duration = $request->get('duration', 'all');
+		$fromDate = null;
+		$toDate = now()->toDateString();
+
+		switch ($duration) {
+
+			case 'monthly':
+				$fromDate = now()->startOfMonth()->toDateString();
+				$toDate   = now()->endOfMonth()->toDateString();
+				break;
+
+			case 'quarterly':
+				$fromDate = now()->startOfQuarter()->toDateString();
+				$toDate   = now()->endOfQuarter()->toDateString();
+				break;
+
+			case 'yearly':
+				$fromDate = now()->startOfYear()->toDateString();
+				$toDate   = now()->endOfYear()->toDateString();
+				break;
+
+			case 'custom':
+				$fromDate = $request->from_date;
+				$toDate   = $request->to_date;
+				break;
+
+			default:
+				$fromDate = null;
+				$toDate   = null;
+				break;
+		}
 		$bank = DB::table('banks as b')
 				->leftJoin('company_profiles as cp', 'b.added_by', '=', 'cp.userId')
 				->leftJoin('proprietorship_profiles as pp', 'pp.userId', '=', 'b.added_by')
@@ -508,7 +536,7 @@ class ContraController extends Controller
 			->when($prop_id, function ($q) use ($prop_id) {
 				$q->where('propId', $prop_id);
 			})
-			->whereDate('date', '<=', $toDate)
+			->whereDate('date', '<=', $todayDate)
 			->selectRaw("
 				COALESCE(
 					SUM(
@@ -543,6 +571,9 @@ class ContraController extends Controller
 							->leftJoin('company_profiles', 'bank_trans.added_by', '=', 'company_profiles.userId')
 							->where('bank_trans.added_by', '=', $userId)
 							->where('bank_trans.bankId','=',$bankId)
+							->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+								$query->whereBetween('bank_trans.tran_date', [$fromDate, $toDate]);
+							})
 							->orderBy('bank_trans.tran_date', 'DESC')->get();
 		}else if(Auth::user()->u_type ==4){ //ca employee
 			$bank_trans =  DB::table('bank_trans')
@@ -550,6 +581,9 @@ class ContraController extends Controller
 							->leftJoin('company_profiles', 'bank_trans.added_by', '=', 'company_profiles.userId')
 							->where('bank_trans.added_by', '=', $userId)
 							->where('bank_trans.bankId','=',$bankId)
+							->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+								$query->whereBetween('bank_trans.tran_date', [$fromDate, $toDate]);
+							})
 							->orderBy('bank_trans.tran_date', 'DESC')->get();
 		}elseif(Auth::user()->u_type ==2 || Auth::user()->u_type ==5){ //user
 			$bank_trans =  DB::table('bank_trans')
@@ -557,6 +591,9 @@ class ContraController extends Controller
 							->leftJoin('company_profiles', 'bank_trans.added_by', '=', 'company_profiles.userId')
 							->where('bank_trans.added_by', '=', $userId)
 							->where('bank_trans.bankId','=',$bankId)
+							->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+								$query->whereBetween('bank_trans.tran_date', [$fromDate, $toDate]);
+							})
 							->orderBy('bank_trans.tran_date', 'DESC')->get();
 		}
 		elseif(Auth::user()->u_type ==3){ //admin

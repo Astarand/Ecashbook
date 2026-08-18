@@ -9,19 +9,38 @@
             <div class="row align-items-center">
                 <div class="col-md-12">
                     <div class="d-flex justify-content-between align-items-center w-100">
-                    <ul class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="">Business Setup</a></li>
-                        <li class="breadcrumb-item" aria-current="page">Ca Access Control</li>
-                    </ul>
-                    
+						<ul class="breadcrumb mb-0">
+							<li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
+							<li class="breadcrumb-item"><a href="">Business Setup</a></li>
+							<li class="breadcrumb-item" aria-current="page">Ca Access Control</li>
+						</ul>
+						
+					</div>
                 </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="page-header-title">
-                        <h2 class="mb-0">Ca Access Control</h2>
-                    </div>
-                </div>
+                <div class="col-md-12">
+					<div class="page-header-title d-flex align-items-center gap-4">
+
+						<h2 class="mb-0 text-nowrap">
+							CA/Accountant Access Control
+						</h2>
+
+						<div class="d-flex align-items-center px-3 py-2 rounded-2 bg-info-subtle border border-info-subtle"
+							 style="font-size: 13px; line-height: 1.5; flex: 1;">
+
+							<i class="ti ti-info-circle text-info me-2"
+							   style="font-size: 19px;"></i>
+
+							<span class="text-dark">
+								Your CA/Accountant will have
+								<strong class="text-primary">Review-Only</strong> access to the information
+								you authorize, with <strong class="text-danger">no Edit rights</strong>,
+								ensuring proper compliance management and accurate financial reporting.
+							</span>
+
+						</div>
+
+					</div>
+				</div>
             </div>
         </div>
     </div>

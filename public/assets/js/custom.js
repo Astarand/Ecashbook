@@ -1005,8 +1005,10 @@ $("form#addSalesFrmThree").bind("submit", function () {
 var addSalesFrmFour = $("#addSalesFrmFour").validate({
     rules: {
         mode_of_pay: {
-            required: true,
-        },
+			required: function () {
+				return $("#pay_status").val() !== "Due";
+			},
+		},
         pay_status: {
             required: true,
         },

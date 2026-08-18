@@ -280,28 +280,13 @@
 					</li>
 
 					@if(in_array('ALL', $userMenu) || in_array('Inventory', $userMenu))
-						<li class="pc-item pc-hasmenu">
-							<a href="#!" class="pc-link">
-								<span class="pc-micon"><i class="ph-duotone ph-lockers"></i></span>
+						<li class="pc-item">
+							<a href="{{ route('user.Inventory') }}" class="pc-link">
+								<span class="pc-micon">
+									<i class="ph-duotone ph-lockers"></i>
+								</span>
 								<span class="pc-mtext">Inventory</span>
-								<span class="pc-arrow mt-1"><i data-feather="chevron-right"></i></span>
 							</a>
-
-							<ul class="pc-submenu">
-								<li class="pc-item">
-									<a class="pc-link" href="{{ route('user.Inventory') }}">
-										<i class="ph-duotone ph-package"></i>
-										<span>Stock & Inventory</span>
-									</a>
-								</li>
-
-								<!--<li class="pc-item">
-									<a class="pc-link" href="{{ route('user.expenses_inventory') }}">
-										<i class="ph-duotone ph-receipt"></i>
-										<span>Inventory Expenses</span>
-									</a>
-								</li>-->
-							</ul>
 						</li>
 					@endif
 
@@ -1760,32 +1745,13 @@
 					@endphp
 
 					@if($inventory && canAccess('Inventory', $userMenu, $permissions))
-						<li class="pc-item pc-hasmenu">
-							<a href="#!" class="pc-link">
+						<li class="pc-item">
+							<a href="{{ route('user.Inventory') }}" class="pc-link">
 								<span class="pc-micon">
 									<i class="ph-duotone ph-lockers"></i>
 								</span>
 								<span class="pc-mtext">{{ $inventory->menu_name }}</span>
-								<span class="pc-arrow mt-1">
-									<i data-feather="chevron-right"></i>
-								</span>
 							</a>
-
-							<ul class="pc-submenu">
-								<li class="pc-item">
-									<a class="pc-link" href="{{ route('user.Inventory') }}">
-										<i class="ph-duotone ph-package"></i>
-										<span>Stock & Inventory</span>
-									</a>
-								</li>
-
-								<!--<li class="pc-item">
-									<a class="pc-link" href="{{ route('user.expenses_inventory') }}">
-										<i class="ph-duotone ph-receipt"></i>
-										<span>Inventory Expenses</span>
-									</a>
-								</li>-->
-							</ul>
 						</li>
 					@endif
 

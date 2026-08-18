@@ -298,7 +298,7 @@ class AssetController extends Controller
 				$rules['cwip_amount'] = 'required|numeric';
 			}else{
 				$rules['asset_name']       = 'required|string|max:255';
-				$rules['asset_category'] = 'required';
+				//$rules['asset_category'] = 'required';
 				$rules['asset_code'] = 'required';
 				$rules['invoice_value'] = 'required';
 				$rules['pay_status'] = 'required';
