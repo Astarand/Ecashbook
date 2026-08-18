@@ -75,6 +75,7 @@ class SalesController extends Controller
 					'sales.status',
 					'sales.signed_pdf',
 					'sales.signed_pdf_status',
+					'sales.is_send',
 
 					'company_profiles.comp_name',
 
@@ -117,6 +118,7 @@ class SalesController extends Controller
 					'sales.status',
 					'sales.signed_pdf',
 					'sales.signed_pdf_status',
+					'sales.is_send',
 					'company_profiles.comp_name',
 					'proprietorship_profiles.comp_name',
 					'customers.cust_name',
@@ -153,6 +155,7 @@ class SalesController extends Controller
 			$array[$val->id]['status'] = $val->status;
 			$array[$val->id]['signed_pdf'] = $val->signed_pdf;
 			$array[$val->id]['signed_pdf_status'] = $val->signed_pdf_status;
+			$array[$val->id]['is_send'] = $val->is_send;
 			$array[$val->id]['cust_name'] = $val->cust_name ?? '';
 			$array[$val->id]['cust_phone'] = $val->cust_phone ?? '';
 

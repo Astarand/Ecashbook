@@ -9,6 +9,7 @@ use App\Http\Controllers\LoginController;
 /* Common Controller */
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DocumentMailController;
 
 /* User/Company Controller */
 use App\Http\Controllers\User\DashboardController;
@@ -1319,5 +1320,7 @@ Route::middleware(['ensure.login'])->group(function () {
 		Route::post('/upload', [HsnSacController::class, 'upload'])->name('upload');
 		Route::post('/status/{id}', [HsnSacController::class, 'status'])->name('status');
 	});
+	Route::get('/get-proform-invoice-total/{id}', [ProformasController::class, 'getInvoiceTotal']);
+	Route::post('/send-document-mail', [DocumentMailController::class,'sendDocumentMail'])->name('send.document.mail');
 	
 });
