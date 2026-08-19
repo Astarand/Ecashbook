@@ -67,6 +67,7 @@
     @include('App.Header')
     @include('partials.chat-modal')
     @include('partials.settlement-modal')
+    @include('partials.send-mail-modal')
 
     <div class="pc-container">
         @yield('container')

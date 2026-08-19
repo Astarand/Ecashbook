@@ -129,7 +129,7 @@
                                                 <tbody id="tableBody">
                                                     <tr>
                                                         <td>1</td>
-                                                        <td><input type="text" class="form-control" placeholder="Name"></td>
+                                                        <td><input type="text" class="form-control" autocomplete="off" placeholder="Name"></td>
                                                         <td><input type="text" class="form-control" placeholder="Price"></td>
                                                         <td><input type="number" class="form-control" placeholder="HSN/ SAC Code"></td>
                                                         <td><input type="number" class="form-control" placeholder="Quantity"></td>
@@ -498,6 +498,173 @@
     </div>
 @endsection
 
+<style>
+/* =========================================================
+   Expense / Item Detail Table
+   No HTML changes required
+   ========================================================= */
+
+#items-table-section .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Table */
+#items-table-section .table {
+    width: 100%;
+    min-width: 1200px;
+    margin-bottom: 0;
+    table-layout: fixed;
+}
+
+/* Cells */
+#items-table-section .table th,
+#items-table-section .table td {
+    vertical-align: middle;
+    padding: 0.65rem 0.5rem;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------
+   Column widths
+   --------------------------------------------------------- */
+
+/* # */
+#items-table-section .table th:nth-child(1),
+#items-table-section .table td:nth-child(1) {
+    width: 45px;
+    text-align: center;
+}
+
+/* Product / Service */
+#items-table-section .table th:nth-child(2),
+#items-table-section .table td:nth-child(2) {
+    width: 220px;
+}
+
+/* Price */
+#items-table-section .table th:nth-child(3),
+#items-table-section .table td:nth-child(3) {
+    width: 130px;
+}
+
+/* HSN/SAC */
+#items-table-section .table th:nth-child(4),
+#items-table-section .table td:nth-child(4) {
+    width: 150px;
+}
+
+/* Qty */
+#items-table-section .table th:nth-child(5),
+#items-table-section .table td:nth-child(5) {
+    width: 100px;
+}
+
+/* GST Mode */
+#items-table-section .table th:nth-child(6),
+#items-table-section .table td:nth-child(6) {
+    width: 170px;
+}
+
+/* CGST / SGST / IGST */
+#items-table-section .table th:nth-child(7),
+#items-table-section .table td:nth-child(7),
+#items-table-section .table th:nth-child(8),
+#items-table-section .table td:nth-child(8),
+#items-table-section .table th:nth-child(9),
+#items-table-section .table td:nth-child(9) {
+    width: 110px;
+}
+
+/* Total Amount */
+#items-table-section .table th:nth-child(10),
+#items-table-section .table td:nth-child(10) {
+    width: 130px;
+}
+
+/* Action */
+#items-table-section .table th:nth-child(11),
+#items-table-section .table td:nth-child(11) {
+    width: 75px;
+}
+
+/* ---------------------------------------------------------
+   Inputs / Select
+   --------------------------------------------------------- */
+
+#items-table-section .table .form-control,
+#items-table-section .table .form-select {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 38px;
+    min-height: 38px;
+    box-sizing: border-box;
+    padding: 0.375rem 0.65rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Price and Quantity */
+#items-table-section .table input[type="number"] {
+    text-align: right;
+}
+
+/* Prevent browser number controls from making the field look cramped */
+#items-table-section .table input[type="number"] {
+    min-width: 0;
+}
+
+/* Select */
+#items-table-section .table .form-select {
+    cursor: pointer;
+    padding-right: 2rem;
+}
+
+/* ---------------------------------------------------------
+   Amount columns
+   --------------------------------------------------------- */
+
+#items-table-section .table td:nth-child(7),
+#items-table-section .table td:nth-child(8),
+#items-table-section .table td:nth-child(9),
+#items-table-section .table td:nth-child(10) {
+    text-align: right;
+    font-weight: 500;
+}
+
+/* ---------------------------------------------------------
+   Delete button
+   --------------------------------------------------------- */
+
+#items-table-section .table td:last-child {
+    text-align: center;
+}
+
+#items-table-section .table td:last-child a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------------------------------------------------------
+   Tablet / Mobile
+   --------------------------------------------------------- */
+
+@media (max-width: 991.98px) {
+    #items-table-section .table {
+        min-width: 1150px;
+    }
+
+    #items-table-section .table th,
+    #items-table-section .table td {
+        padding: 0.5rem 0.4rem;
+    }
+}
+</style>
+
 @section('page-script')
 <script>
 
@@ -601,7 +768,7 @@
             const newRow = document.createElement("tr");
             newRow.innerHTML = `
                 <td>${rowCount + 1}</td>
-                <td><input type="text" class="form-control" placeholder="Name"></td>
+                <td><input type="text" class="form-control" autocomplete="off" placeholder="Name"></td>
                 <td><input type="number" class="form-control" placeholder="Price"></td>
                 <td><input type="number" class="form-control" placeholder="HSN/ SAC Code"></td>
                 <td><input type="number" class="form-control" placeholder="Quantity"></td>

@@ -52,10 +52,31 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-success viewLetterBtn"
-                                        data-subject="{{ $letter->subject }}" data-content="{{ $letter->content }}">
-                                        <i class="ti ti-eye"></i> View
-                                    </button>
+                                    <div class="d-inline-flex align-items-center gap-2">
+
+                                        <!-- View Letter -->
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-success d-flex align-items-center gap-1 viewLetterBtn"
+                                                data-subject="{{ $letter->subject }}"
+                                                data-content="{{ $letter->content }}"
+                                                title="View Letter">
+                                            <i class="ti ti-eye"></i>
+                                            <span>View</span>
+                                        </button>
+
+                                        <!-- Download PDF -->
+                                        <a href="{{ route('user.employee_hr_letter_pdf', [
+                                                'empId' => base64_encode($empId),
+                                                'letterId' => base64_encode($letter->id)
+                                            ]) }}"
+                                        class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+                                        target="_blank"
+                                        title="Download PDF">
+                                            <i class="ti ti-file-type-pdf"></i>
+                                            <span>PDF</span>
+                                        </a>
+
+                                    </div>
                                 </td>
                             </tr>
                             @empty

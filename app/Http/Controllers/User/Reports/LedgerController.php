@@ -264,7 +264,7 @@ class LedgerController extends Controller
 			$purchaseDebitRows = $this->getPurchaseDebitNoteLedgerRows($propId,$userId,$from,$to,$ledger,$partyName,$vendId);
 			$rows = array_merge($rows, $purchaseDebitRows);
 
-			$expenseRows = $this->getExpenseLedgerRows($propId,$userId,$from,$to,$ledger,$partyName,$vendId);
+			$expenseRows = $this->getExpenseLedgerRows($propId,$userId,$from,$to,$ledger,$partyName,$vendId,$ledgerGroup);
 			$rows = array_merge($rows, $expenseRows);
 		}
 		
@@ -1406,7 +1406,7 @@ class LedgerController extends Controller
 	}
 	
 	
-	private function getExpenseLedgerRows($propId, $userId, $from, $to, $ledger = null, $partyName = null, $vendId = null)
+	private function getExpenseLedgerRows_old($propId, $userId, $from, $to, $ledger = null, $partyName = null, $vendId = null)
 	{
 		$rows = [];
 		$source = 'Expense';
@@ -1633,6 +1633,430 @@ class LedgerController extends Controller
 		return $rows;
 	}
 	
+	
+	private function getExpenseLedgerRows($propId, $userId, $from, $to, $ledger = null, $partyName = null, $vendId = null,$ledgerGroup = null)
+	{
+		$rows = [];
+		$source = 'Expense';
+
+		$query = DB::table('expenses as e')
+			->whereBetween('e.expense_date', [$from, $to]);
+
+		/*
+		|--------------------------------------------------------------------------
+		| Company / User Filter
+		|--------------------------------------------------------------------------
+		*/
+		if (!empty($propId)) {
+			$query->where('e.propId', $propId);
+		} else {
+			$query->where('e.added_by', $userId);
+		}
+
+		/*
+		|--------------------------------------------------------------------------
+		| Vendor Filter
+		|--------------------------------------------------------------------------
+		*/
+		if (!empty($vendId)) {
+			$query->where('e.vendor_id', $vendId);
+		}
+
+		/*
+		|--------------------------------------------------------------------------
+		| Freight / Carriage Inward already linked with Purchase
+		|--------------------------------------------------------------------------
+		*/
+		$query->where(function ($q) {
+			$q->where('e.expense_type', '!=', 'Freight / Carriage Inward')
+				->orWhereNull('e.expense_type')
+				->orWhereNotExists(function ($sub) {
+					$sub->select(DB::raw(1))
+						->from('purchases as p')
+						->whereColumn('p.inv_num', 'e.exp_invno');
+				});
+		});
+
+		/*
+		|--------------------------------------------------------------------------
+		| Ledger Group Filter
+		|--------------------------------------------------------------------------
+		|
+		| Adjust this according to how your ledger group is stored.
+		| For example, if Rent Expense belongs to Indirect Expenses,
+		| this can be matched against expense_cat.
+		|--------------------------------------------------------------------------
+		*/
+		if (!empty($ledgerGroup)) {
+			$query->where(function ($q) use ($ledgerGroup) {
+				$q->where('e.expense_cat', $ledgerGroup)
+					->orWhere('e.expense_type', $ledgerGroup);
+			});
+		}
+
+		$expenses = $query
+			->orderBy('e.expense_date', 'asc')
+			->orderBy('e.id', 'asc')
+			->get();
+
+		foreach ($expenses as $expense) {
+
+			/*
+			|--------------------------------------------------------------------------
+			| Vendor
+			|--------------------------------------------------------------------------
+			*/
+			$vendorName = '';
+
+			if (!empty($expense->vendor_id)) {
+				$vendorName = DB::table('vendors')
+					->where('id', $expense->vendor_id)
+					->value('vendor_name');
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Expense Ledger Name
+			|--------------------------------------------------------------------------
+			|
+			| DB:
+			| rent_expense
+			|
+			| Ledger:
+			| Rent Expense
+			|--------------------------------------------------------------------------
+			*/
+			$expenseLedger = $expense->expense_type ?? '';
+
+			if (empty($expenseLedger)) {
+				$expenseLedger = $expense->other_expenses_details ?? 'Expense';
+			}
+
+			$expenseLedgerDisplay = ucwords(
+				str_replace('_', ' ', trim($expenseLedger))
+			);
+
+			/*
+			|--------------------------------------------------------------------------
+			| Amount
+			|--------------------------------------------------------------------------
+			*/
+			$expenseAmount = (float) ($expense->expense_amt ?? 0);
+
+			/*
+			|--------------------------------------------------------------------------
+			| GST
+			|--------------------------------------------------------------------------
+			*/
+			$cgst = 0;
+			$sgst = 0;
+			$igst = 0;
+
+			$gstAmount = (float) ($expense->total_gst ?? 0);
+			$gstRate = (float) ($expense->gst_rate ?? 0);
+
+			$gstTrans = strtolower(
+				trim((string) ($expense->gst_trans ?? ''))
+			);
+
+			/*
+			|--------------------------------------------------------------------------
+			| Use total_gst if available
+			|--------------------------------------------------------------------------
+			*/
+			if ($gstAmount > 0) {
+
+				if (
+					$gstTrans === 'intrastate' ||
+					$gstTrans === 'union'
+				) {
+					$cgst = $gstAmount / 2;
+					$sgst = $gstAmount / 2;
+				} elseif ($gstTrans === 'interstate') {
+					$igst = $gstAmount;
+				}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Fallback: calculate GST from GST rate
+			|--------------------------------------------------------------------------
+			*/
+			} elseif ($gstRate > 0 && $expenseAmount > 0) {
+
+				if (
+					$gstTrans === 'intrastate' ||
+					$gstTrans === 'union'
+				) {
+					$cgst = ($expenseAmount * ($gstRate / 2)) / 100;
+					$sgst = ($expenseAmount * ($gstRate / 2)) / 100;
+				} elseif ($gstTrans === 'interstate') {
+					$igst = ($expenseAmount * $gstRate) / 100;
+				}
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Total Expense Payable
+			|--------------------------------------------------------------------------
+			*/
+			$total = $expenseAmount + $cgst + $sgst + $igst;
+
+			/*
+			|--------------------------------------------------------------------------
+			| Selected Ledger Matching
+			|--------------------------------------------------------------------------
+			*/
+			$isVendor = false;
+			$isExpense = false;
+			$isGstLedger = false;
+
+			$selectedLedger = strtolower(trim((string) $ledger));
+			$selectedParty = strtolower(trim((string) $partyName));
+
+			$vendorNameLower = strtolower(trim($vendorName));
+			$expenseLedgerLower = strtolower(trim($expenseLedger));
+			$expenseLedgerDisplayLower = strtolower(trim($expenseLedgerDisplay));
+
+			/*
+			|--------------------------------------------------------------------------
+			| Vendor Match
+			|--------------------------------------------------------------------------
+			*/
+			if (
+				!empty($ledger) &&
+				$selectedLedger === $vendorNameLower
+			) {
+				$isVendor = true;
+			}
+
+			if (
+				!empty($partyName) &&
+				$selectedParty === $vendorNameLower
+			) {
+				$isVendor = true;
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Expense Ledger Match
+			|--------------------------------------------------------------------------
+			|
+			| Supports:
+			| rent_expense
+			| Rent Expense
+			|--------------------------------------------------------------------------
+			*/
+			if (!empty($ledger)) {
+
+				if (
+					$selectedLedger === $expenseLedgerLower ||
+					$selectedLedger === $expenseLedgerDisplayLower
+				) {
+					$isExpense = true;
+				}
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| GST Ledger Match
+			|--------------------------------------------------------------------------
+			*/
+			if (
+				$selectedLedger === 'input cgst' ||
+				$selectedLedger === 'input sgst' ||
+				$selectedLedger === 'input igst'
+			) {
+				$isGstLedger = true;
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Debit / Credit
+			|--------------------------------------------------------------------------
+			*/
+			$debit = 0;
+			$credit = 0;
+
+			/*
+			|--------------------------------------------------------------------------
+			| No Ledger Selected
+			|--------------------------------------------------------------------------
+			*/
+			if (empty($ledger) && empty($partyName)) {
+
+				$debit = $total;
+
+			/*
+			|--------------------------------------------------------------------------
+			| Vendor Ledger
+			|--------------------------------------------------------------------------
+			*/
+			} elseif ($isVendor) {
+
+				$credit = $total;
+
+			/*
+			|--------------------------------------------------------------------------
+			| Expense Ledger
+			|--------------------------------------------------------------------------
+			*/
+			} elseif ($isExpense) {
+
+				$debit = $expenseAmount;
+
+			/*
+			|--------------------------------------------------------------------------
+			| GST Ledgers
+			|--------------------------------------------------------------------------
+			*/
+			} elseif ($isGstLedger) {
+
+				if ($selectedLedger === 'input cgst') {
+					$debit = $cgst;
+				}
+
+				if ($selectedLedger === 'input sgst') {
+					$debit = $sgst;
+				}
+
+				if ($selectedLedger === 'input igst') {
+					$debit = $igst;
+				}
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Skip if no matching ledger
+			|--------------------------------------------------------------------------
+			*/
+			if ($debit == 0 && $credit == 0) {
+				continue;
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Transaction Details
+			|--------------------------------------------------------------------------
+			*/
+			$details = [];
+
+			if ($expenseAmount > 0) {
+				$details[] = [
+					'ledger' => $expenseLedgerDisplay,
+					'debit' => round($expenseAmount, 2),
+					'credit' => 0,
+				];
+			}
+
+			if ($cgst > 0) {
+				$details[] = [
+					'ledger' => 'Input CGST',
+					'debit' => round($cgst, 2),
+					'credit' => 0,
+				];
+			}
+
+			if ($sgst > 0) {
+				$details[] = [
+					'ledger' => 'Input SGST',
+					'debit' => round($sgst, 2),
+					'credit' => 0,
+				];
+			}
+
+			if ($igst > 0) {
+				$details[] = [
+					'ledger' => 'Input IGST',
+					'debit' => round($igst, 2),
+					'credit' => 0,
+				];
+			}
+
+			if ($total > 0 && !empty($vendorName)) {
+				$details[] = [
+					'ledger' => $vendorName,
+					'debit' => 0,
+					'credit' => round($total, 2),
+				];
+			}
+
+			/*
+			|--------------------------------------------------------------------------
+			| Main Row
+			|--------------------------------------------------------------------------
+			*/
+			$rows[] = [
+				'date' => $expense->expense_date,
+				'voucher' => $expense->exp_invno ?? '-',
+				'type' => 'Expense',
+				'source' => $source,
+
+				'transaction_details' =>
+					$expense->other_expenses_details ??
+					$expenseLedgerDisplay,
+
+				'ledgername' => $ledger ?? '',
+
+				'counter' =>
+					$vendorName ?: $expenseLedgerDisplay,
+
+				'debit_ledger' =>
+					$debit > 0
+						? ($ledger ?? $expenseLedgerDisplay)
+						: '',
+
+				'credit_ledger' =>
+					$credit > 0
+						? ($ledger ?? $vendorName)
+						: '',
+
+				'narration' => $expenseLedgerDisplay,
+
+				'cgst' => round($cgst, 2),
+				'sgst' => round($sgst, 2),
+				'igst' => round($igst, 2),
+
+				'shipping_cost' => 0,
+
+				'debit' => round($debit, 2),
+				'credit' => round($credit, 2),
+
+				'balance' => 0,
+
+				'payment_status' =>
+					$expense->payment_status ?? 'Due',
+
+				'status' =>
+					$expense->status ?? '',
+
+				'details' => $details,
+			];
+
+			/*
+			|--------------------------------------------------------------------------
+			| Payment Voucher Rows
+			|--------------------------------------------------------------------------
+			*/
+			$payStatus = $expense->payment_status ?? 'Due';
+
+			$paymentRows = $this->getPaymentVoucherLedgerRows(
+				$propId,
+				$userId,
+				$from,
+				$to,
+				$ledger,
+				$source,
+				$expense->id,
+				$payStatus
+			);
+
+			if (!empty($paymentRows)) {
+				$rows = array_merge($rows, $paymentRows);
+			}
+		}
+
+		return $rows;
+	}
 	
 	private function getAssetLedgerRows($propId, $userId, $from, $to, $ledger = null, $partyName = null, $vendId = null)
 	{

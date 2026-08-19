@@ -43,181 +43,126 @@ class AssetController extends Controller
 		$this->profitLossService = $profitLossService;
     }
 	
-    public function AssetList(Request $request)
-    {
-        //die('hhh');
-        //$this->middleware('auth');
+	public function AssetList(Request $request)
+	{
 		$title = 'Assets';
 		$userId = currentOwnerId();
+
 		checkCoreAccess('Asset Management');
 
 		$req_tag = 0;
+
 		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
-			
 			$userId = getAccessCompanyId($request);
 			$req_tag = 1;
 		}
 
-		if(Auth::user()->u_type ==1){ //ca
-			$assets = DB::table('assets as a')
-						->leftJoin('assets_currs as ac', 'ac.aid', '=', 'a.id')
-						->leftJoin('company_profiles as cp', 'cp.userId', '=', 'a.added_by')
-						->leftJoin('proprietorship_profiles as pp', 'pp.id', '=', 'a.propId')
-						->where('a.added_by', $userId)
-						->orderBy('a.id', 'DESC')
-						->select(
-							'a.*',
+		/*
+		|--------------------------------------------------------------------------
+		| Asset Query
+		|--------------------------------------------------------------------------
+		*/
+		if (in_array(Auth::user()->u_type, [1, 2, 4, 5])) {
 
-							// ✅ FINAL AMOUNT (COMMON ALIAS)
-							DB::raw("
-								CASE
-									-- CURRENT ASSETS → SUM ALL FIELDS
-									WHEN a.assetType = 'current' THEN
-										COALESCE(ac.cash_amount,0)
-									  + COALESCE(ac.bank_balance,0)
-									  + COALESCE(ac.amount,0)
-									  + COALESCE(ac.pending_amount,0)
-									  + COALESCE(ac.amount_vendor,0)
-									  + COALESCE(ac.employee_advance_amount,0)
-									  + COALESCE(ac.prepaid_amt,0)
-									  + COALESCE(ac.itc_amt,0)
-									  + COALESCE(ac.tds_gross_amount,0)
-									  + COALESCE(ac.gross_profit,0)
+			$query = DB::table('assets as a')
+				->leftJoin('assets_currs as ac', 'ac.aid', '=', 'a.id')
+				->leftJoin('company_profiles as cp', 'cp.userId', '=', 'a.added_by')
+				->leftJoin('proprietorship_profiles as pp', 'pp.id', '=', 'a.propId')
+				->where('a.added_by', $userId)
 
-									-- CWIP
-									WHEN a.nonCurrentAssetType = 'Capital Work in Progress' THEN a.cwip_amount
+				->when($request->filled('from_date'), function ($query) use ($request) {
+					$query->whereDate('a.date', '>=', $request->from_date);
+				})
 
-									-- NORMAL ASSET
-									ELSE a.invoice_value
-								END as amount
-							"),
+				->when($request->filled('to_date'), function ($query) use ($request) {
+					$query->whereDate('a.date', '<=', $request->to_date);
+				})
 
-							// TDS
-							'a.tds_amt as tdsAmount',
+				->when($request->filled('asset_type'), function ($query) use ($request) {
+					$query->where('a.assetType', $request->asset_type);
+				})
 
-							// Company Name
-							DB::raw("
-								CASE
-									WHEN a.propId IS NOT NULL AND a.propId != ''
-									THEN pp.comp_name
-									ELSE cp.comp_name
-								END as comp_name
-							")
-						)
-						->paginate(10);
-		}else if(Auth::user()->u_type ==4){ //ca employee
-			$assets = DB::table('assets as a')
-						->leftJoin('assets_currs as ac', 'ac.aid', '=', 'a.id')
-						->leftJoin('company_profiles as cp', 'cp.userId', '=', 'a.added_by')
-						->leftJoin('proprietorship_profiles as pp', 'pp.id', '=', 'a.propId')
-						->where('a.added_by', $userId)
-						->orderBy('a.id', 'DESC')
-						->select(
-							'a.*',
+				->select(
+					'a.*',
+					// Final Amount
+					DB::raw("
+						CASE
+							WHEN a.assetType = 'current' THEN
+								COALESCE(ac.cash_amount, 0)
+							  + COALESCE(ac.bank_balance, 0)
+							  + COALESCE(ac.amount, 0)
+							  + COALESCE(ac.pending_amount, 0)
+							  + COALESCE(ac.amount_vendor, 0)
+							  + COALESCE(ac.employee_advance_amount, 0)
+							  + COALESCE(ac.prepaid_amt, 0)
+							  + COALESCE(ac.itc_amt, 0)
+							  + COALESCE(ac.tds_gross_amount, 0)
+							  + COALESCE(ac.gross_profit, 0)
 
-							// ✅ FINAL AMOUNT (COMMON ALIAS)
-							DB::raw("
-								CASE
-									-- CURRENT ASSETS → SUM ALL FIELDS
-									WHEN a.assetType = 'current' THEN
-										COALESCE(ac.cash_amount,0)
-									  + COALESCE(ac.bank_balance,0)
-									  + COALESCE(ac.amount,0)
-									  + COALESCE(ac.pending_amount,0)
-									  + COALESCE(ac.amount_vendor,0)
-									  + COALESCE(ac.employee_advance_amount,0)
-									  + COALESCE(ac.prepaid_amt,0)
-									  + COALESCE(ac.itc_amt,0)
-									  + COALESCE(ac.tds_gross_amount,0)
-									  + COALESCE(ac.gross_profit,0)
+							WHEN a.nonCurrentAssetType = 'Capital Work in Progress'
+								THEN COALESCE(a.cwip_amount, 0)
 
-									-- CWIP
-									WHEN a.nonCurrentAssetType = 'Capital Work in Progress' THEN a.cwip_amount
+							ELSE COALESCE(a.invoice_value, 0)
+						END AS amount
+					"),
 
-									-- NORMAL ASSET
-									ELSE a.invoice_value
-								END as amount
-							"),
+					// TDS
+					'a.tds_amt as tdsAmount',
 
-							// TDS
-							'a.tds_amt as tdsAmount',
+					// Company Name
+					DB::raw("
+						CASE
+							WHEN a.propId IS NOT NULL AND a.propId != ''
+								THEN pp.comp_name
+							ELSE cp.comp_name
+						END AS comp_name
+					")
+				)
+				->orderBy('a.id', 'DESC');
 
-							// Company Name
-							DB::raw("
-								CASE
-									WHEN a.propId IS NOT NULL AND a.propId != ''
-									THEN pp.comp_name
-									ELSE cp.comp_name
-								END as comp_name
-							")
-						)
-						->paginate(10);
-		}elseif(Auth::user()->u_type ==2 || Auth::user()->u_type ==5){ //user
-			$assets = DB::table('assets as a')
-						->leftJoin('assets_currs as ac', 'ac.aid', '=', 'a.id')
-						->leftJoin('company_profiles as cp', 'cp.userId', '=', 'a.added_by')
-						->leftJoin('proprietorship_profiles as pp', 'pp.id', '=', 'a.propId')
-						->where('a.added_by', $userId)
-						->orderBy('a.id', 'DESC')
-						->select(
-							'a.*',
+			$assets = $query
+				->paginate(10)
+				->withQueryString();
 
-							// ✅ FINAL AMOUNT (COMMON ALIAS)
-							DB::raw("
-								CASE
-									-- CURRENT ASSETS → SUM ALL FIELDS
-									WHEN a.assetType = 'current' THEN
-										COALESCE(ac.cash_amount,0)
-									  + COALESCE(ac.bank_balance,0)
-									  + COALESCE(ac.amount,0)
-									  + COALESCE(ac.pending_amount,0)
-									  + COALESCE(ac.amount_vendor,0)
-									  + COALESCE(ac.employee_advance_amount,0)
-									  + COALESCE(ac.prepaid_amt,0)
-									  + COALESCE(ac.itc_amt,0)
-									  + COALESCE(ac.tds_gross_amount,0)
-									  + COALESCE(ac.gross_profit,0)
+		} elseif (Auth::user()->u_type == 3) {
 
-									-- CWIP
-									WHEN a.nonCurrentAssetType = 'Capital Work in Progress' THEN a.cwip_amount
+			$query = DB::table('assets as a')
+				->select(
+					'a.*',
+					'company_profiles.comp_name'
+				)
+				->leftJoin('company_profiles','a.added_by','=','company_profiles.userId')
+				->leftJoin('asset_currents','a.id','=','asset_currents.aid')
+				->leftJoin('asset_non_currents','a.id','=','asset_non_currents.asid')
 
-									-- NORMAL ASSET
-									ELSE a.invoice_value
-								END as amount
-							"),
+				->when($request->filled('from_date'), function ($query) use ($request) {
+					$query->whereDate('a.date', '>=', $request->from_date);
+				})
 
-							// TDS
-							'a.tds_amt as tdsAmount',
+				->when($request->filled('to_date'), function ($query) use ($request) {
+					$query->whereDate('a.date', '<=', $request->to_date);
+				})
 
-							// Company Name
-							DB::raw("
-								CASE
-									WHEN a.propId IS NOT NULL AND a.propId != ''
-									THEN pp.comp_name
-									ELSE cp.comp_name
-								END as comp_name
-							")
-						)
-						->paginate(10);
+				->when($request->filled('asset_type'), function ($query) use ($request) {
+					$query->where('a.assetType', $request->asset_type);
+				})
+
+				->orderBy('a.id', 'DESC');
+
+			$assets = $query
+				->paginate(10)
+				->withQueryString();
 		}
-		elseif(Auth::user()->u_type ==3){ //admin
-			$assets =  DB::table('assets')
-							->select(DB::raw('assets.*,company_profiles.comp_name'))
-							->leftJoin('company_profiles', 'assets.added_by', '=', 'company_profiles.userId')
-							->leftJoin('asset_currents', 'assets.id', '=', 'asset_currents.aid')
-							->leftJoin('asset_non_currents', 'assets.id', '=', 'asset_non_currents.asid')
-							->orderBy('id', 'DESC')->paginate(10);
-		}
-		
+
 		$assets_pagination = $assets;
-		// echo "<pre>"; print_r($assets);exit;
+
 		return view('User.assets-list')->with([
-			'title' =>$title,
-			'assets'=>$assets,
-			'assets_pagination' =>$assets_pagination,
+			'title' => $title,
+			'assets' => $assets,
+			'assets_pagination' => $assets_pagination,
 			'req_tag' => $req_tag
 		]);
-    }
+	}
 
     public function AddAsset()
     {

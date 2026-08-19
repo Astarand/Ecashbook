@@ -62,7 +62,7 @@ class PayController extends Controller
 				->where('id',$id)
 				->first();
 
-			$invoiceTotal = getRoundedAmount(($expense->expense_amt ?? 0));
+			$invoiceTotal = getRoundedAmount(($expense->expense_amt ?? 0) + ($expense->total_gst ?? 0));
 		}else if($type=='Income'){
 			$income = DB::table('income')
 				->where('id',$id)
@@ -79,12 +79,12 @@ class PayController extends Controller
 				// Normal Asset
 				if($asset->nonCurrentAssetType != 'Capital Work in Progress')
 				{
-					$invoiceTotal = getRoundedAmount($asset->invoice_value ?? 0);
+					$invoiceTotal = getRoundedAmount(($asset->invoice_value ?? 0) + ($asset->gst_amt ?? 0));
 				}
 				// CWIP Asset
 				else
 				{
-					$invoiceTotal = getRoundedAmount($asset->cwip_amount ?? 0);
+					$invoiceTotal = getRoundedAmount(($asset->cwip_amount ?? 0) + ($asset->gst_amt ?? 0));
 				}
 			}
 			else

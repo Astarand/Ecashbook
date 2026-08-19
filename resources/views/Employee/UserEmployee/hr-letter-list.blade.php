@@ -53,6 +53,10 @@
                                         class="avtar avtar-xs btn-link-secondary" title="View Letter">
                                             <i class="ti ti-eye f-20"></i>
                                         </a>
+                                        <a href="{{ route('userEmployee.hr-letters-pdf', ['id' => encrypt($letter->id)]) }}" 
+                                        class="avtar avtar-xs btn-link-danger ms-1" title="Download PDF" target="_blank">
+                                            <i class="ti ti-download f-20"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             @empty

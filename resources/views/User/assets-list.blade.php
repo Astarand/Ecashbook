@@ -54,33 +54,52 @@
 					</div>
 	
 					<div class="row">
-
 						<div class="col-md-3">
 							<label>From Date</label>
-							<input type="date" id="from_date" class="form-control">
+							<input type="date"
+								   id="from_date"
+								   class="form-control"
+								   value="{{ request('from_date') }}">
 						</div>
 
 						<div class="col-md-3">
 							<label>To Date</label>
-							<input type="date" id="to_date" class="form-control">
+							<input type="date"
+								   id="to_date"
+								   class="form-control"
+								   value="{{ request('to_date') }}">
 						</div>
-						
-						<div class="col-md-3">
+
+						<div class="col-md-2">
 							<label>Asset Type</label>
 							<select id="asset_type_filter" class="form-control">
 								<option value="">All</option>
-								<option value="current">Current</option>
-								<option value="non-current">Non-Current</option>
+								<option value="current"
+									{{ request('asset_type') == 'current' ? 'selected' : '' }}>
+									Current
+								</option>
+								<option value="non-current"
+									{{ request('asset_type') == 'non-current' ? 'selected' : '' }}>
+									Non-Current
+								</option>
 							</select>
 						</div>
 
-						<div class="col-md-3 d-flex align-items-end">
-							<button class="btn btn-success w-100" id="exportBtn">
-								Export Excel
+						<div class="col-md-4 d-flex align-items-center justify-content-center gap-2">
+							<button type="button" class="btn btn-primary btn-sm" id="filterBtn">
+								<i class="ti ti-filter"></i> Filter
+							</button>
+
+							<button type="button" class="btn btn-success btn-sm" id="exportBtn">
+								<i class="ti ti-file-spreadsheet"></i> Export
+							</button>
+
+							<button type="button" class="btn btn-light-secondary btn-sm" id="resetBtn">
+								<i class="ti ti-refresh"></i> Reset
 							</button>
 						</div>
-
 					</div>
+					
 				</div>
 			</div>
             <div class="card card-body table-card">
@@ -269,6 +288,36 @@
 </div>
 
 <script>
+
+	document.getElementById('filterBtn').addEventListener('click', function () {
+
+		const fromDate = document.getElementById('from_date').value;
+		const toDate = document.getElementById('to_date').value;
+		const assetType = document.getElementById('asset_type_filter').value;
+
+		const params = new URLSearchParams();
+
+		if (fromDate) {
+			params.append('from_date', fromDate);
+		}
+
+		if (toDate) {
+			params.append('to_date', toDate);
+		}
+
+		if (assetType) {
+			params.append('asset_type', assetType);
+		}
+
+		window.location.href =
+			"{{ route('user.AssetList') }}" +
+			(params.toString() ? '?' + params.toString() : '');
+	});
+	
+	document.getElementById('resetBtn').addEventListener('click', function () {
+		window.location.href = "{{ route('user.AssetList') }}";
+	});
+
     let deleteId = null; // Store the ID of the asset to be deleted
 
     // Capture the asset ID when the delete button is clicked

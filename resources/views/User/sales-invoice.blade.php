@@ -218,6 +218,7 @@
 								<th>Digital Signature</th>
 								<th>Payment Status</th>
 								<th>Status</th>
+								<th>Email Status</th>
 								<th>Action</th>
 							</tr>
 						</thead>
@@ -284,6 +285,19 @@
 									@endif
 								</td>
 								<td>
+									@if($sale->is_send == 1)
+										<span class="badge bg-success">
+											<i class="ti ti-mail-check me-1"></i>
+											Sent
+										</span>
+									@else
+										<span class="badge bg-secondary">
+											<i class="ti ti-mail-off me-1"></i>
+											Not Sent
+										</span>
+									@endif
+								</td>
+								<td>
 									<span><i class="ti ti-dots-vertical f-20"></i></span>
 									<div class="prod-action-links">
 										<ul class="list-inline me-auto mb-0">
@@ -334,6 +348,16 @@
 												<a href="{{ url('/edit-sales-invoice/'.base64_encode($sale->id)) }}"
 													class="avtar avtar-xs btn-link-success btn-pc-default">
 													<i class="ti ti-edit-circle f-18"></i>
+												</a>
+											</li>
+											<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Send Invoice by Email">
+												<a href="javascript:void(0)"
+												   class="avtar avtar-xs btn-link-primary btn-pc-default send-mail-btn"
+												   data-id="{{ $sale->id }}"
+												   data-module="sales"
+												   data-document="Invoice"
+												   data-number="{{ $sale->inv_num }}">
+													<i class="ti ti-mail f-18"></i>
 												</a>
 											</li>
 											@endif

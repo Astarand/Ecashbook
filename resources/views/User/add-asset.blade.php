@@ -493,7 +493,7 @@
 											<div  class="row" id="bankAccountSection" style="display:none;">
 												<div class="col-md-4 mb-3">
 													<label>Bank Account</label>
-													<select name="bank_id" id="bank_id" class="form-control"></select>
+													<select name="bank_id" id="curr_bank_id" class="form-control"></select>
 												</div>
 
 												<div class="col-md-4 mb-3">
@@ -1235,18 +1235,18 @@
 						 </option>`;
 			});
 
-			$('#bank_id').html(html);
+			$('#curr_bank_id').html(html);
 			$('#bank_balance').val(totalBalance.toFixed(2));
 		});
 	}
 
-	$('#bank_id').on('change', function () {
+	$('#curr_bank_id').on('change', function () {
 
 		let selected = $(this).val();
 		if (selected === "") {
 			let total = 0;
 
-			$('#bank_id option').each(function () {
+			$('#curr_bank_id option').each(function () {
 				let bal = parseFloat($(this).data('balance')) || 0;
 				total += bal;
 			});

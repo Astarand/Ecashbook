@@ -4003,3 +4003,107 @@ function changeRatePo(el) {
 	});
 	//end upload pdf
 	
+	//start send mail invoice
+	$(document).ready(function () {
+
+		$(document).on('click', '.send-mail-btn', function () {
+
+			let id = $(this).data('id');
+			let module = $(this).data('module');
+			let documentName = $(this).data('document') || 'Document';
+
+			$('#sendMailId').val(id);
+			$('#sendMailModule').val(module);
+			$('#sendMailDocumentName').text(documentName);
+
+			$('#sendMailModal').modal('show');
+		});
+
+
+		/*
+		|--------------------------------------------------------------------------
+		| Confirm Send Mail
+		|--------------------------------------------------------------------------
+		*/
+		$(document).on('click', '#confirmSendMail', function () {
+
+			let id = $('#sendMailId').val();
+			let module = $('#sendMailModule').val();
+
+			let button = $(this);
+
+			button.prop('disabled', true);
+
+			button.html(
+				'<span class="spinner-border spinner-border-sm me-1"></span> Sending...'
+			);
+
+			$.ajax({
+
+				url: '/send-document-mail',
+
+				type: 'POST',
+
+				data: {
+					_token: $('meta[name="csrf-token"]').attr('content'),
+					id: id,
+					module: module
+				},
+
+				success: function (response) {
+
+					$('#sendMailModal').modal('hide');
+
+					showToast(
+						response.message || 'Email sent successfully.',
+						'success'
+					);
+
+				},
+
+				error: function (xhr) {
+
+					let response = xhr.responseJSON;
+
+					if (response && response.email_missing) {
+
+						$('#sendMailModal').modal('hide');
+
+						showToast(
+							'Email is not set for this customer/vendor.',
+							'error'
+						);
+
+					} else if (response && response.message) {
+
+						showToast(
+							response.message,
+							'error'
+						);
+
+					} else {
+
+						showToast(
+							'Unable to send email. Please try again.',
+							'error'
+						);
+					}
+
+				},
+
+				complete: function () {
+
+					button.prop('disabled', false);
+
+					button.html(
+						'<i class="ti ti-mail me-1"></i> Yes, Send Mail'
+					);
+				}
+
+			});
+
+		});
+
+	});
+	//end send mail invoice
+	

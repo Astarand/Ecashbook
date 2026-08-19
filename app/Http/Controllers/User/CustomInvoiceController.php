@@ -32,10 +32,29 @@ class CustomInvoiceController extends Controller
     public function CustomInvoiceList()
     {
         $userId = currentOwnerId();
-        $custom_invoices = DB::table('custom_invoices')
-                        ->where('added_by', $userId)
-                        ->orderBy('id', 'desc')
-                        ->get();
+		$custom_invoices = DB::table('custom_invoices as ci')
+						->where('ci.added_by', $userId)
+						->select(
+							'ci.*',
+							DB::raw('(
+								SELECT COALESCE(SUM(cip.quantity), 0)
+								FROM custom_invoice_product as cip
+								WHERE cip.custom_invoice_id = ci.id
+							) as total_quantity'),
+							DB::raw('(
+								SELECT COALESCE(
+									SUM(
+										COALESCE(cip.cgst, 0) +
+										COALESCE(cip.sgst, 0) +
+										COALESCE(cip.igst, 0)
+									), 0
+								)
+								FROM custom_invoice_product as cip
+								WHERE cip.custom_invoice_id = ci.id
+							) as total_gst')
+						)
+						->orderByDesc('ci.id')
+						->get();
 
         if(Auth::user()->u_type == "1" || Auth::user()->u_type == "4"){
             return view('User.custom-invoice-list', compact('custom_invoices'));
