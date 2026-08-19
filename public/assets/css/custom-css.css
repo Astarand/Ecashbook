@@ -2191,3 +2191,506 @@ label[for="fileUpload"].btn-primary.btn-icon:active {
     font-size: 1.1rem !important;
 }
 
+/* ==========================================================================
+   Assign CA Details & Purpose of Attachment Tab Styles
+   ========================================================================== */
+
+.ca-assigned-card {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    overflow: hidden !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ca-assigned-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 140, 173, 0.08) !important;
+    border-color: #c2e7ef !important;
+}
+
+.ca-assigned-card .ca-avatar-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.ca-assigned-card .ca-avatar-img {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 140, 173, 0.15);
+}
+
+.ca-assigned-card .ca-status-dot {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #10b981;
+    border: 2px solid #ffffff;
+}
+
+.ca-stat-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 10px;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.ca-stat-box:hover {
+    background: #f0f9fb;
+    border-color: #c2e7ef;
+    transform: translateY(-2px);
+}
+
+.ca-spec-badge {
+    display: inline-block;
+    background: #f0f9fb !important;
+    color: #008CAD !important;
+    border: 1px solid #c2e7ef !important;
+    border-radius: 20px !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    padding: 5px 12px !important;
+    margin: 3px !important;
+    transition: all 0.2s ease !important;
+}
+
+.ca-spec-badge:hover {
+    background: #008CAD !important;
+    color: #ffffff !important;
+    border-color: #008CAD !important;
+}
+
+.purpose-attachment-card {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+}
+
+.purpose-attachment-card .card-header {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 18px 24px !important;
+}
+
+.purpose-switch-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.purpose-switch-card:hover {
+    background: #ffffff;
+    border-color: #008CAD;
+    box-shadow: 0 4px 12px rgba(0, 140, 173, 0.06);
+}
+
+.purpose-switch-card .form-check-input {
+    cursor: pointer;
+    width: 2.2em;
+    height: 1.2em;
+    transition: all 0.2s ease;
+}
+
+.purpose-switch-card .form-check-input:checked {
+    background-color: #008CAD !important;
+    border-color: #008CAD !important;
+}
+
+.purpose-switch-card .service-title {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0;
+}
+
+/* CA Card Contact & Info Boxes */
+.ca-contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    text-decoration: none !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.ca-contact-link:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.ca-info-card {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+}
+
+.ca-show-more-btn {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ca-show-more-btn:hover {
+    background-color: #008CAD !important;
+    color: #ffffff !important;
+    border-color: #008CAD !important;
+}
+
+/* ==========================================================================
+   Assign CA Page & Directory Styles (Scoped & Conflict-Free)
+   ========================================================================== */
+
+/* Filter Sidebar & Scroll Block */
+.ecom-filter .card {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+  overflow: hidden !important;
+}
+.ecom-filter .card-header {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  padding: 16px 20px !important;
+}
+.ecom-filter .card-header h5 {
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  color: #1e293b !important;
+}
+.ecom-filter .scroll-block {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Unified Filter Search Inputs */
+.ecom-filter .filter-input-group {
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.ecom-filter .filter-input-group:focus-within {
+  border-color: #008CAD !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.12) !important;
+}
+.ecom-filter .filter-input-group .input-group-text {
+  background: transparent !important;
+  border: none !important;
+  padding: 10px 8px 10px 14px !important;
+  color: #94a3b8 !important;
+  font-size: 1.1rem !important;
+}
+.ecom-filter .filter-input-group .form-control {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 10px 14px 10px 4px !important;
+  font-size: 0.88rem !important;
+  color: #1e293b !important;
+}
+.ecom-filter .filter-input-group .form-control:focus {
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Filter Checkboxes */
+.ecom-filter .form-check-input {
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  width: 1.15em !important;
+  height: 1.15em !important;
+  transition: all 0.2s ease !important;
+}
+.ecom-filter .form-check-input:checked {
+  background-color: #008CAD !important;
+  border-color: #008CAD !important;
+}
+.ecom-filter .form-check-input:focus {
+  box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15) !important;
+  border-color: #008CAD !important;
+}
+.ecom-filter .form-check-label {
+  cursor: pointer !important;
+  font-size: 0.88rem !important;
+  user-select: none !important;
+}
+
+/* Filter Reset Button */
+#clearFiltersBtn {
+  transition: all 0.2s ease !important;
+}
+#clearFiltersBtn:hover {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+/* CA Cards Grid & Fixed Width Protection */
+.ecom-wrapper {
+  display: flex !important;
+  gap: 24px !important;
+  align-items: flex-start !important;
+  width: 100% !important;
+}
+.ecom-content {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+.ca-card {
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+.ca-card .card.user-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+  background-color: #ffffff !important;
+}
+.ca-card .card.user-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 28px rgba(0, 140, 173, 0.09) !important;
+  border-color: #b3e5ef !important;
+}
+.ca-card .card-body {
+  padding: 22px !important;
+  box-sizing: border-box !important;
+}
+.ca-card h5 {
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  color: #1e293b !important;
+}
+
+/* Assign Button */
+.user-card .assignCABtn {
+  font-weight: 600 !important;
+  font-size: 0.82rem !important;
+  transition: all 0.2s ease !important;
+}
+.user-card .assignCABtn[data-status="0"] {
+  background-color: #008CAD !important;
+  border-color: #008CAD !important;
+  color: #ffffff !important;
+}
+.user-card .assignCABtn[data-status="0"]:hover {
+  background-color: #00738e !important;
+  border-color: #00738e !important;
+}
+.user-card .assignCABtn[data-status="1"] {
+  background-color: #fee2e2 !important;
+  border-color: #fecaca !important;
+  color: #ef4444 !important;
+}
+.user-card .assignCABtn[data-status="1"]:hover {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+/* Scoped Modal Dialogs for CA Assignment */
+div[id^="staticBackdrop"] .modal-content {
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04) !important;
+}
+div[id^="staticBackdrop"] .modal-body {
+  padding: 24px !important;
+}
+div[id^="staticBackdrop"] .modal-body textarea.form-control {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  font-size: 0.9rem !important;
+  transition: all 0.2s ease !important;
+}
+div[id^="staticBackdrop"] .modal-body textarea.form-control:focus {
+  border-color: #008CAD !important;
+  box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15) !important;
+}
+div[id^="staticBackdrop"] .modal-footer {
+  border-top: 1px solid #f1f5f9 !important;
+  padding: 16px 24px !important;
+}
+div[id^="staticBackdrop"] .modal-footer .btn {
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+/* Add CA Drawer Overrides */
+.ca-side-panel .form-control,
+.ca-side-panel .form-select {
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+}
+.ca-side-panel .form-control:focus,
+.ca-side-panel .form-select:focus {
+  border-color: #008CAD !important;
+  box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15) !important;
+  outline: none !important;
+}
+.ca-side-panel button[type="submit"] {
+  background: #008CAD !important;
+  color: white !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  transition: all 0.2s ease !important;
+}
+.ca-side-panel button[type="submit"]:hover {
+  background: #006b85 !important;
+}
+
+/* Inline Skill Badges Collapse */
+.ca-extra-skills.collapse.show {
+  display: inline !important;
+}
+.ca-extra-skills.collapsing {
+  display: inline !important;
+}
+.toggle-ca-skills-btn:hover {
+  background-color: #008CAD !important;
+  color: #ffffff !important;
+  border-color: #008CAD !important;
+}
+
+/* ==========================================================================
+   CA Access Control Module Styles
+   ========================================================================== */
+.ca-access-card {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  background-color: #ffffff !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.ca-access-card:hover {
+  border-color: #b3e5ef !important;
+  box-shadow: 0 8px 20px rgba(0, 140, 173, 0.08) !important;
+  transform: translateY(-2px) !important;
+}
+.ca-access-card.access-active {
+  border-color: #80cedd !important;
+  background-color: #f7fdff !important;
+}
+.ca-access-card .module-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 1.3rem;
+  transition: all 0.25s ease;
+}
+.ca-access-card.access-active .module-icon-box {
+  background-color: #e0f6fa !important;
+  color: #008CAD !important;
+}
+.ca-access-card .form-check-input {
+  cursor: pointer !important;
+  width: 2.2em !important;
+  height: 1.25em !important;
+}
+.ca-access-card .form-check-input:checked {
+  background-color: #008CAD !important;
+  border-color: #008CAD !important;
+}
+
+/* ==========================================================================
+   Media Uploader & Preview Grid Styles (Add Product / Service)
+   ========================================================================== */
+.media-uploader-input {
+  display: none;
+}
+.media-uploader-dropzone {
+  border: 1px dashed #c8cedb;
+  border-radius: 12px;
+  background: #f8f9fc;
+  min-height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.media-uploader-dropzone:hover,
+.media-uploader-dropzone.is-dragging {
+  border-color: #008CAD !important;
+  background: #f0f9fb !important;
+}
+.media-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+.media-preview-item {
+  border: 1px solid #e8ecf5;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.media-preview-thumb {
+  width: 100%;
+  height: 85px;
+  background: #f3f5fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.media-preview-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.media-preview-name {
+  font-size: 12px;
+  padding: 8px;
+  color: #5b6375;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+
+

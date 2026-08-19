@@ -62,7 +62,7 @@
     @include('App.Sidebar')
 
     <!-- Subscription Reminder -->
-    @include('partials.subscription-reminder')
+    {{-- @include('partials.subscription-reminder') --}}
 
     @include('App.Header')
     @include('partials.chat-modal')

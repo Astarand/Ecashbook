@@ -3,30 +3,60 @@
 @section('container')
 
 <div class="pc-content">
-    <!-- [ breadcrumb ] start -->
-    <div class="page-header">
-        <div class="page-block">
-            <div class="row align-items-center">
-                <div class="col-md-12 d-flex justify-content-between align-items-center">
-                    <ul class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Subscription & Billing</li>
-                    </ul>
-                    <a href="javascript:void(0);" id="start-plans-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
-                        <u>How does this Page works?</u>
-                    </a>
-                </div>
-                <div class="col-md-4 mt-2">
-                    <div class="page-header-title">
-                        <h2 class="mb-0">Subscription & Billing</h2>
-                    </div>
-                </div>
+
+    <!-- [ Main Content ] start -->
+    <div class="row justify-content-center py-4">
+        <div class="col-12 col-lg-10 col-xl-8 text-center">
+
+            <!-- Free Badge -->
+            <div class="mb-3">
+                <span class="badge bg-light-success text-success px-4 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.85rem; letter-spacing: 1px;">
+                    <i class="ti ti-gift fs-5 align-middle me-1"></i> Special Complimentary Access
+                </span>
+            </div>
+
+            <!-- Plan Illustration Image -->
+            <div class="my-4">
+                <img src="{{ asset('assets/images/user/plan.png') }}"
+                     alt="Currently Free Plan"
+                     class="img-fluid"
+                     style="max-height: 280px; width: auto; filter: drop-shadow(0 12px 24px rgba(0, 140, 173, 0.18));">
+            </div>
+
+            <!-- Main Text / Free Offer Announcement -->
+            <h1 class="fw-bold text-dark mb-2" style="font-size: 2.3rem;">
+                Enjoy All Features — <span style="color: #008CAD;">Currently It's Free!</span>
+            </h1>
+            <p class="text-muted fs-5 mx-auto mb-4" style="max-width: 580px; line-height: 1.6;">
+                You have full, unrestricted access to all features, multi-branch operations, compliance tools, and analytics completely free of charge. No subscription or payment required.
+            </p>
+
+            <!-- Feature Highlights Pills -->
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+                <span class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-xs">
+                    <i class="ti ti-circle-check text-success me-1"></i> Unlimited Invoicing & Vouchers
+                </span>
+                <span class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-xs">
+                    <i class="ti ti-circle-check text-success me-1"></i> Multi-Location & Geofencing
+                </span>
+                <span class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-xs">
+                    <i class="ti ti-circle-check text-success me-1"></i> GST & Financial Reports
+                </span>
+                <span class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-xs">
+                    <i class="ti ti-circle-check text-success me-1"></i> 100% Free / No Hidden Fees
+                </span>
+            </div>
+
+            <!-- Action Button -->
+            <div class="mt-3">
+                <a href="{{ route('index') }}" class="btn btn-primary btn-lg px-4 py-2 rounded-pill shadow-sm" style="background-color: #008CAD; border-color: #008CAD;">
+                    <i class="ti ti-layout-dashboard me-1"></i> Go To Dashboard
+                </a>
             </div>
         </div>
     </div>
-    <!-- [ breadcrumb ] end -->
 
-    <!-- [ Main Content ] start -->
+    {{--
     <div class="row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
@@ -213,6 +243,7 @@
         </div>
         <!-- [ sample-page ] end -->
     </div>
+    --}}
     <!-- [ Main Content ] end -->
 
 </div>

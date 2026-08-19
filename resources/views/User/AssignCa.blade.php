@@ -91,125 +91,99 @@
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
             <div class="ecom-wrapper">
+                <!-- Filter Sidebar -->
                 <div class="offcanvas-xxl offcanvas-start ecom-offcanvas" tabindex="-1" id="offcanvas_mail_filter">
                     <div class="offcanvas-body p-0 sticky-xxl-top">
                         <div id="ecom-filter" class="show collapse collapse-horizontal">
                             <div class="ecom-filter">
-                                <div class="card">
-                                    <div class="card-header d-flex align-items-center justify-content-between">
-                                        <h5>Filter</h5>
+                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4" style="background: #ffffff; border: 1px solid #e2e8f0;">
+                                    <div class="card-header bg-transparent d-flex align-items-center justify-content-between py-3 border-bottom">
+                                        <h5 class="mb-0 fw-bold d-flex align-items-center">
+                                            <i class="ti ti-adjustments-horizontal text-primary fs-4 me-2"></i> Filter Directory
+                                        </h5>
                                         <a
                                             href="#"
-                                            class="avtar avtar-s btn-link-danger btn-pc-default"
+                                            class="avtar avtar-s btn-link-danger btn-pc-default d-xxl-none"
                                             data-bs-dismiss="offcanvas"
                                             data-bs-target="#offcanvas_mail_filter">
                                             <i class="ti ti-x f-20"></i>
                                         </a>
                                     </div>
                                     <div class="scroll-block">
-                                        <div class="card-body">
-                                            <div class="col-lg-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">CA/ Accountant Name</label>
-                                                    <input type="text" class="form-control" id="caNameInput" placeholder="Enter CA Name">
+                                        <div class="card-body p-3 p-xl-4">
+                                            <!-- CA Name Search -->
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold text-muted text-uppercase small" style="font-size: 0.75rem; letter-spacing: 0.5px;">CA / Firm Name</label>
+                                                <div class="input-group filter-input-group">
+                                                    <span class="input-group-text"><i class="ti ti-search"></i></span>
+                                                    <input type="text" class="form-control" id="caNameInput" placeholder="Search by name...">
                                                 </div>
                                             </div>
-                                            <div class="col-lg-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Serach by Zip Code</label>
-                                                    <input type="number" class="form-control" id="zipInput" placeholder="Enter Zip Code">
+
+                                            <!-- Zip Code Search -->
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold text-muted text-uppercase small" style="font-size: 0.75rem; letter-spacing: 0.5px;">Search by Pincode / Zip</label>
+                                                <div class="input-group filter-input-group">
+                                                    <span class="input-group-text"><i class="ti ti-map-pin"></i></span>
+                                                    <input type="number" class="form-control" id="zipInput" placeholder="Enter Pincode">
                                                 </div>
                                             </div>
-                                            <ul class="list-group list-group-flush">
 
-                                                <!-- Expert Filter -->
-                                                <li class="list-group-item border-0 px-0 py-2">
-                                                    <a class="btn border-0 px-0 text-start w-100 pb-0 d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#filtercollapse2">
-                                                        <span><i class="bi bi-person-badge me-1"></i>Choose Service</span>
-                                                        <i class="ti ti-chevron-down"></i>
-                                                    </a>
-                                                    <div class="collapse show" id="filtercollapse2">
-                                                        <div class="mt-2">
-                                                            <div class="form-check my-2">
-                                                                <input class="form-check-input expert-checkbox" type="checkbox" id="expertAll" value="all">
-                                                                <label class="form-check-label" for="expertAll">All</label>
-                                                            </div>                                                           
-															<!-- Dynamic Expert List -->
-															@php
-																$visibleCount = 5;
-															@endphp
+                                            <div class="border-top my-3"></div>
 
-															@foreach($expertList as $key => $expert)
-
-																@if($key == $visibleCount)
-																	<div class="collapse" id="moreExperts">
-																@endif
-
-																<div class="form-check my-2">
-																	<input class="form-check-input expert-checkbox"
-																		   type="checkbox"
-																		   id="expert{{ $key }}"
-																		   value="{{ $expert }}">
-
-																	<label class="form-check-label" for="expert{{ $key }}">
-																		{{ $expert }}
-																	</label>
-																</div>
-
-															@endforeach
-
-															@if(count($expertList) > $visibleCount)
-																</div>
-
-																<div class="mt-2">
-																	<a class="btn btn-sm btn-link text-decoration-none px-0"
-																	   data-bs-toggle="collapse"
-																	   href="#moreExperts"
-																	   role="button"
-																	   id="toggleExpertBtn">
-																		+ Show More
-																	</a>
-																</div>
-															@endif
-                                                        </div>
+                                            <!-- Services Filter -->
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold text-muted text-uppercase small d-flex justify-content-between align-items-center" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                                                    <span><i class="ti ti-briefcase text-primary me-1"></i> Specialization</span>
+                                                </label>
+                                                <div class="mt-2">
+                                                    <div class="form-check my-2 p-2 rounded-2 bg-light bg-opacity-50">
+                                                        <input class="form-check-input expert-checkbox ms-1" type="checkbox" id="expertAll" value="all">
+                                                        <label class="form-check-label fw-semibold ms-2" for="expertAll">All Services</label>
                                                     </div>
-                                                </li>
 
-                                                <!-- Rating Filter -->
-                                               {{--- <li class="list-group-item border-0 px-0 py-2">
-                                                    <a class="btn border-0 px-0 text-start w-100 pb-0 d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#filtercollapse5">
-                                                        <span><i class="bi bi-star me-1"></i>Rating</span>
-                                                        <i class="ti ti-chevron-down"></i>
-                                                    </a>
-                                                    <div class="collapse show" id="filtercollapse5">
-                                                        <div class="mt-2">
-                                                            <div class="form-check mb-2">
-                                                                <input class="form-check-input rating-checkbox" type="checkbox" value="4" id="rating4">
-                                                                <label class="form-check-label" for="rating4">4★ & above</label>
-                                                            </div>
-                                                            <div class="form-check mb-2">
-                                                                <input class="form-check-input rating-checkbox" type="checkbox" value="3" id="rating3">
-                                                                <label class="form-check-label" for="rating3">3★ & above</label>
-                                                            </div>
-                                                            <div class="form-check mb-2">
-                                                                <input class="form-check-input rating-checkbox" type="checkbox" value="2" id="rating2">
-                                                                <label class="form-check-label" for="rating2">2★ & above</label>
-                                                            </div>
-                                                            <div class="form-check mb-2">
-                                                                <input class="form-check-input rating-checkbox" type="checkbox" value="1" id="rating1">
-                                                                <label class="form-check-label" for="rating1">1★ & above</label>
-                                                            </div>
+                                                    @php
+                                                        $visibleCount = 5;
+                                                    @endphp
+
+                                                    @foreach($expertList as $key => $expert)
+                                                        @if($key == $visibleCount)
+                                                            <div class="collapse" id="moreExperts">
+                                                        @endif
+
+                                                        <div class="form-check my-2">
+                                                            <input class="form-check-input expert-checkbox"
+                                                                   type="checkbox"
+                                                                   id="expert{{ $key }}"
+                                                                   value="{{ $expert }}">
+                                                            <label class="form-check-label small text-secondary" for="expert{{ $key }}">
+                                                                {{ $expert }}
+                                                            </label>
                                                         </div>
-                                                    </div>
-                                                </li>--}}
+                                                    @endforeach
 
-                                                <!-- Clear All -->
-                                                <li class="list-group-item border-0 px-0 py-2">
-                                                    <a href="#" id="clearFiltersBtn" class="btn btn-light-danger w-100"><i class="bi bi-x-circle me-1"></i>Clear All</a>
-                                                </li>
+                                                    @if(count($expertList) > $visibleCount)
+                                                        </div>
+                                                        <div class="mt-3 text-center">
+                                                            <a class="btn btn-sm btn-light-primary text-decoration-none px-3 py-1 rounded-pill fw-semibold"
+                                                               data-bs-toggle="collapse"
+                                                               href="#moreExperts"
+                                                               role="button"
+                                                               id="toggleExpertBtn"
+                                                               style="font-size: 0.78rem;">
+                                                                + Show More Services
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
 
-                                            </ul>
-
+                                            <!-- Reset / Clear All -->
+                                            <div class="mt-4 pt-2 border-top">
+                                                <a href="#" id="clearFiltersBtn" class="btn btn-outline-danger w-100 rounded-pill py-2 fw-semibold d-flex align-items-center justify-content-center">
+                                                    <i class="ti ti-refresh me-1"></i> Reset All Filters
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -217,112 +191,195 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Directory Content -->
                 <div class="ecom-content">
                     <div class="message-container"></div>
-                    <div class="row" >
+                    <div class="row g-4">
                         @if ($ca_details)
                         @foreach ($ca_details as $ca_detail)
                             @if($ca_detail->ca_current_status == 0)
 
                             @php
                                 $expertiseList = strtolower(str_replace(' ', '', $ca_detail->ca_spec ?? ''));
-
                                 $ca_name = strtolower($ca_detail->comp_name != "" ? $ca_detail->comp_name : $ca_detail->name);
                                 $ca_zip = $ca_detail->comp_bill_pin ?? '';
+
+                                $parts = array_filter([
+                                    $ca_detail->comp_bill_addone ?? '',
+                                    $ca_detail->ca_city ?? '',
+                                    $ca_detail->ca_state ?? '',
+                                    $ca_detail->comp_bill_pin ?? ''
+                                ]);
                             @endphp
 
-                            <div class="col-md-6 col-xl-6 ca-card"
+                            <!-- CA Card (col-md-6) -->
+                            <div class="col-12 col-md-6 ca-card"
                                 data-name="{{ $ca_name }}"
                                 data-zip="{{ $ca_zip }}"
                                 data-expert="{{ $expertiseList }}">
-                                <div class="card user-card" style="min-width:400px; max-width:100%; width:100%;">
-                                    <div class="card-body position-relative">
-                                        <div class="chat-avtar d-inline-flex mx-auto">
-                                            @if(isset($ca_detail->comp_logo) && $ca_detail->comp_logo != "")
-                                                <img class="rounded-circle img-fluid wid-90 img-thumbnail" src="{{ asset('storage/ca_profile/' . $ca_detail->comp_logo) }}" alt="User image">
-                                            @else
-                                                <img class="rounded-circle img-fluid wid-90 img-thumbnail" src="{{ asset('public/assets/images/user/ecashbook.png') }}" alt="User image">
-                                            @endif
+                                <div class="card user-card h-100 border-0 shadow-sm rounded-4 position-relative overflow-hidden mb-0"
+                                     style="background: #ffffff; border: 1px solid #e8eef5 !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+
+                                    <!-- Top Subtle Gradient Header Accent -->
+                                    <div class="w-100" style="height: 5px; background: linear-gradient(90deg, #008CAD 0%, #6366f1 50%, #8b5cf6 100%);"></div>
+
+                                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                        <!-- Header: Avatar, Name & Badges -->
+                                        <div class="d-flex align-items-start gap-3 mb-3">
+                                            <!-- Avatar with Squircle & Online Dot -->
+                                            <div class="position-relative flex-shrink-0">
+                                                @if(isset($ca_detail->comp_logo) && $ca_detail->comp_logo != "")
+                                                    <img class="img-fluid shadow-sm" style="width: 58px; height: 58px; border-radius: 16px; object-fit: cover; border: 2px solid #f1f5f9;" src="{{ asset('storage/ca_profile/' . $ca_detail->comp_logo) }}" alt="CA logo">
+                                                @else
+                                                    <img class="img-fluid shadow-sm" style="width: 58px; height: 58px; border-radius: 16px; object-fit: cover; border: 2px solid #f1f5f9;" src="{{ asset('public/assets/images/user/ecashbook.png') }}" alt="CA logo">
+                                                @endif
+                                                <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-white rounded-circle" style="transform: translate(2px, 2px);"></span>
+                                            </div>
+
+                                            <!-- Name, Type & Verified -->
+                                            <div class="flex-grow-1 min-w-0">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <h5 class="mb-0 fw-bold text-dark text-truncate" title="{{ $ca_detail->comp_name != '' ? $ca_detail->comp_name : $ca_detail->name }}" style="font-size: 1.08rem;">
+                                                        {{ $ca_detail->comp_name != "" ? $ca_detail->comp_name : $ca_detail->name }}
+                                                    </h5>
+                                                    @if($ca_detail->isCaActive == 1)
+                                                        <i class="ti ti-rosette-discount-check-filled text-primary fs-5 flex-shrink-0" title="Verified Professional"></i>
+                                                    @endif
+                                                </div>
+                                                <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
+                                                    <span class="badge bg-light-primary text-primary px-2 py-1 rounded-pill fw-semibold" style="font-size: 0.72rem;">
+                                                        <i class="ti ti-certificate me-1"></i> CA / Accounting Firm
+                                                    </span>
+                                                    @if(!empty($ca_detail->ca_city))
+                                                        <span class="text-muted small d-inline-flex align-items-center" style="font-size: 0.76rem;">
+                                                            <i class="ti ti-map-pin text-danger me-1"></i> {{ $ca_detail->ca_city }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div class="d-flex flex-wrap gap-2 mt-3">
-                                            <div class="flex-grow-1">
-                                                <h6 class="mb-1">{{ $ca_detail->comp_name != "" ? $ca_detail->comp_name : $ca_detail->name }}</h6>
+                                        <!-- 3-Box Stats Matrix -->
+                                        <div class="row g-2 mb-3 text-center">
+                                            <div class="col-4">
+                                                <div class="p-2 rounded-3 h-100 d-flex flex-column justify-content-center" style="background: #f8fafc; border: 1px solid #edf2f7;">
+                                                    <span class="fw-bold fs-5 text-dark lh-1 mb-1">{{ $ca_detail->total_no_client ?? 0 }}</span>
+                                                    <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.5px;">Assigned</small>
+                                                </div>
                                             </div>
-                                            <div class="flex-shrink-0">
-                                                @if($ca_detail->ca_assign_status == 0)
-                                                    <button class="btn btn-primary btn-md assignCABtn"
-                                                            data-id="{{ $ca_detail->id }}"
-                                                            data-status="{{ $ca_detail->ca_assign_status }}"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#staticBackdrop{{ $ca_detail->id }}">Assign</button>
+                                            <div class="col-4">
+                                                <div class="p-2 rounded-3 h-100 d-flex flex-column justify-content-center" style="background: #f8fafc; border: 1px solid #edf2f7;">
+                                                    <div class="mb-1">
+                                                        @if($ca_detail->isCaActive == 1)
+                                                            <span class="badge bg-light-success text-success rounded-pill px-2 py-1 fw-bold" style="font-size: 0.7rem;">
+                                                                <i class="ti ti-check"></i> Verified
+                                                            </span>
+                                                        @else
+                                                            <span class="badge bg-light-secondary text-muted rounded-pill px-2 py-1 fw-bold" style="font-size: 0.7rem;">
+                                                                Pending
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                    <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.5px;">Verification</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="p-2 rounded-3 h-100 d-flex flex-column justify-content-center" style="background: #f8fafc; border: 1px solid #edf2f7;">
+                                                    <div class="mb-1">
+                                                        @if($ca_detail->status == 1)
+                                                            <span class="badge bg-light-success text-success rounded-pill px-2 py-1 fw-bold" style="font-size: 0.7rem;">
+                                                                Active
+                                                            </span>
+                                                        @else
+                                                            <span class="badge bg-light-danger text-danger rounded-pill px-2 py-1 fw-bold" style="font-size: 0.7rem;">
+                                                                Inactive
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                    <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.5px;">Status</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Core Specializations -->
+                                        <div class="mb-3">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <small class="fw-bold text-muted text-uppercase d-flex align-items-center" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                                    <i class="ti ti-sparkles text-warning me-1"></i> Specializations
+                                                </small>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-1 align-items-center">
+                                                @if (!empty($ca_detail->ca_spec))
+                                                    @php
+                                                        $allSpecs = array_filter(array_map('trim', explode(",", $ca_detail->ca_spec)));
+                                                        $initialSpecs = array_slice($allSpecs, 0, 4);
+                                                        $extraSpecs = array_slice($allSpecs, 4);
+                                                    @endphp
+                                                    @foreach ($initialSpecs as $val)
+                                                        <span class="badge rounded-pill fw-medium ca-skill-badge"
+                                                              style="background-color: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1; font-size: 0.75rem; padding: 5px 10px;">
+                                                            {{ $val }}
+                                                        </span>
+                                                    @endforeach
+
+                                                    @if(count($extraSpecs) > 0)
+                                                        <span class="collapse ca-extra-skills" id="extraSkills{{ $ca_detail->id }}">
+                                                            @foreach ($extraSpecs as $extraVal)
+                                                                <span class="badge rounded-pill fw-medium ca-skill-badge me-1 mb-1"
+                                                                      style="background-color: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1; font-size: 0.75rem; padding: 5px 10px;">
+                                                                    {{ $extraVal }}
+                                                                </span>
+                                                            @endforeach
+                                                        </span>
+                                                        <a class="badge rounded-pill bg-light text-primary border text-decoration-none fw-semibold toggle-ca-skills-btn mb-1"
+                                                           data-bs-toggle="collapse"
+                                                           href="#extraSkills{{ $ca_detail->id }}"
+                                                           role="button"
+                                                           aria-expanded="false"
+                                                           aria-controls="extraSkills{{ $ca_detail->id }}"
+                                                           data-more-text="+{{ count($extraSpecs) }} more"
+                                                           style="font-size: 0.72rem; padding: 5px 8px; cursor: pointer; transition: all 0.2s ease;">
+                                                            +{{ count($extraSpecs) }} more
+                                                        </a>
+                                                    @endif
                                                 @else
-                                                    <button class="btn btn-primary btn-md assignCABtn"
-                                                            data-id="{{ $ca_detail->id }}"
-                                                            data-status="{{ $ca_detail->ca_assign_status }}"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#staticBackdrop{{ $ca_detail->id }}">Undo-Assign</button>
+                                                    <span class="text-muted small fst-italic" style="font-size: 0.8rem;">General Accounting & Compliance</span>
                                                 @endif
                                             </div>
                                         </div>
 
-                                        <div class="row g-3 my-3 text-center">
-                                            <div class="col-4">
-                                                <h5 class="mb-0">{{ $ca_detail->total_no_client ?? 0 }}</h5>
-                                                <small class="text-muted">Company Assign</small>
+                                        <!-- Footer: Full Address & Action Button -->
+                                        <div class="pt-3 border-top d-flex align-items-center justify-content-between gap-2 mt-auto">
+                                            <div class="d-flex align-items-center gap-1 text-muted text-truncate" style="max-width: 62%;">
+                                                <i class="ti ti-map-pin text-danger fs-5 flex-shrink-0"></i>
+                                                <small class="text-muted text-truncate mb-0" style="font-size: 0.78rem;" title="{{ implode(', ', $parts) }}">
+                                                    {{ !empty($parts) ? implode(', ', $parts) : 'Location not specified' }}
+                                                </small>
                                             </div>
-                                            <div class="col-4 border border-top-0 border-bottom-0">
-												<h5 class="mb-0">
-													@if($ca_detail->isCaActive == 1)
-														<span class="text-success">Yes</span>
-													@else
-														<span class="text-danger">No</span>
-													@endif
-												</h5>
-												<small class="text-muted">Verified</small>
-											</div>
 
-											<div class="col-4">
-												<h5 class="mb-0">
-													@if($ca_detail->status == 1)
-														<span class="text-success">Active</span>
-													@else
-														<span class="text-danger">Inactive</span>
-													@endif
-												</h5>
-												<small class="text-muted">Platform Status</small>
-											</div>
+                                            <div class="flex-shrink-0">
+                                                @if($ca_detail->ca_assign_status == 0)
+                                                    <button class="btn btn-primary btn-sm rounded-pill px-3 py-2 shadow-sm assignCABtn d-inline-flex align-items-center fw-semibold"
+                                                            data-id="{{ $ca_detail->id }}"
+                                                            data-status="{{ $ca_detail->ca_assign_status }}"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#staticBackdrop{{ $ca_detail->id }}"
+                                                            style="background: linear-gradient(135deg, #008CAD 0%, #026d87 100%); border: none; font-size: 0.82rem;">
+                                                        <i class="ti ti-user-plus me-1"></i> Assign
+                                                    </button>
+                                                @else
+                                                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2 shadow-sm assignCABtn d-inline-flex align-items-center fw-semibold"
+                                                            data-id="{{ $ca_detail->id }}"
+                                                            data-status="{{ $ca_detail->ca_assign_status }}"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#staticBackdrop{{ $ca_detail->id }}"
+                                                            style="font-size: 0.82rem;">
+                                                        <i class="ti ti-user-x me-1"></i> Undo-Assign
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </div>
-
-                                        <div class="saprator my-3">
-                                            <span>Experts In</span>
-                                        </div>
-                                        <div class="text-center">
-                                            @if (!empty($ca_detail->ca_spec))
-                                                @php
-                                                    $specArr = explode(",", $ca_detail->ca_spec);
-                                                @endphp
-                                                @foreach ($specArr as $val)
-                                                    <span class="badge bg-light-secondary border rounded-pill border-secondary bg-transparent f-14 me-1 mt-1">{{ $val }}</span>
-                                                @endforeach
-                                            @endif
-                                        </div>
-
-                                        <div class="saprator my-3">
-                                            <span>Address</span>
-                                        </div>
-                                        @php
-                                            $parts = array_filter([
-                                                $ca_detail->comp_bill_addone ?? '',
-                                                $ca_detail->ca_state ?? '',
-                                                $ca_detail->ca_city ?? '',
-                                                $ca_detail->comp_bill_pin ?? ''
-                                            ]);
-                                        @endphp
-
-                                        @if(!empty($parts))
-                                            <h6 class="text-center">{{ implode(', ', $parts) }}</h6>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -330,19 +387,25 @@
                             {{-- Modal --}}
                             <div class="modal fade" id="staticBackdrop{{ $ca_detail->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
+                                    <div class="modal-content rounded-4 border-0 shadow">
+                                        <div class="modal-header border-0 pb-0">
+                                            <h5 class="modal-title fw-bold">Invite {{ $ca_detail->comp_name != "" ? $ca_detail->comp_name : $ca_detail->name }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
                                         <div class="modal-body">
                                             <div class="message-container"></div>
                                             <form>
                                                 <div class="mb-3">
-                                                    <label class="form-label" for="exampleFormControlTextarea1">Write Message</label>
-                                                    <textarea class="form-control" name="msg" id="msg" rows="3" placeholder="Enter Message"></textarea>
+                                                    <label class="form-label fw-semibold" for="exampleFormControlTextarea1">Personalized Message</label>
+                                                    <textarea class="form-control rounded-3" name="msg" id="msg" rows="3" placeholder="Write a short message or note for the CA..."></textarea>
                                                 </div>
                                             </form>
                                         </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button type="button" class="btn btn-primary assignCASendBtn">Send Invitation</button>
+                                        <div class="modal-footer border-0 pt-0">
+                                            <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+                                            <button type="button" class="btn btn-primary rounded-pill px-4 assignCASendBtn" style="background-color: #008CAD; border-color: #008CAD;">
+                                                <i class="ti ti-send me-1"></i> Send Invitation
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -352,12 +415,14 @@
 
                         <div class="message-container"></div>
                         @else
-                        <div class="col-lg-12 col-md-12 col-sm-12">
-                            <div class="card customer-details-group">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm rounded-4 text-center py-5">
                                 <div class="card-body">
-                                    <div class="row align-items-center">
-                                        <h6 class="text-center"> No CA found in search location</h6>
+                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light-primary text-primary mb-3" style="width: 70px; height: 70px;">
+                                        <i class="ti ti-user-search fs-2"></i>
                                     </div>
+                                    <h5 class="fw-bold text-dark mb-1">No CA Professionals Found</h5>
+                                    <p class="text-muted mb-0">Try changing your search terms or filter criteria.</p>
                                 </div>
                             </div>
                         </div>
@@ -446,343 +511,10 @@
     </div>
 </div>
 
-<style>
-  /* 💎 Premium Assign CA Page Style Overrides 💎 */
-
-  /* Filter Card & Scroll Block */
-  .ecom-filter .card {
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
-    overflow: hidden !important;
-  }
-  .ecom-filter .card-header {
-    background-color: #ffffff !important;
-    border-bottom: 1px solid #f1f5f9 !important;
-    padding: 16px 20px !important;
-  }
-  .ecom-filter .card-header h5 {
-    font-weight: 700 !important;
-    font-size: 1.05rem !important;
-    color: #1e293b !important;
-  }
-  .ecom-filter .scroll-block {
-    height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-  
-  /* Custom scrollbar for Choose Service checklist */
-  #filtercollapse2 > div {
-    max-height: 250px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding-right: 5px !important;
-  }
-  #filtercollapse2 > div::-webkit-scrollbar {
-    width: 6px !important;
-  }
-  #filtercollapse2 > div::-webkit-scrollbar-track {
-    background: transparent !important;
-  }
-  #filtercollapse2 > div::-webkit-scrollbar-thumb {
-    background: #cbd5e1 !important;
-    border-radius: 10px !important;
-  }
-  #filtercollapse2 > div::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8 !important;
-  }
-
-  /* Form inputs in filter */
-  .ecom-filter .form-control {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    padding: 8px 12px !important;
-    font-size: 0.85rem !important;
-    transition: all 0.2s ease !important;
-  }
-  .ecom-filter .form-control:focus {
-    border-color: #008CAD !important;
-    box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.1) !important;
-    outline: none !important;
-  }
-  .ecom-filter .form-label {
-    font-size: 0.78rem !important;
-    font-weight: 600 !important;
-    color: #475569 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    margin-bottom: 6px !important;
-  }
-
-  /* Checkboxes */
-  .ecom-filter .form-check-input {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 4px !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-  }
-  .ecom-filter .form-check-input:checked {
-    background-color: #008CAD !important;
-    border-color: #008CAD !important;
-  }
-  .ecom-filter .form-check-input:focus {
-    box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15) !important;
-    border-color: #008CAD !important;
-  }
-  .ecom-filter .form-check-label {
-    cursor: pointer !important;
-    font-size: 0.88rem !important;
-    color: #475569 !important;
-    user-select: none !important;
-  }
-
-  /* Clear All Button */
-  #clearFiltersBtn {
-    background-color: #f0f9fb !important;
-    border: 1px solid #c2e7ef !important;
-    color: #008CAD !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    padding: 10px !important;
-    transition: all 0.2s ease !important;
-  }
-  #clearFiltersBtn:hover {
-    background-color: #008CAD !important;
-    border-color: #008CAD !important;
-    color: #ffffff !important;
-  }
-
-  /* CA Cards Grid */
-  .ca-card .card.user-card {
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 20px rgba(0, 140, 173, 0.02) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    background-color: #ffffff !important;
-    overflow: hidden !important;
-  }
-  .ca-card .card.user-card:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 10px 25px rgba(0, 140, 173, 0.06) !important;
-    border-color: #b3e5ef !important;
-  }
-  .ca-card .card-body {
-    padding: 24px !important;
-  }
-  .ca-card .chat-avtar img {
-    border: 3px solid #f1f5f9 !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
-    transition: all 0.3s ease !important;
-  }
-  .ca-card .card.user-card:hover .chat-avtar img {
-    transform: scale(1.05) !important;
-    border-color: #b3e5ef !important;
-  }
-  .ca-card h6 {
-    font-weight: 700 !important;
-    font-size: 1.1rem !important;
-    color: #1e293b !important;
-  }
-
-  /* Address styling */
-  .ca-card .saprator + h6,
-  .ca-card h6.text-center {
-    font-size: 0.85rem !important;
-    font-weight: 500 !important;
-    color: #64748b !important;
-    line-height: 1.5 !important;
-  }
-
-  /* Separators */
-  .ca-card .saprator {
-    position: relative !important;
-    text-align: center !important;
-    margin: 16px 0 !important;
-  }
-  .ca-card .saprator:before {
-    content: "" !important;
-    position: absolute !important;
-    top: 50% !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 1px !important;
-    background-color: #f1f5f9 !important;
-    z-index: 1 !important;
-  }
-  .ca-card .saprator span {
-    position: relative !important;
-    background-color: #ffffff !important;
-    padding: 0 12px !important;
-    font-size: 0.72rem !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.8px !important;
-    color: #94a3b8 !important;
-    z-index: 2 !important;
-  }
-
-  /* Stats row grid layout */
-  .user-card .row.g-3.my-3 {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    display: flex !important;
-    gap: 8px !important;
-    justify-content: space-between !important;
-  }
-  .user-card .row.g-3.my-3 > div {
-    flex: 1 !important;
-    padding: 12px 8px !important;
-    background-color: #f8fafc !important;
-    border: 1px solid #f1f5f9 !important;
-    border-radius: 12px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .user-card .row.g-3.my-3 > div.border {
-    border: 1px solid #f1f5f9 !important;
-  }
-  .user-card .row.g-3.my-3 h5 {
-    font-size: 1.1rem !important;
-    font-weight: 700 !important;
-    color: #1e293b !important;
-  }
-  .user-card .row.g-3.my-3 small {
-    font-size: 0.65rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    font-weight: 600 !important;
-    margin-top: 4px !important;
-  }
-
-  /* Status Indicator Badges */
-  .user-card .row.g-3.my-3 .text-success {
-    background-color: #d1fae5 !important;
-    color: #065f46 !important;
-    padding: 2px 8px !important;
-    border-radius: 20px !important;
-    font-size: 0.75rem !important;
-    font-weight: 600 !important;
-    display: inline-block !important;
-  }
-  .user-card .row.g-3.my-3 .text-danger {
-    background-color: #fee2e2 !important;
-    color: #991b1b !important;
-    padding: 2px 8px !important;
-    border-radius: 20px !important;
-    font-size: 0.75rem !important;
-    font-weight: 600 !important;
-    display: inline-block !important;
-  }
-
-  /* Specialty Badge Overrides */
-  .user-card .badge.bg-light-secondary {
-    background-color: #f0f9fb !important;
-    color: #008CAD !important;
-    border: 1px solid #c2e7ef !important;
-    border-radius: 20px !important;
-    font-weight: 500 !important;
-    padding: 6px 12px !important;
-    font-size: 0.8rem !important;
-    transition: all 0.2s ease !important;
-  }
-  .user-card .badge.bg-light-secondary:hover {
-    background-color: #008CAD !important;
-    color: #ffffff !important;
-    border-color: #008CAD !important;
-  }
-
-  /* Button Overrides */
-  .user-card .assignCABtn {
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    padding: 8px 16px !important;
-    transition: all 0.2s ease !important;
-  }
-  .user-card .assignCABtn[data-status="0"] {
-    background-color: #008CAD !important;
-    border-color: #008CAD !important;
-    color: #ffffff !important;
-  }
-  .user-card .assignCABtn[data-status="0"]:hover {
-    background-color: #006b85 !important;
-    border-color: #006b85 !important;
-  }
-  .user-card .assignCABtn[data-status="1"] {
-    background-color: #fee2e2 !important;
-    border-color: #fecaca !important;
-    color: #ef4444 !important;
-  }
-  .user-card .assignCABtn[data-status="1"]:hover {
-    background-color: #ef4444 !important;
-    border-color: #ef4444 !important;
-    color: #ffffff !important;
-  }
-
-  /* Dialogs & Modals styling */
-  .modal-content {
-    border-radius: 16px !important;
-    border: none !important;
-    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04) !important;
-  }
-  .modal-body {
-    padding: 24px !important;
-  }
-  .modal-body textarea.form-control {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    padding: 12px !important;
-    font-size: 0.9rem !important;
-    transition: all 0.2s ease !important;
-  }
-  .modal-body textarea.form-control:focus {
-    border-color: #008CAD !important;
-    box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15) !important;
-  }
-  .modal-footer {
-    border-top: 1px solid #f1f5f9 !important;
-    padding: 16px 24px !important;
-  }
-  .modal-footer .btn {
-    padding: 10px 20px !important;
-    font-weight: 600 !important;
-    border-radius: 8px !important;
-  }
-
-  /* Add CA Drawer Overrides */
-  .ca-side-panel .form-control,
-  .ca-side-panel .form-select {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 8px !important;
-    padding: 10px 12px !important;
-    font-size: 14px !important;
-    transition: all 0.2s ease !important;
-  }
-  .ca-side-panel .form-control:focus,
-  .ca-side-panel .form-select:focus {
-    border-color: #008CAD !important;
-    box-shadow: 0 0 0 3px rgba(0, 140, 173, 0.15) !important;
-    outline: none !important;
-  }
-  .ca-side-panel button[type="submit"] {
-    background: #008CAD !important;
-    color: white !important;
-    border-radius: 8px !important;
-    padding: 12px !important;
-    transition: all 0.2s ease !important;
-  }
-  .ca-side-panel button[type="submit"]:hover {
-    background: #006b85 !important;
-  }
-</style>
-
 @endsection
 
 <script>
-	//Show experts more/less
+	//Show experts more/less in Filter
 	document.addEventListener("DOMContentLoaded", function () {
 
         const moreExperts = document.getElementById('moreExperts');
@@ -794,9 +526,36 @@
             });
 
             moreExperts.addEventListener('hidden.bs.collapse', function () {
-                toggleBtn.innerHTML = '+ Show More';
+                toggleBtn.innerHTML = '+ Show More Services';
             });
         }
+
+        // Toggle CA Card skill badges on click
+        $(document).on('click', '.toggle-ca-skills-btn', function (e) {
+            e.preventDefault();
+            const targetId = $(this).attr('href');
+            const $target = $(targetId);
+            if ($target.length) {
+                $target.collapse('toggle');
+            }
+        });
+
+        $(document).on('shown.bs.collapse', '[id^="extraSkills"]', function () {
+            const collapseId = this.id;
+            const btn = $(`a[href="#${collapseId}"]`);
+            if (btn.length) {
+                btn.text('Show less');
+            }
+        });
+
+        $(document).on('hidden.bs.collapse', '[id^="extraSkills"]', function () {
+            const collapseId = this.id;
+            const btn = $(`a[href="#${collapseId}"]`);
+            if (btn.length) {
+                const moreText = btn.data('more-text') || '+ more';
+                btn.text(moreText);
+            }
+        });
     });
 	
     document.addEventListener("DOMContentLoaded", function() {
@@ -1073,11 +832,36 @@
         const caCards = document.querySelectorAll('.ca-card');
         const nameInput = document.getElementById('caNameInput');
         const zipInput = document.getElementById('zipInput');
-        const expertCheckboxes = document.querySelectorAll('.expert-checkbox');
+        const expertAllCheckbox = document.getElementById('expertAll');
+        const individualExpertCheckboxes = document.querySelectorAll('.expert-checkbox:not(#expertAll)');
+
+        // Handle "All Services" checkbox toggling all individual checkboxes
+        if (expertAllCheckbox) {
+            expertAllCheckbox.addEventListener('change', function () {
+                const isChecked = this.checked;
+                individualExpertCheckboxes.forEach(cb => {
+                    cb.checked = isChecked;
+                });
+                filterCACards();
+            });
+
+            // Handle individual checkboxes updating the "All Services" state
+            individualExpertCheckboxes.forEach(cb => {
+                cb.addEventListener('change', function () {
+                    const allChecked = Array.from(individualExpertCheckboxes).every(item => item.checked);
+                    expertAllCheckbox.checked = allChecked;
+                    filterCACards();
+                });
+            });
+        }
 
         function getSelectedExperts() {
-            return Array.from(expertCheckboxes)
-                .filter(cb => cb.checked && cb.value !== "all")
+            // If "All Services" is checked, we don't need to filter by specific service
+            if (expertAllCheckbox && expertAllCheckbox.checked) {
+                return [];
+            }
+            return Array.from(individualExpertCheckboxes)
+                .filter(cb => cb.checked)
                 .map(cb => cb.value.toLowerCase().replace(/\s/g, '')); // remove spaces
         }
 
@@ -1105,7 +889,6 @@
 
         nameInput.addEventListener("input", filterCACards);
         zipInput.addEventListener("input", filterCACards);
-        expertCheckboxes.forEach(cb => cb.addEventListener("change", filterCACards));
     });
 
     function startAssignCATour() {

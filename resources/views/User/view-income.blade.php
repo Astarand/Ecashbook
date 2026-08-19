@@ -2,311 +2,395 @@
 
 @section('container')
 
+<style>
+    .toggle-radio-group .btn-outline-success {
+        color: #198754 !important;
+        border-color: #198754 !important;
+        background-color: transparent !important;
+    }
+    .toggle-radio-group .btn-check:checked + .btn-outline-success,
+    .toggle-radio-group .btn-outline-success.active {
+        background-color: #198754 !important;
+        border-color: #198754 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 6px rgba(25, 135, 84, 0.4) !important;
+    }
+    .toggle-radio-group .btn-outline-danger {
+        color: #dc3545 !important;
+        border-color: #dc3545 !important;
+        background-color: transparent !important;
+    }
+    .toggle-radio-group .btn-check:checked + .btn-outline-danger,
+    .toggle-radio-group .btn-outline-danger.active {
+        background-color: #dc3545 !important;
+        border-color: #dc3545 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4) !important;
+    }
+</style>
+
 <div class="pc-content">
-    <div class="col-md-4">
-		<div class="page-header-title">
-			<h2 class="mb-0">View Other Income</h2>
-		</div>
-	</div>
-
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-body">
-                <form data-route="{{ route('income.update', $income->id) }}" id="incomeForm"  enctype="multipart/form-data">
-                
-                    @csrf
-                    <div class="row">
-                
-						<div class="mb-3 col-md-3">
-							<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
-							<select name="propId" class="form-control">
-								<option value="">{{ parentCompanyName() }}</option>
-								@foreach($proprietorships as $company)
-									<option value="{{ $company->id }}" <?=($income->propId == $company->id) ? 'selected' : '' ?>>
-										{{ $company->comp_name }}
-									</option>
-								@endforeach
-							</select>
-						</div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">Date <span class="text-danger">*</span></label>
-                            <input type="date" name="dateInput" required id="permanent-address1" class="form-control" placeholder="Project Name"
-                                value="{{$income->dateInput}}">
-                        </div>
-						<!-- INCOME TYPE -->
-						<div class="col-md-3 mb-3">
-							<label class="form-label">Income Type <span class="text-danger">*</span></label>
-							<select id="incomeType" name="incomeType" class="form-select" required>
-								<option value="">Select</option>
-								<option value="Revenue" {{ $income->incomeType == 'Revenue' ? 'selected' : '' }}>
-									Other Operating Income
-								</option>
-								<option value="Other" {{ $income->incomeType == 'Other' ? 'selected' : '' }}>
-									Other Non-Operating Income
-								</option>
-							</select>
-						</div>
-						
-						<div class="col-sm-3 mb-3">
-                            <label class="form-label">Income Category<span class="text-danger">*</span></label>
-                            <select id="categoryIncome" name="categoryIncome" required class="form-select">
-                                <option value="">Select Category</option>                                
-                                <!--<option value="Other Income" <?=($income->categoryIncome == "Other Income") ? 'selected' : '' ?>>Other Income</option>-->
-                            </select>
-                        </div>
-                        <div class="mb-3 col-sm-3" id="otherIncomeCategory" style="display: none;">
-                            <label for="otherInput" class="form-label">Other</label>
-                            <input type="text" name="other_income" class="form-control" id="otherInput"
-                                placeholder="Enter other category" value="{{$income->other_income}}">
-                        </div>
-												
-						<div class="col-md-3 mb-3">
-							<label class="form-label">Party / Source Name</label>
-							<input type="text" name="customer_name" id="customer_name" class="form-control" value="{{$income->customer_name}}">
-							<!---<select name="customer_id" id="customer_id" required class="form-control">
-								<option value="">Select</option>
-								@foreach($customers as $customer)
-									<option value="{{ $customer->id }}" {{ (isset($income->customer_id) && $income->customer_id == $customer->id) ? 'selected' : '' }}>
-										{{ $customer->cust_name }}
-									</option>
-								@endforeach
-							</select>-->
-						</div>
-						<div class="col-md-3 mb-3">
-							<label class="form-label">Invoice / Reference Number</label>
-							<input type="text" name="invoice_no" id="invoice_no" value="{{$income->invoice_no}}" class="form-control">
-						</div>
-						<div class="col-md-3 mb-3">
-                            <label class="form-label">Income Amount <span class="text-danger">*</span></label>
-                            <input type="number" step="0.01" name="amount" id="amount" value="{{$income->amount}}" required class="form-control" placeholder="Amount">
-                        </div>
-						<div class="col-md-3 mb-3">
-							<label class="form-label">Received Amount<span class="text-danger">*</span></label>
-							<select name="pay_status" id="pay_status" required class="form-select">
-								<option value="">Select</option>
-								<option value="Full" <?=($income->pay_status == "Full") ? 'selected' : '' ?>>Full</option>
-								<option value="Advance" <?=($income->pay_status == "Advance") ? 'selected' : '' ?>>Advance</option>														
-								<option value="Due" <?=($income->pay_status == "Due") ? 'selected' : '' ?>>Due</option>														
-							</select>
-						</div>
-						<div class="col-md-3 mb-3">
-							<label class="form-label">Payment Mode<span class="text-danger">*</span></label>
-							<select name="pay_mode" id="pay_mode" required class="form-select">
-								<option value="">Select</option>
-								<option value="Cash" <?=($income->pay_mode == "Cash") ? 'selected' : '' ?>>Cash</option>
-								<option value="Bank" <?=($income->pay_mode == "Bank") ? 'selected' : '' ?>>Bank</option>														
-								<option value="UPI" <?=($income->pay_mode == "UPI") ? 'selected' : '' ?>>UPI</option>														
-							</select>
-						</div>
-						<div class="col-sm-4 mb-3 d-flex flex-column">
-							<label class="form-label">&nbsp;</label>
-							<a href="javascript:void(0);"
-								class="btn btn-primary btn-sm paymentModalBtn"
-								data-id="{{ $income->id ?? '' }}"
-								data-type="Income"
-								style="width:90px;">
-								Payment
-							</a>
-						</div>
-						<div class="col-md-3 mb-3">
-                            <label class="form-label">Advance Amount</label>
-                            <input type="number" step="0.01" name="advance_amt" id="advance_amt" value="{{$income->advance_amt}}" class="form-control" placeholder="Amount">
-                        </div>
-						<div class="col-md-3 mb-3">
-                            <label class="form-label">Balance Receivable Amount</label>
-                            <input type="number" step="0.01" name="receivable_amt" id="receivable_amt" value="{{$income->receivable_amt}}" class="form-control" placeholder="Amount">
-                        </div>
-						<div class="col-md-3 mb-3">
-                            <label class="form-label">Adjust Now (Amount)</label>
-                            <input type="number" step="0.01" name="adjust_amt" id="adjust_amt" value="{{$income->adjust_amt}}" class="form-control" placeholder="Amount">
-                        </div>
-						<!--<div class="col-md-3 mb-3" id="dueDateContainer" style="display:none;">
-							<label class="form-label">Due Date<span class="text-danger">*</span></label>
-							<input type="date" name="due_date" id="due_date" value="{{$income->due_date}}" class="form-control">
-						</div>-->
-						           
-						
-						<div class="card">
-							<div class="card-header">
-								<h5>GST & TDS</h5>
-							</div>
-							<div class="card-body">
-								<div class="row">
-									<div class="col-md-12">
-										<label class="form-label">TDS Applicable</label>
-										<div class="row">
-											<div class="col-6">
-												<div class="card shadow-sm border-0 p-3 m-2">
-													<div class="form-check">
-														<input class="form-check-input" type="radio" name="tds_applicable" value="yes" id="tdsYes" {{ old('tds_applicable', $income->tds_applicable ?? '') == 'yes' ? 'checked' : '' }}>
-														<label class="form-check-label" for="tdsYes">Yes</label>
-													</div>
-												</div>
-											</div>
-											<div class="col-6">
-												<div class="card shadow-sm border-0 p-3 m-2">
-													<div class="form-check">
-														<input class="form-check-input" type="radio" name="tds_applicable" value="no" id="tdsNo" {{ old('tds_applicable', $income->tds_applicable ?? '') == 'no' ? 'checked' : '' }}>
-														<label class="form-check-label" for="tdsNo">No</label>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="tds-container col-md-12"  id="tdsContainer">
-										<div class="row">
-											<div class="col-md-6">
-												<div id="tds_dropdown_universal">
-													<label for="tds_percent" class="form-label">TDS Percentage</label>
-													<select name="tds_percent" id="tds_percent" class="form-control">
-														@foreach ($purposes_of_tds as $purpose)
-														<option value="{{ $purpose->tds_rate . '-' . $purpose->id }}"  {{ ($purpose->id == $income->tds_id) ? 'selected' : '' }}>
-															{{ $purpose->category }} ({{ $purpose->tds_rate }}%)
-														</option>
-														@endforeach
-													</select>
-												</div>
-											</div>
-											<div class="col-md-6">
-												<label for="tds_amount">TDS Amount</label>
-												<input type="text"  id="tds_amount"  value="{{$income->tds_amount}}" class="form-control" readonly>
-											</div>
-										</div>
-									</div>
-
-									<div class="gst-container col-md-12">
-										<div class="mb-3">
-											<label class="form-label">GST Applicable</label>
-											<div class="row">
-												@php
-													$gstApplicable = strtolower(trim($income->gst_applicable ?? 'no'));
-												@endphp
-												<div class="col-6">
-													<div class="card shadow-sm border-0 p-3 m-2">
-														<div class="form-check">
-															<input class="form-check-input" type="radio" name="gst_applicable" value="yes" id="gstYes_ca" {{ ($gstApplicable === 'yes') ? 'checked' : '' }}>
-															<label class="form-check-label" for="gstYes_ca">Yes</label>
-														</div>
-													</div>
-												</div>
-												<div class="col-6">
-													<div class="card shadow-sm border-0 p-3 m-2">
-														<div class="form-check">
-															<input class="form-check-input" name="gst_applicable" value="no" type="radio" id="gstNo_ca" {{ ($gstApplicable !== 'yes') ? 'checked' : '' }}>
-															<label class="form-check-label" for="gstNo_ca">No</label>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="row mb-3">
-											<div class="col-md-4">
-												<label for="gst_trans">GST Transaction Mode</label>
-												<select class="form-select" name="gst_trans" id="gst_trans">
-													<option value="">Select</option>
-													<option value="intrastate" <?= ($income->gst_trans == 'intrastate')?'selected':'' ?>>Intra State</option>
-													<option value="interstate" <?= ($income->gst_trans == 'interstate')?'selected':'' ?>>Inter State</option>
-													<option value="union" <?= ($income->gst_trans == 'union')?'selected':'' ?>>Union Territory</option>
-												</select>
-											</div>
-											<div class="col-md-4">
-												<label for="gst_rate">GST Rate (%)</label>
-												<input type="number" name="gst_rate" id="gst_rate" value="{{$income->gst_rate}}" class="form-control" min="0" step="0.01">
-											</div>
-											<div class="col-md-4">
-												<label for="gst_allocation">GST Allocation</label>
-												<input type="text" name="gst_allocation" id="gst_allocation" value="{{$income->gst_allocation}}" class="form-control" readonly>
-											</div>
-											<div class="col-md-4">
-												<label for="gst_amt">Total GST Amount</label>
-												<input type="text" name="gst_amt" id="gst_amt" value="{{$income->gst_amt}}" class="form-control" readonly>
-											</div>                                                    
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						
-						
-						
-                        <div class="mb-3 col-md-12">
-                            <label class="form-label" for="inputEmail4">Notes</label>
-                            <textarea class="form-control" name="specification" id="projectDescription" placeholder="Specification"
-                                rows="4">{{$income->specification}}</textarea>
-                        </div>
-						
-						<div class="col-md-3 mb-3">
-							<label class="form-label">Attachment</label>
-
-							<!-- FILE INPUT -->
-							<input type="file" name="income_doc" id="income_doc" class="form-control">
-
-							<!-- OLD FILE (HIDDEN) -->
-							<input type="hidden" name="old_income_doc" value="{{ $income->income_doc }}">
-
-							<!-- VIEW LINK -->
-							@if($income->income_doc)
-								<div class="mt-2">
-									<a href="{{ asset('uploads/income_docs/'.$income->income_doc) }}" target="_blank">
-										📄 View Document
-									</a>
-								</div>
-							@endif
-						</div>
-
-                        <div class="col-md-12 text-end">
-                            <button type="button" id="#" class="btn btn-secondary me-2">
-                                <a href="/other-income-list">Cancel</a>
-                            </button>
-                            
-                        </div>
-                
-                    </div>
-                </form>
+    <!-- [ breadcrumb ] start -->
+    <div class="page-header mb-3">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12 d-flex justify-content-between align-items-center">
+                    <ul class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('/other-income-list') }}">Other Income</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">View Other Income</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
+    <!-- [ breadcrumb ] end -->
+
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-7">
+            <h3 class="mb-1 fw-bold text-dark"><i class="ti ti-file-analytics text-primary me-2"></i>View Other Income</h3>
+            <p class="text-muted mb-0" style="font-size: 0.88rem;">Details for income receipt record <strong>#{{ $income->invoice_no ?? $income->id }}</strong></p>
+        </div>
+        <div class="col-md-5 text-md-end mt-2 mt-md-0">
+            <a href="javascript:void(0);" class="btn btn-info rounded px-3 me-2 paymentModalBtn" data-id="{{ $income->id ?? '' }}" data-type="Income">
+                <i class="ti ti-receipt me-1"></i> Payment Details
+            </a>
+            <a href="{{ route('income.edit', base64_encode($income->id)) }}" class="btn btn-primary rounded px-3 me-2">
+                <i class="ti ti-edit me-1"></i> Edit
+            </a>
+            <a href="{{ url('/other-income-list') }}" class="btn btn-outline-secondary rounded px-3">
+                <i class="ti ti-arrow-left me-1"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <form id="incomeForm" enctype="multipart/form-data">
+        @csrf
+
+        <!-- 📌 SECTION 1: Income Classification & Basic Details -->
+        <div class="card border-0 shadow-sm rounded-3 mb-3">
+            <div class="card-header bg-light-subtle py-3 border-bottom">
+                <h5 class="mb-0 fw-bold text-primary d-flex align-items-center">
+                    <i class="ti ti-category me-2 fs-4"></i> 1. Classification & Basic Details
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    @if($hasProprietorship)
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
+                        <select name="propId" class="form-select" disabled>
+                            <option value="">{{ parentCompanyName() }}</option>
+                            @foreach($proprietorships as $company)
+                                <option value="{{ $company->id }}" {{ ($income->propId == $company->id) ? 'selected' : '' }}>
+                                    {{ $company->comp_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Transaction Date</label>
+                        <input type="date" name="dateInput" id="dateInput" value="{{ $income->dateInput }}" disabled class="form-control bg-light">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Income Type</label>
+                        <select id="incomeType" name="incomeType" class="form-select" disabled>
+                            <option value="Revenue" {{ ($income->incomeType == 'Revenue') ? 'selected' : '' }}>Other Operating Income</option>
+                            <option value="Other" {{ ($income->incomeType == 'Other') ? 'selected' : '' }}>Other Non-Operating Income</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Income Category / Sub-Category</label>
+                        <select id="categoryIncome" name="categoryIncome" disabled class="form-select">
+                            <option value="{{ $income->categoryIncome }}">{{ $income->categoryIncome }}</option>
+                        </select>
+                    </div>
+
+                    @if(!empty($income->other_income))
+                    <div class="col-12" id="otherIncomeCategory">
+                        <label for="otherInput" class="form-label fw-semibold text-dark">Specified Other Category</label>
+                        <input type="text" name="other_income" class="form-control bg-light" id="otherInput" disabled value="{{ $income->other_income }}">
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- 📌 SECTION 2: Party & Reference Info -->
+        <div class="card border-0 shadow-sm rounded-3 mb-3">
+            <div class="card-header bg-light-subtle py-3 border-bottom">
+                <h5 class="mb-0 fw-bold text-primary d-flex align-items-center">
+                    <i class="ti ti-user-check me-2 fs-4"></i> 2. Party & Reference Details
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark">Party / Source Name</label>
+                        <input type="text" name="customer_name" id="customer_name" class="form-control bg-light" disabled value="{{ $income->customer_name ?? 'N/A' }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark">Invoice / Reference Number</label>
+                        <input type="text" name="invoice_no" id="invoice_no" class="form-control bg-light" disabled value="{{ $income->invoice_no ?? 'N/A' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📌 SECTION 3: Amount & Payment Information -->
+        <div class="card border-0 shadow-sm rounded-3 mb-3">
+            <div class="card-header bg-light-subtle py-3 border-bottom">
+                <h5 class="mb-0 fw-bold text-primary d-flex align-items-center">
+                    <i class="ti ti-credit-card me-2 fs-4"></i> 3. Amount & Payment Details
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <!-- Income Amount -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Total Income Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light fw-bold">₹</span>
+                            <input type="number" step="0.01" name="amount" id="amount" value="{{ $income->amount }}" disabled class="form-control fw-bold fs-6 text-dark bg-light">
+                        </div>
+                    </div>
+
+                    <!-- Payment Status -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Receipt Status</label>
+                        <select name="pay_status" id="pay_status" disabled class="form-select">
+                            <option value="Full" {{ ($income->pay_status == 'Full') ? 'selected' : '' }}>Full Payment</option>
+                            <option value="Advance" {{ ($income->pay_status == 'Advance') ? 'selected' : '' }}>Advance Payment</option>
+                            <option value="Due" {{ ($income->pay_status == 'Due') ? 'selected' : '' }}>Due / Receivable</option>
+                        </select>
+                    </div>
+
+                    <!-- Payment Mode -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Payment Mode</label>
+                        <select name="pay_mode" id="pay_mode" disabled class="form-select">
+                            <option value="Cash" {{ ($income->pay_mode == 'Cash') ? 'selected' : '' }}>Cash</option>
+                            <option value="Bank" {{ ($income->pay_mode == 'Bank') ? 'selected' : '' }}>Bank Transfer</option>
+                            <option value="UPI" {{ ($income->pay_mode == 'UPI') ? 'selected' : '' }}>UPI</option>
+                        </select>
+                    </div>
+
+                    <!-- Select Bank -->
+                    @if(!empty($income->bank_id) || ($income->pay_mode == 'Bank' || $income->pay_mode == 'UPI'))
+                    <div class="col-md-4" id="bank_div">
+                        <label class="form-label fw-semibold text-dark">Deposited Bank Account</label>
+                        <select name="bank_id" id="bank_id" class="form-select" disabled>
+                            <option value="">-- Bank Account --</option>
+                            @if(!empty($bankDetails))
+                                @foreach($bankDetails as $bank)
+                                    <option value="{{ $bank->id }}" {{ (isset($income->bank_id) && $income->bank_id == $bank->id) ? 'selected' : '' }}>
+                                        {{ $bank->bank_name }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                    @endif
+
+                    <!-- Dynamic Advance / Receivable fields -->
+                    <div class="col-md-4" id="advance_amt_div">
+                        <label class="form-label fw-semibold text-dark">Advance Received Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">₹</span>
+                            <input type="number" step="0.01" name="advance_amt" id="advance_amt" value="{{ $income->advance_amt }}" disabled class="form-control bg-light">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4" id="receivable_amt_div">
+                        <label class="form-label fw-semibold text-dark">Balance Receivable</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">₹</span>
+                            <input type="number" step="0.01" name="receivable_amt" id="receivable_amt" value="{{ $income->receivable_amt }}" disabled class="form-control bg-light">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4" id="adjust_amt_div">
+                        <label class="form-label fw-semibold text-dark">Adjust Amount (Received)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">₹</span>
+                            <input type="number" step="0.01" name="adjust_amt" id="adjust_amt" value="{{ $income->adjust_amt }}" disabled class="form-control bg-light">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📌 SECTION 4: Tax & Compliance (GST & TDS) -->
+        <div class="card border-0 shadow-sm rounded-3 mb-3 currAsset">
+            <div class="card-header bg-light-subtle py-3 border-bottom">
+                <h5 class="mb-0 fw-bold text-primary d-flex align-items-center">
+                    <i class="ti ti-receipt-tax me-2 fs-4"></i> 4. Tax & Compliance (GST & TDS)
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <!-- TDS Block -->
+                    <div class="col-lg-6 border-end-lg pe-lg-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <label class="form-label fw-bold text-dark mb-0 fs-6">TDS Deducted by Payer?</label>
+                            <div class="btn-group btn-group-sm toggle-radio-group" role="group">
+                                <input type="radio" class="btn-check" name="tds_applicable" value="yes" id="tdsYes" disabled {{ old('tds_applicable', $income->tds_applicable ?? '') == 'yes' ? 'checked' : '' }}>
+                                <label class="btn btn-outline-success px-3 fw-semibold" for="tdsYes">Yes</label>
+
+                                <input type="radio" class="btn-check" name="tds_applicable" value="no" id="tdsNo" disabled {{ old('tds_applicable', $income->tds_applicable ?? '') != 'yes' ? 'checked' : '' }}>
+                                <label class="btn btn-outline-danger px-3 fw-semibold" for="tdsNo">No</label>
+                            </div>
+                        </div>
+
+                        @if(($income->tds_applicable ?? '') == 'yes')
+                        <div class="tds-container mt-3 p-3 bg-light-subtle rounded-3 border" id="tdsContainer">
+                            <div class="row g-3">
+                                <div class="col-12" id="tds_dropdown_universal">
+                                    <label for="tds_percent" class="form-label fw-semibold text-dark">TDS Section & Rate</label>
+                                    <select name="tds_percent" id="tds_percent" class="form-select" disabled>
+                                        @foreach ($purposes_of_tds as $purpose)
+                                            <option value="{{ $purpose->tds_rate . '-' . $purpose->id }}" {{ ($purpose->id == $income->tds_id) ? 'selected' : '' }}>
+                                                {{ $purpose->category }} ({{ $purpose->tds_rate }}%)
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="tds_amount" class="form-label fw-semibold text-dark">Calculated TDS Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white">₹</span>
+                                        <input type="text" id="tds_amount" value="{{ $income->tds_amount }}" class="form-control fw-bold bg-white" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+
+                    <!-- GST Block -->
+                    <div class="col-lg-6 ps-lg-4 gst-container">
+                        @php
+                            $gstApplicable = strtolower(trim($income->gst_applicable ?? 'no'));
+                        @endphp
+                        <div class="d-flex align-items-center justify-content-between">
+                            <label class="form-label fw-bold text-dark mb-0 fs-6">GST Applicable?</label>
+                            <div class="btn-group btn-group-sm toggle-radio-group" role="group">
+                                <input type="radio" class="btn-check" name="gst_applicable" value="yes" id="gstYes_ca" disabled {{ ($gstApplicable === 'yes') ? 'checked' : '' }}>
+                                <label class="btn btn-outline-success px-3 fw-semibold" for="gstYes_ca">Yes</label>
+
+                                <input type="radio" class="btn-check" name="gst_applicable" value="no" id="gstNo_ca" disabled {{ ($gstApplicable !== 'yes') ? 'checked' : '' }}>
+                                <label class="btn btn-outline-danger px-3 fw-semibold" for="gstNo_ca">No</label>
+                            </div>
+                        </div>
+
+                        @if($gstApplicable === 'yes')
+                        <div class="gst-fields-wrapper mt-3 p-3 bg-light-subtle rounded-3 border" id="gstFieldsWrapper">
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label for="gst_trans" class="form-label fw-semibold text-dark">GST Transaction Mode</label>
+                                    <select class="form-select" name="gst_trans" id="gst_trans" disabled>
+                                        <option value="intrastate" {{ ($income->gst_trans == 'intrastate') ? 'selected' : '' }}>Intra State (CGST + SGST)</option>
+                                        <option value="interstate" {{ ($income->gst_trans == 'interstate') ? 'selected' : '' }}>Inter State (IGST)</option>
+                                        <option value="union" {{ ($income->gst_trans == 'union') ? 'selected' : '' }}>Union Territory (UTGST)</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="gst_rate" class="form-label fw-semibold text-dark">GST Rate (%)</label>
+                                    <div class="input-group">
+                                        <input type="number" name="gst_rate" id="gst_rate" value="{{ $income->gst_rate }}" class="form-control bg-white" disabled>
+                                        <span class="input-group-text bg-white">%</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="gst_allocation" class="form-label fw-semibold text-dark">Tax Allocation</label>
+                                    <input type="text" name="gst_allocation" id="gst_allocation" value="{{ $income->gst_allocation }}" class="form-control bg-white" readonly>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="gst_amt" class="form-label fw-semibold text-dark">Total GST Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white">₹</span>
+                                        <input type="text" name="gst_amt" id="gst_amt" value="{{ $income->gst_amt }}" class="form-control fw-bold bg-white" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📌 SECTION 5: Additional Info & Supporting Document -->
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-header bg-light-subtle py-3 border-bottom">
+                <h5 class="mb-0 fw-bold text-primary d-flex align-items-center">
+                    <i class="ti ti-file-description me-2 fs-4"></i> 5. Notes & Attachment
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold text-dark" for="projectDescription">Notes / Description</label>
+                        <textarea class="form-control bg-light" name="specification" id="projectDescription" disabled rows="3">{{ $income->specification }}</textarea>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-dark">Supporting Attachment</label>
+                        @if($income->income_doc)
+                            <div>
+                                <a href="{{ asset('uploads/income_docs/'.$income->income_doc) }}" target="_blank" class="btn btn-outline-primary d-inline-flex align-items-center gap-1">
+                                    <i class="ti ti-file-download fs-5"></i> View Attached Document
+                                </a>
+                            </div>
+                        @else
+                            <p class="text-muted mb-0">No document attached.</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Submit Actions -->
+        <div class="col-md-12 text-end mb-5">
+            <a href="{{ url('/other-income-list') }}" class="btn btn-danger me-2">Back to List</a>
+            <a href="{{ route('income.edit', base64_encode($income->id)) }}" class="btn btn-primary">Edit Income</a>
+        </div>
+    </form>
 </div>
 
+<!-- Payment Voucher Modal -->
 <div class="modal fade" id="paymentVoucherModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-
             <div class="modal-header">
                 <h5 class="modal-title">Payment Details</h5>
-                <button type="button" class="btn-close"
-                    data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
-
                 <input type="hidden" id="f_id">
                 <input type="hidden" id="voucher_type">
-				<input type="hidden" id="isViewPage" value="1">
+                <input type="hidden" id="isViewPage" value="1">
 
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label>Total Invoice Amount</label>
-                        <input type="text"
-                            id="invoice_total"
-                            class="form-control"
-                            readonly>
+                        <input type="text" id="invoice_total" class="form-control" readonly>
                     </div>
 
                     <div class="col-md-4">
                         <label>Paid Amount</label>
-                        <input type="text"
-                            id="total_paid"
-                            class="form-control"
-                            readonly>
+                        <input type="text" id="total_paid" class="form-control" readonly>
                     </div>
 
                     <div class="col-md-4">
                         <label>Balance Due</label>
-                        <input type="text"
-                            id="balance_due"
-                            class="form-control"
-                            readonly>
+                        <input type="text" id="balance_due" class="form-control" readonly>
                     </div>
                 </div>
 
@@ -315,443 +399,15 @@
                     <tr>
                         <th>Date</th>
                         <th>Amount</th>
-						<th>Mode</th>
-						<th>Bank</th>
+                        <th>Mode</th>
+                        <th>Bank</th>
                         <th id="actionHeader" width="80">Action</th>
                     </tr>
                     </thead>
-
-                    <tbody id="voucherRows">
-
-                    </tbody>
+                    <tbody id="voucherRows"></tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-
-	document.querySelectorAll('input, textarea, select').forEach(el => {
-			el.disabled = true;
-	});
-
-	
-	$('#income_doc').on('change', function () {
-		let fileName = this.files[0]?.name;
-		if (fileName) {
-			$(this).after(`<small class="text-success">Selected: ${fileName}</small>`);
-		}
-	});
-	
-	//Income Type and Sub category
-	$(document).ready(function () {
-
-		const revenueOptions = [
-			"Freight / Delivery Charges Recovery",
-			"Packing & Handling Charges Recovery",
-			"Installation Charges",
-			"Training Charges",
-			"AMC / Maintenance Charges",
-			"Commission Income",
-			"Service Recovery Charges",
-			"Documentation Charges",
-			"Processing Charges",
-			"Onboarding Charges",
-			"Platform / API Usage Charges",
-			"SMS / Communication Charges Recovery",
-			"Data Migration Charges",
-			"Scrap Sales",			
-			"Miscellaneous Operating Income"
-		];
-
-		const otherOptions = [
-			"Interest Income",
-			"Rental Income",
-			"Dividend Income",
-			"Profit on Sale of Fixed Assets",
-			"Profit on Sale of Investments",
-			"Foreign Exchange Gain",
-			"Insurance Claim Received",
-			"Bad Debts Recovered",
-			"Government Grant / Subsidy Income",
-			"Miscellaneous Non-Operating Income"
-		];
-
-		// Get old values from blade
-		let selectedType = "{{ $income->incomeType }}";
-		let selectedCategory = "{{ $income->categoryIncome }}";
-
-		function loadCategory(type, selected = '') {
-
-			let categoryDropdown = $('#categoryIncome');
-			categoryDropdown.empty().append('<option value="">Select</option>');
-
-			if (!type) {
-				categoryDropdown.prop('disabled', true);
-				return;
-			}
-
-			categoryDropdown.prop('disabled', false);
-
-			let options = [];
-
-			if (type === 'Revenue') {
-				options = revenueOptions;
-			} else if (type === 'Other') {
-				options = otherOptions;
-			}
-
-			options.forEach(function (item) {
-				let isSelected = (item === selected) ? 'selected' : '';
-				categoryDropdown.append(`<option value="${item}" ${isSelected}>${item}</option>`);
-			});
-		}
-
-		// INITIAL LOAD (Edit mode)
-		loadCategory(selectedType, selectedCategory);
-
-		// On change
-		$('#incomeType').on('change', function () {
-			loadCategory($(this).val());
-			$('#otherIncomeCategory').hide();
-		});
-
-		// Show "Other" field
-		$('#categoryIncome').on('change', function () {
-			let selected = $(this).val();
-			if (
-				selected === "Miscellaneous Non-Operating Income" ||
-				selected === "Miscellaneous Operating Income"
-			) {
-				$('#otherIncomeCategory').show();
-			} else {
-				$('#otherIncomeCategory').hide();
-				$('#otherInput').val(''); // reset value
-			}
-		});
-
-		// Show "Other" if already selected in edit
-		if (selectedCategory === "Miscellaneous Non-Operating Income" || selectedCategory === "Miscellaneous Operating Income") {
-			$('#otherIncomeCategory').show();
-		}
-
-	});
-	
-	//amount based on pay_status
-	function allowOnlyDecimal(el) {
-		let value = el.value;
-
-		// Remove invalid characters (allow digits + one dot)
-		value = value.replace(/[^0-9.]/g, '');
-
-		// Allow only one decimal point
-		let parts = value.split('.');
-		if (parts.length > 2) {
-			value = parts[0] + '.' + parts.slice(1).join('');
-		}
-
-		el.value = value;
-	}
-	
-	$('#amount, #advance_amt, #receivable_amt, #adjust_amt').on('input', function () {
-		allowOnlyDecimal(this);
-	});
-	
-	$(document).ready(function () {
-
-		function resetFields() {
-
-			$('#advance_amt, #receivable_amt, #adjust_amt')
-				.prop({ readonly: true, required: false });
-
-			$('#advance_amt').closest('.col-md-3').hide();
-			$('#receivable_amt').closest('.col-md-3').hide();
-			$('#adjust_amt').closest('.col-md-3').hide();
-		}
-
-		function calculateAmounts() {
-
-			let amount     = parseFloat($('#amount').val()) || 0;
-			let adjustAmt  = parseFloat($('#adjust_amt').val()) || 0;
-			let advanceAmt = parseFloat($('#advance_amt').val()) || 0;
-
-			let status = ($('#pay_status').val() || '').trim().toLowerCase();
-
-			// ==========================================
-			// FULL
-			// ==========================================
-
-			if (status === 'full') {
-
-				$('#adjust_amt').closest('.col-md-3').show();
-
-				$('#advance_amt').closest('.col-md-3').hide();
-				$('#receivable_amt').closest('.col-md-3').hide();
-
-				$('#adjust_amt')
-					.val(amount.toFixed(2))
-					.prop({
-						readonly: true,
-						required: true
-					});
-
-				$('#advance_amt').val(0);
-				$('#receivable_amt').val(0);
-			}
-
-			// ==========================================
-			// ADVANCE
-			// ==========================================
-
-			else if (status === 'advance') {
-
-				$('#advance_amt').closest('.col-md-3').show();
-				$('#receivable_amt').closest('.col-md-3').show();
-				$('#adjust_amt').closest('.col-md-3').show();
-
-				$('#advance_amt').prop({
-					readonly: false,
-					required: true
-				});
-
-				$('#adjust_amt').prop({
-					readonly: false,
-					required: true
-				});
-
-				$('#receivable_amt').prop({
-					readonly: true,
-					required: true
-				});
-
-				let usedAmount = adjustAmt || advanceAmt;
-
-				if (usedAmount > amount) {
-
-					usedAmount = amount;
-
-					$('#adjust_amt').val(amount.toFixed(2));
-					$('#advance_amt').val(amount.toFixed(2));
-
-					alert('Amount cannot exceed total income amount');
-				}
-
-				let balance = amount - usedAmount;
-
-				$('#receivable_amt').val(balance.toFixed(2));
-			}
-
-			// ==========================================
-			// DEFAULT
-			// ==========================================
-
-			else {
-
-				resetFields();
-			}
-		}
-
-		// ==========================================
-		// EVENTS
-		// ==========================================
-
-		$('#pay_status').on('change', function () {
-
-			resetFields();
-			calculateAmounts();
-		});
-
-		$('#amount').on('input', function () {
-
-			calculateAmounts();
-		});
-
-		$('#adjust_amt').on('input', function () {
-
-			$('#advance_amt').val($(this).val());
-
-			calculateAmounts();
-		});
-
-		$('#advance_amt').on('input', function () {
-
-			$('#adjust_amt').val($(this).val());
-
-			calculateAmounts();
-		});
-
-		// ==========================================
-		// INITIAL LOAD EDIT MODE
-		// ==========================================
-
-		calculateAmounts();
-
-	});
-	
-	//TDS applicable
-	$(document).ready(function () {
-
-		function toggleTDS() {
-			let val = $('input[name="tds_applicable"]:checked').val();
-
-			if (val === 'yes') {
-				$('#tdsContainer').show();
-				calculateTDS(); 
-			} else {
-				$('#tdsContainer').hide();
-				$('#tds_amount').val(0); 
-			}
-		}
-
-		function calculateTDS() {
-
-			let amount = parseFloat($('#amount').val()) || 0;
-
-			$.ajax({
-				url: '/calculate-tds-income',
-				type: "POST",
-				data: {
-					_token: "{{ csrf_token() }}",
-					amount: amount
-				},
-				success: function (res) {
-					if (res) {
-						$('#tds_amount').val(res.tds_amount);
-					}
-				}
-			});
-		}
-
-		$('input[name="tds_applicable"]').on('change', function () {
-			toggleTDS();
-		});
-
-		$('#amount').on('input change', function () {
-			if ($('#tdsYes').is(':checked')) {
-				calculateTDS();
-			}
-		});
-
-		toggleTDS();
-
-	});
-	
-	//GST applicable
-	document.addEventListener("DOMContentLoaded", function () {
-
-		document.querySelectorAll(".gst-container").forEach((container) => {
-
-			const gstYes = container.querySelector('#gstYes_ca');
-			const gstNo  = container.querySelector('#gstNo_ca');
-
-			if (gstYes && gstNo) {
-				toggleGST(container, 'ca');
-				gstYes.addEventListener('change', () => toggleGST(container, 'ca'));
-				gstNo.addEventListener('change', () => toggleGST(container, 'ca'));
-			}
-
-		});
-
-		function toggleGST(container, type) {
-
-			let isYes = false;
-
-			if (type === 'ca') {
-				isYes = container.querySelector('#gstYes_ca')?.checked;
-			} else {
-				isYes = container.querySelector('#gstYes_nca')?.checked;
-			}
-
-			let fields = [];
-
-			if (type === 'ca') {
-				fields = container.querySelectorAll('#gst_trans, #gst_rate, #gst_allocation,#gst_amt');
-			} else {
-				
-			}
-
-			fields.forEach(field => {
-				field.closest(".col-md-4").style.display = isYes ? "block" : "none";
-			});
-		}
-
-	});
-	
-	//GST calculation
-	function calculateGST() 
-	{
-
-		let invoiceValue = parseFloat($('#amount').val()) || 0;
-
-		let gstRate  = parseFloat($('#gst_rate').val()) || 0;
-		let gstTrans = $('#gst_trans').val();
-
-		// ================= GST CALC =================
-		let gstAmount = (invoiceValue * gstRate) / 100;
-
-		// ================= GST SPLIT =================
-		let cgst = 0, sgst = 0, igst = 0;
-
-		if (gstTrans === 'intrastate' || gstTrans === 'union') {
-			cgst = gstAmount / 2;
-			sgst = gstAmount / 2;
-		} else if (gstTrans === 'interstate') {
-			igst = gstAmount;
-		}
-
-		// ================= SET VALUES =================
-		$('#gst_amt').val(gstAmount.toFixed(2));
-
-		if (igst > 0) {
-			$('#gst_allocation').val(`IGST: ${igst.toFixed(2)}`);
-		} else {
-			$('#gst_allocation').val(`CGST: ${cgst.toFixed(2)} | SGST: ${sgst.toFixed(2)}`);
-		}
-	}
-	
-	$('#amount, #gst_rate, #gst_trans').on('change keyup', function () {
-		calculateGST();
-	});
-
-
-	//Submit form
-    $(document).on("submit", "#incomeForm", function (e) {
-        e.preventDefault();
-
-        let formData = new FormData(this);
-        let formAction = $("#incomeForm").data("route");
-        
-        $("#loader").show();
-        $.ajax({
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            url: formAction,
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                $("#loader").hide();
-                if (response.status === "success") {
-                    showToast(response.message, "success");
-                    setTimeout(() => {
-                        window.location.href = response.redirect;
-                    }, 2000);
-                } else {
-                    showToast(response.message, "error");
-                    console.error("Error Response:", response);
-                }
-            },
-            error: function (xhr, status, error) {
-                $("#loader").hide();
-                // console.error("AJAX Error:", xhr.responseText);
-                showToast("Something went wrong! Please try again.", "error");
-            }
-        });
-    });
-
-
-</script>
 @endsection

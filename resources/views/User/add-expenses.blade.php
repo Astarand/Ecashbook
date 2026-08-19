@@ -60,8 +60,8 @@
                         <label class="form-label">Direct Expenses Type<span class="text-danger">*</span></label>
                         <select id="directExpensesType" class="form-control" name="direct_expense_type">
                             <option value="">Select</option>
-                            
-                        </select>						
+
+                        </select>
 						<small id="directExpenseTypeInfo" class="text-primary fw-bold mt-1 d-block"></small>
                     </div>
 
@@ -74,8 +74,8 @@
                         </select>
 						<small id="indirectExpenseTypeInfo" class="text-primary fw-bold mt-1 d-block"></small>
                     </div>
-					
-					
+
+
 
                     <div id="normalExpenseFields" class="row">
                         <div class="col-sm-4 mb-3" id="other_text_box">
@@ -83,12 +83,12 @@
                             <input type="text" id="other_exp" name="other_exp" class="form-control" placeholder="Enter Share Holder's Capital">
                         </div>
 
-                    
+
                         <div class="col-sm-4 mb-3">
                             <label class="form-label">Date<span class="text-danger">*</span></label>
                             <input type="date" id="expense_date" name="expense_date" class="form-control" placeholder="Enter Share Holder's Capital">
-                        </div>						
-										
+                        </div>
+
                         <div class="col-sm-4 mb-3" id="employeeDropdownDiv" style="display:none;">
                             <label class="form-label">Select Employee <span class="text-danger">*</span></label>
                             <select name="employee_id" id="employee_id" class="form-control">
@@ -147,7 +147,7 @@
                                 <option value="Cash">Cash</option>
                             </select>
                         </div>
-						
+
 						<div class="col-md-4 mb-3" id="bank_div">
 							<div class="form-group">
 								<label>Select Bank</label>
@@ -161,7 +161,7 @@
 								</select>
 							</div>
 						</div>
-						
+
 						<div class="row mt-2 tax-info-section" style="display:none;">
 							<div class="col-md-4">
 								<label>Tax Treatment</label>
@@ -179,23 +179,23 @@
 							</div>
 						</div>
 
-                        <div class="col-sm-4 mb-3">
-                            <label class="form-label">Party / Vendor Name<span class="text-danger">*</span></label>
-                            <select name="vendor_id" id="vendor_id" class="form-control">
-                                <option value="">Select Vendor</option>
-                                @foreach($vendors as $vendor)
-                                    <option value="{{ $vendor->id }}" data-pan="{{ $vendor->vendor_pan }}">
-                                        {{ $vendor->vendor_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+            <div class="col-sm-4 mb-3">
+                <label class="form-label">Party / Vendor Name<span class="text-danger">*</span></label>
+                <select name="vendor_id" id="vendor_id" class="form-control">
+                    <option value="">Select Vendor</option>
+                    @foreach($vendors as $vendor)
+                        <option value="{{ $vendor->id }}" data-pan="{{ $vendor->vendor_pan }}">
+                            {{ $vendor->vendor_name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
                         <div class="col-sm-4 mb-3">
                             <label class="form-label">PAN Card of Party / Vendor</label>
                             <input type="text" id="vendor_pan" name="vendor_pan" class="form-control" placeholder="Enter PAN Number" maxlength="10">
                         </div>
-                        
+
                         <div class="col-md-12 mb-3">
                             <label class="form-label">Description of Expenses </label>
                             <textarea  name="pur_of_expense" id="pur_of_expense" class="form-control" placeholder="Description of Expenses" rows="4"></textarea>
@@ -325,8 +325,8 @@
                             </div>
                         </div>
 
-                        
-                        
+
+
 
                         <div class="col-sm-4 mb-3">
                             <label class="form-label">Approver Name</label>
@@ -570,7 +570,7 @@
             })
             .then(res => res.json())
             .then(data => {
-                
+
                 // If rule found
                 if (data && data.tds_rate !== null) {
                     currentRule = data;
@@ -635,7 +635,7 @@
             tdsSection.style.display = "none";
         }
 
-        // ✅ EVENTS		
+        // ✅ EVENTS
 		expenseCat.addEventListener("change", function(){
 			if($('#tdsYes').is(':checked')){
 				fetchTdsRule();
@@ -654,13 +654,13 @@
 			}
 		});
 
-		
+
 		$('#expense_amt').on('input', function(){
 			if($('#tdsYes').is(':checked')){
 				calculateTDS();
 			}
 		});
-		
+
 		$('#tdsYes').on('change', function () {
 			if (!this.checked) return;
 			$.get('/check-company-policies', function (res) {
@@ -678,12 +678,12 @@
 				fetchTdsRule();
 			});
 		});
-		
-		
+
+
 		$('#tdsNo').on('change', function () {
 			resetTDS();
 		});
-		
+
     });
 
     //------ end TDS auto fetch & calculation logic ------
@@ -838,7 +838,7 @@
             } else if (expense_cat === "indirect") {
                 expense_type = $("form#addExpenseFrm #indirectExpensesType option:selected").val();
             }
-			
+
 			if (!expense_type) {
 				showToast("Please select expense type", "error");
 				return false;
@@ -860,7 +860,7 @@
 			let tax_treatment = $("form#addExpenseFrm #tax_treatment").val();
 			let allowed_ratio = $("form#addExpenseFrm #allowed_ratio").val();
 			let rebate_amt = $("form#addExpenseFrm #rebate_amt").val();
-			
+
 			if ((expense_cat === "indirect" || expense_cat === "direct") && expense_type === "employee_benefits" && !employee_id) {
 				showToast("Please select employee", "error");
 				return false;
@@ -873,17 +873,17 @@
             let vendor_id = $("#vendor_id option:selected").val();
             let vendor_pan = $("#vendor_pan").val();
             let payment_status = $("#payment_status").val();
-			
+
 			if (!expense_date) {
 				showToast("Please select expense date", "error");
 				return false;
 			}
-			
+
 			if (!payment_status) {
 				showToast("Please select payment status", "error");
 				return false;
 			}
-			
+
 			if (payment_status !== 'due' && !mode_of_expense) {
 				showToast("Please select mode of expense", "error");
 				return false;
@@ -906,7 +906,7 @@
             let gst_rate = parseFloat($("#gst_rate").val()) || 0;
             let gst_allocation = $("#gst_allocation").val();
             let total_gst = parseFloat($("#total_gst").val()) || 0;
-            
+
             let advance_amount = parseFloat($("#advance_amount").val()) || 0;
             let balance_amount = parseFloat($("#balance_amount").val()) || 0;
             let adjusted_now = parseFloat($("#adjusted_now").val()) || 0;
@@ -964,7 +964,7 @@
             expensesData.append("gst_rate", gst_rate);
             expensesData.append("gst_allocation", gst_allocation);
             expensesData.append("total_gst", total_gst);
-            
+
             expensesData.append("advance_amount", advance_amount);
             expensesData.append("balance_amount", balance_amount);
             expensesData.append("adjusted_now", adjusted_now);
@@ -1062,7 +1062,7 @@
     });
 
         // --- END: TDS Auto Fetch & Calculation Logic ---
-	
+
 	//Employee dropdown logic
 	$(document).ready(function () {
 
@@ -1088,8 +1088,8 @@
 
 		function handleEmployeeDropdown() {
 			let category = $("#expense_cat").val();
-			let type = (category === "direct") 
-                    ? $("#directExpensesType").val() 
+			let type = (category === "direct")
+                    ? $("#directExpensesType").val()
                     : $("#indirectExpensesType").val();
 
 			// ✅ Indirect + employee_benefits → show
@@ -1121,8 +1121,8 @@
     function handleEmployeeExpenseUI() {
 
         let category = $("#expense_cat").val();
-        let type = (category === "direct") 
-                    ? $("#directExpensesType").val() 
+        let type = (category === "direct")
+                    ? $("#directExpensesType").val()
                     : $("#indirectExpensesType").val();
 
         let tdsSection = $("#tds_section").closest(".row");
@@ -1158,7 +1158,7 @@
 
             // ✅ Reset values
             $("#payment_status_div").val("");
-            $("#advance_amount_div").val(0);    
+            $("#advance_amount_div").val(0);
             $("#balance_amount_div").val(0);
             $("#adjusted_now_div").val(0);
 
@@ -1258,8 +1258,8 @@
     function handleEmployeeInvoiceToggle() {
 
         let category = $("#expense_cat").val();
-        let type = (category === "direct") 
-                ? $("#directExpensesType").val() 
+        let type = (category === "direct")
+                ? $("#directExpensesType").val()
                 : $("#indirectExpensesType").val();
 
         if ((category === "indirect" || category === "direct") && type === "employee_benefits") {
@@ -1295,8 +1295,8 @@
     function handleDepreciationUI() {
 
         let category = $("#expense_cat").val();
-        let type = (category === "direct") 
-                    ? $("#directExpensesType").val()    
+        let type = (category === "direct")
+                    ? $("#directExpensesType").val()
                     : $("#indirectExpensesType").val();
 
         if (category === "indirect" && type === "depreciation") {
@@ -1339,7 +1339,7 @@
         handleDepreciationUI();
     });
 
-    
+
     document.addEventListener("DOMContentLoaded", function () {
 
         const expenseCat = document.getElementById("expense_cat");
@@ -1364,8 +1364,8 @@
         // Run on page load (important for edit mode)
         toggleOtherField();
     });
-	
-	
+
+
 	$('#expense_cat').on('change', function () {
 
 		let expenseCat = $(this).val();
@@ -1413,7 +1413,7 @@
 		});
 
 	});
-	
+
 	//Show the Type
 	$(document).on("change", "#directExpensesType", function () {
 		let type = $(this).find(":selected").data("type") || "";
@@ -1432,7 +1432,7 @@
 			$("#indirectExpenseTypeInfo").html("");
 		}
 	});
-	
+
 	//Start calculate Tax deduction
 	function loadTaxRule(expenseType, expenseHead)
 	{
@@ -1503,7 +1503,7 @@
 			}
 		});
 	}
-	
+
 	function calculateRebate()
 	{
 		let amount = parseFloat($('#expense_amt').val()) || 0;
@@ -1511,7 +1511,7 @@
 		let rebate = (amount * ratio) / 100;
 		$('#rebate_amt').val(rebate.toFixed(2));
 	}
-	
+
 	$(document).on('input', '#allowed_ratio', function(){
 
 		let min = parseFloat($(this).attr('min')) || 0;
@@ -1530,16 +1530,16 @@
 
 		calculateRebate();
 	});
-	
+
 	$('#directExpensesType').change(function(){
 		loadTaxRule('direct',$(this).val());
 	});
-	
+
 	$('#indirectExpensesType').change(function(){
 		loadTaxRule('indirect',$(this).val());
 	});
-	
-	
+
+
 	$(document).on('keyup change','#expense_amt',function(){
 		calculateRebate();
 	});

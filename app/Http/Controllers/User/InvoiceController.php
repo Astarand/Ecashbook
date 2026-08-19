@@ -49,6 +49,16 @@ class InvoiceController extends Controller
 		$inv_num = $sales->inv_num;
 		$custId = $sales->inv_name;
 		$added_by = $sales->added_by;
+		$userObj = DB::table('users')->where('id', $added_by)->first();
+		$ownerId = $added_by;
+		if ($userObj) {
+			if ($userObj->u_type == 5 && !empty($userObj->user_add_by)) {
+				$ownerId = $userObj->user_add_by;
+			} elseif ($userObj->u_type == 4 && !empty($userObj->ca_add_by)) {
+				$ownerId = $userObj->ca_add_by;
+			}
+		}
+
 		$invDate = $sales->created_at;
 
 		$special_discount = $sales->special_discount;
@@ -67,11 +77,22 @@ class InvoiceController extends Controller
 									ELSE cp.comp_name
 								END as comp_name
 							"),
+							DB::raw("
+								CASE 
+									WHEN '".$sales->propId."' IS NOT NULL AND '".$sales->propId."' != ''
+									THEN pp.comp_logo
+									ELSE cp.comp_logo
+								END as comp_logo
+							"),
 							'cp.gst_no',
 							'cp.comp_pan_no',
-							'cp.comp_bill_addone'
+							'cp.comp_bill_addone',
+							'cp.comp_bill_addtwo',
+							'cp.comp_bill_pin',
+							'cp.comp_phone',
+							'cp.comp_email'
 						)
-						->where('users.id', $added_by)
+						->where('users.id', $ownerId)
 						->first();
 		//get customer details
 		$custDetails = DB::table('customers')
@@ -180,7 +201,7 @@ class InvoiceController extends Controller
 			$inv_num = str_replace('/', '-', $inv_num);
 			$pdf = \PDF::loadView('User.sales-invoice-pdf', 
 			compact('sales','sales_values','inv_num','invDate','compDetails','custDetails','stateBill','cityBill','stateShip','cityShip','bankDetails'))
-			->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+			->setOptions(['dpi' => 96, 'defaultFont' => 'sans-serif', 'isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
 			$pdfName = 'Sales-Inv-'.$inv_num.'.pdf';
 			return $pdf->stream($pdfName);
 		}
@@ -469,6 +490,17 @@ class InvoiceController extends Controller
 		$special_discount = 0;
 		$special_discount_amount = 0;
 		$special_discount_type = "";
+
+		$userObj = DB::table('users')->where('id', $added_by)->first();
+		$ownerId = $added_by;
+		if ($userObj) {
+			if ($userObj->u_type == 5 && !empty($userObj->user_add_by)) {
+				$ownerId = $userObj->user_add_by;
+			} elseif ($userObj->u_type == 4 && !empty($userObj->ca_add_by)) {
+				$ownerId = $userObj->ca_add_by;
+			}
+		}
+
 		//get company details
 		$compDetails = DB::table('users')
 						->leftJoin('company_profiles as cp', 'users.id', '=', 'cp.userId')
@@ -482,12 +514,24 @@ class InvoiceController extends Controller
 									ELSE cp.comp_name
 								END as comp_name
 							"),
+							DB::raw("
+								CASE 
+									WHEN '".$sales->propId."' IS NOT NULL AND '".$sales->propId."' != ''
+									THEN pp.comp_logo
+									ELSE cp.comp_logo
+								END as comp_logo
+							"),
 							'cp.gst_no',
 							'cp.comp_pan_no',
-							'cp.comp_bill_addone'
+							'cp.comp_bill_addone',
+							'cp.comp_bill_addtwo'
 						)
-						->where('users.id', $added_by)
+						->where('users.id', $ownerId)
 						->first();
+
+		$bankDetails = DB::table('banks')->where('added_by', '=', $ownerId)->whereNull('propId')->first()
+						?? DB::table('banks')->where('added_by', '=', $ownerId)->first();
+
 		//get customer details
 		$custDetails = DB::table('vendors')
 						->select(DB::raw('vendors.*'))					                   					
@@ -566,7 +610,7 @@ class InvoiceController extends Controller
 				'cityBill' => $cityBill,
 				'stateShip' => $stateShip,
 				'cityShip' => $cityShip,
-
+				'bankDetails' => $bankDetails,
 				'special_discount' => $special_discount,
 				'special_discount_amount' => $special_discount_amount,
 				'special_discount_type' => $special_discount_type,
@@ -574,10 +618,10 @@ class InvoiceController extends Controller
 		}else{
 			
 			$inv_num = str_replace('/', '-', $inv_num);
-			$pdf = \PDF::loadView('User.sales-invoice-pdf', 
-			compact('sales','sales_values','inv_num','invDate','compDetails','custDetails','stateBill','cityBill','stateShip','cityShip'))
-			->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
-			$pdfName = 'Sales-Inv-'.$inv_num.'.pdf';
+			$pdf = \PDF::loadView('User.purchase-invoice-pdf', 
+			compact('sales','sales_values','inv_num','invDate','compDetails','custDetails','stateBill','cityBill','stateShip','cityShip','bankDetails'))
+			->setOptions(['dpi' => 96, 'defaultFont' => 'sans-serif','isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+			$pdfName = 'Purchase-Inv-'.$inv_num.'.pdf';
 			return $pdf->stream($pdfName);
 		}
 	}

@@ -86,6 +86,14 @@
                                                         <i class="ti ti-eye f-18"></i>
                                                     </a>
                                                 </li>
+                                                <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Download PDF">
+                                                    <a
+                                                        target="_blank"
+                                                        href="{{ url('/custom-invoice-pdf/'.base64_encode($invoice->id)) }}"
+                                                        class="avtar avtar-xs btn-link-primary btn-pc-default">
+                                                        <i class="ti ti-download f-18"></i>
+                                                    </a>
+                                                </li>
                                                     {{-- <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
                                                         <a href="#!" class="avtar avtar-xs btn-link-success btn-pc-default">
                                                             <i class="ti ti-edit-circle f-18"></i>

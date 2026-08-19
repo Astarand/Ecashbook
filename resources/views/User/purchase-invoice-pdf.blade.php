@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Sales Invoice #{{ $inv_num }}</title>
+    <title>Purchase Invoice #{{ $inv_num }}</title>
     <style>
         @page {
             margin: 8mm 10mm 8mm 10mm;
@@ -235,8 +235,8 @@
 
         /* Authorized Signatory Section */
         .signatory-table {
-            margin-top: 22px;
-            margin-bottom: 18px;
+            margin-top: 20px;
+            margin-bottom: 16px;
             page-break-inside: avoid;
         }
 
@@ -298,19 +298,17 @@
                 @endif
             </td>
             <td style="width: 45%; text-align: right; vertical-align: middle;">
-                <div class="invoice-title">TAX INVOICE</div>
+                <div class="invoice-title">PURCHASE INVOICE</div>
                 <div class="invoice-meta"><strong>Invoice No:</strong> <span style="font-weight: bold; color: #000000;">#{{ $inv_num }}</span></div>
                 <div class="invoice-meta"><strong>Date:</strong> {{ date('d-m-Y', strtotime($invDate)) }}</div>
             </td>
         </tr>
     </table>
 
-    <!-- Party Details (Company, Billing, Shipping) -->
+    <!-- Party Details (Company Details, Billing Address, Shipping Address) -->
     @php
         $shipAddressParts = array_filter([
             $sales->ship_addone ?? '',
-            $sales->ship_addtwo ?? '',
-            $sales->ship_city ?? '',
             $sales->ship_pin ?? ''
         ]);
         $hasShipping = !empty($shipAddressParts) && trim(implode('', $shipAddressParts)) !== '';
@@ -321,7 +319,7 @@
         <tr>
             <!-- Company Details -->
             <td class="party-box" style="width: {{ $partyWidth }};">
-                <div class="box-title">Company Details (Issuer)</div>
+                <div class="box-title">Company Details</div>
                 <div class="party-name">{!! $compDetails->comp_name !!}</div>
                 <p class="party-desc">{{ $compDetails->comp_bill_addone ?? '' }} {{ $compDetails->comp_bill_addtwo ?? '' }}</p>
                 @if(!empty($compDetails->comp_pan_no))
@@ -332,19 +330,19 @@
                 @endif
             </td>
 
-            <!-- Billing Address -->
+            <!-- Billing Address (Vendor) -->
             <td class="party-box" style="width: {{ $partyWidth }};">
                 <div class="box-title">Billing Address</div>
-                <div class="party-name">{!! $custDetails->cust_name ?? 'N/A' !!}</div>
+                <div class="party-name">{!! $custDetails->vendor_name ?? 'N/A' !!}</div>
                 <p class="party-desc">
-                    {{ optional($sales)->bill_addone ?? '' }} {{ optional($sales)->bill_addtwo ?? '' }}
-                    @if(optional($sales)->bill_pin) - {{ optional($sales)->bill_pin }} @endif
+                    {{ optional($sales)->bill_addone ?? '' }}
+                    @if(optional($sales)->cust_bill_pin) - {{ optional($sales)->cust_bill_pin }} @endif
                 </p>
-                @if(!empty($custDetails->cust_pan))
-                    <p class="party-desc"><strong>PAN:</strong> {{ $custDetails->cust_pan }}</p>
+                @if(!empty($custDetails->vendor_pan))
+                    <p class="party-desc"><strong>PAN:</strong> {{ $custDetails->vendor_pan }}</p>
                 @endif
-                @if(!empty($custDetails->cust_gst_no))
-                    <p class="party-desc"><strong>GSTIN:</strong> {{ $custDetails->cust_gst_no }}</p>
+                @if(!empty($custDetails->vendor_gstin))
+                    <p class="party-desc"><strong>GSTIN:</strong> {{ $custDetails->vendor_gstin }}</p>
                 @endif
             </td>
 
@@ -363,26 +361,22 @@
         <thead>
             <tr>
                 <th style="width: 4%; text-align: center;">#</th>
-                <th style="width: 36%;">Description of Goods / Service</th>
+                <th style="width: 36%;">Description of Goods</th>
                 <th style="width: 14%;">HSN / SAC</th>
-                <th style="width: 8%; text-align: center;">Qty</th>
+                <th style="width: 8%; text-align: center;">Quantity</th>
                 <th style="width: 14%; text-align: right;">Unit Price</th>
-                <th style="width: 8%; text-align: center;">Disc</th>
+                <th style="width: 8%; text-align: center;">Discount</th>
                 <th style="width: 16%; text-align: right;">Amount</th>
             </tr>
         </thead>
         <tbody>
             @php
                 $cgst = 0;
-                $sgst = 0;
                 $igst = 0;
-                $gst_trans = "";
                 $taxableAmt = 0;
                 $totalDisc = 0;
                 $totalTax = 0;
                 $totalAmount = 0;
-                $totalGovPay = 0;
-                $totalSerPay = 0;
             @endphp
             @if(!empty($sales_values))
                 @foreach($sales_values as $k => $value)
@@ -390,13 +384,9 @@
                         $taxableAmt += $value->amount;
                         $totalDisc += $value->disc_amt;
                         $totalTax += $value->tax_amt;
-                        $cgst += $value->tax_amt / 2;
-                        $sgst += $value->tax_amt / 2;
-                        $igst += $value->tax_amt;
-                        $totalGovPay += $value->gov_pay ?? 0;
-                        $totalSerPay += $value->ser_pay ?? 0;
+                        $cgst += ($value->amount) * 9 / 100;
+                        $igst += ($value->amount) * 9 / 100;
                         $totalAmount += $value->amount;
-                        $gst_trans = $value->gst_trans;
                     @endphp
                     <tr>
                         <td class="text-center">{{ $k + 1 }}</td>
@@ -409,13 +399,14 @@
                     </tr>
                 @endforeach
                 @php
-                    $totalAmount = getRoundedAmount(($totalAmount + $totalTax + $totalGovPay + $totalSerPay));
+                    $shippingCost = $sales->shipping_cost ?? 0;
+                    $totalAmount = ceil(($totalAmount + $cgst + $igst + $shippingCost));
                 @endphp
             @endif
         </tbody>
     </table>
 
-    <!-- 📌 Summary & Total Amount Layout - Clean Black & Neutral Theme -->
+    <!-- 📌 Summary & Total Amount Layout -->
     <table class="summary-section avoid-break">
         <tr>
             <!-- Left: Amount in words Card -->
@@ -431,44 +422,32 @@
                         <td class="totals-row-label">Taxable Amount:</td>
                         <td class="totals-row-val nowrap"><span class="r-sym">&#8377;</span>{{ number_format($taxableAmt, 2) }}</td>
                     </tr>
+                    @if($totalDisc > 0)
                     <tr>
                         <td class="totals-row-label">Discount:</td>
                         <td class="totals-row-val nowrap"><span class="r-sym">&#8377;</span>{{ number_format($totalDisc, 2) }}</td>
                     </tr>
-                    @if($gst_trans == 'intrastate')
-                        <tr>
-                            <td class="totals-row-label">CGST 9.0%:</td>
-                            <td class="totals-row-val nowrap"><span class="r-sym">&#8377;</span>{{ number_format($cgst, 2) }}</td>
-                        </tr>
-                        <tr>
-                            <td class="totals-row-label">SGST 9.0%:</td>
-                            <td class="totals-row-val nowrap"><span class="r-sym">&#8377;</span>{{ number_format($sgst, 2) }}</td>
-                        </tr>
-                    @else
-                        <tr>
-                            <td class="totals-row-label">IGST:</td>
-                            <td class="totals-row-val nowrap"><span class="r-sym">&#8377;</span>{{ number_format($igst, 2) }}</td>
-                        </tr>
                     @endif
+                    <tr>
+                        <td class="totals-row-label">CGST 9.0%:</td>
+                        <td class="totals-row-val nowrap"><span class="r-sym">&#8377;</span>{{ number_format($cgst, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="totals-row-label">IGST 9.0%:</td>
+                        <td class="totals-row-val nowrap"><span class="r-sym">&#8377;</span>{{ number_format($igst, 2) }}</td>
+                    </tr>
 
-                    @if($totalGovPay > 0)
+                    @if(!empty($shippingCost) && (float)$shippingCost > 0)
                         <tr>
-                            <td class="totals-row-label">Government Fees:</td>
-                            <td class="totals-row-val nowrap"><span class="r-sym">&#8377;</span>{{ number_format($totalGovPay, 2) }}</td>
-                        </tr>
-                    @endif
-
-                    @if($totalSerPay > 0)
-                        <tr>
-                            <td class="totals-row-label">Service Charges:</td>
-                            <td class="totals-row-val nowrap"><span class="r-sym">&#8377;</span>{{ number_format($totalSerPay, 2) }}</td>
+                            <td class="totals-row-label">Shipping Cost:</td>
+                            <td class="totals-row-val nowrap"><span class="r-sym">&#8377;</span>{{ number_format((float)$shippingCost, 2) }}</td>
                         </tr>
                     @endif
                 </table>
 
                 <table class="grand-total-box" style="width: 100%;">
                     <tr>
-                        <td style="text-align: left;">Grand Total:</td>
+                        <td style="text-align: left;">Total Amount:</td>
                         <td style="text-align: right;" class="nowrap"><span class="r-sym">&#8377;</span>{{ number_format($totalAmount, 2) }}</td>
                     </tr>
                 </table>
@@ -500,76 +479,45 @@
         </tr>
     </table>
 
-    <!-- 📌 ROW 1: Bank Details & QR Code in a single row (avoid-break) -->
+    <!-- 📌 ROW 1: Payment Details & Delivery Details in a single row (avoid-break) -->
     <table class="info-table avoid-break">
         <tr>
-            <!-- Bank Details (78%) -->
-            <td class="info-box" style="width: 78%; vertical-align: top;">
-                <div class="box-title">Bank Details</div>
-                @if(!empty($bankDetails))
-                    <table style="width: 100%; font-size: 8.5px;">
-                        <tr>
-                            <td style="width: 50%; padding: 1.5px 0;"><strong>Account Holder:</strong> {{ $bankDetails->accholder_name ?? '' }}</td>
-                            <td style="width: 50%; padding: 1.5px 0;"><strong>Account No:</strong> <span style="font-weight: bold; color: #000000;">{{ $bankDetails->bank_ac_no ?? '' }}</span></td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 1.5px 0;"><strong>Bank Name:</strong> {{ $bankDetails->bank_name ?? '' }}</td>
-                            <td style="padding: 1.5px 0;"><strong>IFSC Code:</strong> <span style="font-weight: bold; color: #000000;">{{ $bankDetails->ifsc_code ?? '' }}</span></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="padding: 1.5px 0;"><strong>Branch:</strong> {{ $bankDetails->bank_branch ?? '' }}</td>
-                        </tr>
-                    </table>
-                @else
-                    <p style="margin: 0; color: #64748b; font-size: 8.5px;">No bank details available.</p>
-                @endif
-            </td>
-
-            <!-- QR Code (22%) -->
-            <td class="info-box" style="width: 22%; vertical-align: middle; text-align: center;">
-                @php
-                    $qrPath = !empty($bankDetails->bank_qr_code) ? public_path('storage/' . $bankDetails->bank_qr_code) : null;
-                    $qrSrc = '';
-                    if (!empty($qrPath) && file_exists($qrPath)) {
-                        $qrData = base64_encode(file_get_contents($qrPath));
-                        $qrMime = mime_content_type($qrPath) ?: 'image/png';
-                        $qrSrc = 'data:' . $qrMime . ';base64,' . $qrData;
-                    }
-                @endphp
-                @if(!empty($qrSrc))
-                    <img src="{{ $qrSrc }}" style="width: 55px; height: 55px; object-fit: contain;" alt="QR Code"><br>
-                    <span style="font-size: 8px; color: #334155; font-weight: 600;">Scan to Pay</span>
-                @else
-                    <div style="font-size: 8.5px; color: #94a3b8; padding: 8px 0;">No QR Code</div>
-                @endif
-            </td>
-        </tr>
-    </table>
-
-    <!-- 📌 ROW 2: Delivery Details & Terms of Delivery in a single row (avoid-break) -->
-    <table class="info-table avoid-break" style="margin-bottom: 0;">
-        <tr>
-            <!-- Delivery Details -->
+            <!-- Payment Details (50%) -->
             <td class="info-box" style="width: 50%; vertical-align: top;">
-                <div class="box-title">Delivery Details</div>
+                <div class="box-title">Payment Details</div>
                 <div style="font-size: 8.5px; color: #334155;">
-                    <p class="party-desc"><strong>Buyer's Order No:</strong> {{ $sales->buyer_orderno ?? 'N/A' }}</p>
+                    <p class="party-desc"><strong>Mode Of Payment:</strong> {{ $sales->mode_of_pay ?? 'N/A' }}</p>
                     @if(!empty($sales->dispa_docno_one))
                         <p class="party-desc"><strong>Dispatch Doc No:</strong> {{ $sales->dispa_docno_one }}</p>
                     @endif
                     @if(!empty($sales->disp_through))
                         <p class="party-desc"><strong>Dispatched Through:</strong> {{ $sales->disp_through }}</p>
                     @endif
+                    @if(!empty($sales->ship_pin))
+                        <p class="party-desc"><strong>Destination:</strong> {{ $sales->ship_pin }}</p>
+                    @endif
+                </div>
+            </td>
+
+            <!-- Delivery Details (50%) -->
+            <td class="info-box" style="width: 50%; vertical-align: top;">
+                <div class="box-title">Delivery Details</div>
+                <div style="font-size: 8.5px; color: #334155;">
+                    <p class="party-desc"><strong>Buyer's Order No:</strong> {{ $sales->buyer_orderno ?? 'N/A' }}</p>
                     <p class="party-desc"><strong>Supplier's Ref:</strong> {{ $sales->supplier_refno ?? 'N/A' }}</p>
                     <p class="party-desc"><strong>Other Reference(s):</strong> {{ $sales->other_refno ?? 'N/A' }}</p>
                 </div>
             </td>
+        </tr>
+    </table>
 
-            <!-- Terms of Delivery -->
-            <td class="info-box" style="width: 50%; vertical-align: top;">
+    <!-- 📌 ROW 2: Terms of Delivery (avoid-break) -->
+    <table class="info-table avoid-break" style="margin-bottom: 0;">
+        <tr>
+            <td class="info-box" style="width: 100%; vertical-align: top;">
                 <div class="box-title">Terms of Delivery</div>
-                <p class="party-desc" style="line-height: 1.35;">
-                    {{ !empty($sales->terms_delivery) ? $sales->terms_delivery : 'Standard commercial terms and conditions apply.' }}
+                <p class="party-desc" style="line-height: 1.35; margin: 2px 0;">
+                    {{ (!empty($sales->terms_delivery) && $sales->terms_delivery != 'undefined') ? $sales->terms_delivery : 'Standard commercial terms and conditions apply.' }}
                 </p>
             </td>
         </tr>

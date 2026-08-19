@@ -223,6 +223,12 @@
                                                     <i class="ti ti-file f-18"></i>
                                                 </a>
                                             </li>
+                                            <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Download PDF">
+                                                <a target="_blank" href="{{ url('/purchase-invoice-pdf/'.base64_encode($sale->id).'/pdf') }}"
+                                                    class="avtar avtar-xs btn-link-primary btn-pc-default">
+                                                    <i class="ti ti-download f-18"></i>
+                                                </a>
+                                            </li>
                                             <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="View">
                                                 <a
                                                     href="{{ url('/view-purchase-invoice/'.base64_encode($sale->id)) }}"

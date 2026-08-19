@@ -36,7 +36,7 @@
                 </li>
 
                 <!-- Search Options -->
-                <li class="pc-h-item d-none d-md-inline-flex ms-2 position-relative">
+                <li class="pc-h-item d-none d-md-inline-flex ms-2 position-relative pt-3">
                     <form class="form-search tour-search" onsubmit="return false;">
                         <i class="ph-duotone ph-magnifying-glass icon-search"></i>
                         <input type="search"
@@ -79,13 +79,13 @@
                             {{-- 2 = User / Business Owner --}}
                             <a href="{{ route('user.AssignCa') }}" class="dropdown-item"><i class="ph-duotone ph-user-circle-plus"></i> <span>Assign CA</span></a>
                             <a href="{{ route('user.SalesInvoices') }}" class="dropdown-item"><i class="ph-duotone ph-scroll"></i> <span>Sales Invoice</span></a>
-                            <a href="{{ route('user.PurchaseInvoices') }}" class="dropdown-item"><i class="ph-duotone ph-archive-tray"></i> <span>Purchase Bills</span></a>
-                            <a href="{{ route('user.CustomerList') }}" class="dropdown-item"><i class="ph-duotone ph-users"></i> <span>Customers</span></a>
-                            <a href="{{ route('user.VendorList') }}" class="dropdown-item"><i class="ph-duotone ph-truck"></i> <span>Vendors</span></a>
-                            <a href="{{ route('user.ExpensesList') }}" class="dropdown-item"><i class="ph-duotone ph-wallet"></i> <span>Expenses</span></a>
-                            <a href="{{ route('user.EmployeeList') }}" class="dropdown-item"><i class="ph-duotone ph-user-list"></i> <span>Employees</span></a>
-                            <a href="{{ route('user.Plans') }}" class="dropdown-item"><i class="ph-duotone ph-credit-card"></i> <span>Plans</span></a>
-                            <a href="{{ route('User.GSTComplianceSupport') }}" class="dropdown-item"><i class="ph-duotone ph-chats-circle"></i> <span>Support</span></a>
+                            <a href="{{ route('user.ExpensesList') }}" class="dropdown-item"><i class="ph-duotone ph-wallet"></i> <span>Expense</span></a>
+                            <a href="{{ route('user.PaymentVoucherList') }}" class="dropdown-item"><i class="ph-duotone ph-receipt"></i> <span>Payment Voucher</span></a>
+                            <a href="{{ route('user.EmployeeList') }}" class="dropdown-item"><i class="ph-duotone ph-user-list"></i> <span>Employee Master</span></a>
+                            <a href="{{ route('User.GstDashboard') }}" class="dropdown-item"><i class="ph-duotone ph-file-text"></i> <span>GSTIN</span></a>
+                            <a href="{{ route('user.PayrollReports') }}" class="dropdown-item"><i class="ph-duotone ph-chart-line-up"></i> <span>Payroll Reports</span></a>
+                            <a href="{{ route('user.Ledger') }}" class="dropdown-item"><i class="ph-duotone ph-book-open"></i> <span>Ledger Report</span></a>
+                            <a href="{{ route('user.DocLocker') }}" class="dropdown-item"><i class="ph-duotone ph-folder-lock"></i> <span>Doc Locker</span></a>
 
                         @elseif(Auth::user()->u_type == 3 || Auth::user()->u_type == 6)
                             {{-- 3 = Admin --}}

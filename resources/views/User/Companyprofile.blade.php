@@ -134,10 +134,11 @@
                                         <div class="d-flex align-items-center">
                                             <div class="flex-grow-1 me-3">
                                                 <h3 class="alert-heading">Alert!</h3>
-                                                <p class="mb-2">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-1">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-0">Enter Once. MethotX Reuses, Validates & Connects Your Data Across Your Business.</p>
                                             </div>
                                             <div class="flex-shrink-0">
-                                                <img src="../assets/images/application/img-accout-alert.png"
+                                                <img src="{{ asset('assets/images/application/img-accout-alert.png') }}"
                                                     alt="img" class="img-fluid wid-80">
                                             </div>
                                         </div>
@@ -591,12 +592,8 @@
 
                                     </div>
                                     <div class="text-end btn-page">
-                                        {{-- <div class="btn btn-outline-secondary">Cancel</div> --}}
-                                        <a href="javascript:void(0);" id="cancel_compDetBtn"
-                                            class="btn customer-btn-cancel">Cancel</a>
-                                        {{-- <div class="btn btn-primary">Save Changes</div> --}}
-                                        <button type="submit" id="save_compDetBtn" class="btn btn-primary">Save
-                                            Changes</button>
+                                        <a href="javascript:void(0);" id="cancel_compDetBtn" class="btn btn-danger">Cancel</a>
+                                        <button type="submit" id="save_compDetBtn" class="btn btn-primary">Save Changes</button>
                                     </div>
                                 </form>
                             </div>
@@ -607,7 +604,8 @@
                                         <div class="d-flex align-items-center">
                                             <div class="flex-grow-1 me-3">
                                                 <h3 class="alert-heading">Alert!</h3>
-                                                <p class="mb-2">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-1">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-0">Enter Once. MethotX Reuses, Validates & Connects Your Data Across Your Business.</p>
                                             </div>
                                             <div class="flex-shrink-0">
                                                 <img src="{{ asset('assets/images/application/img-accout-alert.png') }}" alt="img" class="img-fluid wid-80">
@@ -617,181 +615,201 @@
                                 </div>
                                 <form action="javascript:void(0);" name="frmbusdet" id="frmbusdet" method="post">
                                     @csrf
-                                    <div class="col-lg-12 col-sm-12">
-                                        <div class="card">
-                                            <div class="message-container"></div>
-                                            <div class="card-header">
-                                                <h5>Business Details</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-sm-12 mb-3">
-                                                        <label class="form-label">Category Of Business <span class="text-danger">*</span></label>
-                                                        <div id="business">
-															<div class="form-check form-check-inline">
-                                                                <input class="form-check-input" type="radio"
-                                                                    name="comp_nature" id="manufacturing"
-                                                                    value="manufacturing"
-                                                                    {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'manufacturing' ? 'checked' : '') : '' }}>
-                                                                <label class="form-check-label"
-                                                                    for="manufacturing">Manufacturing</label>
-                                                            </div>
-                                                            <div class="form-check form-check-inline">
-                                                                <input class="form-check-input" type="radio"
-                                                                    name="comp_nature" id="trading"
-                                                                    value="trading"
-                                                                    {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'trading' ? 'checked' : '') : '' }}>
-                                                                <label class="form-check-label"
-                                                                    for="trading">Trading / Reseller</label>
-                                                            </div>
-                                                            <div class="form-check form-check-inline">
-                                                                <input class="form-check-input" type="radio"
-                                                                    name="comp_nature" id="service_provider" value="service"
-                                                                    {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'service' ? 'checked' : '') : '' }}>
-                                                                <label class="form-check-label"
-                                                                    for="service_provider">Service Provider</label>
-                                                            </div>
-                                                            <div class="form-check form-check-inline">
-                                                                <input class="form-check-input" type="radio"
-                                                                    name="comp_nature" id="professional" value="professional"
-                                                                    {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'professional' ? 'checked' : '') : '' }}>
-                                                                <label class="form-check-label"
-                                                                    for="professional">Professional</label>
-                                                            </div>
-                                                            <div class="form-check form-check-inline">
-                                                                <input class="form-check-input" type="radio"
-                                                                    name="comp_nature" id="mixed" value="mixed_nature"
-                                                                    {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'mixed_nature' ? 'checked' : '') : '' }}>
-                                                                <label class="form-check-label"
-                                                                    for="mixed">Mixed Nature (Trading + Service)</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Exact Nature of Business <span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control"
-                                                                name="exact_comp_nature" id="exact_comp_nature" required
-                                                                value="{{ isset($compDetails->exact_comp_nature) ? $compDetails->exact_comp_nature : '' }}"
-                                                                placeholder="Enter Exact Nature of Business">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Date of Commencement of Business</label>
-                                                            <input type="date" class="form-control" name="start_date"
-                                                                id="start_date"
-                                                                value="{{ isset($compDetails->start_date) ? $compDetails->start_date : '' }}"
-                                                                placeholder="Select Date">
-                                                        </div>
-                                                    </div>
-													<!-- Opening Balance Setup -->
-													<div class="col-sm-12 mb-3">
-														<div class="d-flex align-items-center px-3 py-2 rounded-2 border border-info-subtle"
-															 style="background:#f0f9ff; border-left:4px solid #0dcaf0 !important;">
-															<i class="ti ti-wallet text-info me-3" style="font-size:22px;"></i>
-															<div>
-																<h5 class="mb-0 fw-semibold">Opening Balance Setup</h5>
-																<small class="text-muted">
-																	Fill with proper financial reports
-																</small>
-															</div>
-														</div>
-													</div>
-                                                    <div class="col-sm-4">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Previous FY Turnover</label>
-                                                            <input type="number" class="form-control"
-                                                                name="turnover_last_year" id="turnover_last_year"
-                                                                value="{{ isset($compDetails->turnover_last_year) ? $compDetails->turnover_last_year : '' }}"
-                                                                placeholder="Enter Business Turnover">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-4">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Opening Balance (This FY)</label>
-                                                            <input type="number" class="form-control"
-                                                                name="opening_balance" id="opening_balance"
-                                                                value="{{ isset($compDetails->opening_balance) ? $compDetails->opening_balance : '' }}"
-                                                                placeholder="Enter Opening Balance">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-4">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Opening Balance Cr</label>
-                                                            <input type="number" class="form-control"
-                                                                name="openingbalancecr" id="openingbalancecr"
-                                                                value="{{ isset($compDetails->openingbalancecr) ? $compDetails->openingbalancecr : '' }}"
-                                                                placeholder="Enter Opening Balance Cr">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-4">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Opening Balance Dr</label>
-                                                            <input type="number" class="form-control"
-                                                                name="openingbalancedr" id="openingbalancedr"
-                                                                value="{{ isset($compDetails->openingbalancedr) ? $compDetails->openingbalancedr : '' }}"
-                                                                placeholder="Enter Opening Balance Dr">
-                                                        </div>
-                                                    </div>
-													<!-- Invoice Series Setup -->
-													<div class="col-sm-12 mb-3 mt-2">
-														<div class="d-flex align-items-center px-3 py-2 rounded-2 border border-primary-subtle"
-															 style="background:#f5f8ff; border-left:4px solid #0d6efd !important;">
+                                    <div class="message-container mb-3"></div>
 
-															<i class="ti ti-file-invoice text-primary me-3" style="font-size:22px;"></i>
-															<div>
-																<h5 class="mb-0 fw-semibold">Invoice Series Setup</h5>
-															</div>
-														</div>
-													</div>
-                                                    <div class="col-sm-4">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Quotation Invoice Series Setup</label>
-                                                            <input type="text" class="form-control"
-                                                                name="comp_quo_digits" id="comp_quo_digits" maxlength="16"
-                                                                value="{{ isset($compDetails->comp_quo_digits) ? $compDetails->comp_quo_digits : '' }}"
-                                                                placeholder="e.g., QT/2024-25/">
+                                    <!-- 1. Business Basic Details Card -->
+                                    <div class="card mb-3 shadow-sm border-0">
+                                        <div class="card-header bg-transparent d-flex align-items-center justify-content-between py-3">
+                                            <h5 class="mb-0 d-flex align-items-center fw-bold">
+                                                <i class="ti ti-briefcase text-primary fs-4 me-2"></i> Business Basic Details
+                                            </h5>
+                                            <span class="badge bg-light-primary text-primary px-3 py-1 rounded-pill fw-semibold">
+                                                Core Business Info
+                                            </span>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-3">
+                                                <div class="col-sm-12 mb-2">
+                                                    <label class="form-label fw-semibold">Category Of Business <span class="text-danger">*</span></label>
+                                                    <div id="business" class="d-flex flex-wrap gap-4 mt-1">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="comp_nature" id="manufacturing"
+                                                                value="manufacturing"
+                                                                {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'manufacturing' ? 'checked' : '') : '' }}>
+                                                            <label class="form-check-label fw-medium"
+                                                                for="manufacturing">Manufacturing</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="comp_nature" id="trading"
+                                                                value="trading"
+                                                                {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'trading' ? 'checked' : '') : '' }}>
+                                                            <label class="form-check-label fw-medium"
+                                                                for="trading">Trading / Reseller</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="comp_nature" id="service_provider" value="service"
+                                                                {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'service' ? 'checked' : '') : '' }}>
+                                                            <label class="form-check-label fw-medium"
+                                                                for="service_provider">Service Provider</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="comp_nature" id="professional" value="professional"
+                                                                {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'professional' ? 'checked' : '') : '' }}>
+                                                            <label class="form-check-label fw-medium"
+                                                                for="professional">Professional</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="comp_nature" id="mixed" value="mixed_nature"
+                                                                {{ isset($compDetails->comp_nature) ? ($compDetails->comp_nature == 'mixed_nature' ? 'checked' : '') : '' }}>
+                                                            <label class="form-check-label fw-medium"
+                                                                for="mixed">Mixed Nature (Trading + Service)</label>
                                                         </div>
                                                     </div>
-                                                    <div class="col-sm-4">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Proforma Invoice Series Setup</label>
-                                                            <input type="text" class="form-control"
-                                                                name="comp_prof_digits" id="comp_prof_digits" maxlength="16"
-                                                                value="{{ isset($compDetails->comp_prof_digits) ? $compDetails->comp_prof_digits : '' }}"
-                                                                placeholder="e.g., PI/2024-25/">
-                                                        </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold">Exact Nature of Business <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control"
+                                                            name="exact_comp_nature" id="exact_comp_nature" required
+                                                            value="{{ isset($compDetails->exact_comp_nature) ? $compDetails->exact_comp_nature : '' }}"
+                                                            placeholder="Enter Exact Nature of Business">
                                                     </div>
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Sales Invoice Series Setup </label>
-                                                            <input type="text" class="form-control"
-                                                                name="comp_inv_digits" id="comp_inv_digits" maxlength="16"
-                                                                value="{{ isset($compDetails->comp_inv_digits) ? $compDetails->comp_inv_digits : '' }}"
-                                                                placeholder="e.g., SI/2024-25/">
-                                                            <small class="form-text text-muted">This replaces Company Invoice Number Digits</small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Purchase Order (PO) Series Setup</label>
-                                                            <input type="text" class="form-control"
-                                                                name="comp_po_digits" id="comp_po_digits" maxlength="16"
-                                                                value="{{ isset($compDetails->comp_po_digits) ? $compDetails->comp_po_digits : '' }}"
-                                                                placeholder="e.g., PO/2024-25/">
-                                                        </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold">Date of Commencement of Business</label>
+                                                        <input type="date" class="form-control" name="start_date"
+                                                            id="start_date"
+                                                            value="{{ isset($compDetails->start_date) ? $compDetails->start_date : '' }}"
+                                                            placeholder="Select Date">
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="text-end btn-page">
-                                        <a href="javascript:void(0);" id="cancel_busDetBtn"
-                                            class="btn btn-outline-secondary">Cancel</a>
-                                        <button type="submit" id="save_busDetBtn" class="btn btn-primary">Save
-                                            Changes</button>
+
+                                    <!-- 2. Opening Balance Setup Card -->
+                                    <div class="card mb-3 shadow-sm border-0">
+                                        <div class="card-header bg-transparent d-flex align-items-center justify-content-between py-3">
+                                            <div>
+                                                <h5 class="mb-0 d-flex align-items-center fw-bold">
+                                                    <i class="ti ti-wallet text-info fs-4 me-2"></i> Opening Balance Setup
+                                                </h5>
+                                                <small class="text-muted">Fill with proper financial reports & accounting records</small>
+                                            </div>
+                                            <span class="badge bg-light-info text-info px-3 py-1 rounded-pill fw-semibold">
+                                                Financial Year Balances
+                                            </span>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6 col-lg-3">
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold">Previous FY Turnover</label>
+                                                        <input type="number" step="any" class="form-control"
+                                                            name="turnover_last_year" id="turnover_last_year"
+                                                            value="{{ isset($compDetails->turnover_last_year) ? $compDetails->turnover_last_year : '' }}"
+                                                            placeholder="Enter Previous Turnover">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-lg-3">
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold">Opening Balance (This FY)</label>
+                                                        <input type="number" step="any" class="form-control"
+                                                            name="opening_balance" id="opening_balance"
+                                                            value="{{ isset($compDetails->opening_balance) ? $compDetails->opening_balance : '' }}"
+                                                            placeholder="Enter Opening Balance">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-lg-3">
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold">Opening Balance Cr</label>
+                                                        <input type="number" step="any" class="form-control"
+                                                            name="openingbalancecr" id="openingbalancecr"
+                                                            value="{{ isset($compDetails->openingbalancecr) ? $compDetails->openingbalancecr : '' }}"
+                                                            placeholder="Enter Opening Balance Cr">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-lg-3">
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold">Opening Balance Dr</label>
+                                                        <input type="number" step="any" class="form-control"
+                                                            name="openingbalancedr" id="openingbalancedr"
+                                                            value="{{ isset($compDetails->openingbalancedr) ? $compDetails->openingbalancedr : '' }}"
+                                                            placeholder="Enter Opening Balance Dr">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. Invoice Series Setup Card -->
+                                    <div class="card mb-3 shadow-sm border-0">
+                                        <div class="card-header bg-transparent d-flex align-items-center justify-content-between py-3">
+                                            <div>
+                                                <h5 class="mb-0 d-flex align-items-center fw-bold">
+                                                    <i class="ti ti-file-invoice text-primary fs-4 me-2"></i> Invoice Series Setup
+                                                </h5>
+                                                <small class="text-muted">Custom prefix/series formatting for billing and commercial documents</small>
+                                            </div>
+                                            <span class="badge bg-light-primary text-primary px-3 py-1 rounded-pill fw-semibold">
+                                                Document Numbering
+                                            </span>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold">Sales Invoice Series Setup</label>
+                                                        <input type="text" class="form-control"
+                                                            name="comp_inv_digits" id="comp_inv_digits" maxlength="16"
+                                                            value="{{ isset($compDetails->comp_inv_digits) ? $compDetails->comp_inv_digits : '' }}"
+                                                            placeholder="e.g., SI/2024-25/">
+                                                        <small class="form-text text-muted">Prefix/Series for Tax Invoices (e.g. INV/24-25/)</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold">Purchase Order (PO) Series Setup</label>
+                                                        <input type="text" class="form-control"
+                                                            name="comp_po_digits" id="comp_po_digits" maxlength="16"
+                                                            value="{{ isset($compDetails->comp_po_digits) ? $compDetails->comp_po_digits : '' }}"
+                                                            placeholder="e.g., PO/2024-25/">
+                                                        <small class="form-text text-muted">Prefix/Series for Purchase Orders</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold">Quotation Invoice Series Setup</label>
+                                                        <input type="text" class="form-control"
+                                                            name="comp_quo_digits" id="comp_quo_digits" maxlength="16"
+                                                            value="{{ isset($compDetails->comp_quo_digits) ? $compDetails->comp_quo_digits : '' }}"
+                                                            placeholder="e.g., QT/2024-25/">
+                                                        <small class="form-text text-muted">Prefix/Series for Quotations</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-2">
+                                                        <label class="form-label fw-semibold">Proforma Invoice Series Setup</label>
+                                                        <input type="text" class="form-control"
+                                                            name="comp_prof_digits" id="comp_prof_digits" maxlength="16"
+                                                            value="{{ isset($compDetails->comp_prof_digits) ? $compDetails->comp_prof_digits : '' }}"
+                                                            placeholder="e.g., PI/2024-25/">
+                                                        <small class="form-text text-muted">Prefix/Series for Proforma Invoices</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="text-end btn-page mt-3">
+                                        <a href="javascript:void(0);" id="cancel_busDetBtn" class="btn btn-danger me-2">Cancel</a>
+                                        <button type="submit" id="save_busDetBtn" class="btn btn-primary">Save Changes</button>
                                     </div>
                                 </form>
                             </div>
@@ -802,7 +820,8 @@
                                         <div class="d-flex align-items-center">
                                             <div class="flex-grow-1 me-3">
                                                 <h3 class="alert-heading">Alert!</h3>
-                                                <p class="mb-2">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-1">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-0">Enter Once. MethotX Reuses, Validates & Connects Your Data Across Your Business.</p>
                                             </div>
                                             <div class="flex-shrink-0">
                                                 <img src="{{ asset('assets/images/application/img-accout-alert.png') }}" alt="img" class="img-fluid wid-80">
@@ -861,10 +880,8 @@
                                         </div>
                                     </div>
                                     <div class="text-end btn-page">
-                                        <a href="javascript:void(0);" id="cancel_contDetBtn"
-                                            class="btn btn-outline-secondary">Cancel</a>
-                                        <button type="submit" id="save_contDetBtn" class="btn btn-primary">Save
-                                            Changes</button>
+                                        <a href="javascript:void(0);" id="cancel_contDetBtn" class="btn btn-danger">Cancel</a>
+                                        <button type="submit" id="save_contDetBtn" class="btn btn-primary">Save Changes</button>
                                     </div>
                                 </form>
                             </div>
@@ -876,7 +893,8 @@
                                         <div class="d-flex align-items-center">
                                             <div class="flex-grow-1 me-3">
                                                 <h3 class="alert-heading">Alert!</h3>
-                                                <p class="mb-2">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-1">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-0">Enter Once. MethotX Reuses, Validates & Connects Your Data Across Your Business.</p>
                                             </div>
                                             <div class="flex-shrink-0">
                                                 <img src="{{ asset('assets/images/application/img-accout-alert.png') }}" alt="img" class="img-fluid wid-80">
@@ -944,10 +962,8 @@
                                         </div>
                                     </div>
                                     <div class="text-end btn-page">
-                                        <a href="javascript:void(0);" id="cancel_dirDetBtn"
-                                            class="btn btn-outline-secondary">Cancel</a>
-                                        <button type="submit" id="save_dirDetBtn" class="btn btn-primary">Save
-                                            Changes</button>
+                                        <a href="javascript:void(0);" id="cancel_dirDetBtn" class="btn btn-danger">Cancel</a>
+                                        <button type="submit" id="save_dirDetBtn" class="btn btn-primary">Save Changes</button>
                                     </div>
                                 </form>
                             </div>
@@ -958,7 +974,8 @@
                                         <div class="d-flex align-items-center">
                                             <div class="flex-grow-1 me-3">
                                                 <h3 class="alert-heading">Alert!</h3>
-                                                <p class="mb-2">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-1">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-0">Enter Once. MethotX Reuses, Validates & Connects Your Data Across Your Business.</p>
                                             </div>
                                             <div class="flex-shrink-0">
                                                 <img src="{{ asset('assets/images/application/img-accout-alert.png') }}" alt="img" class="img-fluid wid-80">
@@ -1144,7 +1161,8 @@
                                         <div class="d-flex align-items-center">
                                             <div class="flex-grow-1 me-3">
                                                 <h3 class="alert-heading">Alert!</h3>
-                                                <p class="mb-2">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-1">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-0">Enter Once. MethotX Reuses, Validates & Connects Your Data Across Your Business.</p>
                                             </div>
                                             <div class="flex-shrink-0">
                                                 <img src="{{ asset('assets/images/application/img-accout-alert.png') }}" alt="img" class="img-fluid wid-80">
@@ -1680,10 +1698,9 @@
                                         </div>-->
                                         <div class="text-end btn-page">
                                             <a href="javascript:void(0);" id="cancel_attaBtn"
-                                                class="btn btn-outline-secondary">Cancel</a>
+                                                class="btn btn-danger me-2">Cancel</a>
                                             <button type="submit" id="save_attaBtn" class="btn btn-primary">Save
                                                 Changes</button>
-                                            
                                         </div>
                                         <div class="modal fade" id="termsModal" tabindex="-1" role="dialog"
                                             aria-labelledby="termsModalLabel" aria-hidden="true">
@@ -1740,7 +1757,7 @@
 												</p>
 											</div>
 											<div class="flex-shrink-0">
-												<img src="../assets/images/application/img-accout-password-alert.png"
+												<img src="{{ asset('assets/images/application/img-accout-password-alert.png') }}"
 													alt="img" class="img-fluid wid-80">
 											</div>
 										</div>
@@ -1750,92 +1767,189 @@
 
                                 @if ($ca_details)
                                     @foreach ($ca_details as $ca_id => $ca_detail)
-                                        <div class="row">
-                                            <div class="col-md-6 col-xl-6">
-                                                <div class="card user-card">
-                                                    <div class="card-body position-relative">
-                                                        <div class="chat-avtar d-inline-flex mx-auto">
-                                                            <!--<img class="rounded-circle img-fluid wid-90 img-thumbnail" src="../assets/images/user/avatar-1.jpg" alt="User image">-->
-                                                            @if (isset($ca_detail->comp_logo) && $ca_detail->comp_logo != '')
-                                                                <img class="rounded-circle img-fluid wid-90 img-thumbnail"
-                                                                    src="{{ asset('storage/ca_profile/' . $ca_detail->comp_logo) }}"
-                                                                    alt="User image">
-                                                            @else
-                                                                <img class="rounded-circle img-fluid wid-90 img-thumbnail"
-                                                                    src="../assets/images/user/avatar-1.jpg"
-                                                                    alt="User image">
-                                                            @endif
-                                                        </div>
-                                                        <div class="d-flex flex-wrap gap-2">
-                                                            <div class="flex-grow-1">
-                                                                <h6 class="mb-1">
-                                                                    {{ $ca_detail->comp_name != '' ? $ca_detail->comp_name : $ca_detail->name }}
-                                                                </h6>
-                                                            </div>
-                                                            <div class="flex-shrink-0">
-                                                                @if ($ca_detail->ca_assign_status == 0)
-                                                                    <button class="btn btn-primary btn-md assignCABtn"
-                                                                        data-id="{{ $ca_detail->id }}"
-                                                                        data-status="{{ $ca_detail->ca_assign_status }}"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#staticBackdrop">Assign</button>
+                                        <div class="row g-4">
+                                            {{-- CA Firm Details Card (col-12) --}}
+                                            <div class="col-12">
+                                                <div class="card ca-assigned-card shadow-sm border-0">
+                                                    <div class="card-body p-4">
+                                                        <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start gap-4 pb-3 border-bottom">
+                                                            <!-- Logo / Avatar -->
+                                                            <div class="ca-avatar-wrapper flex-shrink-0">
+                                                                @if (isset($ca_detail->comp_logo) && $ca_detail->comp_logo != '')
+                                                                    <img class="ca-avatar-img"
+                                                                        src="{{ asset('storage/ca_profile/' . $ca_detail->comp_logo) }}"
+                                                                        alt="{{ $ca_detail->comp_name ?? $ca_detail->name }}">
                                                                 @else
-                                                                    <button class="btn btn-primary btn-md assignCABtn"
-                                                                        data-id="{{ $ca_detail->id }}"
-                                                                        data-status="{{ $ca_detail->ca_assign_status }}"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#staticBackdrop">Un-Assign</button>
+                                                                    <img class="ca-avatar-img"
+                                                                        src="{{ asset('assets/images/user/avatar-2.jpg') }}"
+                                                                        alt="User image">
                                                                 @endif
+                                                                <span class="ca-status-dot" title="Active Partner"></span>
                                                             </div>
-                                                        </div>
-                                                        <div class="row g-3 my-3 text-center">
-                                                            <div class="col-4">
-                                                                <h5 class="mb-0">{{ $ca_detail->total_no_client }}
-                                                                </h5>
-                                                                <small class="text-muted">Company Assign</small>
-                                                            </div>
-                                                            <div class="col-4 border border-top-0 border-bottom-0">
-                                                                <h5 class="mb-0">4 Years +</h5>
-                                                                <small class="text-muted">Exprience</small>
-                                                            </div>
-                                                            <div class="col-4">
-                                                                <h5 class="mb-0"></i>4.5</h5>
-                                                                <small class="text-muted"><i
-                                                                        class="ph-duotone ph-star text-warning me-1"></i>Rating</small>
-                                                            </div>
-                                                        </div>
-                                                        <div class="saprator my-3">
-                                                            <span>Experts In</span>
-                                                        </div>
-                                                        <div class="text-center">
-                                                            <?php if ($ca_detail->ca_spec != "") {
-                                                                $specArr = explode(",", $ca_detail->ca_spec);
-                                                                foreach ($specArr as $k => $val) {
-                                                            ?>
-                                                            <span
-                                                                class="badge bg-light-secondary border rounded-pill border-secondary bg-transparent f-14 me-1 mt-1">{{ $val }}</span>
-                                                            <?php }
-                                            } ?>
-                                                        </div>
-                                                        <div class="saprator my-3">
-                                                            <span>Address</span>
-                                                        </div>
-                                                        <h6 class="text-center">
-                                                            {{ $ca_detail->comp_bill_addone . ',' . $ca_detail->ca_state . ',' . $ca_detail->ca_city . ',' . $ca_detail->comp_bill_pin }}
-                                                        </h6>
+
+                                                            <!-- Title & Details -->
+                                                            <div class="flex-grow-1 text-center text-md-start w-100">
+                                                                <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+                                                                    <div>
+                                                                        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+                                                                            <h4 class="mb-0 fw-bold text-dark">
+                                                                                {{ $ca_detail->comp_name != '' ? $ca_detail->comp_name : $ca_detail->name }}
+                                                                            </h4>
+                                                                            <span class="badge bg-light-primary text-primary px-3 py-1 rounded-pill fw-semibold">
+                                                                                <i class="ph-duotone ph-seal-check me-1"></i> Assigned Professional CA Firm
+                                                                            </span>
+                                                                        </div>
+
+                                                                    <!-- Improved Contact Info (Email & Phone) -->
+                                        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mt-2">
+                                            @if(!empty($ca_detail->email))
+                                            <a href="mailto:{{ $ca_detail->email }}" class="ca-contact-link" title="Official Email">
+                                                <i class="ph-duotone ph-envelope-simple text-primary"></i>
+                                                <span>{{ $ca_detail->email }}</span>
+                                            </a>
+                                            @endif
+
+                                            @if(!empty($ca_detail->phone))
+                                            <a href="tel:{{ $ca_detail->phone }}" class="ca-contact-link" title="Contact Number">
+                                                <i class="ph-duotone ph-phone-call text-success"></i>
+                                                <span>{{ $ca_detail->phone }}</span>
+                                            </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0">
+                                        @if ($ca_detail->ca_assign_status == 0)
+                                            <button class="btn btn-primary px-4 py-2 fw-semibold assignCABtn"
+                                                data-id="{{ $ca_detail->id }}"
+                                                data-status="{{ $ca_detail->ca_assign_status }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#staticBackdrop">
+                                                <i class="ph-duotone ph-user-plus me-1"></i> Assign
+                                            </button>
+                                        @else
+                                            <button class="btn btn-outline-danger px-4 py-2 fw-semibold assignCABtn"
+                                                data-id="{{ $ca_detail->id }}"
+                                                data-status="{{ $ca_detail->ca_assign_status }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#staticBackdrop">
+                                                <i class="ph-duotone ph-user-minus me-1"></i> Un-Assign
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Metrics Stats Row -->
+                                <div class="row g-3 mt-2">
+                                    <div class="col-12 col-md-4">
+                                        <div class="ca-stat-box">
+                                            <h5 class="mb-0 fw-bold text-dark">{{ $ca_detail->total_no_client ?? 0 }}</h5>
+                                            <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Companies Assigned</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="ca-stat-box">
+                                            <h5 class="mb-0 fw-bold text-dark">4 Years +</h5>
+                                            <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Professional Experience</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <div class="ca-stat-box">
+                                            <h5 class="mb-0 fw-bold text-dark"><i class="ph-fill ph-star text-warning me-1"></i> 4.5</h5>
+                                            <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.72rem;">Client Rating</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Expertise & Address Row (Both inside neat background boxes) -->
+                        <div class="row g-3 mt-2">
+                            <!-- Areas of Expertise (Shows 2 items initially + Show More toggle) -->
+                            <div class="col-12 col-md-6">
+                                <div class="ca-info-card p-3 h-100">
+                                    <h6 class="fw-bold text-dark mb-2 d-flex align-items-center">
+                                        <i class="ph-duotone ph-certificate text-primary me-2 fs-5"></i>
+                                        Areas of Expertise
+                                    </h6>
+                                    @php
+                                        $specArr = !empty($ca_detail->ca_spec) ? array_values(array_filter(array_map('trim', explode(',', $ca_detail->ca_spec)))) : [];
+                                        $initialSpecs = array_slice($specArr, 0, 2);
+                                        $extraSpecs = array_slice($specArr, 2);
+                                    @endphp
+
+                                    @if(count($specArr) > 0)
+                                        <div class="d-flex flex-wrap gap-2 align-items-center pt-1">
+                                            @foreach($initialSpecs as $spec)
+                                                <span class="badge bg-white text-primary border border-primary-subtle rounded-pill px-2.5 py-1.5 fw-medium" style="font-size: 0.82rem;">{{ $spec }}</span>
+                                            @endforeach
+
+                                            @if(count($extraSpecs) > 0)
+                                                <a href="#extraSpecs_{{ $ca_detail->id }}" 
+                                                   data-bs-toggle="collapse" 
+                                                   role="button" 
+                                                   aria-expanded="false" 
+                                                   aria-controls="extraSpecs_{{ $ca_detail->id }}" 
+                                                   class="badge bg-light text-primary border border-primary-subtle rounded-pill px-2.5 py-1.5 fw-semibold text-decoration-none ca-show-more-btn"
+                                                   onclick="var isExp = this.getAttribute('aria-expanded') === 'true'; this.innerHTML = isExp ? '<i class=\'ph-duotone ph-minus-circle me-1\'></i> Show Less' : '<i class=\'ph-duotone ph-plus-circle me-1\'></i> +{{ count($extraSpecs) }} More';">
+                                                    <i class="ph-duotone ph-plus-circle me-1"></i> +{{ count($extraSpecs) }} More
+                                                </a>
+                                                <div class="collapse w-100 mt-2" id="extraSpecs_{{ $ca_detail->id }}">
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        @foreach($extraSpecs as $extraSpec)
+                                                            <span class="badge bg-white text-primary border border-primary-subtle rounded-pill px-2.5 py-1.5 fw-medium" style="font-size: 0.82rem;">{{ $extraSpec }}</span>
+                                                        @endforeach
                                                     </div>
                                                 </div>
-                                            </div>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <p class="text-muted mb-0 small pt-1">Corporate Accounting, GST, Audit & Tax Compliance</p>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Registered Office Address (in clean background box, styled typography) -->
+                            <div class="col-12 col-md-6">
+                                <div class="ca-info-card p-3 h-100">
+                                    <h6 class="fw-bold text-dark mb-2 d-flex align-items-center">
+                                        <i class="ph-duotone ph-map-pin text-danger me-2 fs-5"></i>
+                                        Registered Office Address
+                                    </h6>
+                                    <div class="text-secondary pt-1" style="font-size: 0.875rem; line-height: 1.6;">
+                                        @if(!empty($ca_detail->comp_bill_addone))
+                                            <div>{{ $ca_detail->comp_bill_addone }}</div>
+                                        @endif
+                                        <div>
+                                            {{ !empty($ca_detail->ca_city) ? $ca_detail->ca_city . ', ' : '' }}
+                                            {{ !empty($ca_detail->ca_state) ? $ca_detail->ca_state . ' ' : '' }}
+                                            {{ !empty($ca_detail->comp_bill_pin) ? '- ' . $ca_detail->comp_bill_pin : '' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
                                             <?php
                                             $specDetails = isset($ca_detail->request_for) ? $ca_detail->request_for : '';
                                             $specDetails = explode(',', $specDetails);
-											//echo "<pre>";print_r($specDetails);exit;
                                             ?>
-                                            <div class="col-md-6 col-xl-6">
-                                                <div class="card">
-                                                    <div class="card-header">
-                                                        <h5>Purpose of Attachment with CA / Accountant</h5>
+                                            {{-- Purpose of Attachment with CA / Accountant (col-12) --}}
+                                            <div class="col-12">
+                                                <div class="card purpose-attachment-card shadow-sm border-0">
+                                                    <div class="card-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+                                                        <div>
+                                                            <h5 class="mb-1 fw-bold text-dark d-flex align-items-center">
+                                                                <i class="ph-duotone ph-sliders-horizontal text-primary me-2 fs-4"></i>
+                                                                Purpose of Attachment with CA / Accountant
+                                                            </h5>
+                                                            <small class="text-muted">Enable or disable specific regulatory compliance & operational services delegated to this CA Firm.</small>
+                                                        </div>
+                                                        <span class="badge bg-light-info text-info rounded-pill px-3 py-1.5 align-self-start align-self-md-center">
+                                                            <i class="ph-duotone ph-arrows-clockwise me-1"></i> Auto-saves on toggle
+                                                        </span>
                                                     </div>
                                                     <form action="javascript:void(0);" name="frmRequestFor"
                                                         id="frmRequestFor" method="post">
@@ -1845,250 +1959,53 @@
                                                             value="{{ $ca_id }}" />
                                                         @csrf
                                                         <div class="message-container"></div>
-															<div class="card-body">
-																<!-- Company Incorporation -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Company Incorporation</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Company Incorporation',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Company Incorporation">
-																	</div>
-																</div>
+                                                        <div class="card-body p-4">
+                                                            <div class="row g-3">
+                                                                @php
+                                                                    $purposeItems = [
+                                                                        'Company Incorporation' => 'ph-building',
+                                                                        'Company Compliances' => 'ph-shield-check',
+                                                                        'MCA / ROC Compliances' => 'ph-files',
+                                                                        'Accounts Preparation' => 'ph-calculator',
+                                                                        'GST & Filings' => 'ph-receipt',
+                                                                        'Auditing' => 'ph-chart-pie',
+                                                                        'Auditor Recruitment' => 'ph-user-check',
+                                                                        'MSME / Trade Lisence' => 'ph-certificate',
+                                                                        'Licensing & Registration' => 'ph-stamp',
+                                                                        'Income Tax Filings' => 'ph-file-text',
+                                                                        'TDS & Filing' => 'ph-percent',
+                                                                        'PF & ESIC' => 'ph-users-three',
+                                                                        'Professional Tax' => 'ph-briefcase',
+                                                                        'Project Report / DPR with CMA Data' => 'ph-presentation-chart',
+                                                                        'Outsourcing of work' => 'ph-handshake',
+                                                                        'Outsourcing of Employee' => 'ph-user-switch',
+                                                                        'Payroll & HR Compliances' => 'ph-money',
+                                                                        'Company Leagal Service' => 'ph-scales',
+                                                                        'Consulting & Advisory Services' => 'ph-chats-circle',
+                                                                        'DPDP Act 2023' => 'ph-lock-key',
+                                                                        'IP Advisory' => 'ph-lightbulb',
+                                                                        'Other' => 'ph-dots-three-circle'
+                                                                    ];
+                                                                @endphp
 
-																<!-- Company Compliances -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Company Compliances</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Company Compliances',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Company Compliances">
-																	</div>
-																</div>
-
-																<!-- MCA / ROC Compliances -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">MCA / ROC Compliances</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('MCA / ROC Compliances',$specDetails)) echo 'checked="checked"'; ?>
-																		value="MCA / ROC Compliances">
-																	</div>
-																</div>
-
-																<!-- Accounts Preparation -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Accounts Preparation</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Accounts Preparation',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Accounts Preparation">
-																	</div>
-																</div>
-
-																<!-- GST & Filings -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">GST & Filings</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('GST & Filings',$specDetails)) echo 'checked="checked"'; ?>
-																		value="GST & Filings">
-																	</div>
-																</div>
-
-																<!-- Auditing -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Auditing</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Auditing',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Auditing">
-																	</div>
-																</div>
-
-																<!-- Auditor Recruitment -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Auditor Recruitment</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Auditor Recruitment',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Auditor Recruitment">
-																	</div>
-																</div>
-
-																<!-- MSME / Trade License -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">MSME / Trade Lisence</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('MSME / Trade Lisence',$specDetails)) echo 'checked="checked"'; ?>
-																		value="MSME / Trade Lisence">
-																	</div>
-																</div>
-
-																<!-- Licensing & Registration -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Licensing & Registration</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Licensing & Registration',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Licensing & Registration">
-																	</div>
-																</div>
-
-																<!-- Income Tax Filings -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Income Tax Filings</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Income Tax Filings',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Income Tax Filings">
-																	</div>
-																</div>
-
-																<!-- TDS & Filing -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">TDS & Filing</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('TDS & Filing',$specDetails)) echo 'checked="checked"'; ?>
-																		value="TDS & Filing">
-																	</div>
-																</div>
-
-																<!-- PF & ESIC -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">PF & ESIC</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('PF & ESIC',$specDetails)) echo 'checked="checked"'; ?>
-																		value="PF & ESIC">
-																	</div>
-																</div>
-
-																<!-- Professional Tax -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Professional Tax</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Professional Tax',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Professional Tax">
-																	</div>
-																</div>
-
-																<!-- Project Report / DPR with CMA Data -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Project Report / DPR with CMA Data</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Project Report / DPR with CMA Data',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Project Report / DPR with CMA Data">
-																	</div>
-																</div>
-
-																<!-- Outsourcing of work -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Outsourcing of work</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Outsourcing of work',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Outsourcing of work">
-																	</div>
-																</div>
-
-																<!-- Outsourcing of employee -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Outsourcing of employee</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Outsourcing of Employee',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Outsourcing of Employee">
-																	</div>
-																</div>
-
-																<!-- Payroll & HR Compliances -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Payroll & HR Compliances</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Payroll & HR Compliances',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Payroll & HR Compliances">
-																	</div>
-																</div>
-
-																<!-- Company Legal Service -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Company Legal Service</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Company Leagal Service',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Company Leagal Service">
-																	</div>
-																</div>
-
-																<!-- Consulting & Advisory Services -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Consulting & Advisory Services</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Consulting & Advisory Services',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Consulting & Advisory Services">
-																	</div>
-																</div>
-
-																<!-- DPDP Act -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">DPDP Act, 2023</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('DPDP Act 2023',$specDetails)) echo 'checked="checked"'; ?>
-																		value="DPDP Act 2023">
-																	</div>
-																</div>
-
-																<!-- IP Advisory -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">IP Advisory</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('IP Advisory',$specDetails)) echo 'checked="checked"'; ?>
-																		value="IP Advisory">
-																	</div>
-																</div>
-
-																<!-- Other -->
-																<div class="d-flex align-items-center justify-content-between mb-3">
-																	<div><p class="text-muted mb-0">Other</p></div>
-																	<div class="form-check form-switch p-0">
-																		<input class="m-0 form-check-input h5 position-relative requestForCheck"
-																		type="checkbox" role="switch" name="request_for[]"
-																		<?php if (in_array('Other',$specDetails)) echo 'checked="checked"'; ?>
-																		value="Other">
-																	</div>
-																</div>
-
-															</div>
+                                                                @foreach ($purposeItems as $itemKey => $itemIcon)
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <div class="purpose-switch-card">
+                                                                            <div class="d-flex align-items-center gap-2">
+                                                                                <i class="ph-duotone {{ $itemIcon }} text-primary fs-5"></i>
+                                                                                <span class="service-title">{{ $itemKey }}</span>
+                                                                            </div>
+                                                                            <div class="form-check form-switch p-0 m-0">
+                                                                                <input class="form-check-input requestForCheck m-0"
+                                                                                    type="checkbox" role="switch" name="request_for[]"
+                                                                                    {{ in_array($itemKey, $specDetails) ? 'checked' : '' }}
+                                                                                    value="{{ $itemKey }}">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
                                                     </form>
                                                 </div>
                                             </div>
@@ -2100,6 +2017,20 @@
 
 
                             <div class="tab-pane fade" id="holidays" role="tabpanel" aria-labelledby="holidays-tab">
+                                <div class="card alert alert-warning p-0">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 me-3">
+                                                <h3 class="alert-heading">Alert!</h3>
+                                                <p class="mb-1">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-0">Enter Once. MethotX Reuses, Validates & Connects Your Data Across Your Business.</p>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <img src="{{ asset('assets/images/application/img-accout-alert.png') }}" alt="img" class="img-fluid wid-80">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4><i class="ph-duotone ph-calendar me-2"></i>Company Holidays</h4>
@@ -2372,6 +2303,20 @@
 
                             <!-- Day Schedule Tab -->
                             <div class="tab-pane fade" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
+                                <div class="card alert alert-warning p-0">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 me-3">
+                                                <h3 class="alert-heading">Alert!</h3>
+                                                <p class="mb-1">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-0">Enter Once. MethotX Reuses, Validates & Connects Your Data Across Your Business.</p>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <img src="{{ asset('assets/images/application/img-accout-alert.png') }}" alt="img" class="img-fluid wid-80">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="card">
                                     <div class="card-header">
                                         <h5><i class="ph-duotone ph-clock me-2"></i>Day Schedule</h5>
@@ -3004,239 +2949,253 @@
 
                             <!-- Company Locations Tab -->
                             <div class="tab-pane fade" id="locations" role="tabpanel" aria-labelledby="locations-tab">
-                                <div class="card">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h5><i class="ph-duotone ph-map-pin me-2"></i>Company Locations</h5>
-                                            <p class="text-muted mb-0">Manage your company's multiple locations</p>
-                                        </div>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#locationModal">
-                                            <i class="ti ti-plus me-1"></i>Add Location
-                                        </button>
-                                    </div>
+                                <div class="card alert alert-warning p-0">
                                     <div class="card-body">
-                                        <!-- Location Statistics -->
-                                        <div class="row mb-4 g-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1 me-3">
+                                                <h3 class="alert-heading">Alert!</h3>
+                                                <p class="mb-1">This is a CIP platform. Accurate organization details ensure precise compliance, tax management, and financial reporting.</p>
+                                                <p class="mb-0">Enter Once. MethotX Reuses, Validates & Connects Your Data Across Your Business.</p>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <img src="{{ asset('assets/images/application/img-accout-alert.png') }}" alt="img" class="img-fluid wid-80">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CARD 1: Location Statistics Overview -->
+                                <div class="card mb-4 border-0 shadow-sm" style="border-radius: 14px;">
+                                    <div class="card-body p-4">
+                                        <div class="row g-3">
                                             <!-- Total Locations -->
                                             <div class="col-md-3">
-                                                <div
-                                                    class="card border-0 shadow-sm h-100 position-relative overflow-hidden">
-                                                    <div class="card-body text-center p-4 position-relative"
-                                                        style="z-index: 1;">
-                                                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                                                            style="width: 70px; height: 70px;">
-                                                            <i class="ti ti-map-pin fa-2x text-primary"></i>
-                                                        </div>
-                                                        <h1 class="display-3 fw-bold text-primary mb-2">
-                                                            {{ $locations->count() }}</h1>
-                                                        <h6 class="text-uppercase fw-bold text-muted mb-1"
-                                                            style="letter-spacing: 1.5px;">Total Locations</h6>
-                                                        <span
-                                                            class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">All
-                                                            Offices</span>
+                                                <div class="card h-100 text-center py-4 px-3 mb-0"
+                                                     style="background-color: #eaf4ff; border: 1.5px solid #c7e2fe; border-radius: 12px; box-shadow: none;">
+                                                    <div class="d-inline-flex align-items-center justify-content-center mx-auto mb-3 rounded-circle"
+                                                         style="width: 48px; height: 48px; background-color: #0084ff; color: #ffffff;">
+                                                        <i class="ti ti-map-pin fs-4"></i>
                                                     </div>
+                                                    <h1 class="fw-bold mb-1" style="color: #0084ff; font-size: 2.2rem;">{{ $locations->count() }}</h1>
+                                                    <h6 class="text-uppercase fw-bold text-muted mb-0" style="font-size: 0.78rem; letter-spacing: 0.5px;">TOTAL LOCATIONS</h6>
                                                 </div>
                                             </div>
 
                                             <!-- Active Locations -->
                                             <div class="col-md-3">
-                                                <div
-                                                    class="card border-0 shadow-sm h-100 position-relative overflow-hidden">
-                                                    <div class="card-body text-center p-4 position-relative"
-                                                        style="z-index: 1;">
-                                                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                                                            style="width: 70px; height: 70px;">
-                                                            <i class="ti ti-circle-check fa-2x text-success"></i>
-                                                        </div>
-                                                        <h1 class="display-3 fw-bold text-success mb-2">
-                                                            {{ $locations->where('status', 'Active')->count() }}</h1>
-                                                        <h6 class="text-uppercase fw-bold text-muted mb-1"
-                                                            style="letter-spacing: 1.5px;">Active Locations</h6>
-                                                        <span
-                                                            class="badge bg-success bg-opacity-10 text-success px-3 py-2">Operational</span>
+                                                <div class="card h-100 text-center py-4 px-3 mb-0"
+                                                     style="background-color: #e6faf2; border: 1.5px solid #a3f0d4; border-radius: 12px; box-shadow: none;">
+                                                    <div class="d-inline-flex align-items-center justify-content-center mx-auto mb-3 rounded-circle"
+                                                         style="width: 48px; height: 48px; background-color: #00d284; color: #ffffff;">
+                                                        <i class="ti ti-circle-check fs-4"></i>
                                                     </div>
+                                                    <h1 class="fw-bold mb-1" style="color: #00d284; font-size: 2.2rem;">{{ $locations->where('status', 'Active')->count() }}</h1>
+                                                    <h6 class="text-uppercase fw-bold text-muted mb-0" style="font-size: 0.78rem; letter-spacing: 0.5px;">ACTIVE LOCATIONS</h6>
                                                 </div>
                                             </div>
 
                                             <!-- Head Office -->
                                             <div class="col-md-3">
-                                                <div
-                                                    class="card border-0 shadow-sm h-100 position-relative overflow-hidden">
-                                                    <div class="card-body text-center p-4 position-relative"
-                                                        style="z-index: 1;">
-                                                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                                                            style="width: 70px; height: 70px;">
-                                                            <i class="ti ti-building fa-2x text-warning"></i>
-                                                        </div>
-                                                        <h1 class="display-3 fw-bold text-warning mb-2">
-                                                            {{ $locations->where('location_type', 'Head Office')->count() }}
-                                                        </h1>
-                                                        <h6 class="text-uppercase fw-bold text-muted mb-1"
-                                                            style="letter-spacing: 1.5px;">Head Office</h6>
-                                                        <span
-                                                            class="badge bg-warning bg-opacity-10 text-warning px-3 py-2">Headquarters</span>
+                                                <div class="card h-100 text-center py-4 px-3 mb-0"
+                                                     style="background-color: #fff9e6; border: 1.5px solid #ffe499; border-radius: 12px; box-shadow: none;">
+                                                    <div class="d-inline-flex align-items-center justify-content-center mx-auto mb-3 rounded-circle"
+                                                         style="width: 48px; height: 48px; background-color: #f59e0b; color: #ffffff;">
+                                                        <i class="ti ti-building fs-4"></i>
                                                     </div>
+                                                    <h1 class="fw-bold mb-1" style="color: #f59e0b; font-size: 2.2rem;">{{ $locations->where('location_type', 'Head Office')->count() }}</h1>
+                                                    <h6 class="text-uppercase fw-bold text-muted mb-0" style="font-size: 0.78rem; letter-spacing: 0.5px;">HEAD OFFICE</h6>
                                                 </div>
                                             </div>
 
                                             <!-- Branch Offices -->
                                             <div class="col-md-3">
-                                                <div
-                                                    class="card border-0 shadow-sm h-100 position-relative overflow-hidden">
-                                                    <div class="card-body text-center p-4 position-relative"
-                                                        style="z-index: 1;">
-                                                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                                                            style="width: 70px; height: 70px;">
-                                                            <i class="ti ti-building-community fa-2x text-info"></i>
-                                                        </div>
-                                                        <h1 class="display-3 fw-bold text-info mb-2">
-                                                            {{ $locations->where('location_type', 'Branch Office')->count() }}
-                                                        </h1>
-                                                        <h6 class="text-uppercase fw-bold text-muted mb-1"
-                                                            style="letter-spacing: 1.5px;">Branch Offices</h6>
-                                                        <span
-                                                            class="badge bg-info bg-opacity-10 text-info px-3 py-2">Regional</span>
+                                                <div class="card h-100 text-center py-4 px-3 mb-0"
+                                                     style="background-color: #e8f7ff; border: 1.5px solid #b3e5fc; border-radius: 12px; box-shadow: none;">
+                                                    <div class="d-inline-flex align-items-center justify-content-center mx-auto mb-3 rounded-circle"
+                                                         style="width: 48px; height: 48px; background-color: #00b4d8; color: #ffffff;">
+                                                        <i class="ti ti-building-community fs-4"></i>
                                                     </div>
+                                                    <h1 class="fw-bold mb-1" style="color: #00b4d8; font-size: 2.2rem;">{{ $locations->where('location_type', 'Branch Office')->count() }}</h1>
+                                                    <h6 class="text-uppercase fw-bold text-muted mb-0" style="font-size: 0.78rem; letter-spacing: 0.5px;">BRANCH OFFICES</h6>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
 
+                                <!-- CARD 2: Company Locations (2-Column Rich Card Grid) -->
+                                <div class="card border-0 shadow-sm" style="border-radius: 14px;">
+                                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3 flex-wrap gap-2">
+                                        <div>
+                                            <h5 class="mb-0 fw-bold d-flex align-items-center">
+                                                <i class="ph-duotone ph-map-pin text-primary fs-4 me-2"></i> Company Locations
+                                            </h5>
+                                            <p class="text-muted mb-0 small">Manage your company's multiple office branches & geofenced operational zones</p>
+                                        </div>
+                                        <button type="button" class="btn btn-primary d-flex align-items-center shadow-sm" data-bs-toggle="modal" data-bs-target="#locationModal">
+                                            <i class="ti ti-plus me-1"></i> Add Location
+                                        </button>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        @if ($locations->count() > 0)
+                                            <div class="row g-4">
+                                                @foreach ($locations as $index => $location)
+                                                    @php
+                                                        $iconClass = 'ti ti-building';
+                                                        $badgeColor = 'primary';
+                                                        $themeColor = '#0084ff';
 
-                                        <!-- Locations List -->
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th width="5%">Sr.</th>
-                                                        <th width="25%">Location Name</th>
-                                                        <th width="20%">Type</th>
-                                                        <th width="25%">Geofencing Area</th>
-                                                        <th width="15%">Status</th>
-                                                        <th width="10%">Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @if ($locations->count() > 0)
-                                                        @foreach ($locations as $index => $location)
-                                                            @php
-                                                                // Define icon and color based on location type
+                                                        switch ($location->location_type) {
+                                                            case 'Head Office':
                                                                 $iconClass = 'ti ti-building';
-                                                                $iconColor = 'text-primary';
-                                                                $badgeClass = 'bg-primary';
+                                                                $badgeColor = 'warning';
+                                                                $themeColor = '#f59e0b';
+                                                                break;
+                                                            case 'Branch Office':
+                                                                $iconClass = 'ti ti-building-store';
+                                                                $badgeColor = 'info';
+                                                                $themeColor = '#00b4d8';
+                                                                break;
+                                                            case 'Warehouse':
+                                                                $iconClass = 'ti ti-building-warehouse';
+                                                                $badgeColor = 'secondary';
+                                                                $themeColor = '#6c757d';
+                                                                break;
+                                                            case 'Sales Office':
+                                                                $iconClass = 'ti ti-building-bank';
+                                                                $badgeColor = 'success';
+                                                                $themeColor = '#10b981';
+                                                                break;
+                                                            case 'Manufacturing Unit':
+                                                                $iconClass = 'ti ti-building-factory';
+                                                                $badgeColor = 'danger';
+                                                                $themeColor = '#ef4444';
+                                                                break;
+                                                            case 'Service Center':
+                                                                $iconClass = 'ti ti-building-community';
+                                                                $badgeColor = 'dark';
+                                                                $themeColor = '#343a40';
+                                                                break;
+                                                            case 'Project Location':
+                                                                $iconClass = 'ti ti-map-pin';
+                                                                $badgeColor = 'primary';
+                                                                $themeColor = '#0084ff';
+                                                                break;
+                                                        }
+                                                    @endphp
 
-                                                                switch ($location->location_type) {
-                                                                    case 'Head Office':
-                                                                        $iconClass = 'ti ti-building';
-                                                                        $iconColor = 'text-warning';
-                                                                        $badgeClass = 'bg-warning';
-                                                                        break;
-                                                                    case 'Branch Office':
-                                                                        $iconClass = 'ti ti-building-store';
-                                                                        $iconColor = 'text-info';
-                                                                        $badgeClass = 'bg-info';
-                                                                        break;
-                                                                    case 'Warehouse':
-                                                                        $iconClass = 'ti ti-building-warehouse';
-                                                                        $iconColor = 'text-secondary';
-                                                                        $badgeClass = 'bg-secondary';
-                                                                        break;
-                                                                    case 'Sales Office':
-                                                                        $iconClass = 'ti ti-building-bank';
-                                                                        $iconColor = 'text-success';
-                                                                        $badgeClass = 'bg-success';
-                                                                        break;
-                                                                    case 'Manufacturing Unit':
-                                                                        $iconClass = 'ti ti-building-factory';
-                                                                        $iconColor = 'text-danger';
-                                                                        $badgeClass = 'bg-danger';
-                                                                        break;
-                                                                    case 'Service Center':
-                                                                        $iconClass = 'ti ti-building-community';
-                                                                        $iconColor = 'text-dark';
-                                                                        $badgeClass = 'bg-dark';
-                                                                        break;
-                                                                    case 'Project Location':
-                                                                        $iconClass = 'ti ti-map-pin';
-                                                                        $iconColor = 'text-primary';
-                                                                        $badgeClass = 'bg-primary';
-                                                                        break;
-                                                                }
-                                                            @endphp
+                                                    <!-- Location Card (col-md-6) -->
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="card h-100 border shadow-sm rounded-4 position-relative overflow-hidden mb-0"
+                                                             style="background: #ffffff; border: 1px solid #e9ecef; transition: all 0.25s ease-in-out;">
 
-                                                            <tr
-                                                                class="{{ $location->status == 'Inactive' ? 'table-secondary' : '' }}">
-                                                                <td>{{ $index + 1 }}</td>
-                                                                <td>
-                                                                    <div class="d-flex align-items-center">
-                                                                        <i
-                                                                            class="{{ $iconClass }} {{ $location->status == 'Inactive' ? 'text-muted' : $iconColor }} me-2"></i>
+                                                            <!-- Top Accent Line -->
+                                                            <div class="w-100" style="height: 4px; background: {{ $location->status == 'Active' ? $themeColor : '#adb5bd' }};"></div>
+
+                                                            <div class="card-body p-4 d-flex flex-column">
+                                                                <!-- Card Top Header -->
+                                                                <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                                                                    <div class="d-flex align-items-center gap-3">
+                                                                        <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                                                             style="width: 48px; height: 48px; background: {{ $themeColor }}15; color: {{ $themeColor }};">
+                                                                            <i class="{{ $iconClass }} fs-3"></i>
+                                                                        </div>
                                                                         <div>
-                                                                            <strong
-                                                                                class="{{ $location->status == 'Inactive' ? 'text-muted' : '' }}">{{ $location->location_name }}</strong>
-                                                                            <br><small
-                                                                                class="text-muted">{{ $location->location_type }}</small>
+                                                                            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                                                                <h5 class="mb-0 fw-bold text-dark text-truncate" style="max-width: 220px;" title="{{ $location->location_name }}">
+                                                                                    {{ $location->location_name }}
+                                                                                </h5>
+                                                                                <span class="badge rounded-pill px-2 py-1 fw-semibold"
+                                                                                      style="background: {{ $themeColor }}18; color: {{ $themeColor }}; font-size: 0.75rem;">
+                                                                                    {{ $location->location_type }}
+                                                                                </span>
+                                                                            </div>
+                                                                            <small class="text-muted d-flex align-items-center">
+                                                                                <i class="ti ti-hash me-1"></i> Facility #{{ $index + 1 }}
+                                                                            </small>
                                                                         </div>
                                                                     </div>
-                                                                </td>
-                                                                <td>
-                                                                    <span
-                                                                        class="badge {{ $location->status == 'Inactive' ? 'bg-light text-dark' : $badgeClass }}">{{ $location->location_type }}</span>
-                                                                </td>
-                                                                <td>
-                                                                    <div>
-                                                                        <small
-                                                                            class="{{ $location->status == 'Inactive' ? 'text-muted' : '' }}">
-                                                                            <i
-                                                                                class="ti ti-map-pin me-1 {{ $location->status == 'Inactive' ? 'text-muted' : 'text-primary' }}"></i>{{ $location->latitude }},
-                                                                            {{ $location->longitude }}
-                                                                        </small><br>
-                                                                        <small class="text-muted">Radius:
-                                                                            {{ $location->radius }}m</small>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <span
-                                                                        class="badge {{ $location->status == 'Active' ? 'bg-success' : 'bg-danger' }}">{{ $location->status }}</span>
-                                                                </td>
-                                                                <td>
-                                                                    <div class="btn-group" role="group">
-                                                                        <button class="btn btn-sm btn-outline-primary"
-                                                                            onclick="editLocation({{ $location->id }})"
-                                                                            title="Edit">
-                                                                            <i class="ti ti-edit"></i>
-                                                                        </button>
-                                                                        <button class="btn btn-sm btn-outline-danger"
-                                                                            onclick="deleteLocation({{ $location->id }})"
-                                                                            title="Delete">
-                                                                            <i class="ti ti-trash"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
-                                                    @else
-                                                        <tr>
-                                                            <td colspan="6" class="text-center py-4">
-                                                                <div class="mb-3">
-                                                                    <i class="ti ti-map-pin-off"
-                                                                        style="font-size: 3rem; color: #ccc;"></i>
+
+                                                                    <span class="badge {{ $location->status == 'Active' ? 'bg-light-success text-success' : 'bg-light-danger text-danger' }} rounded-pill px-3 py-1 fw-bold" style="font-size: 0.78rem;">
+                                                                        <i class="ti ti-point-filled me-1"></i>{{ $location->status }}
+                                                                    </span>
                                                                 </div>
-                                                                <h6 class="text-muted">No Locations Found</h6>
-                                                                <p class="text-muted mb-3">You haven't added any locations
-                                                                    yet.
-                                                                </p>
-                                                                <button type="button" class="btn btn-primary"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#locationModal">
-                                                                    <i class="ti ti-plus me-1"></i>Add Your First Location
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    @endif
-                                                </tbody>
-                                            </table>
-                                        </div>
+
+                                                                <!-- Detailed Address & Geofencing Information Container (col-6 split) -->
+                                                                <div class="p-3 rounded-3 mb-3 mt-auto" style="background: #f8fafc; border: 1px solid #edf2f7;">
+                                                                    <div class="row g-3">
+                                                                        <!-- GPS Coordinates & Maps Link -->
+                                                                        <div class="col-sm-6 border-end-sm">
+                                                                            <span class="text-muted d-block small fw-bold text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                                                                                <i class="ti ti-map-pin text-primary me-1"></i> GPS Coordinates
+                                                                            </span>
+                                                                            <div class="text-dark fw-bold small mb-1">
+                                                                                {{ number_format((float)$location->latitude, 5) }}, {{ number_format((float)$location->longitude, 5) }}
+                                                                            </div>
+                                                                            <a href="https://www.google.com/maps?q={{ $location->latitude }},{{ $location->longitude }}"
+                                                                               target="_blank"
+                                                                               class="text-primary text-decoration-none small d-inline-flex align-items-center fw-semibold">
+                                                                                <i class="ti ti-external-link me-1"></i> View on Google Maps
+                                                                            </a>
+                                                                        </div>
+
+                                                                        <!-- Geofence & Boundary -->
+                                                                        <div class="col-sm-6 ps-sm-3">
+                                                                            <span class="text-muted d-block small fw-bold text-uppercase mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                                                                                <i class="ti ti-radar text-info me-1"></i> Geofence Boundary
+                                                                            </span>
+                                                                            <div class="d-flex align-items-center gap-1 mb-1">
+                                                                                <span class="badge bg-light-primary text-primary fw-bold px-2 py-1">
+                                                                                    <i class="ti ti-arrows-maximize me-1"></i> {{ $location->radius }} Meters
+                                                                                </span>
+                                                                            </div>
+                                                                            <small class="text-muted d-block" style="font-size: 0.75rem;">
+                                                                                <i class="ti ti-shield-check text-success me-1"></i> Attendance Geofence
+                                                                            </small>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Card Actions Footer -->
+                                                                <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-1">
+                                                                    <span class="text-muted small">
+                                                                        <i class="ti ti-map-2 me-1"></i> {{ $location->status == 'Active' ? 'Operational Zone' : 'Zone Inactive' }}
+                                                                    </span>
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <button type="button"
+                                                                                class="btn btn-sm btn-outline-primary px-3 py-1 rounded-pill d-inline-flex align-items-center"
+                                                                                onclick="editLocation({{ $location->id }})"
+                                                                                title="Edit Location">
+                                                                            <i class="ti ti-edit me-1"></i> Edit
+                                                                        </button>
+                                                                        <button type="button"
+                                                                                class="btn btn-sm btn-outline-danger px-3 py-1 rounded-pill d-inline-flex align-items-center"
+                                                                                onclick="deleteLocation({{ $location->id }})"
+                                                                                title="Delete Location">
+                                                                            <i class="ti ti-trash me-1"></i> Delete
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <!-- Empty State -->
+                                            <div class="text-center py-5">
+                                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light-primary text-primary mb-3" style="width: 80px; height: 80px;">
+                                                    <i class="ti ti-map-pin-off" style="font-size: 2.5rem;"></i>
+                                                </div>
+                                                <h5 class="fw-bold text-dark mb-1">No Locations Registered</h5>
+                                                <p class="text-muted mb-3 mx-auto" style="max-width: 440px;">
+                                                    Add your company's head office, regional branches, manufacturing units, or warehouses with geofencing coordinates for seamless management.
+                                                </p>
+                                                <button type="button" class="btn btn-primary d-inline-flex align-items-center shadow-sm" data-bs-toggle="modal" data-bs-target="#locationModal">
+                                                    <i class="ti ti-plus me-1"></i> Add Your First Location
+                                                </button>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

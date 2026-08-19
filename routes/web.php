@@ -363,6 +363,7 @@ Route::middleware(['ensure.login'])->group(function () {
 	Route::get('/custom-invoice-list', [CustomInvoiceController::class, 'CustomInvoiceList'])->name('user.CustomInvoiceList');
 	Route::get('/gererate-custom-invoice', [CustomInvoiceController::class, 'GenerateCustomInvoice'])->name('user.GenerateCustomInvoice');
 	Route::get('/view-invoice-details/{id}', [CustomInvoiceController::class, 'ViewCustomInvoice'])->name('ViewCustomInvoice');
+	Route::get('/custom-invoice-pdf/{id}', [CustomInvoiceController::class, 'getCustomInvoicePdf'])->name('user.getCustomInvoicePdf');
 	Route::post('/custom_invoice_status_update', [CustomInvoiceController::class, 'custom_invoice_status_update'])->name('custom_invoice_status_update');
 	Route::post('/custom_invoice_store', [CustomInvoiceController::class, 'saveInvoice'])->name('custom_invoice_store');
 

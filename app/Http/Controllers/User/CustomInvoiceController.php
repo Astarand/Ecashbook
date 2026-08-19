@@ -433,13 +433,89 @@ class CustomInvoiceController extends Controller
             ->where('custom_invoice_id', $id)
             ->get();
 
-            // echo '<pre>';
-            // print_r($invoice);
-            // die();
+        $userId = $invoice->added_by ?? currentOwnerId();
+        $userObj = DB::table('users')->where('id', $userId)->first();
+        $ownerId = $userId;
+        if ($userObj) {
+            if ($userObj->u_type == 5 && !empty($userObj->user_add_by)) {
+                $ownerId = $userObj->user_add_by;
+            } elseif ($userObj->u_type == 4 && !empty($userObj->ca_add_by)) {
+                $ownerId = $userObj->ca_add_by;
+            }
+        }
+
+        $compDetails = DB::table('users')
+            ->leftJoin('company_profiles as cp', 'users.id', '=', 'cp.userId')
+            ->select('cp.comp_logo', 'cp.comp_name', 'cp.gst_no', 'cp.comp_pan_no')
+            ->where('users.id', $ownerId)
+            ->first();
+
+        $ownerBank = DB::table('banks')->where('added_by', '=', $ownerId)->whereNull('propId')->first() 
+            ?? DB::table('banks')->where('added_by', '=', $ownerId)->first();
+        $bankDetails = null;
+        if (!empty($invoice->bank_name)) {
+            $bankDetails = (object)[
+                'accholder_name' => $invoice->account_holder_name ?? ($ownerBank->accholder_name ?? ''),
+                'bank_name' => $invoice->bank_name ?? ($ownerBank->bank_name ?? ''),
+                'bank_branch' => $invoice->branch_name ?? ($ownerBank->bank_branch ?? ''),
+                'bank_ac_no' => $invoice->account_no ?? ($ownerBank->bank_ac_no ?? ''),
+                'ifsc_code' => $invoice->ifsc_code ?? ($ownerBank->ifsc_code ?? ''),
+                'bank_qr_code' => $ownerBank->bank_qr_code ?? null
+            ];
+        } else {
+            $bankDetails = $ownerBank;
+        }
 
         // Pass the data to the view
-        return view('User.view-invoice-details', compact('invoice', 'invoiceProducts'));
+        return view('User.view-invoice-details', compact('invoice', 'invoiceProducts', 'compDetails', 'bankDetails'));
+    }
 
+    public function getCustomInvoicePdf($id)
+    {
+        $id = base64_decode($id);
+        $invoice = DB::table('custom_invoices')->where('id', $id)->first();
+        $invoiceProducts = DB::table('custom_invoice_product')
+            ->where('custom_invoice_id', $id)
+            ->get();
+
+        $userId = $invoice->added_by ?? currentOwnerId();
+        $userObj = DB::table('users')->where('id', $userId)->first();
+        $ownerId = $userId;
+        if ($userObj) {
+            if ($userObj->u_type == 5 && !empty($userObj->user_add_by)) {
+                $ownerId = $userObj->user_add_by;
+            } elseif ($userObj->u_type == 4 && !empty($userObj->ca_add_by)) {
+                $ownerId = $userObj->ca_add_by;
+            }
+        }
+
+        $compDetails = DB::table('users')
+            ->leftJoin('company_profiles as cp', 'users.id', '=', 'cp.userId')
+            ->select('cp.comp_logo', 'cp.comp_name', 'cp.gst_no', 'cp.comp_pan_no')
+            ->where('users.id', $ownerId)
+            ->first();
+
+        $ownerBank = DB::table('banks')->where('added_by', '=', $ownerId)->whereNull('propId')->first() 
+            ?? DB::table('banks')->where('added_by', '=', $ownerId)->first();
+        $bankDetails = null;
+        if (!empty($invoice->bank_name)) {
+            $bankDetails = (object)[
+                'accholder_name' => $invoice->account_holder_name ?? ($ownerBank->accholder_name ?? ''),
+                'bank_name' => $invoice->bank_name ?? ($ownerBank->bank_name ?? ''),
+                'bank_branch' => $invoice->branch_name ?? ($ownerBank->bank_branch ?? ''),
+                'bank_ac_no' => $invoice->account_no ?? ($ownerBank->bank_ac_no ?? ''),
+                'ifsc_code' => $invoice->ifsc_code ?? ($ownerBank->ifsc_code ?? ''),
+                'bank_qr_code' => $ownerBank->bank_qr_code ?? null
+            ];
+        } else {
+            $bankDetails = $ownerBank;
+        }
+
+        $inv_num = str_replace('/', '-', $invoice->invoice_number ?? 'Custom-Invoice');
+        $pdf = \PDF::loadView('User.custom-invoice-pdf', compact('invoice', 'invoiceProducts', 'compDetails', 'bankDetails'))
+            ->setOptions(['dpi' => 96, 'defaultFont' => 'sans-serif', 'isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+        $pdfName = 'Custom-Inv-' . $inv_num . '.pdf';
+        return $pdf->stream($pdfName);
     }
 
     public function custom_invoice_status_update(Request $request){

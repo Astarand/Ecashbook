@@ -16,18 +16,9 @@
         <div class="col-md-9 col-sm-12">
           <div class="d-flex flex-nowrap align-items-center justify-content-md-end justify-content-center flex-md-nowrap flex-wrap gap-2 mt-md-0 mt-2 pe-md-2">
 
-            <button id="start-tour-btn" class="btn btn-outline-primary btn-sm flex-shrink-0 d-flex align-items-center" data-bs-toggle="tooltip" title="Take a Tour">
+            <button id="start-tour-btn" class="btn btn-primary btn-sm flex-shrink-0 d-flex align-items-center" data-bs-toggle="tooltip" title="Take a Tour">
               <i class="ti ti-help me-1"></i> <span class="d-md-inline d-none">Guide Tour</span>
             </button>
-            <a href="{{ route('user.AssignCa') }}" class="btn btn-primary btn-sm flex-shrink-0 d-flex align-items-center tour-assign-ca" data-bs-toggle="tooltip" title="Assign CA">
-              <i class="ti ti-user-plus me-1"></i> <span class="d-md-inline d-none">Assign CA Firm</span>
-            </a>
-            <a href="{{ route('user.CreateSalesInvoices') }}" class="btn btn-secondary btn-sm flex-shrink-0 d-flex align-items-center tour-add-sales" data-bs-toggle="tooltip" title="Add Sales">
-              <i class="ti ti-download me-1"></i> <span class="d-md-inline d-none">Add Sales</span>
-            </a>
-            <a href="{{ route('user.CreatePurchaseInvoices') }}" class="btn btn-primary btn-sm flex-shrink-0 d-flex align-items-center tour-add-purchases">
-              <i class="ti ti-square-plus me-1"></i> <span class="d-md-inline d-none">Add Purchases</span>
-            </a>
             <select name="slet_financial_year" id="slet_financial_year" class="form-select form-select-sm flex-shrink-0" style="max-width: 180px; min-width: 150px;">
               <option disabled selected>Select Financial Year</option>
             </select>

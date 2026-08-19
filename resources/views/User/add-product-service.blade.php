@@ -56,7 +56,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="mb-3 col-md-3">
+                        <div class="mb-3 col-md-4">
                             <label class="form-label" for="inputEmail4">Product Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="item_name" id="item_name" placeholder="Enter Product Name">
                         </div>
@@ -69,31 +69,28 @@
                             <input type="hidden" id="txn_input">
                             <button id="verifyOtpBtn" class="btn btn-success">Verify OTP</button>
                         </div>--}}
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">HSN Code<span class="text-danger">*</span></label>
-                            <div class="mb-3">
-                               <div class="input-group">
-                                    <input type="text" class="form-control" name="hsn_code" id="hsn_code" placeholder="Enter HSN Number">
-                                    <a href="https://cbic-gst.gov.in/gst-goods-services-rates.html" target="_blank" class="btn btn-primary" id="searchHsnBtn">
-                                        <i class="ti ti-search align-middle"></i> Search HSN
-                                    </a>
-                                </div>
-
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="hsn_code">HSN Code <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="hsn_code" id="hsn_code" placeholder="Enter HSN Number">
+                                <a href="https://cbic-gst.gov.in/gst-goods-services-rates.html" target="_blank" class="btn btn-primary d-inline-flex align-items-center gap-1" id="searchHsnBtn">
+                                    <i class="ti ti-search fs-5"></i> Search HSN
+                                </a>
                             </div>
                         </div>
-                        <div class="mb-3 col-md-3">
+                        <div class="mb-3 col-md-4">
                             <label class="form-label" for="inputEmail4">Opening Stock<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="opening_stock_bal" id="opening_stock_bal" placeholder="Enter Opening Stock">
                         </div>
-                        <div class="mb-3 col-md-3">
+                        <div class="mb-3 col-md-4">
                             <label class="form-label" for="inputEmail4">GST Rate<span class="text-danger">*</span></label>
                             <input type="number" class="form-control" name="gst_rate_prod" id="gst_rate_prod" placeholder="Enter GST Rate">
                         </div>
-                         <div class="mb-3 col-md-3">
+                         <div class="mb-3 col-md-4">
                             <label class="form-label" for="inputEmail4">Goods Description</label>
                             <input type="text" class="form-control" name="goods_desc" id="goods_desc" placeholder="Enter Goods Description">
                         </div>
-                        <div class="mb-3 col-md-3">
+                        <div class="mb-3 col-md-4">
                             <label class="form-label" for="inputEmail4">Base Unit<span class="text-danger">*</span></label>
                             <select class="select form-select" name="base_unit" id="base_unit">
                                 <option value="">None</option>
@@ -102,7 +99,7 @@
                                 <option value="BDL">BUNDLES (Bundle)</option>
                                 <option value="BKL">BUCKETS (Bucket)</option>
                                 <option value="BOU">BOUNDS (Bound)</option>
-                                <option value="BOX">BOXES (Box)</option>                               
+                                <option value="BOX">BOXES (Box)</option>
                                 <option value="BUN">BUNS (Bun)</option>
                                 <option value="CAN">CANS (Can)</option>
                                 <option value="CBM">CUBIC METERS (Cbm)</option>
@@ -205,7 +202,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="modal-footer">
                             <div class="message-container"></div>
                             <div id="addEmployeeLoader" class="loader"></div>
@@ -227,18 +224,15 @@
                             <input type="text" class="form-control" name="service_name" id="service_name" placeholder="Enter Service Name">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">SAC Code<span class="text-danger">*</span></label>
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" name="sac_code" id="sac_code" placeholder="Enter SAC Number">
-                                    <!--<button class="btn btn-primary" type="button"><i class="ti ti-search align-middle"></i> Serarch SAC</button>-->
-									<a href="https://cbic-gst.gov.in/gst-goods-services-rates.html" target="_blank" class="btn btn-primary" id="searchSacBtn">
-                                        <i class="ti ti-search align-middle"></i> Serarch SAC
-                                    </a>
-                                </div>
+                            <label class="form-label" for="sac_code">SAC Code <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="sac_code" id="sac_code" placeholder="Enter SAC Number">
+                                <a href="https://cbic-gst.gov.in/gst-goods-services-rates.html" target="_blank" class="btn btn-primary d-inline-flex align-items-center gap-1" id="searchSacBtn">
+                                    <i class="ti ti-search fs-5"></i> Search SAC
+                                </a>
                             </div>
                         </div>
-                        <div class="mb-3 col-md-3">
+                        <div class="mb-3 col-md-4">
                             <label class="form-label" for="inputEmail4">GST Rate<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="gst_rate_service" id="gst_rate_service" placeholder="Enter GST Rate">
                         </div>
@@ -277,11 +271,11 @@
                         </div>
                         <!-- <div class="mb-3 col-md-6">
                             <div class="card-body">
-                                
+
                                     <div class="fallback">
                                     <input type="file" id="prod_image" name="prod_image">
                                     </div>
-                                
+
                             </div>
                         </div> -->
                         <div class="mb-3 col-md-6">
@@ -319,68 +313,6 @@
 </form>
 </div>
 
-<style>
-    .media-uploader-input {
-        display: none;
-    }
-
-    .media-uploader-dropzone {
-        border: 1px dashed #c8cedb;
-        border-radius: 12px;
-        background: #f8f9fc;
-        min-height: 130px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 16px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .media-uploader-dropzone:hover,
-    .media-uploader-dropzone.is-dragging {
-        border-color: #0d6efd;
-        background: #eef4ff;
-    }
-
-    .media-preview-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 12px;
-    }
-
-    .media-preview-item {
-        border: 1px solid #e8ecf5;
-        border-radius: 10px;
-        background: #fff;
-        overflow: hidden;
-    }
-
-    .media-preview-thumb {
-        width: 100%;
-        height: 85px;
-        background: #f3f5fa;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-
-    .media-preview-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .media-preview-name {
-        font-size: 12px;
-        padding: 8px;
-        color: #5b6375;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
 @endsection
 
 @section('page-script')
@@ -437,59 +369,60 @@
 		// =========================================
 
 		Swal.fire({
-			title: 'Manage Inventory?',
-			
+			title: '<span style="font-weight: 700; color: #1e293b; font-size: 1.35rem;">Manage Inventory?</span>',
 			html: `
-				<div style="font-size:14px; color:#495057;">
-
+				<div style="font-size: 13.5px; color: #475569; text-align: left;">
+					<!-- Info Box with full border matching theme -->
 					<div style="
-						background:#f4f7ff;
-						border-left:4px solid #0d6efd;
-						padding:14px;
-						border-radius:6px;
-						text-align:left;
-						margin-bottom:15px;
+						background: #f0f9fb;
+						border: 1px solid #cceef5;
+						padding: 14px 16px;
+						border-radius: 12px;
+						margin-bottom: 16px;
 					">
-						You can create a product without maintaining inventory stock.You can continue below fields as <b>0</b>.
+						<div class="d-flex align-items-start gap-2">
+							<i class="ti ti-info-circle text-primary flex-shrink-0" style="font-size: 18px; color: #008CAD !important; margin-top: 2px;"></i>
+							<span style="line-height: 1.45; color: #334155;">
+								You can create a product without maintaining inventory stock. You can continue below fields as <strong>0</strong>.
+							</span>
+						</div>
 					</div>
 
-					<table style="width:100%; font-size:14px;">
-						<tr>
-							<td style="padding:8px 0;">Purchase Price</td>
-							<td style="text-align:right;">0</td>
-						</tr>
-
-						<tr>
-							<td style="padding:8px 0;">Selling Price</td>
-							<td style="text-align:right;">0</td>
-						</tr>
-
-						<tr>
-							<td style="padding:8px 0;">GST Rate</td>
-							<td style="text-align:right;">0</td>
-						</tr>
-
-						<tr>
-							<td style="padding:8px 0;">Opening Stock</td>
-							<td style="text-align:right;"><b>0</b></td>
-						</tr>
-					</table>
-
+					<!-- Field Preview Matrix -->
+					<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 16px;">
+						<div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #edf2f7;">
+							<span style="color: #64748b; font-weight: 500;">Purchase Price</span>
+							<span class="badge bg-white text-dark border px-2 py-1 fw-bold" style="font-size: 13px;">0</span>
+						</div>
+						<div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #edf2f7;">
+							<span style="color: #64748b; font-weight: 500;">Selling Price</span>
+							<span class="badge bg-white text-dark border px-2 py-1 fw-bold" style="font-size: 13px;">0</span>
+						</div>
+						<div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #edf2f7;">
+							<span style="color: #64748b; font-weight: 500;">GST Rate</span>
+							<span class="badge bg-white text-dark border px-2 py-1 fw-bold" style="font-size: 13px;">0%</span>
+						</div>
+						<div class="d-flex justify-content-between align-items-center py-2">
+							<span style="color: #64748b; font-weight: 500;">Opening Stock</span>
+							<span class="badge bg-white text-dark border px-2 py-1 fw-bold" style="font-size: 13px;">0</span>
+						</div>
+					</div>
 				</div>
 			`,
-
 			icon: 'question',
-			confirmButtonText: 'OK',
-			confirmButtonColor: '#0d6efd',
-			width: 480,
+			confirmButtonText: 'OK, Got it!',
+			confirmButtonColor: '#008CAD',
+			width: 460,
 			allowOutsideClick: false,
 			customClass: {
-				popup: 'rounded-3'
-			}
+				popup: 'rounded-4 shadow-lg border-0',
+				confirmButton: 'btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm'
+			},
+			buttonsStyling: false
 		});
-		
+
 	});
-	
+
 	function getActiveImageInput() {
         const selectedType = $('input[name="item_type"]:checked').val();
         if (selectedType === 'product') {
@@ -593,7 +526,7 @@
         renderPreview();
     }
 
-   
+
     $(document).ready(function () {
         bindMediaUploader({
             inputId: 'productImageInput',
@@ -667,9 +600,9 @@
 
    $("#searchHsnBtn").on("click", function() {
     let hsnCode = $("#hsn_code").val();
-    if (!hsnCode) { 
-        alert("Please enter HSN Code"); 
-        return; 
+    if (!hsnCode) {
+        alert("Please enter HSN Code");
+        return;
     }
 
     // Step 1: OTP Request
@@ -767,12 +700,20 @@ $("#getOtpBtn").on("click", function() {
                 const openingStock = $("[name='opening_stock_bal']").val() || "0";
 
                 Swal.fire({
-                    title: 'Confirm Opening Stock',
+                    title: '<span style="font-weight: 700; color: #1e293b;">Confirm Opening Stock</span>',
                     text: `You have entered Opening Stock: ${openingStock}. Do you want to proceed?`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, continue',
-                    cancelButtonText: 'No, go back'
+                    cancelButtonText: 'No, go back',
+                    confirmButtonColor: '#008CAD',
+                    cancelButtonColor: '#64748b',
+                    customClass: {
+                        popup: 'rounded-4 shadow-lg border-0',
+                        confirmButton: 'btn btn-primary rounded-pill px-4 py-2 fw-semibold me-2 shadow-sm',
+                        cancelButton: 'btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold'
+                    },
+                    buttonsStyling: false
                 }).then((result) => {
                     if (result.isConfirmed) {
                         submitForm(); // Now this is defined below

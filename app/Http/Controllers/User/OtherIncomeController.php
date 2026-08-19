@@ -271,11 +271,17 @@ class OtherIncomeController extends Controller
 					->select('id', 'cust_name', 'cust_gst_no')
 					->get();
 					
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name')
+					->where('added_by', $userId)
+					->where('status', 1)
+					->get();
+					
         if (!$income) {
             return redirect()->back()->with('error', 'Income record not found.');
         }
 
-        return view('User.view-income', compact('income', 'purposes_of_tds','proprietorships','customers'));
+        return view('User.view-income', compact('income', 'purposes_of_tds','proprietorships','customers','bankDetails'));
 
     }
     public function editIncome($id){
@@ -317,7 +323,14 @@ class OtherIncomeController extends Controller
 					->where('status', 1)
 					->select('id', 'cust_name', 'cust_gst_no')
 					->get();
-        return view('User.edit-income', compact('income','purposes_of_tds','proprietorships','customers'));
+					
+		$bankDetails = DB::table('banks')
+					->select('id', 'bank_name')
+					->where('added_by', $userId)
+					->where('status', 1)
+					->get();
+					
+        return view('User.edit-income', compact('income','purposes_of_tds','proprietorships','customers','bankDetails'));
 
     }
     
