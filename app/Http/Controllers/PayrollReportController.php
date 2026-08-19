@@ -82,17 +82,27 @@ class PayrollReportController extends Controller
 
         // =========================================================
         // Active employees for selected month
+        // (join users + designations so computeBulkPayslipValuesForEmployee
+        //  has all columns it needs for CASE B calculation)
         // =========================================================
-        $activeEmployees = DB::table('employees')
-            ->where('added_by', $ownerId)
+        $activeEmployees = DB::table('employees as e')
+            ->leftJoin('users as u', 'u.id', '=', 'e.empId')
+            ->leftJoin('designations as d', 'd.id', '=', 'e.desig_id')
+            ->where('e.added_by', $ownerId)
+            // Must have joined on or before the last day of the selected month
             ->where(function ($q) use ($selectedMonthEnd) {
-                $q->whereIn('emp_status', ['Confirmed', 'In Probation'])
-                ->orWhere(function ($qq) use ($selectedMonthEnd) {
-                    $qq->whereIn('emp_status', ['Resigned', 'Terminated'])
-                        ->whereNotNull('regine_date')
-                        ->whereDate('regine_date', '>=', $selectedMonthEnd);
+                $q->whereNull('e.joining_date')
+                  ->orWhereDate('e.joining_date', '<=', $selectedMonthEnd);
+            })
+            ->where(function ($q) use ($selectedMonthStart) {
+                $q->whereIn('e.emp_status', ['Confirmed', 'In Probation'])
+                ->orWhere(function ($qq) use ($selectedMonthStart) {
+                    $qq->whereIn('e.emp_status', ['Resigned', 'Terminated'])
+                        ->whereNotNull('e.regine_date')
+                        ->whereDate('e.regine_date', '>=', $selectedMonthStart);
                 });
             })
+            ->select('e.*', 'u.name', 'd.designation_name')
             ->get();
 
         // =========================================================
@@ -206,14 +216,15 @@ class PayrollReportController extends Controller
 
                 $salary = $response['visible_data']['final_salary_calculation'] ?? [];
 
-                $gross = (float)($salary['basic_salary'] ?? 0);
+                // Use total_earnings as gross (same as what bulk payslip stores)
+                $gross = (float)($salary['total_earnings'] ?? $salary['gross_salary'] ?? $salary['basic_salary'] ?? 0);
                 $net   = (float)($salary['net_salary'] ?? 0);
 
                 $pf    = (float)($salary['provident_fund'] ?? 0);
                 $esi   = (float)($salary['esi'] ?? 0);
                 $pt    = (float)($salary['ptax'] ?? 0);
                 $tds   = (float)($salary['tds'] ?? 0);
-                $lwf   = (float)($salary['lwf'] ?? 0);
+                $lwf   = (float)($salary['lwf_deduct'] ?? $salary['lwf'] ?? 0);
                 $lop   = (float)($salary['lop'] ?? 0);
 
                 // Liability totals
@@ -228,12 +239,14 @@ class PayrollReportController extends Controller
                 $lopTotal     += $lop;
 
                 // ----------------------------------------------
-                // Salary
+                // Salary paid/unpaid
                 // ---------------------------------------------
                 if ($payslip->payment_status == 'Done') {
                     $salaryPaidAmount += $net;
+                    $paid++;
                 } else {
                     $salaryUnpaidAmount += $net;
+                    $unpaid++;
                 }
 
                 // -------------------------------------------------
@@ -275,33 +288,38 @@ class PayrollReportController extends Controller
                 // -------------------------------------------------
                 // LWF
                 // -------------------------------------------------
-                // Recommended: add lwf_payment_status ENUM('Pending','Done')
-                if ($payslip->lwf_payment_status  == 'Done') {
+                if ($payslip->lwf_payment_status == 'Done') {
                     $lwfPaidAmount += $lwf;
                 } else {
                     $lwfUnpaidAmount += $lwf;
                 }
-
-                $paid++;
             }
 
             // -----------------------------------------------------
             // CASE B : Payslip NOT Exists
+            // Use the same calculation logic as bulk payslip generation
+            // so dashboard totals match what would be generated
             // -----------------------------------------------------
             else {
 
-                $salary = $this->calculateEmployeeSalary(
+                [$fyStart2, $fyEnd2] = explode('-', $fy);
+                $year = ($currentMonth >= 4) ? (int)$fyStart2 : (int)$fyEnd2;
+
+                $salary = $this->computeBulkPayslipValuesForEmployee(
                     $employee,
+                    $year,
                     $currentMonth,
-                    $fy
+                    $ownerId,
+                    0,  // bonus
+                    0   // overtime
                 );
 
-                $gross = (float)($salary['gross_salary'] ?? 0);
+                $gross = (float)($salary['total_earnings'] ?? 0);
                 $net   = (float)($salary['net_salary'] ?? 0);
 
                 $pf    = (float)($salary['pf'] ?? 0);
                 $esi   = (float)($salary['esi'] ?? 0);
-                $pt    = (float)($salary['pt'] ?? 0);
+                $pt    = (float)($salary['ptax'] ?? 0);
                 $tds   = (float)($salary['tds'] ?? 0);
                 $lwf   = (float)($salary['lwf'] ?? 0);
                 $lop   = (float)($salary['lop'] ?? 0);
@@ -317,7 +335,7 @@ class PayrollReportController extends Controller
 
                 $lopTotal     += $lop;
 
-                // No payslip => unpaid
+                // No payslip => all unpaid
                 $pfUnpaidAmount  += $pf;
                 $esiUnpaidAmount += $esi;
                 $ptUnpaidAmount  += $pt;
@@ -694,7 +712,7 @@ class PayrollReportController extends Controller
 
     public function payrollRegister(Request $request)
     {
-        $ownerId   = currentOwnerId();
+        $ownerId    = currentOwnerId();
         $authUserId = auth()->id();
 
         $month = $request->month;
@@ -703,152 +721,87 @@ class PayrollReportController extends Controller
         // =========================================================
         // Month Name => Month Number
         // =========================================================
-        $months = [
-            'January'   => 1,
-            'February'  => 2,
-            'March'     => 3,
-            'April'     => 4,
-            'May'       => 5,
-            'June'      => 6,
-            'July'      => 7,
-            'August'    => 8,
-            'September' => 9,
-            'October'   => 10,
-            'November'  => 11,
-            'December'  => 12,
+        $monthMap = [
+            'January'   => 1,  'February'  => 2,  'March'     => 3,
+            'April'     => 4,  'May'       => 5,  'June'      => 6,
+            'July'      => 7,  'August'    => 8,  'September' => 9,
+            'October'   => 10, 'November'  => 11, 'December'  => 12,
         ];
 
-        $currentMonth = $months[$month] ?? date('n');
+        // Use the selected month directly — no offset
+        $payrollMonth = $monthMap[$month] ?? date('n');
+        $payrollFY    = $fy;
 
         [$fyStart, $fyEnd] = explode('-', $fy);
 
-        // =========================================================
-        // Previous Payroll Month
-        // =========================================================
-        $previousMonth = $currentMonth - 1;
-        $previousFY    = $fy;
+        // Determine the calendar year for this month within the FY
+        $payrollYear = ($payrollMonth >= 4) ? (int)$fyStart : (int)$fyEnd;
 
-        if ($previousMonth == 0) {
-            $previousMonth = 12;
-            $previousFY = ($fyStart - 1) . '-' . ($fyEnd - 1);
-        }
-
-        // =========================================================
-        // Previous Payroll Month Date Range
-        // =========================================================
-        [$previousFYStart, $previousFYEnd] = explode('-', $previousFY);
-
-        $previousYear = ($previousMonth >= 4)
-            ? $previousFYStart
-            : $previousFYEnd;
-
-        $payrollStart = Carbon::create(
-            $previousYear,
-            $previousMonth,
-            1
-        )->startOfMonth();
-
-        $payrollEnd = $payrollStart->copy()->endOfMonth();
+        $payrollStart = Carbon::create($payrollYear, $payrollMonth, 1)->startOfMonth();
+        $payrollEnd   = $payrollStart->copy()->endOfMonth();
 
         // =========================================================
         // Employees
         //
-        // Employee should be included if:
-        //
-        // 1. Joined on or before payroll month end
-        //
-        // 2. If resigned/terminated:
-        //    resignation date must be on/after payroll month start
-        //
-        // 3. Confirmed / In Probation employees are included
+        // Include if:
+        // 1. Joined on or before last day of the selected month
+        // 2. Confirmed / In Probation  — always included
+        // 3. Resigned / Terminated     — included only if their
+        //    resignation date falls on or after the first day
+        //    of the selected month (they worked that month)
         // =========================================================
         $employees = DB::table('employees as e')
             ->leftJoin('users as u', 'u.id', '=', 'e.empId')
             ->leftJoin('designations as d', 'd.id', '=', 'e.desig_id')
 
             ->where(function ($query) use ($ownerId, $authUserId) {
-
                 if ($ownerId !== null) {
                     $query->where('e.added_by', $ownerId);
                 }
-
                 if ($authUserId !== null) {
                     $query->orWhere('e.added_by', $authUserId);
                 }
-
                 if ($ownerId === null && $authUserId === null) {
                     $query->whereRaw('1 = 0');
                 }
             })
 
-            // =====================================================
-            // Joining Date
-            // Employee must have joined before/during this month
-            // =====================================================
+            // Joining Date: must have joined on or before the last day of the month
             ->where(function ($q) use ($payrollEnd) {
-
                 $q->whereNull('e.joining_date')
-                    ->orWhereDate('e.joining_date', '<=', $payrollEnd);
+                  ->orWhereDate('e.joining_date', '<=', $payrollEnd);
             })
 
-            // =====================================================
-            // Employee Status
-            // =====================================================
+            // Status filter
             ->where(function ($q) use ($payrollStart) {
-
-                // Normal active employees
-                $q->whereIn('e.emp_status', [
-                    'Confirmed',
-                    'In Probation'
-                ])
-
-                // Resigned / Terminated employees
-                // are included if they worked during this month
-                ->orWhere(function ($qq) use ($payrollStart) {
-
-                    $qq->whereIn('e.emp_status', [
-                        'Resigned',
-                        'Terminated'
-                    ])
-                    ->whereNotNull('e.regine_date')
-                    ->whereDate(
-                        'e.regine_date',
-                        '>=',
-                        $payrollStart
-                    );
-                });
+                $q->whereIn('e.emp_status', ['Confirmed', 'In Probation'])
+                  ->orWhere(function ($qq) use ($payrollStart) {
+                      $qq->whereIn('e.emp_status', ['Resigned', 'Terminated'])
+                         ->whereNotNull('e.regine_date')
+                         ->whereDate('e.regine_date', '>=', $payrollStart);
+                  });
             })
 
-            ->select(
-                'e.*',
-                'u.name',
-                'd.designation_name'
-            )
+            ->select('e.*', 'u.name', 'd.designation_name')
             ->get();
 
         // =========================================================
-        // Existing Payslips
-        //
-        // Get all payslips for this payroll month at once
-        // instead of querying inside every employee loop.
+        // Existing Payslips — load all for this month at once
         // =========================================================
         $existingPayslips = DB::table('user_payslip')
             ->where(function ($query) use ($ownerId, $authUserId) {
-
                 if ($ownerId !== null) {
                     $query->where('added_by', $ownerId);
                 }
-
                 if ($authUserId !== null) {
                     $query->orWhere('added_by', $authUserId);
                 }
-
                 if ($ownerId === null && $authUserId === null) {
                     $query->whereRaw('1 = 0');
                 }
             })
-            ->where('financial_year', $previousFY)
-            ->where('month', $previousMonth)
+            ->where('financial_year', $payrollFY)
+            ->where('month', $payrollMonth)
             ->get()
             ->keyBy('user_emp_id');
 
@@ -903,7 +856,8 @@ class PayrollReportController extends Controller
                 );
 
                 $employee->gross_salary = (float) (
-                    $salary['gross_salary']
+                    $salary['total_earnings']
+                    ?? $salary['gross_salary']
                     ?? $salary['basic_salary']
                     ?? 0
                 );
@@ -932,7 +886,7 @@ class PayrollReportController extends Controller
                 );
 
                 $employee->lwf = (float) (
-                    $salary['lwf'] ?? 0
+                    $salary['lwf_deduct'] ?? $salary['lwf'] ?? 0
                 );
 
                 $employee->lop = (float) (
@@ -982,21 +936,25 @@ class PayrollReportController extends Controller
             // =====================================================
             // CASE B
             // Payslip NOT Generated
-            // Calculate using existing calculateEmployeeSalary()
+            // Use computeBulkPayslipValuesForEmployee() — same logic
+            // as bulk generation so register values match exactly
             // =====================================================
             else {
 
-                $salary = $this->calculateEmployeeSalary(
+                $salary = $this->computeBulkPayslipValuesForEmployee(
                     $employee,
-                    $previousMonth,
-                    $previousFY
+                    $payrollYear,
+                    $payrollMonth,
+                    $ownerId,
+                    0,  // bonus
+                    0   // overtime
                 );
 
                 // -------------------------------------------------
                 // Salary
                 // -------------------------------------------------
                 $employee->gross_salary = (float) (
-                    $salary['gross_salary'] ?? 0
+                    $salary['total_earnings'] ?? 0
                 );
 
                 $employee->basic_salary = (float) (
@@ -1019,7 +977,7 @@ class PayrollReportController extends Controller
                 );
 
                 $employee->ptax = (float) (
-                    $salary['pt'] ?? 0
+                    $salary['ptax'] ?? 0
                 );
 
                 $employee->tds = (float) (
@@ -1114,8 +1072,8 @@ class PayrollReportController extends Controller
             // =====================================================
             // Useful Register Information
             // =====================================================
-            $employee->payroll_month = $previousMonth;
-            $employee->payroll_financial_year = $previousFY;
+            $employee->payroll_month          = $payrollMonth;
+            $employee->payroll_financial_year = $payrollFY;
 
             $employee->joining_date =
                 $employee->joining_date
