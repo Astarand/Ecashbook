@@ -45,6 +45,9 @@
                                 <th>Date</th>
                                 <th>Invoice Number</th>
                                 <th>Customer Name</th>
+                                <th>Quantity</th>
+                                <th>Total Amount</th>
+                                <th>Total GST</th>
                                 <th>Customer Type</th>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -53,10 +56,13 @@
                         <tbody>
                             @foreach($custom_invoices as $key => $invoice)
                                 <tr>
-                                    <td class="text-end">{{ $key + 1 }}</td>
-                                    <td><span class="text-muted text-hover-primary">{{ $invoice->invoice_number }}</span></td>
+                                    <td class="text-end">{{ $key + 1 }}</td>                                    
                                     <td><span class="text-muted text-hover-primary">{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d M Y') }}</span></td>
+									<td><span class="text-muted text-hover-primary">{{ $invoice->invoice_number }}</span></td>
                                     <td><a class="text-muted text-hover-primary" href="#">{{ $invoice->issued_to_company_name }}</a></td>
+									<td>{{ $invoice->total_quantity }}</td>
+									<td>₹ {{ number_format($invoice->total_amount, 2) }}</td>
+									<td>₹ {{ number_format($invoice->total_gst, 2) }}</td>
                                     <td>
                                         @if(empty($invoice->cust_id))
                                             <span class="badge bg-ash-gray text-gray">

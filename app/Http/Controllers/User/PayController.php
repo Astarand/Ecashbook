@@ -79,12 +79,12 @@ class PayController extends Controller
 				// Normal Asset
 				if($asset->nonCurrentAssetType != 'Capital Work in Progress')
 				{
-					$invoiceTotal = getRoundedAmount($asset->invoice_value ?? 0);
+					$invoiceTotal = getRoundedAmount(($asset->invoice_value ?? 0) + ($asset->gst_amt ?? 0));
 				}
 				// CWIP Asset
 				else
 				{
-					$invoiceTotal = getRoundedAmount($asset->cwip_amount ?? 0);
+					$invoiceTotal = getRoundedAmount(($asset->cwip_amount ?? 0) + ($asset->gst_amt ?? 0));
 				}
 			}
 			else
