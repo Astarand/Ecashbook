@@ -316,6 +316,12 @@ class ExpensesController extends Controller
 	public function journalEntry($eId)
 	{
 		$expense = DB::table('expenses')->where('id', $eId)->first();
+		$partyName = '';
+		if (!empty($expense->vendor_id)) {
+			$partyName = DB::table('vendors')
+				->where('id', $expense->vendor_id)
+				->value('vendor_name');
+		}
 		$this->journalService->storeExpenseJournalEntries([
 			'source'        => 'Expense',
 			'autoId'        => $expense->id,
@@ -325,7 +331,7 @@ class ExpensesController extends Controller
 			'reference_no'  => $expense->exp_invno,
 			'entry_type'    => 'Expense',
 			'ledger'        => ucwords(str_replace(['_', '-'], ' ', $expense->expense_type)),
-			'party_name'    => $expense->approved_by,
+			'party_name'    => $partyName,
 			'amount'        => $expense->expense_amt,
 			'payment_status'=> $expense->payment_status,
 			'gst_applicable'=> $expense->gst_applicable ?? 'no',

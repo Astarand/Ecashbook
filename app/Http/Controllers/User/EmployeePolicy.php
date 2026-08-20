@@ -73,18 +73,21 @@ class EmployeePolicy extends Controller
 
         // Insert new policy and get inserted ID
         $policyId = DB::table('employee_policies')->insertGetId([
-            'subject' => $request->subject,
-            'content' => $request->content,
-            'added_by' => $userId,
+            'subject'    => $request->subject,
+            'content'    => $request->content,
+            'added_by'   => $userId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // Log the creation (old_data = NULL for first create)
+        $this->logPolicyChange('created', $request->subject, $userId, null, $request->content);
 
         // Update employee policy read status to 'unread' for all employees under this user
         $this->updateEmployeePolicyReadStatus($request->subject, $userId);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Policy saved successfully and acceptance recorded!'
         ]);
     }
@@ -122,25 +125,31 @@ class EmployeePolicy extends Controller
             \DB::table('employee_policies')
                 ->where('id', $existingPolicy->id)
                 ->update([
-                    'content' => $request->content,
-                    'status' => $request->status,
+                    'content'    => $request->content,
+                    'status'     => $request->status,
                     'updated_at' => now(),
                 ]);
 
             // Delete existing acceptance records for this policy
             \DB::table('policy_accept')->where('policy_id', $existingPolicy->id)->delete();
 
+            // Log: old_data = previous content, new_data = incoming content
+            $this->logPolicyChange('updated', $request->subject, $userId, $existingPolicy->content, $request->content);
+
             $message = 'Policy updated successfully!';
         } else {
             // Create new policy
             $policyId = \DB::table('employee_policies')->insertGetId([
-                'subject' => $request->subject,
-                'content' => $request->content,
-                'status' => $request->status,
-                'added_by' => $userId,
+                'subject'    => $request->subject,
+                'content'    => $request->content,
+                'status'     => $request->status,
+                'added_by'   => $userId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            // Log: first creation — no previous content
+            $this->logPolicyChange('created', $request->subject, $userId, null, $request->content);
 
             $message = 'Policy created successfully!';
         }
@@ -183,6 +192,28 @@ class EmployeePolicy extends Controller
         }
 
         return view('User.view-policy', compact('policy'));
+    }
+
+    /**
+     * Write a row to policy_update_log whenever a policy is created or updated.
+     *
+     * @param  string       $action   'created' | 'updated'
+     * @param  string       $title    Policy subject / title
+     * @param  int          $userId   Owner / added_by ID
+     * @param  string|null  $oldData  Previous content (NULL on first create)
+     * @param  string       $newData  New content
+     */
+    private function logPolicyChange(string $action, string $title, int $userId, ?string $oldData, string $newData): void
+    {
+        \DB::table('policy_update_log')->insert([
+            'added_by'   => $userId,
+            'title'      => $title,
+            'action'     => $action,
+            'old_data'   => $oldData,
+            'new_data'   => $newData,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**

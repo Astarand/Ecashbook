@@ -1044,6 +1044,20 @@ class JournalService
 					'gst_rate'       => 0,
 					'gst_trans'      => null,
 				]);
+			}elseif ($payStatus == 'Due') {
+
+				// Expense is payable to supplier/party
+				$entries[] = array_merge($common, [
+					'ledger'       => $party,
+					'party_name'   => $party,
+					'debit_credit' => 'Credit',
+					'amount'       => $netPayable,
+					'tot_amt'      => $netPayable,
+					'notes'        => 'Expense Payable',
+					'gst_applicable' => 'no',
+					'gst_rate'     => 0,
+					'gst_trans'    => null,
+				]);
 			}
 			//dd($entries);
 			// ================= INSERT =================
