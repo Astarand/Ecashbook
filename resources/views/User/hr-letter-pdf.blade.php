@@ -7,7 +7,7 @@
     <style>
         @page {
             size: A4;
-            margin: 12mm;
+            margin: 30mm 12mm 22mm 12mm; /* top room for header, bottom room for footer */
         }
 
         body {
@@ -20,54 +20,102 @@
             font-size: 12px;
         }
 
-        .container {
-            max-width: 100%;
+        /* ============================================================
+           REPEATING HEADER — fixed at the top of every page
+           DomPDF renders position:fixed elements on every page.
+        ============================================================ */
+        #pdf-header {
+            position: fixed;
+            top: -28mm;           /* pull into the @page top margin */
+            left: 0;
+            right: 0;
+            height: 26mm;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 4px;
         }
 
-        .header {
+        #pdf-header .header-inner {
             display: table;
             width: 100%;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 12px;
-            margin-bottom: 20px;
         }
 
-        .logo-box {
+        #pdf-header .logo-box {
             display: table-cell;
             width: 25%;
             vertical-align: middle;
         }
 
-        .logo-box img {
+        #pdf-header .logo-box img {
             max-width: 120px;
-            max-height: 80px;
+            max-height: 60px;
         }
 
-        .company-box {
+        #pdf-header .company-box {
             display: table-cell;
             width: 75%;
             text-align: right;
             vertical-align: middle;
         }
 
-        .company-name {
-            font-size: 22px;
+        #pdf-header .company-name {
+            font-size: 18px;
             font-weight: bold;
             color: #111827;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
-        .company-meta {
-            font-size: 11px;
+        #pdf-header .company-meta {
+            font-size: 10px;
             color: #374151;
             line-height: 1.5;
+        }
+
+        /* ============================================================
+           REPEATING FOOTER — fixed at the bottom of every page
+        ============================================================ */
+        #pdf-footer {
+            position: fixed;
+            bottom: -20mm;        /* pull into the @page bottom margin */
+            left: 0;
+            right: 0;
+            height: 18mm;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 4px;
+        }
+
+        #pdf-footer .footer-inner {
+            display: table;
+            width: 100%;
+        }
+
+        #pdf-footer .footer-left {
+            display: table-cell;
+            font-size: 9px;
+            color: #6b7280;
+            font-style: italic;
+            vertical-align: middle;
+        }
+
+        #pdf-footer .footer-right {
+            display: table-cell;
+            text-align: right;
+            font-size: 9px;
+            color: #6b7280;
+            vertical-align: middle;
+        }
+
+        /* ============================================================
+           Page body content
+        ============================================================ */
+        .container {
+            max-width: 100%;
         }
 
         .letter-title {
             text-align: center;
             font-size: 20px;
             font-weight: bold;
-            margin: 20px 0 14px;
+            margin: 10px 0 14px;
             color: #111827;
         }
 
@@ -106,8 +154,12 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+
+    {{-- ============================================================
+         HEADER — DomPDF repeats position:fixed on every page
+    ============================================================ --}}
+    <div id="pdf-header">
+        <div class="header-inner">
             <div class="logo-box">
                 @if(!empty($companyLogo))
                     <img src="{{ $companyLogo }}" alt="{{ $companyData->comp_name ?? 'Company Logo' }}">
@@ -117,25 +169,45 @@
                 <div class="company-name">{{ $companyData->comp_name ?? 'Company Name' }}</div>
                 <div class="company-meta">
                     @if(!empty($companyData->comp_email))
-                        <div>Email: {{ $companyData->comp_email }}</div>
+                        <span>Email: {{ $companyData->comp_email }}</span>
                     @endif
                     @if(!empty($companyData->comp_phone))
-                        <div>Phone: {{ $companyData->comp_phone }}</div>
+                        &nbsp;&nbsp;|&nbsp;&nbsp;<span>Phone: {{ $companyData->comp_phone }}</span>
                     @endif
                     @if($showGst && !empty($companyData->gst_no))
-                        <div>GST: {{ $companyData->gst_no }}</div>
+                        &nbsp;&nbsp;|&nbsp;&nbsp;<span>GST: {{ $companyData->gst_no }}</span>
                     @endif
                     @if(!empty($companyData->comp_pan_no))
-                        <div>PAN: {{ $companyData->comp_pan_no }}</div>
+                        &nbsp;&nbsp;|&nbsp;&nbsp;<span>PAN: {{ $companyData->comp_pan_no }}</span>
                     @endif
                 </div>
             </div>
         </div>
+    </div>
 
+    {{-- ============================================================
+         FOOTER — DomPDF repeats position:fixed on every page
+    ============================================================ --}}
+    <div id="pdf-footer">
+        <div class="footer-inner">
+            <div class="footer-left">
+                System generated PDF — no signature required
+            </div>
+            <div class="footer-right">
+                {{ $companyData->comp_name ?? '' }}
+            </div>
+        </div>
+    </div>
+
+    {{-- ============================================================
+         BODY CONTENT
+    ============================================================ --}}
+    <div class="container">
         <div class="letter-title">{{ $letter->subject ?? 'HR Letter' }}</div>
         <div class="letter-content">
             {!! $letter->content ?? '' !!}
         </div>
     </div>
+
 </body>
 </html>

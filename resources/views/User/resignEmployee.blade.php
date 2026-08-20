@@ -84,8 +84,8 @@
                                         $employee->phone }}</a></td>
                                 <td><a class="text-muted text-hover-primary" href="#">{{ $employee->dept_name }}</a>
                                 </td>
-                                <td><a class="text-muted text-hover-primary" href="#">{{ $employee->designation_name
-                                        }}</a></td>
+                                <td><a class="text-muted text-hover-primary" href="#">{{ $employee->designation_name }}</a>
+                                </td>
                                 <td>
                                     @if($employee->emp_status == 'Resigned')
                                         <span class="badge bg-danger">Resigned</span>
