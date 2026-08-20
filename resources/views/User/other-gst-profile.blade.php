@@ -24,9 +24,9 @@
         border: 1px solid transparent !important;
     }
     .nav-pills-gst .nav-link.active {
-        background-color: #eff6ff !important;
-        color: #1d4ed8 !important;
-        border: 1px solid #bfdbfe !important;
+        background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+        color: var(--bs-primary) !important;
+        border: 1px solid rgba(var(--bs-primary-rgb), 0.3) !important;
     }
     #taxProfileTable tr td:first-child {
         background-color: #f8fafc;
@@ -35,7 +35,7 @@
         width: 30%;
     }
     #taxProfileTable tr td i {
-        color: #4f46e5;
+        color: var(--bs-primary);
         margin-right: 6px;
         font-size: 1.1rem;
     }
@@ -70,7 +70,7 @@
     </div>
     <!-- [ breadcrumb ] end -->
     <div class="col-12 mb-4">
-        <div class="card gst-verify-card gst-input-card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+        <div class="card gst-verify-card gst-input-card">
             <div class="card-body p-4">
                 <label class="form-label fw-bold text-dark mb-2" style="font-size: 0.95rem;">Verify Taxpayer GSTIN Number <span class="text-danger">*</span></label>
                 <div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1; background-color: #fff;">
@@ -78,7 +78,7 @@
                         <i class="ti ti-search text-muted f-20"></i>
                     </span>
                     <input type="text" id="inputGst" class="form-control border-0 px-2" placeholder="Enter 15-digit GSTIN (e.g. 27AAAAA1111A1Z1)" style="height: 52px; font-weight: 500; font-size: 1rem; letter-spacing: 0.5px; outline: none; box-shadow: none;">
-                    <button class="btn btn-primary px-4 fw-bold d-flex align-items-center justify-content-center gap-2" id="btnGetGst" type="button" style="height: 52px; background-color: #4f46e5; border: 0; font-size: 1rem; border-radius: 0 6px 6px 0;">
+                    <button class="btn btn-primary px-4 fw-bold d-flex align-items-center justify-content-center gap-2" id="btnGetGst" type="button" style="height: 52px; font-size: 1rem; border-radius: 0 6px 6px 0;">
                         <i class="ti ti-cloud-download f-20"></i> Get Details
                     </button>
                 </div>
@@ -189,23 +189,25 @@
                                     </div>
                                 </div>
                             </div>
-                            <table class="table tbl-product taxReturnTable" id="pc-dt-simple">
-                                <thead>
-                                    <tr>
-                                        <th class="text-end">#</th>
-                                        <th>Valid</th>
-                                        <th>Mode Of Filing</th>
-                                        <th>Date of Filing</th>
-                                        <th>Return Period</th>
-                                        <th>Return Type</th>
-                                        <th>ARN</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table tbl-product taxReturnTable my-3" id="pc-dt-simple">
+                                    <thead>
+                                        <tr style="background-color: #cbcbcb;">
+                                            <th class="text-end">#</th>
+                                            <th>Valid</th>
+                                            <th>Mode Of Filing</th>
+                                            <th>Date of Filing</th>
+                                            <th>Return Period</th>
+                                            <th>Return Type</th>
+                                            <th>ARN</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

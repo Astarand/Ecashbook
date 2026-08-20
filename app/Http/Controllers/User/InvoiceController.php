@@ -237,9 +237,17 @@ class InvoiceController extends Controller
 									ELSE cp.comp_name
 								END as comp_name
 							"),
+							DB::raw("
+								CASE 
+									WHEN '".$sales->propId."' IS NOT NULL AND '".$sales->propId."' != ''
+									THEN pp.comp_logo
+									ELSE cp.comp_logo
+								END as comp_logo
+							"),
 							'cp.gst_no',
 							'cp.comp_pan_no',
-							'cp.comp_bill_addone'
+							'cp.comp_bill_addone',
+							'cp.comp_bill_addtwo'
 						)
 						->where('users.id', $added_by)
 						->first();
@@ -267,6 +275,12 @@ class InvoiceController extends Controller
 					->select(DB::raw('cities.name'))
 					->where('cities.id', '=', $custDetails->cust_ship_city) 
 					->get();
+
+		$bankDetails = DB::table('banks')
+						->where('added_by', $added_by)
+						->where('status', 1)
+						->first();
+
 		//get sales items 
 		$quotations_values = DB::table('quotations_values')
 								->select(DB::raw('quotations_values.*'))
@@ -309,6 +323,7 @@ class InvoiceController extends Controller
 			$array[$k]['signature_name'] = $sales->signature_name;
 		}
 		$quotations_values = json_decode(json_encode($array));
+		$sales_values = $quotations_values;
 		
 		if($invType == "quotation"){
 		    
@@ -328,14 +343,15 @@ class InvoiceController extends Controller
 				'special_discount' => $special_discount,
 				'special_discount_amount' => $special_discount_amount,
 				'special_discount_type' => $special_discount_type,
+				'bankDetails' => $bankDetails,
 			]);
 		}else{
 			
 			$inv_num = str_replace('/', '-', $inv_num);
 			$pdf = \PDF::loadView('User.quotations.quotation-invoice-pdf', 
-			compact('quotations','quotations_values','inv_num','invDate','compDetails','custDetails','stateBill','cityBill','stateShip','cityShip'))
-			->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
-			$pdfName = 'Sales-Inv-'.$inv_num.'.pdf';
+			compact('sales','sales_values','quotations_values','inv_num','invDate','compDetails','custDetails','stateBill','cityBill','stateShip','cityShip','bankDetails','special_discount','special_discount_amount','special_discount_type'))
+			->setOptions(['dpi' => 96, 'defaultFont' => 'sans-serif','isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+			$pdfName = 'Quotation-'.$inv_num.'.pdf';
 			return $pdf->stream($pdfName);
 		}
 	}
@@ -370,9 +386,17 @@ class InvoiceController extends Controller
 									ELSE cp.comp_name
 								END as comp_name
 							"),
+							DB::raw("
+								CASE 
+									WHEN '".$sales->propId."' IS NOT NULL AND '".$sales->propId."' != ''
+									THEN pp.comp_logo
+									ELSE cp.comp_logo
+								END as comp_logo
+							"),
 							'cp.gst_no',
 							'cp.comp_pan_no',
-							'cp.comp_bill_addone'
+							'cp.comp_bill_addone',
+							'cp.comp_bill_addtwo'
 						)
 						->where('users.id', $added_by)
 						->first();
@@ -400,6 +424,12 @@ class InvoiceController extends Controller
 					->select(DB::raw('cities.name'))
 					->where('cities.id', '=', $custDetails->cust_ship_city) 
 					->get();
+
+		$bankDetails = DB::table('banks')
+						->where('added_by', $added_by)
+						->where('status', 1)
+						->first();
+
 		//get sales items 
 		$proformas_values = DB::table('proformas_values')
 								->select(DB::raw('proformas_values.*'))
@@ -442,6 +472,7 @@ class InvoiceController extends Controller
 			$array[$k]['signature_name'] = $sales->signature_name;
 		}
 		$proformas_values = json_decode(json_encode($array));
+		$sales_values = $proformas_values;
 		
 		if($invType == "proforma"){
 		    
@@ -461,14 +492,15 @@ class InvoiceController extends Controller
 				'special_discount' => $special_discount,
 				'special_discount_amount' => $special_discount_amount,
 				'special_discount_type' => $special_discount_type,
+				'bankDetails' => $bankDetails,
 			]);
 		}else{
 			
 			$inv_num = str_replace('/', '-', $inv_num);
 			$pdf = \PDF::loadView('User.proformas.proforma-invoice-pdf', 
-			compact('proformas','proformas_values','inv_num','invDate','compDetails','custDetails','stateBill','cityBill','stateShip','cityShip'))
-			->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif','isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
-			$pdfName = 'Sales-Inv-'.$inv_num.'.pdf';
+			compact('sales','sales_values','proformas_values','inv_num','invDate','compDetails','custDetails','stateBill','cityBill','stateShip','cityShip','bankDetails','special_discount','special_discount_amount','special_discount_type'))
+			->setOptions(['dpi' => 96, 'defaultFont' => 'sans-serif','isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+			$pdfName = 'Proforma-'.$inv_num.'.pdf';
 			return $pdf->stream($pdfName);
 		}
 	}

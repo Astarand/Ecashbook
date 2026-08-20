@@ -83,7 +83,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-6 col-xxl-4">
             <div class="card statistics-card-1">
                 <div class="card-body">
@@ -109,7 +109,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-xxl-4">
+        <div class="col-md-6 col-xxl-6">
             <div class="card statistics-card-1">
                 <div class="card-body">
                     <img src="../assets/images/widget/img-status-3.svg" alt="img" class="img-fluid img-bg">
@@ -134,7 +134,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-12 col-xxl-4">
+        <div class="col-md-12 col-xxl-6">
             <div class="card statistics-card-1">
                 <div class="card-body">
                     <img src="../assets/images/widget/img-status-2.svg" alt="img" class="img-fluid img-bg">
@@ -214,7 +214,7 @@
                                     @if ($row->status == '0')
                                     <span class="badge bg-danger">Cancelled</span>
                                     @elseif ($row->status == '1')
-                                    <span class="badge bg-success">Active</span>   
+                                    <span class="badge bg-success">Active</span>
                                     @endif
                                 </td>
                                 <td>
@@ -240,7 +240,7 @@
                                                 @endif
 
                                                 <li class="list-inline-item" data-bs-toggle="tooltip" title="Delete">
-                                                    <a href="javascript:void(0)" 
+                                                    <a href="javascript:void(0)"
                                                     class="avtar avtar-xs btn-link-danger btn-pc-default liabdelete"
                                                     data-id="{{ $row->id }}"
                                                     data-bs-toggle="modal"
@@ -314,12 +314,12 @@
 
 <script>
 
-	
+
 	$(document).on('click', '.viewLiability', function () {
 		let type = $(this).data('type');
 		let title = $(this).data('title');
 		$('#liabilityModalTitle').text(title);
-        
+
 		$('#liabilityModalBody').html('Loading...');
 		$.get("{{ url('/liabilities') }}/" + type, function (html) {
 			$('#liabilityModalBody').html(html);
@@ -336,7 +336,7 @@
 			$('#liabilityModalBody').html(html);
 		});
 	});
-	
+
     $(document).on("click", ".liabdelete", function() {
         var itemId = $(this).data("id");
 

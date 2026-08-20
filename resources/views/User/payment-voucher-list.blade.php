@@ -272,8 +272,7 @@
             <div class="card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
                 <div class="card-body table-card p-3">
                     <div class="table-responsive">
-                        <!--<table class="table tbl-product mb-0" id="pc-dt-simple">-->
-                        <table class="table tbl-product mb-0" id="">
+                        <table class="table tbl-product my-3" id="pc-dt-simple">
                             <thead>
                                 <tr style="background-color: #cbcbcb;">
                                     <th class="text-end py-3">#</th>
@@ -297,7 +296,7 @@
                         <tbody>
                             @forelse($data as $key => $v)
                             <tr>
-								<td>{{ $data->firstItem() + $loop->index }}</td>
+								<td class="text-end">{{ $loop->iteration }}</td>
 								@if($hasProprietorship)
                                 <td><span class="text-muted text-hover-primary">{{ !empty($v->prop_comp_name) ? $v->prop_comp_name : $v->comp_name }}</span></td>
 								@endif
@@ -397,7 +396,7 @@
                             </tr>
                             @empty
 							<tr>
-								<td colspan="9" class="text-center">
+								<td colspan="14" class="text-center">
 									No data found
 								</td>
 							</tr>
@@ -405,9 +404,6 @@
 
                         </tbody>
                     </table>
-					<div class="mt-3 d-flex justify-content-end">
-						{{ $data->links('pagination::bootstrap-4') }}
-					</div>
                 </div>
             </div>
         </div>

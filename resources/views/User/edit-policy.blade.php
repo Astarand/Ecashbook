@@ -1,6 +1,78 @@
 @extends('App.Layout')
 
 @section('container')
+<style>
+    /* Premium Document Editor Styling */
+    .document-editor {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        display: flex;
+        flex-direction: column;
+        background: #f8fafc;
+        overflow: hidden;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04) !important;
+    }
+    .document-editor__toolbar {
+        z-index: 2;
+        background: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        padding: 8px 12px !important;
+        position: sticky;
+        top: 0;
+    }
+    .document-editor__toolbar .ck-toolbar {
+        border: 0 !important;
+        background: transparent !important;
+    }
+    .document-editor__editable-container {
+        padding: 30px 20px;
+        background: #eef2f6;
+        overflow-y: auto;
+        max-height: 650px;
+        display: flex;
+        justify-content: center;
+    }
+    .document-editor__editable-container .document-editor__editable {
+        width: 100%;
+        max-width: 850px;
+        min-height: 500px;
+        padding: 40px 50px;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06) !important;
+        outline: none !important;
+        font-size: 15px;
+        line-height: 1.7;
+        color: #1e293b;
+    }
+    .document-editor__editable-container .document-editor__editable:focus {
+        border-color: var(--bs-primary, #04a9f5) !important;
+        box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.18), 0 6px 18px rgba(0, 0, 0, 0.06) !important;
+    }
+    .document-editor__editable figure.table table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+    }
+    .document-editor__editable figure.table table th,
+    .document-editor__editable figure.table table td {
+        border: 1px solid #cbd5e1;
+        padding: 8px 12px;
+    }
+    .document-editor__editable figure.table table th {
+        background-color: #f1f5f9;
+        font-weight: 600;
+    }
+    .document-editor__editable blockquote {
+        border-left: 4px solid var(--bs-primary, #04a9f5);
+        padding: 10px 20px;
+        margin: 1.5rem 0;
+        background-color: #f8fafc;
+        border-radius: 0 8px 8px 0;
+        color: #475569;
+    }
+</style>
 <div class="pc-content">
     <!-- [ breadcrumb ] start -->
     <div class="page-header">

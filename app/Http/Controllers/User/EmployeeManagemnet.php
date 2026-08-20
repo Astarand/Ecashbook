@@ -2981,20 +2981,18 @@ class EmployeeManagemnet extends Controller
 		// Keep in ascending order (oldest first)
 		// $attendanceLog is already in ascending order from the date loop
 
-		// Paginate results
+		// Total results
 		$total = count($attendanceLog);
-		$offset = ($page - 1) * $perPage;
-		$paginatedLog = array_slice($attendanceLog, $offset, $perPage);
 
 		return response()->json([
 			'success' => true,
-			'data' => $paginatedLog,
+			'data' => $attendanceLog,
 			'pagination' => [
-				'current_page' => $page,
-				'per_page' => $perPage,
+				'current_page' => 1,
+				'per_page' => $total,
 				'total' => $total,
-				'last_page' => ceil($total / $perPage),
-				'has_more' => $page < ceil($total / $perPage)
+				'last_page' => 1,
+				'has_more' => false
 			],
 			'employee' => [
 				'name' => $employee->name,

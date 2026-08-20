@@ -56,33 +56,32 @@
         <div class="col-sm-12">
             <div class="card card-body table-card gst-support-card">
                 <div class="table-responsive">
-                    <table class="table tbl-product my-3">
+                    <table class="table tbl-product my-3" id="pc-dt-simple">
                         <thead>
-                            <tr>
+                            <tr style="background-color: #cbcbcb;">
                                 <th class="text-end">#</th>
-                                <th>Date</th>
+                                <th>Date & Ticket ID</th>
                                 <th>Queries About</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-						
-							@forelse($tickets as $key => $ticket)
+							@foreach($tickets as $key => $ticket)
 								<tr>
-									<td class="text-end">{{ $key + 1 }}</td>
+									<td class="text-end">{{ $loop->iteration }}</td>
 
 									<td>
 										<span class="d-block fw-semibold text-dark">
 											{{ \Carbon\Carbon::parse($ticket->created_at)->format('d M Y') }}
 										</span>
 										<span class="text-muted f-12">
-											Ticket ID: {{ $ticket->ticket_no }}
+											Ticket ID: <strong class="text-primary">{{ $ticket->ticket_no }}</strong>
 										</span>
 									</td>
 
 									<td>
-										<span class="text-muted text-hover-primary">
+										<span class="fw-medium text-dark">
 											{{ $queryTypeLabels[$ticket->query_type] ?? ucfirst($ticket->query_type) }}
 										</span>
 
@@ -103,55 +102,39 @@
 									</td>
 
 									<td>
-										<span><i class="ti ti-dots-vertical f-20"></i></span>
+										<div class="d-flex align-items-center gap-1">
+											<a href="#ticketChatModal"
+											   class="btn btn-sm btn-light-warning ticket-chat-btn"
+											   data-bs-toggle="modal"
+											   data-bs-target="#ticketChatModal"
+											   onclick="openChat({{ $ticket->id }},'{{ $ticket->status }}')"
+											   title="View Chat & Reply">
+												<i class="ti ti-message-circle"></i>
+											</a>
+											
+											@if($ticket->status === 'open')
+												<a class="btn btn-sm btn-light-success"
+												   href="javascript:void(0)"
+												   onclick="resolveTicket({{ $ticket->id }})"
+												   title="Resolve Ticket">
+													<i class="ti ti-check"></i>
+												</a>
+											@endif
 
-										<div class="prod-action-links">
-											<ul class="list-inline me-auto mb-0">
-												<li class="list-inline-item" data-bs-toggle="tooltip" title="View Chat">
-													<a href="#ticketChatModal"
-													   class="avtar avtar-xs btn-link-warning btn-pc-default ticket-chat-btn"
-													   data-bs-toggle="modal"
-													   data-bs-target="#ticketChatModal"
-													   onclick="openChat({{ $ticket->id }},'{{ $ticket->status }}')">
-														<i class="ti ti-message-circle f-18"></i>
-													</a>
-												</li>
-												
-												@if($ticket->status === 'open')
-													<li>
-														<a class="dropdown-item text-success"
-														   href="javascript:void(0)"
-														   onclick="resolveTicket({{ $ticket->id }})">
-															<i class="ti ti-check me-2"></i> Resolve Ticket
-														</a>
-													</li>
-												@endif
-
-												@if(in_array($ticket->status, ['open','resolved']))
-													<li>
-														<a class="dropdown-item text-danger"
-														   href="javascript:void(0)"
-														   onclick="closeTicket({{ $ticket->id }})">
-															<i class="ti ti-x me-2"></i> Close Ticket
-														</a>
-													</li>
-												@endif
-											</ul>
+											@if(in_array($ticket->status, ['open','resolved']))
+												<a class="btn btn-sm btn-light-danger"
+												   href="javascript:void(0)"
+												   onclick="closeTicket({{ $ticket->id }})"
+												   title="Close Ticket">
+													<i class="ti ti-x"></i>
+												</a>
+											@endif
 										</div>
 									</td>
 								</tr>
-								@empty
-								<tr>
-									<td colspan="5" class="text-center text-muted">
-										No support tickets found
-									</td>
-								</tr>
-								@endforelse                           
+							@endforeach                           
                         </tbody>
                     </table>
-					<div class="d-flex justify-content-end mt-3">
-						{{ $tickets->links('pagination::bootstrap-5') }}
-					</div>
                 </div>
             </div>
         </div>

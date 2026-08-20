@@ -30,411 +30,484 @@
     <div class="row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="row">
-                <div class="col-lg-5 col-xxl-3">
-                    <div class="card overflow-hidden">
-                        <div class="card-body position-relative">
-                            <div class="text-center mt-3">
-
-                                <div class="chat-avtar d-inline-flex mx-auto">
-                                    @php
-                                    $profileImg = $employee->profile_img
-                                        ? asset('storage/user_employee/' . $employee->profile_img)
-                                        : asset('storage/profile/e-cashbook.png');
-                                    @endphp
-
-                                    <img class="rounded-circle img-fluid wid-90 img-thumbnail" src="{{ $profileImg }}"
-                                        alt="User image">
-
-                                    {{-- Status Badge --}}
-                                    @if(!empty($employee->regine_date))
-                                        <i class="chat-badge bg-danger me-2 mb-2"></i>
-                                    @else
-                                        <i class="chat-badge bg-success me-2 mb-2"></i>
-                                    @endif
-                                </div>
-
-                                <h5 class="mb-2 mt-3">{{ $employee->name }}</h5>
-
-                                <h5 class="mb-0">
-                                    <span class="badge bg-primary">{{ $employee->employee_id }}</span>
-                                </h5>
-
-                                {{-- Resignation Info --}}
-                                @if(!empty($employee->regine_date))
-                                    <div class="mt-2">
-                                        <span class="badge bg-danger">Resigned</span><br>
-                                        <small class="text-muted">
-                                            Date: {{ \Carbon\Carbon::parse($employee->regine_date)->format('d M Y') }}
-                                        </small>
-                                    </div>
-                                @endif
-
-                            </div>
-                            {{-- <div class="text-center mt-3">
-
-                                <div class="chat-avtar d-inline-flex mx-auto">
-                                    @php
-                                    $profileImg = $employee->profile_img
+            <div class="row g-4">
+                <div class="col-lg-4 col-xxl-3">
+                    <div class="card shadow-sm border-0 overflow-hidden sticky-top" style="top: 90px; z-index: 1;">
+                        <div class="card-body bg-light-subtle py-4 px-3 text-center border-bottom">
+                            <div class="position-relative d-inline-block mx-auto mb-3">
+                                @php
+                                $profileImg = $employee->profile_img
                                     ? asset('storage/user_employee/' . $employee->profile_img)
                                     : asset('storage/profile/e-cashbook.png');
-                                    @endphp
-                                    <img class="rounded-circle img-fluid wid-90 img-thumbnail" src="{{ $profileImg }}"
-                                        alt="User image">
+                                @endphp
 
-                                    <i class="chat-badge bg-success me-2 mb-2"></i>
+                                <img class="rounded-circle img-fluid shadow-sm border border-3 border-white" style="width: 100px; height: 100px; object-fit: cover;" src="{{ $profileImg }}"
+                                    alt="{{ $employee->name }}">
+
+                                {{-- Status Badge --}}
+                                @if(!empty($employee->regine_date))
+                                    <span class="position-absolute bottom-0 end-0 p-2 bg-danger border border-2 border-white rounded-circle" title="Resigned"></span>
+                                @else
+                                    <span class="position-absolute bottom-0 end-0 p-2 bg-success border border-2 border-white rounded-circle" title="Active"></span>
+                                @endif
+                            </div>
+
+                            <h5 class="fw-bold mb-1 text-dark">{{ $employee->name }}</h5>
+                            <p class="text-muted small fw-medium mb-2">{{ $designationName }} • {{ $departmentName }}</p>
+
+                            <div class="d-inline-flex align-items-center gap-1">
+                                <span class="badge bg-primary px-3 py-2 rounded-pill font-monospace fw-semibold">{{ $employee->employee_id }}</span>
+                                @if(!empty($employee->regine_date))
+                                    <span class="badge bg-danger-subtle text-danger border border-danger px-2 py-1 rounded-pill">Resigned</span>
+                                @else
+                                    <span class="badge bg-success-subtle text-success border border-success px-2 py-1 rounded-pill">{{ $employee->emp_status ?? 'Active' }}</span>
+                                @endif
+                            </div>
+
+                            @if(!empty($employee->regine_date))
+                                <div class="mt-2 text-danger small">
+                                    <i class="ti ti-calendar-x me-1"></i>Resigned on: {{ \Carbon\Carbon::parse($employee->regine_date)->format('d M Y') }}
                                 </div>
-
-                                <h5 class="mb-2 mt-3">{{ $employee->name }}</h5>
-                                <h5 class="mb-0"><span class="badge bg-primary">{{ $employee->employee_id }}</span></h5>
-                            </div> --}}
+                            @endif
                         </div>
                         <div class="nav flex-column nav-pills list-group list-group-flush account-pills mb-0"
                             id="user-set-tab" role="tablist" aria-orientation="vertical">
-                            <a class="nav-link list-group-item list-group-item-action active" id="user-set-profile-tab"
+                            <a class="nav-link list-group-item list-group-item-action active p-3" id="user-set-profile-tab"
                                 data-bs-toggle="pill" href="#user-set-profile" role="tab"
                                 aria-controls="user-set-profile" aria-selected="true">
-                                <span class="f-w-500"><i class="ph-duotone ph-user-circle m-r-10"></i>Profile
-                                    Overview</span>
+                                <span class="f-w-500 d-flex align-items-center"><i class="ph-duotone ph-user-circle fs-4 me-2 text-primary"></i> Profile Overview</span>
                             </a>
-                            <a class="nav-link list-group-item list-group-item-action" id="user-attendance-details-tab"
+                            <a class="nav-link list-group-item list-group-item-action p-3" id="user-attendance-details-tab"
                                 data-bs-toggle="pill" href="#user-attendance-details" role="tab"
                                 aria-controls="user-attendance-details" aria-selected="false">
-                                <span class="f-w-500"><i class="ph-duotone ph-key m-r-10"></i>Check Employee Overview</span>
+                                <span class="f-w-500 d-flex align-items-center"><i class="ph-duotone ph-calendar-check fs-4 me-2 text-primary"></i> Attendance & Actions</span>
                             </a>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-7 col-xxl-9">
+                <div class="col-lg-8 col-xxl-9">
                     <div class="tab-content" id="user-set-tabContent">
                         <div class="tab-pane fade show active" id="user-set-profile" role="tabpanel"
                             aria-labelledby="user-set-profile-tab">
                             
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Personal Details</h5>
+                            <!-- Personal & Contact Details Card -->
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-transparent border-bottom py-3">
+                                    <h5 class="mb-0 text-primary fw-bold"><i class="ti ti-user me-2"></i>Personal & Contact Details</h5>
                                 </div>
-                                <div class="card-body">
-                                    <ul class="list-group list-group-flush">
-
-                                        <!-- Basic Info -->
-                                        <li class="list-group-item px-0 pt-0">
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Full Name</p>
-                                                    <p class="mb-0">{{ $employee->name }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Designation</p>
-                                                    <p class="mb-0">{{ $designationName }} - {{ $departmentName }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Phone</p>
-                                                    <p class="mb-0">{{ $employee->phone }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Alternate Phone</p>
-                                                    <p class="mb-0">{{ $employee->alt_phone }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Email</p>
-                                                    <p class="mb-0">{{ $employee->email_id }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Gender</p>
-                                                    <p class="mb-0">{{ $employee->gender }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">DOB</p>
-                                                    <p class="mb-0">{{ $employee->dob }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Marital Status</p>
-                                                    <p class="mb-0">{{ $employee->marital_status }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Qualification</p>
-                                                    <p class="mb-0">{{ $employee->qualification }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Experience</p>
-                                                    <p class="mb-0">{{ $employee->experience_years ?? '0' }} Years</p>
-                                                </div>
+                                <div class="card-body p-4">
+                                    <div class="row g-3">
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Full Name</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $employee->name ?? '-' }}</span>
                                             </div>
-                                        </li>
+                                        </div>
 
-                                        <!-- Address -->
-                                        <li class="list-group-item px-0">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <p class="mb-1 text-muted">Address</p>
-                                                    <p class="mb-0">
-                                                        {{ $employee->c_addr_lineone ?? '' }},
-                                                        {{ $employee->c_addr_linetwo ?? '' }},
-                                                        {{ $stateName }},
-                                                        {{ $cityName }},
-                                                        {{ $employee->pincode }}
-                                                    </p>
-                                                </div>
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Designation & Dept</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $designationName }} • {{ $departmentName }}</span>
                                             </div>
-                                        </li>
+                                        </div>
 
-                                        <!-- Identity Details -->
-                                        <li class="list-group-item px-0">
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Aadhaar Number</p>
-                                                    <p class="mb-0">{{ $employee->aadhaar_number }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">PAN Number</p>
-                                                    <p class="mb-0">{{ $employee->pan_number }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Emergency Contact</p>
-                                                    <p class="mb-0">
-                                                        {{ $employee->emergency_name }} -
-                                                        {{ $employee->emergency_mobile }}
-                                                    </p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Employee Type</p>
-                                                    <p class="mb-0">{{ $employee->emp_type }}</p>
-                                                </div>
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Email ID</small>
+                                                <span class="fw-bold text-dark fs-6 text-break">{{ $employee->email_id ?? '-' }}</span>
                                             </div>
-                                        </li>
+                                        </div>
 
-                                        <!-- Salary Details -->
-                                        <li class="list-group-item px-0">
-                                            <h6 class="mb-3">Salary Details</h6>
-
-                                            <div class="row">
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">Basic Salary</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->basic_sal,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">Basic %</p>
-                                                    <p class="mb-0">{{ $employee->basic_percentage }}%</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">HRA</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->hra,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">Convayance</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->convayance,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">Medical Allowance</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->medical_allowance,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">Special Bonus</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->special_bonus,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">PF</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->provident_fund,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">ESI</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->esi,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">PTAX</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->ptax,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">TDS</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->tds,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">Total Addition</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->total_addition,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">Total Deduction</p>
-                                                    <p class="mb-0">₹ {{ number_format($employee->total_deduction,2) }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Net Salary</p>
-                                                    <p class="mb-0">
-                                                        ₹ {{ number_format($employee->net_sal,2) }}
-                                                    </p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Salary In Words</p>
-                                                    <p class="mb-0">{{ $employee->net_sal_word }}</p>
-                                                </div>
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Phone Number</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $employee->phone ?? '-' }}</span>
                                             </div>
-                                        </li>
+                                        </div>
 
-                                        <!-- Bank Details -->
-                                        <li class="list-group-item px-0">
-                                            <h6 class="mb-3">Bank Details</h6>
-
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Bank Name</p>
-                                                    <p class="mb-0">{{ $employee->bank_name }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Branch</p>
-                                                    <p class="mb-0">{{ $employee->bank_branch }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">IFSC</p>
-                                                    <p class="mb-0">{{ $employee->ifsc }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Account Holder</p>
-                                                    <p class="mb-0">{{ $employee->account_holder_name }}</p>
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Account Number</p>
-                                                    <p class="mb-0">{{ $employee->account_number }}</p>
-                                                </div>
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Alternate Phone</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $employee->alt_phone ?? '-' }}</span>
                                             </div>
-                                        </li>
+                                        </div>
 
-                                        <!-- Employment Details -->
-                                        <li class="list-group-item px-0">
-                                            <h6 class="mb-3">Employment Details</h6>
-
-                                            <div class="row">
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">Joining Date</p>
-                                                    <p class="mb-0">{{ $employee->joining_date }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">Work Location</p>
-                                                    <p class="mb-0">{{ ucwords(str_replace('_',' ',$employee->work_location)) }}</p>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <p class="mb-1 text-muted">Employee Status</p>
-                                                    <p class="mb-0">{{ $employee->emp_status }}</p>
-                                                </div>
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Gender</small>
+                                                <span class="fw-bold text-dark fs-6">{{ ucfirst($employee->gender ?? '-') }}</span>
                                             </div>
-                                        </li>
+                                        </div>
 
-                                        <li class="list-group-item px-0">
-                                            <h6 class="mb-3">Policy Status</h6>
-
-                                            <div class="row">
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Privacy Policy</p>
-
-                                                    @if($employee->privacy_policy_read == 'read')
-                                                        <span class="badge bg-success">Read</span>
-
-                                                    @elseif($employee->privacy_policy_read == 'unread')
-                                                        <span class="badge bg-warning text-dark">Unread</span>
-
-                                                    @else
-                                                        <span class="badge bg-secondary">Not Created</span>
-                                                    @endif
-                                                </div>
-
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="mb-1 text-muted">Terms & Conditions</p>
-
-                                                    @if($employee->terms_and_conditions == 'read')
-                                                        <span class="badge bg-success">Read</span>
-
-                                                    @elseif($employee->terms_and_conditions == 'unread')
-                                                        <span class="badge bg-warning text-dark">Unread</span>
-
-                                                    @else
-                                                        <span class="badge bg-secondary">Not Created</span>
-                                                    @endif
-                                                </div>
-
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Date of Birth</small>
+                                                <span class="fw-bold text-dark fs-6">{{ !empty($employee->dob) ? \Carbon\Carbon::parse($employee->dob)->format('d M Y') : '-' }}</span>
                                             </div>
-                                        </li>
+                                        </div>
 
-                                        <!-- Documents -->
-                                        <li class="list-group-item px-0">
-                                            <h6 class="mb-3">Documents</h6>
-
-                                            <div class="row">
-
-                                                <div class="col-md-4 mb-3">
-                                                    <a href="{{ asset('/storage/employee_document/'.$employee->pan_doc) }}"
-                                                        target="_blank"
-                                                        class="btn btn-outline-primary btn-sm w-100">
-                                                        PAN Document
-                                                    </a>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <a href="{{ asset('/storage/employee_document/'.$employee->aadhar_doc) }}"
-                                                        target="_blank"
-                                                        class="btn btn-outline-primary btn-sm w-100">
-                                                        Aadhaar Document
-                                                    </a>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <a href="{{ asset('/storage/employee_document/'.$employee->last_qualification_doc) }}"
-                                                        target="_blank"
-                                                        class="btn btn-outline-primary btn-sm w-100">
-                                                        Qualification Document
-                                                    </a>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <a href="{{ asset('/storage/employee_document/'.$employee->cancelled_cheque_doc) }}"
-                                                        target="_blank"
-                                                        class="btn btn-outline-primary btn-sm w-100">
-                                                        Cancelled Cheque
-                                                    </a>
-                                                </div>
-
-                                                <div class="col-md-4 mb-3">
-                                                    <a href="{{ asset('/storage/employee_document/'.$employee->cv_doc) }}"
-                                                        target="_blank"
-                                                        class="btn btn-outline-primary btn-sm w-100">
-                                                        CV Document
-                                                    </a>
-                                                </div>
-
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Marital Status</small>
+                                                <span class="fw-bold text-dark fs-6">{{ ucfirst($employee->marital_status ?? '-') }}</span>
                                             </div>
-                                        </li>
+                                        </div>
 
-                                    </ul>
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Qualification</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $employee->qualification ?? '-' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Experience</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $employee->experience_years ?? '0' }} Years</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Address & Identity Details Card -->
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-transparent border-bottom py-3">
+                                    <h5 class="mb-0 text-primary fw-bold"><i class="ti ti-map-pin me-2"></i>Address & Identity Details</h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="p-3 bg-light-subtle rounded-3 border">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Full Residential Address</small>
+                                                <span class="fw-semibold text-dark">
+                                                    {{ $employee->c_addr_lineone ?? '' }}{{ !empty($employee->c_addr_linetwo) ? ', ' . $employee->c_addr_linetwo : '' }}{{ !empty($cityName) ? ', ' . $cityName : '' }}{{ !empty($stateName) ? ', ' . $stateName : '' }}{{ !empty($employee->pincode) ? ' - ' . $employee->pincode : '' }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xl-3">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Aadhaar Number</small>
+                                                <span class="fw-bold text-dark font-monospace fs-6">{{ $employee->aadhaar_number ?? '-' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xl-3">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">PAN Number</small>
+                                                <span class="fw-bold text-dark font-monospace fs-6">{{ $employee->pan_number ?? '-' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xl-3">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Emergency Contact</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $employee->emergency_name ?? '-' }} {{ !empty($employee->emergency_mobile) ? '• ' . $employee->emergency_mobile : '' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xl-3">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Employee Type</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $employee->emp_type ?? '-' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Salary & Compensation Structure Card -->
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-transparent border-bottom py-3">
+                                    <h5 class="mb-0 text-primary fw-bold"><i class="ti ti-cash me-2"></i>Salary & Compensation Structure</h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <!-- Net Salary Highlight Tile -->
+                                    <div class="p-4 rounded-3 mb-4 text-white d-flex flex-column flex-md-row justify-content-between align-items-md-center shadow-sm" style="background: linear-gradient(135deg, #0d9488 0%, #059669 100%);">
+                                        <div>
+                                            <small class="text-white-50 text-uppercase fw-bold letter-spacing-1">Net Payable Monthly Salary</small>
+                                            <h2 class="text-white fw-bold mb-0 mt-1">₹ {{ number_format($employee->net_sal, 2) }}</h2>
+                                        </div>
+                                        @if(!empty($employee->net_sal_word))
+                                        <div class="mt-3 mt-md-0 text-md-end border-top border-md-0 pt-2 pt-md-0">
+                                            <small class="text-white-50 text-uppercase fw-bold">In Words</small>
+                                            <div class="fw-semibold text-white fs-6 fst-italic">{{ $employee->net_sal_word }}</div>
+                                        </div>
+                                        @endif
+                                    </div>
+
+                                    <!-- Salary Breakdown Grid -->
+                                    <h6 class="text-secondary fw-bold text-uppercase small mb-3">Earnings & Allowances</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                                <small class="text-muted d-block mb-1">Basic Salary <span class="fw-bold text-primary">({{ $employee->basic_percentage }}%)</span></small>
+                                                <span class="fw-bold text-dark fs-6">₹ {{ number_format($employee->basic_sal, 2) }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                                <small class="text-muted d-block mb-1">HRA</small>
+                                                <span class="fw-bold text-dark fs-6">₹ {{ number_format($employee->hra, 2) }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                                <small class="text-muted d-block mb-1">Conveyance</small>
+                                                <span class="fw-bold text-dark fs-6">₹ {{ number_format($employee->convayance, 2) }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                                <small class="text-muted d-block mb-1">Medical Allowance</small>
+                                                <span class="fw-bold text-dark fs-6">₹ {{ number_format($employee->medical_allowance, 2) }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                                <small class="text-muted d-block mb-1">Special Bonus</small>
+                                                <span class="fw-bold text-dark fs-6">₹ {{ number_format($employee->special_bonus, 2) }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border border-success-subtle rounded-3 bg-success-subtle h-100">
+                                                <small class="text-success-emphasis fw-bold text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Total Additions</small>
+                                                <span class="fw-bold text-success fs-5">₹ {{ number_format($employee->total_addition, 2) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h6 class="text-secondary fw-bold text-uppercase small mb-3">Deductions</h6>
+                                    <div class="row g-3">
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                                <small class="text-muted d-block mb-1">Provident Fund (PF)</small>
+                                                <span class="fw-bold text-dark fs-6">₹ {{ number_format($employee->provident_fund, 2) }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                                <small class="text-muted d-block mb-1">ESI</small>
+                                                <span class="fw-bold text-dark fs-6">₹ {{ number_format($employee->esi, 2) }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                                <small class="text-muted d-block mb-1">PTAX</small>
+                                                <span class="fw-bold text-dark fs-6">₹ {{ number_format($employee->ptax, 2) }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                                <small class="text-muted d-block mb-1">TDS</small>
+                                                <span class="fw-bold text-dark fs-6">₹ {{ number_format($employee->tds, 2) }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 col-md-3">
+                                            <div class="p-3 border border-danger-subtle rounded-3 bg-danger-subtle h-100">
+                                                <small class="text-danger-emphasis fw-bold text-uppercase d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.5px;">Total Deductions</small>
+                                                <span class="fw-bold text-danger fs-5">₹ {{ number_format($employee->total_deduction, 2) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bank Account & Employment Info Card -->
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-transparent border-bottom py-3">
+                                    <h5 class="mb-0 text-primary fw-bold"><i class="ti ti-building-bank me-2"></i>Bank & Employment Details</h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Bank Name</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $employee->bank_name ?? '-' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Branch</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $employee->bank_branch ?? '-' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">IFSC Code</small>
+                                                <span class="fw-bold text-dark font-monospace fs-6">{{ $employee->ifsc ?? '-' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Account Holder</small>
+                                                <span class="fw-bold text-dark fs-6">{{ $employee->account_holder_name ?? '-' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Account Number</small>
+                                                <span class="fw-bold text-dark font-monospace fs-6">{{ $employee->account_number ?? '-' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h6 class="text-secondary fw-bold text-uppercase small mb-3">Employment Timeline & Status</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Joining Date</small>
+                                                <span class="fw-bold text-dark fs-6">{{ !empty($employee->joining_date) ? \Carbon\Carbon::parse($employee->joining_date)->format('d M Y') : '-' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Work Location</small>
+                                                <span class="fw-bold text-dark fs-6">{{ ucwords(str_replace('_',' ',$employee->work_location ?? '-')) }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="p-3 bg-light-subtle rounded-3 border h-100">
+                                                <small class="text-muted text-uppercase fw-semibold d-block mb-1">Employee Status</small>
+                                                <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill fs-6">{{ $employee->emp_status ?? 'Active' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h6 class="text-secondary fw-bold text-uppercase small mb-3">Policy Acknowledgment Status</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="p-3 bg-light-subtle rounded-3 border d-flex justify-content-between align-items-center">
+                                                <span class="fw-semibold text-dark">Privacy Policy</span>
+                                                @if($employee->privacy_policy_read == 'read')
+                                                    <span class="badge bg-success-subtle text-success border border-success px-3 py-1 rounded-pill"><i class="ti ti-check me-1"></i>Read</span>
+                                                @elseif($employee->privacy_policy_read == 'unread')
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning px-3 py-1 rounded-pill"><i class="ti ti-clock me-1"></i>Unread</span>
+                                                @else
+                                                    <span class="badge bg-secondary px-3 py-1 rounded-pill">Not Created</span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="p-3 bg-light-subtle rounded-3 border d-flex justify-content-between align-items-center">
+                                                <span class="fw-semibold text-dark">Terms & Conditions</span>
+                                                @if($employee->terms_and_conditions == 'read')
+                                                    <span class="badge bg-success-subtle text-success border border-success px-3 py-1 rounded-pill"><i class="ti ti-check me-1"></i>Read</span>
+                                                @elseif($employee->terms_and_conditions == 'unread')
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning px-3 py-1 rounded-pill"><i class="ti ti-clock me-1"></i>Unread</span>
+                                                @else
+                                                    <span class="badge bg-secondary px-3 py-1 rounded-pill">Not Created</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Uploaded Documents Card -->
+                            <div class="card shadow-sm border-0 mb-4">
+                                <div class="card-header bg-transparent border-bottom py-3">
+                                    <h5 class="mb-0 text-primary fw-bold"><i class="ti ti-files me-2"></i>Uploaded Documents</h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="row g-3">
+                                        @if(!empty($employee->pan_doc))
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 border rounded-3 bg-light-subtle d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="ti ti-file-text fs-3 text-primary"></i>
+                                                    <span class="fw-semibold text-dark">PAN Document</span>
+                                                </div>
+                                                <a href="{{ asset('/storage/employee_document/'.$employee->pan_doc) }}"
+                                                    target="_blank"
+                                                    class="btn btn-outline-primary btn-sm">
+                                                    <i class="ti ti-external-link me-1"></i>View
+                                                </a>
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        @if(!empty($employee->aadhar_doc))
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 border rounded-3 bg-light-subtle d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="ti ti-id fs-3 text-primary"></i>
+                                                    <span class="fw-semibold text-dark">Aadhaar Card</span>
+                                                </div>
+                                                <a href="{{ asset('/storage/employee_document/'.$employee->aadhar_doc) }}"
+                                                    target="_blank"
+                                                    class="btn btn-outline-primary btn-sm">
+                                                    <i class="ti ti-external-link me-1"></i>View
+                                                </a>
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        @if(!empty($employee->last_qualification_doc))
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 border rounded-3 bg-light-subtle d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="ti ti-certificate fs-3 text-primary"></i>
+                                                    <span class="fw-semibold text-dark">Qualification</span>
+                                                </div>
+                                                <a href="{{ asset('/storage/employee_document/'.$employee->last_qualification_doc) }}"
+                                                    target="_blank"
+                                                    class="btn btn-outline-primary btn-sm">
+                                                    <i class="ti ti-external-link me-1"></i>View
+                                                </a>
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        @if(!empty($employee->cancelled_cheque_doc))
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 border rounded-3 bg-light-subtle d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="ti ti-receipt fs-3 text-primary"></i>
+                                                    <span class="fw-semibold text-dark">Cancelled Cheque</span>
+                                                </div>
+                                                <a href="{{ asset('/storage/employee_document/'.$employee->cancelled_cheque_doc) }}"
+                                                    target="_blank"
+                                                    class="btn btn-outline-primary btn-sm">
+                                                    <i class="ti ti-external-link me-1"></i>View
+                                                </a>
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        @if(!empty($employee->cv_doc))
+                                        <div class="col-md-6 col-xl-4">
+                                            <div class="p-3 border rounded-3 bg-light-subtle d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="ti ti-user-check fs-3 text-primary"></i>
+                                                    <span class="fw-semibold text-dark">Resume / CV</span>
+                                                </div>
+                                                <a href="{{ asset('/storage/employee_document/'.$employee->cv_doc) }}"
+                                                    target="_blank"
+                                                    class="btn btn-outline-primary btn-sm">
+                                                    <i class="ti ti-external-link me-1"></i>View
+                                                </a>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -747,7 +820,7 @@
 
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-hover">
+                                        <table class="table tbl-product my-3" id="pc-dt-attendance">
                                             <thead>
                                                 <tr>
                                                     <th>Date</th>
@@ -757,27 +830,20 @@
                                                     <th>Working Hours</th>
                                                     <th>Overtime</th>
                                                     <th>Notes</th>
-
                                                 </tr>
                                             </thead>
                                             <tbody id="attendanceTableBody">
                                                 <tr>
-                                                    <td colspan="7" class="text-center">
-                                                        <div class="spinner-border spinner-border-sm" role="status">
+                                                    <td colspan="7" class="text-center py-4">
+                                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
                                                             <span class="visually-hidden">Loading...</span>
                                                         </div>
-                                                        Loading attendance data...
+                                                        <span class="ms-2">Loading attendance data...</span>
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
-                                    <nav aria-label="Attendance pagination" id="attendancePagination"
-                                        style="display: none;">
-                                        <ul class="pagination pagination-sm justify-content-end" id="paginationList">
-                                            <!-- Pagination will be generated dynamically -->
-                                        </ul>
-                                    </nav>
                                 </div>
                             </div>
 
@@ -1092,27 +1158,29 @@ document.addEventListener('click', function(e) {
 });
 
 // Attendance Log Functionality
-let currentPage = 1;
+let attendanceDataTable = null;
 const employeeId = {{ $employee->empId }};
 
-function loadAttendanceLog(page = 1) {
+function loadAttendanceLog() {
     const year = document.getElementById('attendanceYearSelect').value;
     const month = document.getElementById('attendanceMonthSelect').value;
 
-    // Show loading
-    document.getElementById('attendanceTableBody').innerHTML = `
+    if (attendanceDataTable) {
+        attendanceDataTable.destroy();
+        attendanceDataTable = null;
+    }
+
+    const tbody = document.getElementById('attendanceTableBody');
+    tbody.innerHTML = `
         <tr>
-            <td colspan="7" class="text-center">
-                <div class="spinner-border spinner-border-sm" role="status">
+            <td colspan="7" class="text-center py-4">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                Loading attendance data...
+                <span class="ms-2">Loading attendance data...</span>
             </td>
         </tr>
     `;
-
-    // Hide pagination during loading
-    document.getElementById('attendancePagination').style.display = 'none';
 
     fetch('/get_employee_attendance_log', {
         method: 'POST',
@@ -1123,16 +1191,13 @@ function loadAttendanceLog(page = 1) {
         body: JSON.stringify({
             employee_id: employeeId,
             year: year,
-            month: month,
-            page: page
+            month: month
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             renderAttendanceTable(data.data);
-            renderPagination(data.pagination);
-            currentPage = page;
         } else {
             showError('Failed to load attendance data');
         }
@@ -1144,12 +1209,17 @@ function loadAttendanceLog(page = 1) {
 }
 
 function renderAttendanceTable(attendanceData) {
+    if (attendanceDataTable) {
+        attendanceDataTable.destroy();
+        attendanceDataTable = null;
+    }
+
     const tbody = document.getElementById('attendanceTableBody');
 
-    if (attendanceData.length === 0) {
+    if (!attendanceData || attendanceData.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="text-center text-muted">
+                <td colspan="7" class="text-center text-muted py-4">
                     No attendance records found for the selected period.
                 </td>
             </tr>
@@ -1168,77 +1238,44 @@ function renderAttendanceTable(attendanceData) {
             <td>${record.notes}</td>
         </tr>
     `).join('');
-}
 
-function renderPagination(pagination) {
-    const paginationContainer = document.getElementById('attendancePagination');
-    const paginationList = document.getElementById('paginationList');
-
-    if (pagination.last_page <= 1) {
-        paginationContainer.style.display = 'none';
-        return;
+    const table = document.getElementById('pc-dt-attendance');
+    if (table && window.simpleDatatables) {
+        attendanceDataTable = new simpleDatatables.DataTable(table, {
+            sortable: true,
+            perPage: 10,
+            perPageSelect: [5, 10, 15, 20, 25, 50],
+            searchable: true,
+            fixedHeight: false,
+            labels: {
+                placeholder: "Search...",
+                perPage: "entries per page",
+                noRows: "No data available",
+                info: "Showing {start} to {end} of {rows} entries",
+            },
+            layout: {
+                top: "{select}{search}",
+                bottom: "{info}{pager}",
+            },
+            classes: {
+                active: "active",
+                disabled: "disabled",
+                selector: "form-select",
+                input: "form-control",
+                paginationList: "pagination",
+            },
+        });
     }
-
-    let paginationHTML = '';
-
-    // Previous button
-    if (pagination.current_page > 1) {
-        paginationHTML += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="loadAttendanceLog(${pagination.current_page - 1}); return false;">Previous</a>
-            </li>
-        `;
-    } else {
-        paginationHTML += `
-            <li class="page-item disabled">
-                <span class="page-link">Previous</span>
-            </li>
-        `;
-    }
-
-    // Page numbers
-    const startPage = Math.max(1, pagination.current_page - 2);
-    const endPage = Math.min(pagination.last_page, pagination.current_page + 2);
-
-    for (let i = startPage; i <= endPage; i++) {
-        if (i === pagination.current_page) {
-            paginationHTML += `
-                <li class="page-item active">
-                    <span class="page-link">${i}</span>
-                </li>
-            `;
-        } else {
-            paginationHTML += `
-                <li class="page-item">
-                    <a class="page-link" href="#" onclick="loadAttendanceLog(${i}); return false;">${i}</a>
-                </li>
-            `;
-        }
-    }
-
-    // Next button
-    if (pagination.current_page < pagination.last_page) {
-        paginationHTML += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="loadAttendanceLog(${pagination.current_page + 1}); return false;">Next</a>
-            </li>
-        `;
-    } else {
-        paginationHTML += `
-            <li class="page-item disabled">
-                <span class="page-link">Next</span>
-            </li>
-        `;
-    }
-
-    paginationList.innerHTML = paginationHTML;
-    paginationContainer.style.display = 'block';
 }
 
 function showError(message) {
+    if (attendanceDataTable) {
+        attendanceDataTable.destroy();
+        attendanceDataTable = null;
+    }
     document.getElementById('attendanceTableBody').innerHTML = `
         <tr>
-            <td colspan="7" class="text-center text-danger">
+            <td colspan="7" class="text-center text-danger py-4">
                 <i class="ph-duotone ph-warning-circle"></i> ${message}
             </td>
         </tr>
@@ -1247,11 +1284,11 @@ function showError(message) {
 
 // Event listeners for year and month selectors
 document.getElementById('attendanceYearSelect').addEventListener('change', function() {
-    loadAttendanceLog(1);
+    loadAttendanceLog();
 });
 
 document.getElementById('attendanceMonthSelect').addEventListener('change', function() {
-    loadAttendanceLog(1);
+    loadAttendanceLog();
 });
 
 // Export functionality

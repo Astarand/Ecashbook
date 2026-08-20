@@ -30,41 +30,41 @@
     <div class="row">
         <!-- [ sample-page ] start -->
         <div class="col-sm-12">
-            <div class="row">
-                <div class="col-lg-5 col-xxl-3">
-                    <div class="card overflow-hidden">
+            <div class="row g-4">
+                <div class="col-lg-4 col-xxl-3">
+                    <div class="card shadow-sm border-0 overflow-hidden">
                         <div class="nav flex-column nav-pills list-group list-group-flush account-pills mb-0" id="company-profile-set-tab" role="tablist" aria-orientation="vertical">
-                            <a class="nav-link list-group-item list-group-item-action active" id="asset-information-tab" data-bs-toggle="pill" href="#asset-information" role="tab" aria-controls="asset-information" aria-selected="true">
-                                <span class="f-w-500"><i class="ph-duotone ph-user-circle m-r-10"></i>Asset Information</span>
+                            <a class="nav-link list-group-item list-group-item-action active p-3" id="asset-information-tab" data-bs-toggle="pill" href="#asset-information" role="tab" aria-controls="asset-information" aria-selected="true">
+                                <span class="f-w-500 d-flex align-items-center"><i class="ph-duotone ph-user-circle fs-4 me-2"></i> Asset Information</span>
                             </a>
-                            <a class="nav-link list-group-item list-group-item-action" id="gst-tds-tab" data-bs-toggle="pill" href="#gst-tds" role="tab" aria-controls="gst-tds" aria-selected="false">
-                                <span class="f-w-500"><i class="ph-duotone ph-receipt m-r-10"></i>GST & TDS</span>
+                            <a class="nav-link list-group-item list-group-item-action p-3" id="gst-tds-tab" data-bs-toggle="pill" href="#gst-tds" role="tab" aria-controls="gst-tds" aria-selected="false">
+                                <span class="f-w-500 d-flex align-items-center"><i class="ph-duotone ph-receipt fs-4 me-2"></i> GST & TDS</span>
                             </a>
-                            <a class="nav-link list-group-item list-group-item-action" id="documentation-tab" data-bs-toggle="pill" href="#documentation" role="tab" aria-controls="documentation-tab" aria-selected="false">
-                                <span class="f-w-500"><i class="ph-duotone ph-wallet m-r-10"></i>Documentations<span>
+                            <a class="nav-link list-group-item list-group-item-action p-3" id="documentation-tab" data-bs-toggle="pill" href="#documentation" role="tab" aria-controls="documentation-tab" aria-selected="false">
+                                <span class="f-w-500 d-flex align-items-center"><i class="ph-duotone ph-wallet fs-4 me-2"></i> Documentations</span>
                             </a>
-                            <a class="nav-link list-group-item list-group-item-action" id="audit-trail-tab" data-bs-toggle="pill" href="#audit-trail" role="tab" aria-controls="audit-trail-tab" aria-selected="false">
-                                <span class="f-w-500"><i class="ph-duotone ph-arrow-square-up m-r-10"></i>Audit Trail</span>
+                            <a class="nav-link list-group-item list-group-item-action p-3" id="audit-trail-tab" data-bs-toggle="pill" href="#audit-trail" role="tab" aria-controls="audit-trail-tab" aria-selected="false">
+                                <span class="f-w-500 d-flex align-items-center"><i class="ph-duotone ph-arrow-square-up fs-4 me-2"></i> Audit Trail</span>
                             </a>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-7 col-xxl-9">
+                <div class="col-lg-8 col-xxl-9">
 					
                     <form data-route="{{ route('user.SaveAsset') }}" name="addAssetFrm" id="addAssetFrm" enctype="multipart/form-data">
                         @csrf
 						<div class="message-container"></div>
                         <div class="tab-content" id="company-profile-set-tabContent">
                             <div class="tab-pane fade show active" id="asset-information" role="tabpanel" aria-labelledby="asset-information-tab">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>Asset Information</h5>
+                                <div class="card shadow-sm border-0">
+                                    <div class="card-header bg-transparent border-bottom py-3">
+                                        <h5 class="mb-0 text-primary fw-bold"><i class="ti ti-info-circle me-1"></i> Asset Information</h5>
                                     </div>
 									
-                                    <div class="card-body">
-                                        <div class="row">
-											<div class="col-sm-6 mb-3">
-												<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
+                                    <div class="card-body p-4">
+                                        <div class="row g-3">
+											<div class="col-md-4">
+												<label class="form-label fw-semibold text-dark">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 												<select name="propId" class="form-control">
 													<option value="">{{ parentCompanyName() }}</option>
 													@foreach($proprietorships as $company)
@@ -74,25 +74,23 @@
 													@endforeach
 												</select>
 											</div>
-                                            <div class="col-sm-6 mb-3">
-                                                <label class="form-label">Date<span class="text-danger">*</span></label>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold text-dark">Date <span class="text-danger">*</span></label>
                                                 <input type="date" class="form-control" placeholder="Enter Date" name="date" id="date">
                                             </div>
                                             
-                                            <div class="col-sm-6 mb-3">
-                                                <label class="form-label">Asset Type<span class="text-danger">*</span></label>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold text-dark">Asset Type <span class="text-danger">*</span></label>
                                                 <select id="assetType" name="assetType" class="form-select">
                                                     <option value="">Select</option>
                                                     <option value="current">Current Assets</option>
                                                     <option value="non-current">Non Current Assets</option>
-													{{--<option value="capex">Capital Expenditure (CapEx)</option> --}}
-                                                    {{-- <option value="investment">Investment</option> --}}
                                                 </select>
                                             </div>
                                             <!-- Current Assets Section -->
-                                            <div id="currentAssetsSection" class="row" style="display: none;">
-                                                <div class="col-sm-12 mb-3">
-                                                    <label class="form-label">Current Assets Type <span class="text-danger">*</span></label>
+                                            <div id="currentAssetsSection" class="row g-3 p-0 m-0" style="display: none;">
+                                                <div class="col-md-12">
+                                                    <label class="form-label fw-semibold text-dark">Current Assets Type <span class="text-danger">*</span></label>
                                                     <select id="currentAssetsType" name="currentAssetType" class="form-select">
                                                         <option value="">Select</option>
 														<option value="Cash in Hand">Cash in Hand</option>
@@ -106,69 +104,45 @@
 														<option value="Inventories">Inventories / Stocks</option>														
                                                     </select>
                                                 </div>
-                                                <div class="col-sm-12 mb-3" id="otherCurrentAssetsDiv" style="display: none;">
-                                                    <label class="form-label">Other Current Asset Name<span class="text-danger">*</span></label>
+                                                <div class="col-md-12" id="otherCurrentAssetsDiv" style="display: none;">
+                                                    <label class="form-label fw-semibold text-dark">Other Current Asset Name <span class="text-danger">*</span></label>
                                                     <input type="text" class="form-control" name="otherCurrentAssetName" id="otherCurrentAssetName" placeholder="Enter Other Current Asset Name">
                                                 </div>
                                             </div>
 											
 											<!-- Non-Current Assets Section -->
-                                            <div id="nonCurrentAssetsSection" class="row" style="display: none;">
-												<div class="col-sm-12 mb-3">
-													<label class="form-label" id="assetTypeLabel">Non-Current Assets Type <span class="text-danger">*</span></label>
+                                            <div id="nonCurrentAssetsSection" class="row g-3 p-0 m-0" style="display: none;">
+												<div class="col-md-12">
+													<label class="form-label fw-semibold text-dark" id="assetTypeLabel">Non-Current Assets Type <span class="text-danger">*</span></label>
 													<select id="nonCurrentAssetsType" class="form-select" name="nonCurrentAssetType">
-														<!--<option value="">Select</option>
-														<option value="Property Plant Equipment">Property, Plant & Equipment (PPE)</option>
-														<option value="Furniture Fixtures">Furniture & Fixtures</option>
-														<option value="Computer IT Equipment">Computer & IT Equipment</option>
-														<option value="Machinery">Machinery</option>
-														<option value="Vehicles">Vehicles</option>
-														<option value="Intangible Assets">Intangible / Non-physical Assets</option>
-														<option value="Capital Work in Progress">Capital Work-in-Progress</option>
-														<option value="Other Non-Current Assets">Other Non-Current Assets</option>-->
 													</select>
 												</div>
 											</div>
                                            
-                                            <div class="row" id="commonSection" style="display:none; margin-top:10px;">
+                                            <div class="row g-3 p-0 m-0" id="commonSection" style="display:none; margin-top:10px;">
                                                                                                
                                                 <!-- ================= BASIC DETAILS ================= -->
-												<h5 class="mb-3">Basic Details</h5>
-
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Asset Name <span class="text-danger">*</span></label>
-													<input type="text" name="asset_name" id="asset_name" class="form-control">
+												<div class="col-12 mt-3">
+													<h6 class="text-primary fw-bold border-bottom pb-2 mb-0">Basic Details</h6>
 												</div>
 
-												<!--<div class="col-xl-4 mb-3">
-													<label class="form-label">Asset Category <span class="text-danger">*</span></label>
-													<select name="asset_category" class="form-select">
-														<option value="">Select</option>
-														<option value="Land">Land</option>
-														<option value="Building">Building</option>
-														<option value="Plant Machinery">Plant & Machinery</option>
-														<option value="Furniture Fixtures">Furniture & Fixtures</option>
-														<option value="Office Equipment">Office Equipment</option>
-														<option value="Computer IT Equipment">Computer & IT Equipment</option>
-														<option value="Vehicles">Vehicles</option>
-														<option value="Electrical Installations">Electrical Installations</option>
-														<option value="Leasehold Improvements">Leasehold Improvements</option>
-														<option value="Other">Other</option>
-													</select>
-												</div>-->
-
-												<div class="col-xl-4 mb-3">
-													<label class="form-label"  id="assetCodeLabel">Asset Code / ID <span class="text-danger">*</span></label>
-													<input type="text" name="asset_code" id="asset_code" class="form-control">
+												<div class="col-md-3">
+													<label class="form-label fw-semibold text-dark">Asset Name <span class="text-danger">*</span></label>
+													<input type="text" name="asset_name" id="asset_name" class="form-control" placeholder="Enter Asset Name">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Location / Branch</label>
-													<input type="text" name="location" class="form-control">
+												<div class="col-md-3">
+													<label class="form-label fw-semibold text-dark" id="assetCodeLabel">Asset Code / ID <span class="text-danger">*</span></label>
+													<input type="text" name="asset_code" id="asset_code" class="form-control" placeholder="e.g. AST-001">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Department</label>
+												<div class="col-md-3">
+													<label class="form-label fw-semibold text-dark">Location / Branch</label>
+													<input type="text" name="location" class="form-control" placeholder="Enter Location">
+												</div>
+
+												<div class="col-md-3">
+													<label class="form-label fw-semibold text-dark">Department</label>
 													<select name="department" class="form-select">
 														<option value="">Select</option>
 														<option value="Administration">Administration</option>
@@ -183,10 +157,12 @@
 
 
 												<!-- ================= PURCHASE DETAILS ================= -->
-												<h5 class="mt-4 mb-3">Purchase Details</h5>
+												<div class="col-12 mt-4">
+													<h6 class="text-primary fw-bold border-bottom pb-2 mb-0">Purchase Details</h6>
+												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Vendor Name</label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Vendor Name</label>
 													<select name="vendor_id" id="vendor_id" class="form-control">
 														<option value="">Select Vendor</option>
 														@foreach($vendors as $vendor)
@@ -197,23 +173,23 @@
 													</select>
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Invoice/Reference No</label>
-													<input type="text" name="invoice_no" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Invoice/Reference No</label>
+													<input type="text" name="invoice_no" class="form-control" placeholder="e.g. INV-1002">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Invoice Date</label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Invoice Date</label>
 													<input type="date" name="invoice_date" id="invoice_date" class="form-control">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Asset Amount Value<span class="text-danger">*</span></label>
-													<input type="number" name="invoice_value" id="invoice_value" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Asset Amount Value <span class="text-danger">*</span></label>
+													<input type="number" name="invoice_value" id="invoice_value" class="form-control" placeholder="0.00">
 												</div>
 												
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Payment Status<span class="text-danger">*</span></label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Payment Status <span class="text-danger">*</span></label>
 													<select name="pay_status" id="pay_status" class="form-select">
 														<option value="">Select</option>
 														<option value="Full">Full</option>
@@ -222,9 +198,9 @@
 													</select>
 												</div>
 												
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Payment Mode<span class="text-danger">*</span></label>
-													<select name="pay_mode" id="pay_mode"  class="form-select">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Payment Mode <span class="text-danger">*</span></label>
+													<select name="pay_mode" id="pay_mode" class="form-select">
 														<option value="">Select</option>
 														<option value="Cash">Cash</option>
 														<option value="Bank">Bank</option>														
@@ -232,70 +208,68 @@
 													</select>
 												</div>
 												
-												<div class="col-xl-4 mb-3" id="bank_div">
-													<div class="form-group">
-														<label class="form-label">Select Bank</label>
-														<select name="bank_id" id="bank_id" class="form-control">
-															<option value="">-- Select Bank --</option>
-															@foreach($bankDetails as $bank)
-																<option value="{{ $bank->id }}">
-																	{{ $bank->bank_name }}
-																</option>
-															@endforeach
-														</select>
-													</div>
+												<div class="col-md-4" id="bank_div">
+													<label class="form-label fw-semibold text-dark">Select Bank</label>
+													<select name="bank_id" id="bank_id" class="form-control">
+														<option value="">-- Select Bank --</option>
+														@foreach($bankDetails as $bank)
+															<option value="{{ $bank->id }}">
+																{{ $bank->bank_name }}
+															</option>
+														@endforeach
+													</select>
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Advance Amount<span class="text-danger">*</span></label>
-													<input type="number" name="advance_amt" id="advance_amt" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Advance Amount <span class="text-danger">*</span></label>
+													<input type="number" name="advance_amt" id="advance_amt" class="form-control" placeholder="0.00">
 												</div>
 												
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Balance Payable Amount<span class="text-danger">*</span></label>
-													<input type="number" name="payable_amt" id="payable_amt" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Balance Payable Amount <span class="text-danger">*</span></label>
+													<input type="number" name="payable_amt" id="payable_amt" class="form-control" placeholder="0.00">
 												</div>
 												
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Adjusted Now<span class="text-danger">*</span></label>
-													<input type="number" name="adjusted_amt" id="adjusted_amt" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Adjusted Now <span class="text-danger">*</span></label>
+													<input type="number" name="adjusted_amt" id="adjusted_amt" class="form-control" placeholder="0.00">
 												</div>
-												
-												
 
 
 												<!-- ================= CAPITALIZATION ================= -->
-												<h5 class="mt-4 mb-3">Capitalization Details</h5>
+												<div class="col-12 mt-4">
+													<h6 class="text-primary fw-bold border-bottom pb-2 mb-0">Capitalization Details</h6>
+												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Capitalization Date</label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Capitalization Date</label>
 													<input type="date" name="capitalization_date" class="form-control">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Put to Use Date</label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Put to Use Date</label>
 													<input type="date" name="put_to_use_date" class="form-control">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label" id="assetStatusLabel">Asset Status</label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark" id="assetStatusLabel">Asset Status</label>
 													<select name="asset_status" id="asset_status" class="form-select">
-														<!--<option value="Active">Active</option>
-														<option value="Under Construction">Under Construction</option>-->
 													</select>
 												</div>
 
 
 												<!-- ================= DEPRECIATION ================= -->
-												<h5 class="mt-4 mb-3">Depreciation Setup</h5>
+												<div class="col-12 mt-4">
+													<h6 class="text-primary fw-bold border-bottom pb-2 mb-0">Depreciation Setup</h6>
+												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Depreciation Start Date</label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Depreciation Start Date</label>
 													<input type="date" name="depreciation_start_date" id="depreciation_start_date" class="form-control">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Depreciation Method</label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Depreciation Method</label>
 													<select name="depreciation_method" id="depreciation_method" class="form-select">
 														<option value="">select</option>
 														<option value="SLM">Straight Line Method (SLM)</option>
@@ -303,52 +277,53 @@
 													</select>
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Depreciation Frequency</label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Depreciation Frequency</label>
 													<select name="depreciation_frequency" id="depreciation_frequency" class="form-select">
-														<!--<option value="">select</option>-->
 														<option value="Yearly">Yearly</option>
 													</select>
 												</div>
 
-												<div class="col-xl-4 mb-3" id="usefulLifeDiv" >
-													<label class="form-label">Useful Life (Years)</label>
-													<input type="number" name="useful_life_years" id="useful_life_years" class="form-control">
+												<div class="col-md-4" id="usefulLifeDiv">
+													<label class="form-label fw-semibold text-dark">Useful Life (Years)</label>
+													<input type="number" name="useful_life_years" id="useful_life_years" class="form-control" placeholder="Years">
 												</div>												
 												
-												<div class="col-xl-4 mb-3" id="residualValueDiv">
-													<label class="form-label">Residual Value</label>
-													<input type="number" name="residual_value" id="residual_value" class="form-control">
+												<div class="col-md-4" id="residualValueDiv">
+													<label class="form-label fw-semibold text-dark">Residual Value</label>
+													<input type="number" name="residual_value" id="residual_value" class="form-control" placeholder="0.00">
 												</div>
 
-												<div class="col-xl-4 mb-3" id="depreciationRateDiv" style="display:none;">
-													<label class="form-label">Depreciation Rate (%)</label>
-													<input type="number" name="depreciation_rate" id="depreciation_rate" class="form-control">
+												<div class="col-md-4" id="depreciationRateDiv" style="display:none;">
+													<label class="form-label fw-semibold text-dark">Depreciation Rate (%)</label>
+													<input type="number" name="depreciation_rate" id="depreciation_rate" class="form-control" placeholder="%">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Depreciation Value</label>
-													<input type="number" name="depreciation_value" id="depreciation_value" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Depreciation Value</label>
+													<input type="number" name="depreciation_value" id="depreciation_value" class="form-control" placeholder="0.00">
 												</div>
 												
                                             </div>
                                             
-											<div class="row" id="WorkinProgressSection" style="display:none; margin-top:10px;">
+											<div class="row g-3 p-0 m-0" id="WorkinProgressSection" style="display:none; margin-top:10px;">
 												<!-- ================= PROJECT DETAILS ================= -->
-												<h5 class="mb-3">Project Details</h5>
-
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Project Name <span class="text-danger">*</span></label>
-													<input type="text" name="project_name" class="form-control">
+												<div class="col-12 mt-3">
+													<h6 class="text-primary fw-bold border-bottom pb-2 mb-0">Project Details</h6>
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Project Code / ID <span class="text-danger">*</span></label>
-													<input type="text" name="project_code" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Project Name <span class="text-danger">*</span></label>
+													<input type="text" name="project_name" class="form-control" placeholder="Enter Project Name">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Asset Type <span class="text-danger">*</span></label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Project Code / ID <span class="text-danger">*</span></label>
+													<input type="text" name="project_code" class="form-control" placeholder="e.g. PRJ-001">
+												</div>
+
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Asset Type <span class="text-danger">*</span></label>
 													<select name="cwip_asset_type" class="form-select">
 														<option value="">Select</option>
 														<option value="Land">Land</option>
@@ -366,10 +341,12 @@
 
 
 												<!-- ================= EXPENSE DETAILS ================= -->
-												<h5 class="mt-4 mb-3">Expense Details</h5>
+												<div class="col-12 mt-4">
+													<h6 class="text-primary fw-bold border-bottom pb-2 mb-0">Expense Details</h6>
+												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Expense Type <span class="text-danger">*</span></label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Expense Type <span class="text-danger">*</span></label>
 													<select name="expense_type" class="form-select">
 														<option value="">Select</option>
 														<option value="Material Cost">Material Cost</option>
@@ -384,8 +361,8 @@
 													</select>
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Vendor Name</label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Vendor Name</label>
 													<select name="cwip_vendor_id" id="cwip_vendor_id" class="form-control">
 														<option value="">Select Vendor</option>
 														@foreach($vendors as $vendor)
@@ -396,18 +373,18 @@
 													</select>
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Invoice No</label>
-													<input type="text" name="cwip_invoice_no" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Invoice No</label>
+													<input type="text" name="cwip_invoice_no" class="form-control" placeholder="e.g. INV-1002">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Amount <span class="text-danger">*</span></label>
-													<input type="number" name="cwip_amount" id="cwip_amount" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Amount <span class="text-danger">*</span></label>
+													<input type="number" name="cwip_amount" id="cwip_amount" class="form-control" placeholder="0.00">
 												</div>
 												
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Payment Status<span class="text-danger">*</span></label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Payment Status <span class="text-danger">*</span></label>
 													<select name="cwip_pay_status" id="cwip_pay_status" class="form-select">
 														<option value="">Select</option>
 														<option value="Full">Full</option>
@@ -415,8 +392,8 @@
 														<option value="Due">Due</option>
 													</select>
 												</div>
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Payment Mode<span class="text-danger">*</span></label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Payment Mode <span class="text-danger">*</span></label>
 													<select name="cwip_pay_mode" id="cwip_pay_mode" class="form-select">
 														<option value="">Select</option>
 														<option value="Cash">Cash</option>
@@ -424,46 +401,46 @@
 														<option value="UPI">UPI</option>														
 													</select>
 												</div>
-												<div class="col-xl-4 mb-3">
-													<div class="form-group">
-														<label class="form-label">Select Bank</label>
-														<select name="cwip_bank_id" id="cwip_bank_id" class="form-control">
-															<option value="">-- Select Bank --</option>
-															@foreach($bankDetails as $bank)
-																<option value="{{ $bank->id }}">
-																	{{ $bank->bank_name }}
-																</option>
-															@endforeach
-														</select>
-													</div>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Select Bank</label>
+													<select name="cwip_bank_id" id="cwip_bank_id" class="form-control">
+														<option value="">-- Select Bank --</option>
+														@foreach($bankDetails as $bank)
+															<option value="{{ $bank->id }}">
+																{{ $bank->bank_name }}
+															</option>
+														@endforeach
+													</select>
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Advance Amount</label>
-													<input type="number" name="cwip_advance_amt" id="cwip_advance_amt" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Advance Amount</label>
+													<input type="number" name="cwip_advance_amt" id="cwip_advance_amt" class="form-control" placeholder="0.00">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Balance Payable</label>
-													<input type="number" name="cwip_payable_amt" id="cwip_payable_amt" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Balance Payable</label>
+													<input type="number" name="cwip_payable_amt" id="cwip_payable_amt" class="form-control" placeholder="0.00">
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Adjusted Now</label>
-													<input type="number" name="cwip_adjusted_amt" id="cwip_adjusted_amt" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Adjusted Now</label>
+													<input type="number" name="cwip_adjusted_amt" id="cwip_adjusted_amt" class="form-control" placeholder="0.00">
 												</div>
 
 
 												<!-- ================= PROGRESS TRACKING ================= -->
-												<h5 class="mt-4 mb-3">Progress Tracking</h5>
-
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Stage of Completion (%)</label>
-													<input type="number" name="completion_percentage" class="form-control">
+												<div class="col-12 mt-4">
+													<h6 class="text-primary fw-bold border-bottom pb-2 mb-0">Progress Tracking</h6>
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Capitalization Status</label>
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Stage of Completion (%)</label>
+													<input type="number" name="completion_percentage" class="form-control" placeholder="%">
+												</div>
+
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Capitalization Status</label>
 													<select name="capitalization_status" class="form-select">
 														<option value="">Select</option>
 														<option value="Pending">Pending</option>
@@ -471,262 +448,244 @@
 													</select>
 												</div>
 
-												<div class="col-xl-4 mb-3">
-													<label class="form-label">Work Order / Contract Ref</label>
-													<input type="text" name="work_order_ref" class="form-control">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Work Order / Contract Ref</label>
+													<input type="text" name="work_order_ref" class="form-control" placeholder="Work Order Ref">
 												</div>
 
 											</div>
 											
 											<!--Cash in hand--->
-											<div  class="row" id="cashInHandSection" style="display:none;">
-												<div class="col-md-4 mb-3">
-													<label>Amount</label>
-													<input type="number" name="cash_amount" class="form-control">
+											<div class="row g-3 p-0 m-0" id="cashInHandSection" style="display:none;">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Amount</label>
+													<input type="number" name="cash_amount" class="form-control" placeholder="0.00">
 												</div>
-												<div class="col-md-4 mb-3 d-flex align-items-end">
-													<a href="/cash-management" target="_blank" class="btn btn-primary">Details</a>
+												<div class="col-md-4 d-flex align-items-end">
+													<a href="/cash-management" target="_blank" class="btn btn-outline-primary"><i class="ti ti-external-link me-1"></i> Details</a>
 												</div>
 											</div>
 											
 											<!--Bank Accounts--->
-											<div  class="row" id="bankAccountSection" style="display:none;">
-												<div class="col-md-4 mb-3">
-													<label>Bank Account</label>
+											<div class="row g-3 p-0 m-0" id="bankAccountSection" style="display:none;">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Bank Account</label>
 													<select name="bank_id" id="curr_bank_id" class="form-control"></select>
 												</div>
 
-												<div class="col-md-4 mb-3">
-													<label>Balance</label>
-													<input type="text" name="bank_balance" id="bank_balance" class="form-control" >
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Balance</label>
+													<input type="text" name="bank_balance" id="bank_balance" class="form-control" placeholder="0.00">
 												</div>
-												<div class="col-md-4 mb-3 d-flex align-items-end">
-													<a href="/bank-list" target="_blank" class="btn btn-primary">Details</a>
+												<div class="col-md-4 d-flex align-items-end">
+													<a href="/bank-list" target="_blank" class="btn btn-outline-primary"><i class="ti ti-external-link me-1"></i> Details</a>
 												</div>
 											</div>
 											<!--TRADE RECEIVABLES -->
-											<div  class="row" id="tradeReceivableSection" style="display:none;">
-												<div class="col-md-4 mb-3">
-													<label>Amount</label>
-													<input type="text" name="amount" id="amount" class="form-control" >
+											<div class="row g-3 p-0 m-0" id="tradeReceivableSection" style="display:none;">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Amount</label>
+													<input type="text" name="amount" id="amount" class="form-control" placeholder="0.00">
 												</div>
-												<div class="col-md-4 mb-3 d-flex align-items-end">
-													<a href="/sale-invoices" target="_blank" class="btn btn-primary">Details</a>
+												<div class="col-md-4 d-flex align-items-end">
+													<a href="/sale-invoices" target="_blank" class="btn btn-outline-primary"><i class="ti ti-external-link me-1"></i> Details</a>
 												</div>
 											</div>
 											<!--Advance to vendor-->
-											<div class="row" id="advanceVendorSection" style="display:none;">
-												<div class="col-md-4 mb-3">
-													<label>Amount</label>
-													<input type="text" name="amount_vendor" id="amount_vendor" class="form-control" >
+											<div class="row g-3 p-0 m-0" id="advanceVendorSection" style="display:none;">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Amount</label>
+													<input type="text" name="amount_vendor" id="amount_vendor" class="form-control" placeholder="0.00">
 												</div>	
-												<div class="col-md-4 mb-3 d-flex align-items-end">
-													<a href="/purchase-invoices" target="_blank" class="btn btn-primary">Details</a>
+												<div class="col-md-4 d-flex align-items-end">
+													<a href="/purchase-invoices" target="_blank" class="btn btn-outline-primary"><i class="ti ti-external-link me-1"></i> Details</a>
 												</div>
 											</div>
                                             
 											<!---Employee Advance-->
-											<div class="row" id="employeeAdvanceSection" style="display:none;">
-												<div class="col-md-4 mb-3">
-													<label>Advance Amount</label>
-													<input type="text" name="employee_advance_amount" id="employee_advance_amount" class="form-control" >
+											<div class="row g-3 p-0 m-0" id="employeeAdvanceSection" style="display:none;">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Advance Amount</label>
+													<input type="text" name="employee_advance_amount" id="employee_advance_amount" class="form-control" placeholder="0.00">
 												</div>
-												<div class="col-md-4 mb-3 d-flex align-items-end">
-													<a href="/expenses-list" target="_blank" class="btn btn-primary">Details</a>
+												<div class="col-md-4 d-flex align-items-end">
+													<a href="/expenses-list" target="_blank" class="btn btn-outline-primary"><i class="ti ti-external-link me-1"></i> Details</a>
 												</div>
 											</div>
 											
 											<!--Prepaid expense -->
-											<div class="row" id="prepaidExpenseSection" style="display:none;">
-												<div class="col-md-4 mb-3">
-													<label>Amount</label>
-													<input type="text" name="prepaid_amt" id="prepaid_amt" class="form-control" >
+											<div class="row g-3 p-0 m-0" id="prepaidExpenseSection" style="display:none;">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Amount</label>
+													<input type="text" name="prepaid_amt" id="prepaid_amt" class="form-control" placeholder="0.00">
 												</div>
-												<div class="col-md-4 mb-3 d-flex align-items-end">
-													<a href="/expenses-list" target="_blank" class="btn btn-primary">Details</a>
+												<div class="col-md-4 d-flex align-items-end">
+													<a href="/expenses-list" target="_blank" class="btn btn-outline-primary"><i class="ti ti-external-link me-1"></i> Details</a>
 												</div>
 											</div>
 											
 											<!--Input GST Credit-->
-											<div class="row" id="itcSection" style="display:none;">
-												<div class="col-md-4 mb-3">
-													<label>ITC Amount</label>
-													<input type="text" name="itc_amt" id="itc_amt" class="form-control" >
+											<div class="row g-3 p-0 m-0" id="itcSection" style="display:none;">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">ITC Amount</label>
+													<input type="text" name="itc_amt" id="itc_amt" class="form-control" placeholder="0.00">
 												</div>
-												<div class="col-md-4 mb-3 d-flex align-items-end">
-													<a href="/gst-reports" target="_blank" class="btn btn-primary">Details</a>
+												<div class="col-md-4 d-flex align-items-end">
+													<a href="/gst-reports" target="_blank" class="btn btn-outline-primary"><i class="ti ti-external-link me-1"></i> Details</a>
 												</div>
-												
 											</div>
 											
 											<!--TDS Receivable-->
-											<div class="row" id="tdsReceivableSection" style="display:none;">												
-												<div class="col-md-4 mb-3">
-													<label>Gross Amount</label>
-													<input type="text" id="tds_gross_amount" name="tds_gross_amount" class="form-control" >
+											<div class="row g-3 p-0 m-0" id="tdsReceivableSection" style="display:none;">												
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Gross Amount</label>
+													<input type="text" id="tds_gross_amount" name="tds_gross_amount" class="form-control" placeholder="0.00">
 												</div>
-												<div class="col-md-4 mb-3 d-flex align-items-end">
-													<a href="/tds-returns-filing" target="_blank" class="btn btn-primary">Details</a>
+												<div class="col-md-4 d-flex align-items-end">
+													<a href="/tds-returns-filing" target="_blank" class="btn btn-outline-primary"><i class="ti ti-external-link me-1"></i> Details</a>
 												</div>
 											</div>
 											
-											<div class="row" id="inventorySection" style="display:none;">
-												<div class="col-md-4 mb-3">
-													<label>Total Gross Profit</label>
-													<input type="text" name="gross_profit" id="gross_profit" class="form-control" >
+											<div class="row g-3 p-0 m-0" id="inventorySection" style="display:none;">
+												<div class="col-md-4">
+													<label class="form-label fw-semibold text-dark">Total Gross Profit</label>
+													<input type="text" name="gross_profit" id="gross_profit" class="form-control" placeholder="0.00">
 												</div>
-												<div class="col-md-4 mb-3 d-flex align-items-end">
-													<a href="/inventory-list" target="_blank" class="btn btn-primary">Details</a>
+												<div class="col-md-4 d-flex align-items-end">
+													<a href="/inventory-list" target="_blank" class="btn btn-outline-primary"><i class="ti ti-external-link me-1"></i> Details</a>
 												</div>
 											</div>
 											
 										</div>
                                     </div>
-                                    <div class="d-flex wizard justify-content-end mb-3 me-3">
-                                        <div class="last">
-                                            <a href="javascript:void(0);" id="nextBtn1" class="btn btn-primary next-btn d-flex align-items-center justify-content-center">
-                                                Next <i class="ti ti-arrow-up-right-circle ms-2"></i>
-                                            </a>
-                                        </div>
+                                    <div class="card-footer bg-transparent border-top py-3 d-flex justify-content-end">
+                                        <a href="javascript:void(0);" id="nextBtn1" class="btn btn-primary next-btn d-inline-flex align-items-center">
+                                            Next <i class="ti ti-arrow-right ms-2"></i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="gst-tds" role="tabpanel" aria-labelledby="gst-tds-tab">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>GST & TDS</h5>
+                                <div class="card shadow-sm border-0">
+                                    <div class="card-header bg-transparent border-bottom py-3">
+                                        <h5 class="mb-0 text-primary fw-bold"><i class="ti ti-receipt-tax me-1"></i> GST & TDS</h5>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="row currAsset">
-											<div class="col-md-12">
-												<label class="form-label">TDS Applicable</label>
-												<div class="row">
-													<div class="col-6">
-														<div class="card shadow-sm border-0 p-3 m-2">
-															<div class="form-check">
+                                    <div class="card-body p-4">
+                                        <div class="row g-3 currAsset">
+											<div class="col-md-6">
+												<div class="card p-3 border rounded-3 bg-light-subtle h-100 mb-0">
+													<div class="d-flex align-items-center justify-content-between mb-2">
+														<label class="form-label fw-bold text-dark mb-0">TDS Applicable</label>
+														<div class="d-inline-flex gap-3">
+															<div class="form-check form-check-inline mb-0">
 																<input class="form-check-input" type="radio" name="tds_applicable" value="yes" id="tdsYes">
-																<label class="form-check-label" for="tdsYes">Yes</label>
+																<label class="form-check-label fw-semibold text-success" for="tdsYes">Yes</label>
+															</div>
+															<div class="form-check form-check-inline mb-0">
+																<input class="form-check-input" type="radio" name="tds_applicable" value="no" id="tdsNo" checked>
+																<label class="form-check-label fw-semibold text-danger" for="tdsNo">No</label>
 															</div>
 														</div>
 													</div>
-													<div class="col-6">
-														<div class="card shadow-sm border-0 p-3 m-2">
-															<div class="form-check">
-																<input class="form-check-input" type="radio" name="tds_applicable" value="no" id="tdsNo" checked>
-																<label class="form-check-label" for="tdsNo">No</label>
+													<div class="tds-container mt-2" id="tdsContainer">
+														<div class="row g-2">
+															<div class="col-md-6">
+																<div id="tds_dropdown_universal">
+																	<label for="tds_percent" class="form-label fw-semibold text-dark">TDS Percentage</label>
+																	<select name="tds_percent" id="tds_percent" class="form-control">
+																		@foreach ($purposes_of_tds as $purpose)
+																		<option value="{{ $purpose->tds_rate . '-' . $purpose->id }}">
+																			{{ $purpose->category }} ({{ $purpose->tds_rate }}%)
+																		</option>
+																		@endforeach
+																	</select>
+																</div>
+															</div>
+															<div class="col-md-6">
+																<label for="tds_amt" class="form-label fw-semibold text-dark">TDS Amount</label>
+																<input type="text" id="tds_amt" class="form-control bg-white" readonly placeholder="0.00">
 															</div>
 														</div>
 													</div>
 												</div>
 											</div>
-                                            <div class="tds-container col-md-12" id="tdsContainer">
-                                                <div class="row">
-													<div class="col-md-6">
-														<div id="tds_dropdown_universal">
-															<label for="tds_percent" class="form-label">TDS Percentage</label>
-															<select name="tds_percent" id="tds_percent" class="form-control">
-																@foreach ($purposes_of_tds as $purpose)
-																<option value="{{ $purpose->tds_rate . '-' . $purpose->id }}">
-																	{{ $purpose->category }} ({{ $purpose->tds_rate }}%)
-																</option>
-																@endforeach
+
+                                            <div class="col-md-6 gst-container">
+												<div class="card p-3 border rounded-3 bg-light-subtle h-100 mb-0">
+													<div class="d-flex align-items-center justify-content-between mb-2">
+														<label class="form-label fw-bold text-dark mb-0">GST Applicable <span class="text-danger">*</span></label>
+														<div class="d-inline-flex gap-3">
+															<div class="form-check form-check-inline mb-0">
+																<input class="form-check-input" type="radio" name="gst_applicable" value="yes" id="gstYes_ca">
+																<label class="form-check-label fw-semibold text-success" for="gstYes_ca">Yes</label>
+															</div>
+															<div class="form-check form-check-inline mb-0">
+																<input class="form-check-input" name="gst_applicable" value="no" type="radio" id="gstNo_ca" checked>
+																<label class="form-check-label fw-semibold text-danger" for="gstNo_ca">No</label>
+															</div>
+														</div>
+													</div>
+													<div class="row g-2 mt-2">
+														<div class="col-md-6">
+															<label for="gst_trans" class="form-label fw-semibold text-dark">GST Transaction Mode</label>
+															<select class="form-select" name="gst_trans" id="gst_trans">
+																<option value="">Select</option>
+																<option value="intrastate">Intra State</option>
+																<option value="interstate">Inter State</option>
+																<option value="union">Union Territory</option>
 															</select>
 														</div>
-                                                    </div>
-													<div class="col-md-6">
-														<label for="tds_amt">TDS Amount</label>
-														<input type="text" id="tds_amt"  class="form-control" readonly>
+														<div class="col-md-6">
+															<label for="gst_rate" class="form-label fw-semibold text-dark">GST Rate (%)</label>
+															<input type="number" name="gst_rate" id="gst_rate" class="form-control" min="0" step="0.01" placeholder="%">
+														</div>
+														<div class="col-md-6">
+															<label for="gst_allocation" class="form-label fw-semibold text-dark">GST Allocation</label>
+															<input type="text" name="gst_allocation" id="gst_allocation" class="form-control bg-white" readonly placeholder="Allocation">
+														</div>
+														<div class="col-md-6">
+															<label for="gst_amt" class="form-label fw-semibold text-dark">Total GST Amount</label>
+															<input type="text" name="gst_amt" id="gst_amt" class="form-control bg-white" readonly placeholder="0.00">
+														</div>
 													</div>
-                                                </div>
-                                            </div>
-
-                                            <div class="gst-container col-md-12">
-                                                <div class="mb-3">
-                                                    <label class="form-label">GST Applicable <span class="text-danger">*</span></label>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="card shadow-sm border-0 p-3 m-2">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio" name="gst_applicable" value="yes" id="gstYes_ca" >
-                                                                    <label class="form-check-label" for="gstYes_ca">Yes</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="card shadow-sm border-0 p-3 m-2">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" name="gst_applicable" value="no" type="radio" id="gstNo_ca" checked>
-                                                                    <label class="form-check-label" for="gstNo_ca">No</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row mb-3">
-                                                    <div class="col-md-4">
-                                                        <label for="gst_trans">GST Transaction Mode</label>
-                                                        <select class="form-select" name="gst_trans" id="gst_trans">
-                                                            <option value="">Select</option>
-                                                            <option value="intrastate">Intra State</option>
-                                                            <option value="interstate">Inter State</option>
-                                                            <option value="union">Union Territory</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label for="gst_rate">GST Rate (%)</label>
-                                                        <input type="number" name="gst_rate" id="gst_rate" class="form-control" min="0" step="0.01">
-                                                    </div>
-													<div class="col-md-4">
-                                                        <label for="gst_rate">GST Allocation</label>
-                                                        <input type="text" name="gst_allocation" id="gst_allocation" class="form-control" readonly>
-                                                    </div>
-													<div class="col-md-4">
-                                                        <label for="gst_amt">Total GST Amount</label>
-                                                        <input type="text" name="gst_amt" id="gst_amt" class="form-control" readonly>
-                                                    </div>
-                                                    
-                                                </div>
+												</div>
                                             </div>
                                         </div>
 										
-										
-                                        <div class="d-flex wizard justify-content-between mt-3">
-                                            <div class="first">
-                                                <a href="javascript:void(0);" class="btn btn-secondary previous-btn d-flex align-items-center justify-content-center">
-                                                    <i class="ti ti-arrow-up-circle me-2"></i> Back To Previous
-                                                </a>
-                                            </div>
-                                            <div class="last">
-                                                <a href="javascript:void(0);" class="btn btn-primary next-btn d-flex align-items-center justify-content-center">
-                                                    Next <i class="ti ti-arrow-up-right-circle ms-2"></i>
-                                                </a>
-                                            </div>
+                                        <div class="d-flex wizard justify-content-between mt-4 pt-3 border-top">
+                                            <a href="javascript:void(0);" class="btn btn-outline-secondary previous-btn d-inline-flex align-items-center">
+                                                <i class="ti ti-arrow-left me-2"></i> Back To Previous
+                                            </a>
+                                            <a href="javascript:void(0);" class="btn btn-primary next-btn d-inline-flex align-items-center">
+                                                Next <i class="ti ti-arrow-right ms-2"></i>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="documentation" role="tabpanel" aria-labelledby="documentation-tab">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="row">
+                                <div class="card shadow-sm border-0">
+                                    <div class="card-header bg-transparent border-bottom py-3">
+                                        <h5 class="mb-0 text-primary fw-bold"><i class="ti ti-file-text me-1"></i> Documentations</h5>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="row g-3">
                                             <div class="col-lg-6 col-sm-12">
-                                                <div class="">
-                                                    <div class="card-header">
-                                                        <h5>Attachment 1</h5>
+                                                <div class="card border h-100 mb-0">
+                                                    <div class="card-header bg-light py-2">
+                                                        <h6 class="mb-0 fw-semibold text-dark">Attachment 1</h6>
                                                     </div>
                                                     <div class="card-body">
-                                                        {{-- <form class="uploadForm dropzone"> --}}
                                                         <div class="fallback">
-                                                            <label class="form-label">Upload Document</label>
+                                                            <label class="form-label fw-semibold text-dark">Upload Document</label>
                                                             <input name="file1" type="file" class="fileInput form-control" accept=".pdf,.doc,.docx,.txt,.xlsx">
                                                         </div>
-                                                        {{-- </form> --}}
 
                                                         <!-- Preview Container -->
-                                                        <div class="previewBox text-center mt-4" style="display: none;">
-                                                            <h5>Uploaded Document:</h5>
+                                                        <div class="previewBox text-center mt-3" style="display: none;">
+                                                            <h6 class="fw-semibold">Uploaded Document:</h6>
                                                             <a class="downloadLink" href="#" download>
-                                                                <div class="alert alert-success" role="alert">
+                                                                <div class="alert alert-success py-2 mb-0" role="alert">
                                                                     <span class="fileName"></span>
                                                                 </div>
                                                             </a>
@@ -735,23 +694,21 @@
                                                 </div>
                                             </div>
                                             <div class="col-lg-6 col-sm-12">
-                                                <div class="">
-                                                    <div class="card-header">
-                                                        <h5>Attachment 2</h5>
+                                                <div class="card border h-100 mb-0">
+                                                    <div class="card-header bg-light py-2">
+                                                        <h6 class="mb-0 fw-semibold text-dark">Attachment 2</h6>
                                                     </div>
                                                     <div class="card-body">
-                                                        {{-- <form class="uploadForm dropzone"> --}}
                                                         <div class="fallback">
-                                                            <label class="form-label">Upload Document</label>
+                                                            <label class="form-label fw-semibold text-dark">Upload Document</label>
                                                             <input name="file2" type="file" class="fileInput form-control" accept=".pdf,.doc,.docx,.txt,.xlsx">
                                                         </div>
-                                                        {{-- </form> --}}
 
                                                         <!-- Preview Container -->
-                                                        <div class="previewBox text-center mt-4" style="display: none;">
-                                                            <h5>Uploaded Document:</h5>
+                                                        <div class="previewBox text-center mt-3" style="display: none;">
+                                                            <h6 class="fw-semibold">Uploaded Document:</h6>
                                                             <a class="downloadLink" href="#" download>
-                                                                <div class="alert alert-success" role="alert">
+                                                                <div class="alert alert-success py-2 mb-0" role="alert">
                                                                     <span class="fileName"></span>
                                                                 </div>
                                                             </a>
@@ -760,59 +717,49 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="d-flex wizard justify-content-between mt-3">
-                                            <div class="first">
-                                                <a href="javascript:void(0);" class="btn btn-secondary previous-btn d-flex align-items-center justify-content-center">
-                                                    <i class="ti ti-arrow-up-circle me-2"></i> Back To Previous
-                                                </a>
-                                            </div>
-                                            <div class="last">
-                                                <a href="javascript:void(0);" class="btn btn-primary next-btn d-flex align-items-center justify-content-center">
-                                                    Next <i class="ti ti-arrow-up-right-circle ms-2"></i>
-                                                </a>
-                                            </div>
+                                        <div class="d-flex wizard justify-content-between mt-4 pt-3 border-top">
+                                            <a href="javascript:void(0);" class="btn btn-outline-secondary previous-btn d-inline-flex align-items-center">
+                                                <i class="ti ti-arrow-left me-2"></i> Back To Previous
+                                            </a>
+                                            <a href="javascript:void(0);" class="btn btn-primary next-btn d-inline-flex align-items-center">
+                                                Next <i class="ti ti-arrow-right ms-2"></i>
+                                            </a>
                                         </div>
                                     </div>
 
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="audit-trail" role="tabpanel" aria-labelledby="audit-trail-tab">
-                                <div class="row">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5>Audit Trail</h5>
+                                <div class="card shadow-sm border-0">
+                                    <div class="card-header bg-transparent border-bottom py-3">
+                                        <h5 class="mb-0 text-primary fw-bold"><i class="ti ti-history me-1"></i> Audit Trail</h5>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div class="row g-3">
+                                            <div class="col-md-3">
+                                                <label class="form-label fw-semibold text-dark">Purchase By</label>
+                                                <input type="text" class="form-control" id="purchaseByAudit" name="purchaseByAudit" placeholder="Enter Purchaser Name">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label fw-semibold text-dark">Purchase Date</label>
+                                                <input type="date" class="form-control" id="purchaseDateAudit" name="purchaseDateAudit">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label fw-semibold text-dark">Approve By</label>
+                                                <input type="text" class="form-control" id="approveByAudit" name="approveByAudit" placeholder="Enter Approver Name">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label fw-semibold text-dark">Approve Date</label>
+                                                <input type="date" class="form-control" id="approveDateAudit" name="approveDateAudit">
+                                            </div>
                                         </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-sm-3 mb-3">
-                                                    <label class="form-label">Purchase By</label>
-                                                    <input type="text" class="form-control" id="purchaseByAudit" name="purchaseByAudit" placeholder="Enter Purchaser Name">
-                                                </div>
-                                                <div class="col-sm-3 mb-3">
-                                                    <label class="form-label">Purchase Date</label>
-                                                    <input type="date" class="form-control" id="purchaseDateAudit" name="purchaseDateAudit" placeholder="Enter Purchase Date">
-                                                </div>
-                                                <div class="col-sm-3 mb-3">
-                                                    <label class="form-label">Approve By</label>
-                                                    <input type="text" class="form-control" id="approveByAudit" name="approveByAudit" placeholder="Enter Approver Name">
-                                                </div>
-                                                <div class="col-sm-3 mb-3">
-                                                    <label class="form-label">Approve Date</label>
-                                                    <input type="date" class="form-control" id="approveDateAudit" name="approveDateAudit" placeholder="Enter Approve Date">
-                                                </div>
-                                            </div>
-                                            <div class="d-flex wizard justify-content-between mt-3">
-                                                <div class="first">
-                                                    <a href="javascript:void(0);" class="btn btn-secondary previous-btn d-flex align-items-center justify-content-center">
-                                                        <i class="ti ti-arrow-up-circle me-2"></i> Back To Previous
-                                                    </a>
-                                                </div>
-                                                <div class="last">
-                                                    <button type='submit' class="btn btn-primary d-flex align-items-center justify-content-center">
-                                                        Add Asset <i class="ti ti-arrow-up-right-circle ms-2"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
+                                        <div class="d-flex wizard justify-content-between mt-4 pt-3 border-top">
+                                            <a href="javascript:void(0);" class="btn btn-outline-secondary previous-btn d-inline-flex align-items-center">
+                                                <i class="ti ti-arrow-left me-2"></i> Back To Previous
+                                            </a>
+                                            <button type='submit' class="btn btn-primary d-inline-flex align-items-center">
+                                                <i class="ti ti-device-floppy me-2"></i> Add Asset
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

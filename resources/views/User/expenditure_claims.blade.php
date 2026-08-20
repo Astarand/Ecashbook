@@ -37,8 +37,8 @@
                 <div class="table-responsive">
                     <table class="table tbl-product my-3" id="pc-dt-simple">
                         <thead>
-                            <tr>
-                                <th>#</th>
+                            <tr style="background-color: #cbcbcb;">
+                                <th class="text-end">#</th>
                                 <th>Date</th>
                                 <th>Employee</th>
                                 <th>Category</th>
@@ -50,21 +50,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($claims as $i => $claim)
+                            @foreach($claims as $claim)
                             <tr>
-                                <td>{{ $i + 1 }}</td>
+                                <td class="text-end">{{ $loop->iteration }}</td>
                                 <td>{{ \Carbon\Carbon::parse($claim->claim_date)->format('d M Y') }}</td>
                                 <td>
-                                    {{-- If using join --}}
-                                    {{ $claim->employee_name ?? 'N/A' }}
-
-                                    {{-- If using Eloquent relationship --}}
-                                    {{-- {{ $claim->employee->user->name ?? 'N/A' }} --}}
+                                    <strong class="text-dark">{{ $claim->employee_name ?? 'N/A' }}</strong>
                                 </td>
-                                <td>{{ $claim->category }}</td>
-                                <td>{{ $claim->claim_amount }}</td>
+                                <td><span class="badge bg-light-secondary text-dark">{{ $claim->category }}</span></td>
+                                <td><strong class="text-dark">₹{{ number_format($claim->claim_amount, 2) }}</strong></td>
                                 <td>{{ $claim->payment_method }}</td>
-                                <td>{{ $claim->description }}</td>
+                                <td><span class="text-muted small">{{ \Illuminate\Support\Str::limit($claim->description, 35) }}</span></td>
                                 <td>
                                     @if($claim->status === 'Approved')
                                     <span class="badge bg-success">Approved</span>
@@ -75,15 +71,11 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="#" class="avtar avtar-xs btn-link-secondary tour-claim-actions" data-bs-toggle="modal" data-bs-target="#viewClaimModal{{ $claim->id }}"><i class="ti ti-eye f-20"></i> </a>
-                                    <a href="#" class="avtar avtar-xs btn-link-secondary" data-bs-toggle="modal" data-bs-target="#editClaimModal{{ $claim->id }}"><i class="ti ti-edit f-20"></i> </a>
+                                    <a href="#" class="btn btn-sm btn-light-primary tour-claim-actions" data-bs-toggle="modal" data-bs-target="#viewClaimModal{{ $claim->id }}" title="View Details"><i class="ti ti-eye"></i> </a>
+                                    <a href="#" class="btn btn-sm btn-light-warning" data-bs-toggle="modal" data-bs-target="#editClaimModal{{ $claim->id }}" title="Edit Status"><i class="ti ti-edit"></i> </a>
                                 </td>
                             </tr>
-                            @empty
-                            <tr>
-                                <td colspan="9" class="text-center">No claims submitted yet.</td>
-                            </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

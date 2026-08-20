@@ -171,13 +171,22 @@
                                 </div>
                                 <div class="message-container"></div>
                                 <div id="addSalesLoader" class="loader"></div>
-                                <div class="add-customer-btns text-end">
-                                    <a href="{{ url('/purchase-order') }}" class="btn btn-secondary cancel me-2">Cancel</a>
-                                    <button type="submit" class="btn btn-secondary">Update</button>
-                                    <?php if($sales->seller_name !=""){ ?>
-                                    <a href="javascript:void(0);" id="nextBtnBuyer" title="Next"
-                                        class="btn btn-secondary cancel me-2"> >> </a>
-                                    <?php } ?>
+                                <div class="d-flex wizard justify-content-between align-items-center mt-3">
+                                    <div class="first"></div>
+                                    <div class="text-center">
+                                        <a href="{{ url('/purchase-order') }}" class="btn btn-danger">
+                                            <i class="ph-duotone ph-x-circle me-1"></i> Cancel
+                                        </a>
+                                    </div>
+                                    <div class="last d-flex align-items-center">
+                                        <?php if($sales->seller_name !=""){ ?>
+                                        <a href="javascript:void(0);" id="nextBtnBuyer" title="Next"
+                                            class="btn btn-primary me-2">
+                                            Next <i class="ph-duotone ph-arrow-circle-up-right ms-1"></i>
+                                        </a>
+                                        <?php } ?>
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -327,17 +336,27 @@
 
                                 </div>
                                 <div class="message-container"></div>
-                                    <div id="addSalesLoader" class="loader"></div>
-                                    <div class="add-customer-btns text-end">
-                                        <a href="javascript:void(0);" id="prevBtnBuyer" title="Previous"
-                                            class="btn btn-secondary cancel me-2">
-                                            << </a>
-                                                <button type="submit" class="btn btn-secondary">Save changes</button>                                                
-                                                <?php if($sales->inv_name !=""){ ?>
-                                                <a href="javascript:void(0);" id="nextBtnSeller" title="Next"
-                                                    class="btn btn-secondary cancel me-2"> >> </a>
-                                                <?php } ?>
+                                <div id="addSalesLoader" class="loader"></div>
+                                <div class="d-flex wizard justify-content-between align-items-center mt-3">
+                                    <div class="first">
+                                        <a href="javascript:void(0);" id="prevBtnBuyer" title="Previous" class="btn btn-primary">
+                                            <i class="ph-duotone ph-arrow-circle-up-left me-1"></i> Back To Previous
+                                        </a>
                                     </div>
+                                    <div class="text-center">
+                                        <a href="{{ url('/purchase-order') }}" class="btn btn-danger">
+                                            <i class="ph-duotone ph-x-circle me-1"></i> Cancel
+                                        </a>
+                                    </div>
+                                    <div class="last d-flex align-items-center">
+                                        <?php if($sales->inv_name !=""){ ?>
+                                        <a href="javascript:void(0);" id="nextBtnSeller" title="Next" class="btn btn-primary me-2">
+                                            Next <i class="ph-duotone ph-arrow-circle-up-right ms-1"></i>
+                                        </a>
+                                        <?php } ?>
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                         <!-- end job detail tab pane -->
@@ -543,15 +562,28 @@
                                 
                                 <div class="message-container"></div>
                                 <div id="editSalesLoader" class="loader"></div>
-                                <div class="add-customer-btns text-end">
-                                    <a href="javascript:void(0);" id="prevBtnProd" title="Previous" class="btn btn-secondary"><< </a>
-									<button type="submit" class="btn btn-secondary">Save changes</button>
-									<a target="_blank" href="{{ url('/po-invoice-pdf/'.base64_encode($sales->id).'/invoice') }}" class="btn btn-secondary mt-3 mt-md-0">Preview Invoice</a>
-									<?php if($sales->inv_name !=""){ ?>
-									<a href="javascript:void(0);" id="nextBtnProd" title="Next"
-										class="btn btn-secondary cancel me-2"> >> </a>
-									<?php } ?>
-											
+                                <div class="d-flex wizard justify-content-between align-items-center mt-3">
+                                    <div class="first">
+                                        <a href="javascript:void(0);" id="prevBtnProd" title="Previous" class="btn btn-primary">
+                                            <i class="ph-duotone ph-arrow-circle-up-left me-1"></i> Back To Previous
+                                        </a>
+                                    </div>
+                                    <div class="text-center">
+                                        <a href="{{ url('/purchase-order') }}" class="btn btn-danger">
+                                            <i class="ph-duotone ph-x-circle me-1"></i> Cancel
+                                        </a>
+                                    </div>
+                                    <div class="last d-flex align-items-center">
+                                        <a target="_blank" href="{{ url('/po-invoice-pdf/'.base64_encode($sales->id).'/invoice') }}" class="btn btn-outline-secondary me-2">
+                                            <i class="ph-duotone ph-eye me-1"></i> Preview Invoice
+                                        </a>
+                                        <?php if($sales->inv_name !=""){ ?>
+                                        <a href="javascript:void(0);" id="nextBtnProd" title="Next" class="btn btn-primary me-2">
+                                            Next <i class="ph-duotone ph-arrow-circle-up-right ms-1"></i>
+                                        </a>
+                                        <?php } ?>
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -732,12 +764,23 @@
                                 </div>
                                 <div class="message-container"></div>
                                 <div id="editSalesLoader" class="loader"></div>
-                                <div class="add-customer-btns text-end">
-                                    <a href="javascript:void(0);" id="prevBtnOther" title="Previous"
-                                        class="btn btn-secondary">
-                                        << </a>
-                                            <button type="submit" class="btn btn-secondary">Save changes</button>
-                                            <a target="_blank" href="{{ url('/po-invoice-pdf/'.base64_encode($sales->id).'/invoice') }}" class="btn btn-secondary mt-3 mt-md-0">Preview Invoice</a>
+                                <div class="d-flex wizard justify-content-between align-items-center mt-3">
+                                    <div class="first">
+                                        <a href="javascript:void(0);" id="prevBtnOther" title="Previous" class="btn btn-primary">
+                                            <i class="ph-duotone ph-arrow-circle-up-left me-1"></i> Back To Previous
+                                        </a>
+                                    </div>
+                                    <div class="text-center">
+                                        <a href="{{ url('/purchase-order') }}" class="btn btn-danger">
+                                            <i class="ph-duotone ph-x-circle me-1"></i> Cancel
+                                        </a>
+                                    </div>
+                                    <div class="last d-flex align-items-center">
+                                        <a target="_blank" href="{{ url('/po-invoice-pdf/'.base64_encode($sales->id).'/invoice') }}" class="btn btn-outline-secondary me-2">
+                                            <i class="ph-duotone ph-eye me-1"></i> Preview Invoice
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>

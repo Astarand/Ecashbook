@@ -18,7 +18,7 @@
                         <u>How does this Page works?</u>
                     </a>
                 </div>
-				<div class="col-md-4 mt-2">
+                <div class="col-md-4 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Add New Expenses</h2>
                     </div>
@@ -28,26 +28,27 @@
     </div>
     <!-- [ breadcrumb ] end -->
 
-    <div class="card">
-        <div class="card-body">
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
             <form action="javascript:void(0);" method="POST" name="addExpenseFrm" id="addExpenseFrm" enctype="multipart/form-data">
                 <input type="hidden" name="id" id="eId" value="">
                 @csrf
-                <div class="row">
+                <div class="row g-3">
 
-					<div class="mb-3 col-sm-4">
-						<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
-						<select name="propId" id="propId" class="form-control">
-							<option value="">{{ parentCompanyName() }}</option>
-							@foreach($proprietorships as $company)
-								<option value="{{ $company->id }}">
-									{{ $company->comp_name }}
-								</option>
-							@endforeach
-						</select>
-					</div>
-                    <div class="col-sm-4 mb-3">
-                        <label class="form-label">Expense Category<span class="text-danger">*</span></label>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold text-dark">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
+                        <select name="propId" id="propId" class="form-control">
+                            <option value="">{{ parentCompanyName() }}</option>
+                            @foreach($proprietorships as $company)
+                                <option value="{{ $company->id }}">
+                                    {{ $company->comp_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold text-dark">Expense Category <span class="text-danger">*</span></label>
                         <select id="expense_cat" name="expense_cat" class="form-control" required>
                             <option value="">Select</option>
                             <option value="direct">Direct Expenses</option>
@@ -56,61 +57,60 @@
                     </div>
 
                     <!-- Direct Expenses Section -->
-                    <div id="directExpensesSection" class="col-sm-4 mb-3" style="display: none;">
-                        <label class="form-label">Direct Expenses Type<span class="text-danger">*</span></label>
+                    <div id="directExpensesSection" class="col-md-3" style="display: none;">
+                        <label class="form-label fw-semibold text-dark">Direct Expenses Type <span class="text-danger">*</span></label>
                         <select id="directExpensesType" class="form-control" name="direct_expense_type">
                             <option value="">Select</option>
-
                         </select>
-						<small id="directExpenseTypeInfo" class="text-primary fw-bold mt-1 d-block"></small>
+                        <small id="directExpenseTypeInfo" class="text-primary fw-bold mt-1 d-block"></small>
                     </div>
 
                     <!-- Indirect Expenses Section -->
-                    <div id="indirectExpensesSection" class="col-sm-4 mb-3" style="display: none;">
-                        <label class="form-label">Indirect Expenses Type<span class="text-danger">*</span></label>
+                    <div id="indirectExpensesSection" class="col-md-3" style="display: none;">
+                        <label class="form-label fw-semibold text-dark">Indirect Expenses Type <span class="text-danger">*</span></label>
                         <select id="indirectExpensesType" name="indirect_expense_type" class="form-control">
                             <option value="">Select</option>
-
                         </select>
-						<small id="indirectExpenseTypeInfo" class="text-primary fw-bold mt-1 d-block"></small>
+                        <small id="indirectExpenseTypeInfo" class="text-primary fw-bold mt-1 d-block"></small>
                     </div>
 
-
-
-                    <div id="normalExpenseFields" class="row">
-                        <div class="col-sm-4 mb-3" id="other_text_box">
-                            <label class="form-label">Other<span class="text-danger">*</span></label>
+                    <div id="normalExpenseFields" class="row g-3 p-0 m-0">
+                        <div class="col-md-3" id="other_text_box">
+                            <label class="form-label fw-semibold text-dark">Other <span class="text-danger">*</span></label>
                             <input type="text" id="other_exp" name="other_exp" class="form-control" placeholder="Enter Share Holder's Capital">
                         </div>
 
-
-                        <div class="col-sm-4 mb-3">
-                            <label class="form-label">Date<span class="text-danger">*</span></label>
-                            <input type="date" id="expense_date" name="expense_date" class="form-control" placeholder="Enter Share Holder's Capital">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-dark">Date <span class="text-danger">*</span></label>
+                            <input type="date" id="expense_date" name="expense_date" class="form-control">
                         </div>
 
-                        <div class="col-sm-4 mb-3" id="employeeDropdownDiv" style="display:none;">
-                            <label class="form-label">Select Employee <span class="text-danger">*</span></label>
+                        <div class="col-md-3" id="employeeDropdownDiv" style="display:none;">
+                            <label class="form-label fw-semibold text-dark">Select Employee <span class="text-danger">*</span></label>
                             <select name="employee_id" id="employee_id" class="form-control">
                                 <option value="">Select Employee</option>
                             </select>
                         </div>
-                        <div class="col-sm-4 mb-3" id="employeeIdDiv" style="display:none;">
-                            <label class="form-label">Employee ID</label>
+
+                        <div class="col-md-3" id="employeeIdDiv" style="display:none;">
+                            <label class="form-label fw-semibold text-dark">Employee ID</label>
                             <input type="text" id="employee_code" name="employee_code" class="form-control" readonly>
                         </div>
-                        <div class="col-sm-4 mb-3" id="invoiceDiv">
-                            <label class="form-label">Invoice / Reference no.</label>
+
+                        <div class="col-md-3" id="invoiceDiv">
+                            <label class="form-label fw-semibold text-dark">Invoice / Reference no.</label>
                             <input type="text" id="exp_invno" name="exp_invno" class="form-control" placeholder="Enter Invoice / Referance No">
                         </div>
-                        <div class="col-sm-4 mb-3">
-                            <label class="form-label" id="amountLabel">
-                                Expense Amount<span class="text-danger">*</span>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-dark" id="amountLabel">
+                                Expense Amount <span class="text-danger">*</span>
                             </label>
                             <input type="number" id="expense_amt" name="expense_amt" class="form-control" placeholder="Enter Amount">
                         </div>
-                        <div class="col-sm-4 mb-3" id="payment_status_div">
-                            <label class="form-label">Payment Status <span class="text-danger">*</span></label>
+
+                        <div class="col-md-3" id="payment_status_div">
+                            <label class="form-label fw-semibold text-dark">Payment Status <span class="text-danger">*</span></label>
                             <select id="payment_status" class="form-control">
                                 <option value="">Select Payment Status</option>
                                 <option value="full">Full</option>
@@ -119,22 +119,23 @@
                             </select>
                         </div>
 
-                        <div class="col-sm-4 mb-3" id="advance_amount_div">
-                            <label class="form-label">Advance Amount</label>
+                        <div class="col-md-3" id="advance_amount_div">
+                            <label class="form-label fw-semibold text-dark">Advance Amount</label>
                             <input type="number" id="advance_amount" class="form-control" value="0">
                         </div>
 
-                        <div class="col-sm-4 mb-3" id="balance_amount_div">
-                            <label class="form-label">Balance Payable Amount</label>
+                        <div class="col-md-3" id="balance_amount_div">
+                            <label class="form-label fw-semibold text-dark">Balance Payable Amount</label>
                             <input type="number" id="balance_amount" class="form-control" readonly>
                         </div>
 
-                        <div class="col-sm-4 mb-3" id="adjusted_now_div">
-                            <label class="form-label" >Adjusted Now</label>
+                        <div class="col-md-3" id="adjusted_now_div">
+                            <label class="form-label fw-semibold text-dark">Adjusted Now</label>
                             <input type="number" id="adjusted_now" class="form-control" readonly>
                         </div>
-                        <div class="col-sm-4 mb-3">
-                            <label class="form-label">Payment Method</label>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-dark">Payment Method</label>
                             <select class="form-select" name="mode_of_expense" id="mode_of_expense">
                                 <option value="">Select</option>
                                 <option value="NEFT">NEFT</option>
@@ -148,152 +149,122 @@
                             </select>
                         </div>
 
-						<div class="col-md-4 mb-3" id="bank_div">
-							<div class="form-group">
-								<label>Select Bank</label>
-								<select name="bank_id" id="bank_id" class="form-control">
-									<option value="">-- Select Bank --</option>
-									@foreach($bankDetails as $bank)
-										<option value="{{ $bank->id }}">
-											{{ $bank->bank_name }}
-										</option>
-									@endforeach
-								</select>
-							</div>
-						</div>
+                        <div class="col-md-3" id="bank_div">
+                            <label class="form-label fw-semibold text-dark">Select Bank</label>
+                            <select name="bank_id" id="bank_id" class="form-control">
+                                <option value="">-- Select Bank --</option>
+                                @foreach($bankDetails as $bank)
+                                    <option value="{{ $bank->id }}">
+                                        {{ $bank->bank_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-						<div class="row mt-2 tax-info-section" style="display:none;">
-							<div class="col-md-4">
-								<label>Tax Treatment</label>
-								<input type="text" id="tax_treatment" name="tax_treatment" class="form-control" readonly>
-							</div>
+                        <div class="col-12 tax-info-section" style="display:none;">
+                            <div class="card p-3 border bg-light mb-0">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold text-dark">Tax Treatment</label>
+                                        <input type="text" id="tax_treatment" name="tax_treatment" class="form-control" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold text-dark">Allowed Ratio (%)</label>
+                                        <input type="number" id="allowed_ratio" name="allowed_ratio" class="form-control">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold text-dark">Deduction Amount</label>
+                                        <input type="text" id="rebate_amt" name="rebate_amt" class="form-control" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-							<div class="col-md-4">
-								<label>Allowed Ratio (%)</label>
-								<input type="number" id="allowed_ratio" name="allowed_ratio" class="form-control">
-							</div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-dark">Party / Vendor Name <span class="text-danger">*</span></label>
+                            <select name="vendor_id" id="vendor_id" class="form-control">
+                                <option value="">Select Vendor</option>
+                                @foreach($vendors as $vendor)
+                                    <option value="{{ $vendor->id }}" data-pan="{{ $vendor->vendor_pan }}">
+                                        {{ $vendor->vendor_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-							<div class="col-md-4">
-								<label>Deduction Amount</label>
-								<input type="text" id="rebate_amt" name="rebate_amt" class="form-control" readonly>
-							</div>
-						</div>
-
-            <div class="col-sm-4 mb-3">
-                <label class="form-label">Party / Vendor Name<span class="text-danger">*</span></label>
-                <select name="vendor_id" id="vendor_id" class="form-control">
-                    <option value="">Select Vendor</option>
-                    @foreach($vendors as $vendor)
-                        <option value="{{ $vendor->id }}" data-pan="{{ $vendor->vendor_pan }}">
-                            {{ $vendor->vendor_name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-                        <div class="col-sm-4 mb-3">
-                            <label class="form-label">PAN Card of Party / Vendor</label>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-dark">PAN Card of Party / Vendor</label>
                             <input type="text" id="vendor_pan" name="vendor_pan" class="form-control" placeholder="Enter PAN Number" maxlength="10">
                         </div>
 
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Description of Expenses </label>
-                            <textarea  name="pur_of_expense" id="pur_of_expense" class="form-control" placeholder="Description of Expenses" rows="4"></textarea>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-dark">Description of Expenses</label>
+                            <textarea name="pur_of_expense" id="pur_of_expense" class="form-control" placeholder="Description of Expenses" rows="1" style="height: 38px; resize: vertical;"></textarea>
                         </div>
 
-                        <div class="row">
-                            {{-- <div class="tds-container col-md-12">
-                                <div class="mb-3">
-                                    <div id="tds_dropdown">
-                                        <label for="tds_percentage">TDS Percentage</label>
-                                        <select name="tds_percentage" id="tds_percentage" class="form-control">
-                                            @foreach ($purposes_of_tds as $purpose)
-                                            <option value="{{ $purpose->tds_rate . '-' . $purpose->id }}">
-                                                {{ $purpose->category }} ({{ $purpose->tds_rate }}%)
-                                            </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div> --}}
-
-                            <div class="col-md-12 mb-3" id="tds-applicability-container">
-                                <label class="form-label">TDS Applicable</label>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-check">
-                                            <input type="radio" name="tds_applicable" value="yes" id="tdsYes" >
-                                            <label for="tdsYes">Yes</label>
+                        <div class="col-md-6" id="tds-applicability-container">
+                            <div class="card p-3 border bg-light-subtle h-100 mb-0">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <label class="form-label fw-bold text-dark mb-0">TDS Applicable</label>
+                                    <div class="d-inline-flex gap-3">
+                                        <div class="form-check form-check-inline mb-0">
+                                            <input class="form-check-input" type="radio" name="tds_applicable" value="yes" id="tdsYes">
+                                            <label class="form-check-label fw-semibold" for="tdsYes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline mb-0">
+                                            <input class="form-check-input" type="radio" name="tds_applicable" value="no" id="tdsNo" checked>
+                                            <label class="form-check-label fw-semibold" for="tdsNo">No</label>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-check">
-                                            <input type="radio" name="tds_applicable" value="no" id="tdsNo" >
-                                            <label for="tdsNo">No</label>
-                                        </div>
-                                    </div>
-									<div class="col-md-4">
-										<label class="form-label fw-bold">
-											Threshold Type <span class="text-danger">*</span>
-										</label>
-										<select id="threshold_type"
-												name="threshold_type"
-												class="form-control"
-												required>
-											<option value="">Select Threshold Type</option>
-											<option value="NA">N/A</option>
-											<option value="Single">Single</option>
-											<option value="Annual">Annual</option>
-										</select>
-									</div>
                                 </div>
-                            </div>
-
-                            <div id="tds_section"  style="display:none;">
+                                <div class="mt-2">
+                                    <label class="form-label fw-semibold text-dark">
+                                        Threshold Type <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="threshold_type" name="threshold_type" class="form-control" required>
+                                        <option value="">Select Threshold Type</option>
+                                        <option value="NA">N/A</option>
+                                        <option value="Single">Single</option>
+                                        <option value="Annual">Annual</option>
+                                    </select>
+                                </div>
+                                <div id="tds_section" class="row g-2 mt-2" style="display:none;">
                                     <div class="col-md-4">
-                                        <label>TDS Section</label>
+                                        <label class="form-label">TDS Section</label>
                                         <input type="text" name="tds_section" id="tds_section_field" class="form-control" readonly>
                                     </div>
-
                                     <div class="col-md-4">
-                                        <label>TDS Rate (%)</label>
+                                        <label class="form-label">TDS Rate (%)</label>
                                         <input type="number" name="tds_rate" id="tds_rate_field" class="form-control" readonly>
                                     </div>
-
                                     <div class="col-md-4">
-                                        <label>TDS Amount</label>
+                                        <label class="form-label">TDS Amount</label>
                                         <input type="number" name="tds_amount" id="tds_amount_field" class="form-control" readonly>
                                     </div>
                                     <input type="hidden" id="tds_threshold_limit" value="">
+                                </div>
                             </div>
+                        </div>
 
-                            <div class="gst-container col-md-12" id="gst-applicability-container">
-                                <div class="mb-3">
-                                    <label class="form-label">GST Applicable <span class="text-danger">*</span></label>
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <div class="card shadow-sm border-0 p-3 m-2">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="gst_applicable" value="yes" id="gstYes" checked>
-                                                    <label class="form-check-label" for="gstYes">Yes</label>
-                                                </div>
-                                            </div>
+                        <div class="col-md-6 gst-container" id="gst-applicability-container">
+                            <div class="card p-3 border bg-light-subtle h-100 mb-0">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <label class="form-label fw-bold text-dark mb-0">GST Applicable <span class="text-danger">*</span></label>
+                                    <div class="d-inline-flex gap-3">
+                                        <div class="form-check form-check-inline mb-0">
+                                            <input class="form-check-input" type="radio" name="gst_applicable" value="yes" id="gstYes" checked>
+                                            <label class="form-check-label fw-semibold" for="gstYes">Yes</label>
                                         </div>
-                                        <div class="col-6">
-                                            <div class="card shadow-sm border-0 p-3 m-2">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" name="gst_applicable" value="no" type="radio" id="gstNo">
-                                                    <label class="form-check-label" for="gstNo">No</label>
-                                                </div>
-                                            </div>
+                                        <div class="form-check form-check-inline mb-0">
+                                            <input class="form-check-input" name="gst_applicable" value="no" type="radio" id="gstNo">
+                                            <label class="form-check-label fw-semibold" for="gstNo">No</label>
                                         </div>
                                     </div>
                                 </div>
-                                <div id="gst_section">
-                                    <div class="row mb-3">
-
-                                        <div class="col-md-4">
-                                            <label>GST Transaction Mode</label>
+                                <div id="gst_section" class="mt-2">
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <label class="form-label">GST Transaction Mode</label>
                                             <select class="form-select" name="gst_trans" id="gst_trans">
                                                 <option value="">Select</option>
                                                 <option value="intrastate">Intra State</option>
@@ -301,76 +272,66 @@
                                                 <option value="union">Union Territory</option>
                                             </select>
                                         </div>
-
-                                        <div class="col-md-4">
-                                            <label>GST Rate (%)</label>
+                                        <div class="col-md-6">
+                                            <label class="form-label">GST Rate (%)</label>
                                             <input type="number" id="gst_rate" name="gst_rate" class="form-control" value="18">
                                         </div>
-
-                                        <div class="col-md-4">
-                                            <label>GST Allocation</label>
+                                        <div class="col-md-6">
+                                            <label class="form-label">GST Allocation</label>
                                             <input type="text" id="gst_allocation" name="gst_allocation" class="form-control" readonly>
                                         </div>
-
-                                        <div class="col-md-4 mt-2">
-                                            <label>Total GST Amount</label>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Total GST Amount</label>
                                             <input type="number" id="total_gst" name="total_gst" class="form-control" readonly>
                                         </div>
-
-                                        <!-- OPTIONAL breakup display -->
-                                        {{-- <div class="col-md-12 mt-2" id="gst_breakup"></div> --}}
-
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-
-
-
-                        <div class="col-sm-4 mb-3">
-                            <label class="form-label">Approver Name</label>
-                            <input type="text" name="approved_by" id="approved_by" class="form-control" placeholder="Enter Name ">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-dark">Approver Name</label>
+                            <input type="text" name="approved_by" id="approved_by" class="form-control" placeholder="Enter Name">
                         </div>
-                        <div class="col-sm-4 mb-3">
-                            <label class="form-label">Designation </label>
-                            <input type="text" name="designation" id="designation" class="form-control" placeholder="Enter Designation ">
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-dark">Designation</label>
+                            <input type="text" name="designation" id="designation" class="form-control" placeholder="Enter Designation">
                         </div>
-                        <div class="col-sm-4 mb-3">
-                            <label class="form-label">Approve Date</label>
-                            <input type="date" name="approved_date" id="approved_date" class="form-control" placeholder="Enter Amount">
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-dark">Approve Date</label>
+                            <input type="date" name="approved_date" id="approved_date" class="form-control">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Special Notes/Command</label>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold text-dark">Special Notes/Command</label>
                             <input type="text" name="spec_note" id="spec_note" class="form-control" placeholder="Special Notes/Command">
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label" for="imageUpload">Upload Image</label>
-                                <input type="file" id="imageUpload" name="exp_inv_doc" class="form-control" accept="image/*">
-                            </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold text-dark" for="imageUpload">Upload Image</label>
+                            <input type="file" id="imageUpload" name="exp_inv_doc" class="form-control" accept="image/*">
                             <div id="imagePreview" class="mt-3" style="display: none; text-align: center;">
                                 <a id="downloadLink" href="#" download="uploaded_image.jpg">
-                                    <img id="uploadedImage" src="" alt="Preview Image" style="max-width: 100%; cursor: pointer; border: 1px solid #ddd; padding: 10px;">
+                                    <img id="uploadedImage" src="" alt="Preview Image" style="max-height: 180px; max-width: 100%; border: 1px solid #ddd; padding: 6px; border-radius: 8px;">
                                 </a>
                             </div>
                         </div>
+
                     </div>
 
-                    <div id="depreciationSection" class="row" style="display:none;">
-                        <div class="col-md-4 mb-3">
-                            <label>Depreciation value</label>
-                            <input type="number" class="form-control" id="dep_value">
+                    <div id="depreciationSection" class="col-12" style="display:none;">
+                        <div class="card p-3 border border-warning bg-light-warning">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-dark">Depreciation value</label>
+                                <input type="number" class="form-control" id="dep_value">
+                            </div>
                         </div>
                     </div>
 
-
-
-                    <div class="text-end btn-page mt-4">
-                        {{-- <div class="btn customer-btn-cancel">Cancel</div>
-                            <div class="btn btn-primary">Save Changes</div> --}}
-
-                        <a href="{{ url('/expenses-list') }}" class="btn btn-danger customer-btn-cancel">Cancel</a>
+                    <div class="col-12 text-end btn-page mt-4 pt-3 border-top">
+                        <a href="{{ url('/expenses-list') }}" class="btn btn-danger customer-btn-cancel me-2">Cancel</a>
                         <button type="submit" class="btn btn-primary" id="save-expense-btn">Save</button>
                     </div>
 

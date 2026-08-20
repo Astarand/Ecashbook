@@ -53,9 +53,9 @@
 						</p>
 					</div>
 	
-					<div class="row">
+					<div class="row g-3 align-items-end">
 						<div class="col-md-3">
-							<label>From Date</label>
+							<label class="form-label fw-semibold text-dark mb-1">From Date</label>
 							<input type="date"
 								   id="from_date"
 								   class="form-control"
@@ -63,16 +63,16 @@
 						</div>
 
 						<div class="col-md-3">
-							<label>To Date</label>
+							<label class="form-label fw-semibold text-dark mb-1">To Date</label>
 							<input type="date"
 								   id="to_date"
 								   class="form-control"
 								   value="{{ request('to_date') }}">
 						</div>
 
-						<div class="col-md-2">
-							<label>Asset Type</label>
-							<select id="asset_type_filter" class="form-control">
+						<div class="col-md-3">
+							<label class="form-label fw-semibold text-dark mb-1">Asset Type</label>
+							<select id="asset_type_filter" class="form-select">
 								<option value="">All</option>
 								<option value="current"
 									{{ request('asset_type') == 'current' ? 'selected' : '' }}>
@@ -85,18 +85,20 @@
 							</select>
 						</div>
 
-						<div class="col-md-4 d-flex align-items-center justify-content-center gap-2">
-							<button type="button" class="btn btn-primary btn-sm" id="filterBtn">
-								<i class="ti ti-filter"></i> Filter
-							</button>
+						<div class="col-md-3">
+							<div class="d-flex align-items-center gap-2">
+								<button type="button" class="btn btn-primary flex-fill d-inline-flex align-items-center justify-content-center gap-1" id="filterBtn">
+									<i class="ti ti-filter"></i> Filter
+								</button>
 
-							<button type="button" class="btn btn-success btn-sm" id="exportBtn">
-								<i class="ti ti-file-spreadsheet"></i> Export
-							</button>
+								<button type="button" class="btn btn-success flex-fill d-inline-flex align-items-center justify-content-center gap-1" id="exportBtn">
+									<i class="ti ti-file-spreadsheet"></i> Export
+								</button>
 
-							<button type="button" class="btn btn-light-secondary btn-sm" id="resetBtn">
-								<i class="ti ti-refresh"></i> Reset
-							</button>
+								<button type="button" class="btn btn-outline-secondary flex-fill d-inline-flex align-items-center justify-content-center gap-1" id="resetBtn" title="Reset Filters">
+									<i class="ti ti-refresh"></i> Reset
+								</button>
+							</div>
 						</div>
 					</div>
 					

@@ -230,9 +230,7 @@ class InventoryController extends Controller
 			)
 
 			->orderBy('p.created_at', 'DESC')
-			->paginate(10);
-			
-		$items->appends($request->query());
+			->get();
 
 		//echo "<pre>"; print_r($items);exit;
         return view('User.inventory')->with([

@@ -215,7 +215,7 @@
 							<tr>
 								<!-- Serial Number -->
 								<td class="text-end">
-									{{ $journals->firstItem() + $key }}
+									{{ $loop->iteration }}
 								</td>
 								<td>{{ date('d-m-Y',strtotime($journal->journal_date)) }}</td>
 								<td>{{ 'JV-' . $journal->journal_no }}</td>
@@ -373,9 +373,6 @@
 						@endforelse
                         </tbody>
                     </table>
-					<div class="d-flex justify-content-end mt-3">
-						{{ $journals->links('pagination::bootstrap-4') }}
-					</div>
                 </div>
             </div>
         </div>

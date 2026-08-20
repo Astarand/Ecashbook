@@ -18,8 +18,8 @@
     .customer-widget-icon {
         width: 48px !important;
         height: 48px !important;
-        background-color: #f1f5f9 !important;
-        color: #4f46e5 !important;
+        background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+        color: var(--bs-primary) !important;
         border-radius: 10px !important;
         display: inline-flex !important;
         align-items: center !important;
@@ -28,8 +28,8 @@
         transition: all 0.2s ease !important;
     }
     .customer-details:hover .customer-widget-icon {
-        background-color: #e0e7ff !important;
-        color: #4338ca !important;
+        background-color: var(--bs-primary) !important;
+        color: #ffffff !important;
         transform: scale(1.05);
     }
     .customer-details-cont h6 {
@@ -63,9 +63,9 @@
         border: 1px solid transparent !important;
     }
     .nav-pills-gst .nav-link.active {
-        background-color: #eff6ff !important;
-        color: #1d4ed8 !important;
-        border: 1px solid #bfdbfe !important;
+        background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+        color: var(--bs-primary) !important;
+        border: 1px solid rgba(var(--bs-primary-rgb), 0.25) !important;
     }
 </style>
 
@@ -442,7 +442,7 @@
             steps: [
                 {
                     title: 'GST Profile & Registration Guide',
-                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(0, 140, 173, 0.15), rgba(99, 102, 241, 0.15)); border-radius: 50%; color: #008CAD;"><i class="ti ti-receipt" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the GST Profile & Registration statement. Here you can view verified taxpayer credentials retrieved directly from the GST Portal API.</p></div>'
+                    intro: '<div class="text-center"><div class="welcome-tour-icon-container mb-4 d-inline-flex align-items-center justify-content-center" style="width: 90px; height: 90px; background: linear-gradient(135deg, rgba(0, 140, 173, 0.15), rgba(0, 140, 173, 0.25)); border-radius: 50%; color: #008CAD;"><i class="ti ti-receipt" style="font-size: 45px;"></i></div><p class="mb-0 text-secondary" style="font-size: 1.05rem;">Welcome to the GST Profile & Registration statement. Here you can view verified taxpayer credentials retrieved directly from the GST Portal API.</p></div>'
                 },
                 {
                     element: '.gst-summary-card',

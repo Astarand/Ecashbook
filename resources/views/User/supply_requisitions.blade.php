@@ -37,9 +37,8 @@
                     <div class="table-responsive">
                         <table class="table tbl-product my-3" id="pc-dt-simple">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-
+                                <tr style="background-color: #cbcbcb;">
+                                    <th class="text-end">#</th>
                                     <th>Date</th>
                                     <th>Employee</th>
                                     <th>Category</th>
@@ -52,37 +51,39 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($requisitions as $i => $req)
+                                @foreach($requisitions as $req)
                                 <tr>
-                                    <td>{{ $i + 1 }}</td>
+                                    <td class="text-end">{{ $loop->iteration }}</td>
                                     <td>{{ \Carbon\Carbon::parse($req->requisition_date)->format('d M Y') }}</td>
-                                    <td>{{ $req->employee_name }}</td>
-                                    <td>{{ $req->category }}</td>
-                                    <td>{{ $req->quantity }}</td>
-                                    <td>{{ $req->amount }}</td>
-                                    <td>{{ $req->priority }}</td>
-                                    <td>{{ $req->details }}</td>
+                                    <td><strong class="text-dark">{{ $req->employee_name }}</strong></td>
+                                    <td><span class="badge bg-light-secondary text-dark">{{ $req->category }}</span></td>
+                                    <td><span class="fw-semibold">{{ $req->quantity }}</span></td>
+                                    <td><strong class="text-dark">₹{{ number_format($req->amount, 2) }}</strong></td>
                                     <td>
-                                        {{-- ✅ Status badge --}}
+                                        @if($req->priority === 'High')
+                                        <span class="badge bg-danger">High</span>
+                                        @elseif($req->priority === 'Medium')
+                                        <span class="badge bg-warning">Medium</span>
+                                        @else
+                                        <span class="badge bg-info">Low</span>
+                                        @endif
+                                    </td>
+                                    <td><span class="text-muted small">{{ \Illuminate\Support\Str::limit($req->details, 35) }}</span></td>
+                                    <td>
                                         @if($req->status === 'Approved')
-                                        <span class=" badge bg-success">Approved</span>
+                                        <span class="badge bg-success">Approved</span>
                                         @elseif($req->status === 'Rejected')
                                         <span class="badge bg-danger">Rejected</span>
                                         @else
-                                        <span class="badge bg-warning">Pending</span>
+                                        <span class="badge bg-warning text-dark">Pending</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="#" class="btn btn-sm btn-light-primary tour-requisition-actions" data-bs-toggle="modal" data-bs-target="#viewRequisitionModal{{ $req->id }}"><i class="ti ti-eye"></i></a>
-                                        <a href="#" class="btn btn-sm btn-light-warning" data-bs-toggle="modal" data-bs-target="#editRequisitionModal{{ $req->id }}"><i class="ti ti-edit"></i></a>
-                                        {{-- <a href="#" class="btn btn-sm btn-light-danger"><i class="ti ti-trash"></i></a> --}}
+                                        <a href="#" class="btn btn-sm btn-light-primary tour-requisition-actions" data-bs-toggle="modal" data-bs-target="#viewRequisitionModal{{ $req->id }}" title="View Details"><i class="ti ti-eye"></i></a>
+                                        <a href="#" class="btn btn-sm btn-light-warning" data-bs-toggle="modal" data-bs-target="#editRequisitionModal{{ $req->id }}" title="Edit Status"><i class="ti ti-edit"></i></a>
                                     </td>
                                 </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="8" class="text-center">No requisitions submitted yet.</td>
-                                </tr>
-                                @endforelse
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

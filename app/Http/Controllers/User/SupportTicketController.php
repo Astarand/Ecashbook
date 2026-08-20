@@ -29,7 +29,7 @@ class SupportTicketController extends Controller
 			$userId = (in_array($userType, [2])) ? Auth::user()->id : Auth::user()->user_add_by;
 			$query->where('user_id', $userId);
 		}
-		$tickets = $query->paginate(10);
+		$tickets = $query->get();
 		return view('User.gst-compliance-support', compact('tickets'));
     }
 

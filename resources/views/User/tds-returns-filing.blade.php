@@ -30,8 +30,8 @@
                     <a href="#tdsFilterOffcanvas" class="btn btn-primary shadow" style="font-size: 16px;" data-bs-toggle="offcanvas" data-bs-target="#tdsFilterOffcanvas" aria-controls="tdsFilterOffcanvas">
                         Summary of Return
                     </a>
-					<a href="https://www.incometax.gov.in/" 
-                        target="_blank" 
+					<a href="https://www.incometax.gov.in/"
+                        target="_blank"
                         class="btn btn-primary shadow"
                         style="font-size: 16px;">
                         Payment of TDS/TCS
@@ -230,7 +230,7 @@
                         <option value="q4">Q4 (Jan - Mar)</option>
                     </select>
                 </div>
-                
+
                 <div class="col-12 d-none" id="filterTdsYearGroup">
                     <label for="filterTdsYear" class="form-label">Select Year</label>
                     <select class="form-select" id="filterTdsYear" name="year">
@@ -274,16 +274,16 @@
 
 <style>
     .big-tooltip .tooltip-inner {
-        max-width: 400px;  
-        font-size: 14px;  
-        padding: 12px;   
-        text-align: left; 
+        max-width: 400px;
+        font-size: 14px;
+        padding: 12px;
+        text-align: left;
         line-height: 1.6;
     }
 </style>
 
     <script>
-	
+
 		var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 		tooltipTriggerList.map(function (tooltipTriggerEl) {
 			return new bootstrap.Tooltip(tooltipTriggerEl);

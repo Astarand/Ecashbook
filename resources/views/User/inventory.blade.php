@@ -39,25 +39,7 @@
 				  action="{{ route('user.Inventory') }}"
 				  class="row align-items-end g-3">
 
-				<!-- Financial Year -->
-				<div class="col-lg-3 col-md-4">
-					<label class="form-label fw-semibold mb-1">
-						Financial Year
-					</label>
-
-					<select class="form-select"
-							name="financial_year"
-							onchange="this.form.submit()">
-						@foreach($financialYears as $fy)
-							<option value="{{ $fy }}"
-								{{ $selectedFY == $fy ? 'selected' : '' }}>
-								{{ $fy }}
-							</option>
-						@endforeach
-					</select>
-				</div>
-
-				<!-- Business Type -->
+				<!-- Business Nature (Left Side) -->
 				<div class="col-lg-9 col-md-8">
 
 					<label class="form-label fw-semibold mb-2">
@@ -98,6 +80,24 @@
 
 				</div>
 
+				<!-- Financial Year (Right Side) -->
+				<div class="col-lg-3 col-md-4">
+					<label class="form-label fw-semibold mb-1">
+						Financial Year
+					</label>
+
+					<select class="form-select"
+							name="financial_year"
+							onchange="this.form.submit()">
+						@foreach($financialYears as $fy)
+							<option value="{{ $fy }}"
+								{{ $selectedFY == $fy ? 'selected' : '' }}>
+								{{ $fy }}
+							</option>
+						@endforeach
+					</select>
+				</div>
+
 			</form>
 
 		</div>
@@ -107,7 +107,7 @@
 
     <div class="row g-3 mb-4 inv-summary-cards">
         <!-- 1. Total Inventory Inward Value (Purchase) -->
-        <div class="col-md-2-4 col-lg-2-4">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body text-center p-3">
                     <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
@@ -122,7 +122,7 @@
         </div>
 
         <!-- 2. Total Inventory Outward Value (Sales) -->
-        <div class="col-md-2-4 col-lg-2-4">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body text-center p-3">
                     <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
@@ -137,7 +137,7 @@
         </div>
 
         <!-- 3. Total Purchase Debit Notes Value -->
-        <div class="col-md-2-4 col-lg-2-4">
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body text-center p-3">
                     <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
@@ -151,8 +151,8 @@
             </div>
         </div>
 
-        <!-- 6. Total Sales Credit Notes Value -->
-        <div class="col-md-2-4 col-lg-2-4">
+        <!-- 4. Total Sales Credit Notes Value -->
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body text-center p-3">
                     <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
@@ -166,8 +166,8 @@
             </div>
         </div>
 
-        <!-- 7. Total Direct Inventory Expenses Value -->
-        <div class="col-md-2-4 col-lg-2-4">
+        <!-- 5. Total Direct Inventory Expenses Value -->
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body text-center p-3">
                     <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
@@ -181,8 +181,8 @@
             </div>
         </div>
 
-        <!-- 8. Total Inventory Write-Offs / Loss -->
-        <div class="col-md-2-4 col-lg-2-4">
+        <!-- 6. Total Inventory Write-Offs / Loss -->
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body text-center p-3">
                     <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
@@ -196,8 +196,8 @@
             </div>
         </div>
 
-        <!-- 9. Closing Stock Value -->
-        <div class="col-md-2-4 col-lg-2-4">
+        <!-- 7. Closing Stock Value -->
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body text-center p-3">
                     <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
@@ -211,8 +211,8 @@
             </div>
         </div>
 
-        <!-- 10. Gross Profit Value -->
-        <div class="col-md-2-4 col-lg-2-4">
+        <!-- 8. Gross Profit Value -->
+        <div class="col-12 col-sm-6 col-xl-3">
             <div class="card border-success shadow-sm h-100">
                 <div class="card-body text-center p-3">
                     <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
@@ -308,22 +308,7 @@
               @endforeach
             </tbody>
           </table>
-			<div class="d-flex justify-content-end mt-2">
-				<ul class="pagination pagination-sm mb-0">
-					{{-- Previous Page Link --}}
-					@if ($items->onFirstPage())
-						<li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-					@else
-						<li class="page-item"><a class="page-link" href="{{ $items->previousPageUrl() }}" rel="prev">&laquo;</a></li>
-					@endif
-					{{-- Next Page Link --}}
-					@if ($items->hasMorePages())
-						<li class="page-item"><a class="page-link" href="{{ $items->nextPageUrl() }}" rel="next">&raquo;</a></li>
-					@else
-						<li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-					@endif
-				</ul>
-			</div>
+        </div>
 
 
         </div>

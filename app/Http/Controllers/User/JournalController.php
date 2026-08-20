@@ -99,8 +99,7 @@ class JournalController extends Controller
 
 		$journals = $query
 			->orderBy('journal_date', 'desc')
-			->paginate(10)
-			->appends($request->all());
+			->get();
 			
 		 $ledgers = Journals::where('added_by', $userId)
 			->whereNotNull('ledger')
