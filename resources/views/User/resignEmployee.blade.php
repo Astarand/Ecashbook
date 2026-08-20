@@ -87,9 +87,23 @@
                                 <td><a class="text-muted text-hover-primary" href="#">{{ $employee->designation_name
                                         }}</a></td>
                                 <td>
-                                    <span class="badge {{ $employee->status == 1 ? 'bg-success' : 'bg-danger' }}">
-                                        {{ $employee->status == 1 ? 'Active' : 'Resign' }}
-                                    </span>
+                                    @if($employee->emp_status == 'Resigned')
+                                        <span class="badge bg-danger">Resigned</span>
+
+                                    @elseif($employee->emp_status == 'Terminated')
+                                        <span class="badge bg-danger">Terminated</span>
+
+                                    @elseif($employee->emp_status == 'Confirmed')
+                                        <span class="badge bg-success">Confirmed</span>
+
+                                    @elseif($employee->emp_status == 'In Probation')
+                                        <span class="badge bg-warning text-dark">In Probation</span>
+
+                                    @else
+                                        <span class="badge bg-secondary">
+                                            {{ $employee->emp_status ?? 'N/A' }}
+                                        </span>
+                                    @endif
                                 </td>
                                 <td>
                                     <span><i class="ti ti-dots-vertical f-20"></i></span>

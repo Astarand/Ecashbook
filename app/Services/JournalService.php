@@ -926,7 +926,7 @@ class JournalService
 				}
 			}
 
-			$netPayable = $amount - $tdsAmount;
+			$netPayable = ($amount + $gstAmount - $tdsAmount);
 
 			$existing = $this->checkExisting($autoId,$userId,$source);
 			$journalNo = $this->getJournalNo($autoId,$userId,$source);
@@ -965,7 +965,7 @@ class JournalService
 			// ================= 1. EXPENSE DR =================
 			$expenseAmount = $amount;
 			if ($gstApplicable == 'yes') {
-				$expenseAmount = $amount - $gstAmount;
+				$expenseAmount = $amount;
 			}
 			$entries[] = array_merge($common, [
 				'ledger'       => $expenseLedger,
