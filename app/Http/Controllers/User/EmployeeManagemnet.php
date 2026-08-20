@@ -122,6 +122,7 @@ class EmployeeManagemnet extends Controller
 				'employees.desig_id',
 				'employees.email_id',
 				'employees.profile_img',
+				'employees.emp_status',
 				'depertments.dept_name',
 				'designations.designation_name',
 				DB::raw("

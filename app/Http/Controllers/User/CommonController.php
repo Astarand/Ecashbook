@@ -29,13 +29,13 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use App\Helpers\AuditLogger;
-use App\Services\JournalService;
+use App\Services\BalanceSheetService;
 
 class CommonController extends Controller
 {
-    public function __construct(JournalService $journalService)
+    public function __construct(BalanceSheetService $balanceSheetService)
     {
-        $this->journalService = $journalService;
+        $this->balanceSheetService = $balanceSheetService;
     }
 	
     public function getDropdownTypes(Request $request)
@@ -80,7 +80,7 @@ class CommonController extends Controller
 	//start new
 	public function getCashInHand(Request $request)
 	{
-		// $userId = currentOwnerId();
+		$type = 'Cash in Hand';
 		if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5) {
 			$userId = currentOwnerId();
 		} else {
@@ -88,22 +88,16 @@ class CommonController extends Controller
 		}
 		$propId = $request->propId;
 
-		$query = DB::table('mcash_credit_debits')
-			->where('added_by', $userId);
-
-		if (!empty($propId)) {
-			$query->where('propId', $propId);
-		}
-
-		$total_credit = (clone $query)->where('cd_type', 'cr')->sum('cd_amount');
-		$total_debit  = (clone $query)->where('cd_type', 'dr')->sum('cd_amount');
-
-		$cash_in_hand = $total_credit - $total_debit;
+		$startDate = date('2020-04-01');
+		$endDate = now()->endOfMonth()->toDateString(); //Current Month
+		$cashInHand = $this->balanceSheetService->getCurrentAssetAmount($type,$userId,$startDate,$endDate);
 
 		return response()->json([
-			'cash_in_hand' => $cash_in_hand ?? 0
+			'success'       => true,
+			'cash_in_hand'  => $cashInHand
 		]);
 	}
+	
 	public function getBankAccounts()
 	{
 		// $uid = currentOwnerId();
@@ -113,83 +107,92 @@ class CommonController extends Controller
 			$uid = session('compId'); //ca-accountant access
 		}
 
-		return DB::table('banks')
-			->where('added_by', $uid)
+		$startDate = '2020-04-01';
+		$endDate   = now()->endOfMonth()->toDateString(); //Current Month
+
+		$banks = DB::table('banks as b')
+			->leftJoin('payment_vouchers as pv', function ($join) use ($startDate, $endDate, $uid) {
+				$join->on('pv.bank_id', '=', 'b.id')
+					->where('pv.added_by', $uid)
+					->whereIn('pv.payment_mode', ['Bank', 'UPI'])
+					->whereBetween('pv.date', [$startDate, $endDate]);
+			})
+			->where('b.added_by', $uid)
+			->select(
+				'b.id',
+				'b.bank_name'
+			)
+			->selectRaw("
+				COALESCE(b.curr_bal, 0)
+				+
+				COALESCE(
+					SUM(
+						CASE
+							WHEN pv.credit_debit = 'Credit'
+							THEN COALESCE(pv.amount, 0)
+							ELSE 0
+						END
+					),
+					0
+				)
+				-
+				COALESCE(
+					SUM(
+						CASE
+							WHEN pv.credit_debit = 'Debit'
+							THEN COALESCE(pv.amount, 0)
+							ELSE 0
+						END
+					),
+					0
+				) AS curr_bal
+			")
+			->groupBy(
+				'b.id',
+				'b.bank_name',
+				'b.curr_bal'
+			)
+			->orderBy('b.bank_name')
 			->get();
+
+		return $banks;
+
 	}
 	
 	public function getTradeReceivableAmount(Request $request)
 	{
-		// $uid = currentOwnerId();
+		$type = 'Trade Receivables';
 		if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5) {
 			$uid = currentOwnerId();
 		} else {
 			$uid = session('compId'); //ca-accountant access
 		}
-		// If date passed → use it, else current date
-		$date = $request->date 
-			? Carbon::parse($request->date) 
-			: Carbon::now();
-
-		$start = $date->copy()->startOfMonth();
-		$end   = $date->copy()->endOfMonth();
-
-		$data = DB::table('sales as s')
-			->leftJoin('sales_values as sv', 's.id', '=', 'sv.sid')
-			->where('s.added_by', $uid)
-			->whereBetween('s.inv_date', [$start, $end])
-			->select(
-				DB::raw('SUM(sv.amount) as total_amount'),
-				DB::raw('SUM(sv.tax_amt) as total_gst'),
-				DB::raw('(SUM(sv.amount) + SUM(sv.tax_amt) - IFNULL(SUM(DISTINCT s.advance_amount),0)) as pending_amount')
-			)
-			->first();
+	
+		$startDate = date('2020-04-01');
+		$endDate = now()->endOfMonth()->toDateString();  //Current Month
+		$amount = $this->balanceSheetService->getCurrentAssetAmount($type,$uid,$startDate,$endDate);
 
 		return response()->json([
-			'total_amount'   => $data->total_amount ?? 0,
-			'total_gst'      => $data->total_gst ?? 0,
-			'pending_amount' => $data->pending_amount ?? 0,
+			'total_amount'   => $amount ?? 0,
 		]);
 	}
 	
 	public function getAdvanceVendorAmount(Request $request)
 	{
-		// $uid = currentOwnerId();
+		$type = 'Advance to Vendor';
 		if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5) {
 			$uid = currentOwnerId();
 		} else {
 			$uid = session('compId'); //ca-accountant access
 		}
-		$date = $request->date 
-			? Carbon::parse($request->date) 
-			: Carbon::now();
-
-		$startOfMonth = $date->copy()->startOfMonth();
-		$endOfMonth   = $date->copy()->endOfMonth();
-
-		$data = DB::table('purchases as p')
-			->leftJoin('purchase_values as pv', 'p.id', '=', 'pv.sid') // ensure 'sid' is correct FK
-			->where('p.added_by', $uid)
-			->whereBetween('p.inv_date', [$startOfMonth, $endOfMonth])
-			->select([
-				DB::raw('COALESCE(SUM(pv.amount), 0) as total_amount'),
-				DB::raw('COALESCE(SUM(pv.tax_amt), 0) as total_gst'),
-				DB::raw('COALESCE(SUM(DISTINCT p.advance_amount), 0) as total_advance')
-			])
-			->first();
-
-		$totalAmount   = $data->total_amount;
-		$totalGst      = $data->total_gst;
-		$totalAdvance  = $data->total_advance;
-
-		$grandTotal    = $totalAmount + $totalGst;
-		$pendingAmount = $grandTotal - $totalAdvance;
+		
+		$startDate = date('2020-04-01');
+		$endDate = now()->endOfMonth()->toDateString(); //Current Month
+		$amount = $this->balanceSheetService->getCurrentAssetAmount($type,$uid,$startDate,$endDate);
 
 		// ✅ Response
 		return response()->json([
-			'total_amount'   => $totalAdvance,
-			'total_gst'      => $totalGst,
-			'pending_amount' => $pendingAmount,
+			'total_amount'   => $amount,
 		]);
 	}
 	
@@ -197,46 +200,37 @@ class CommonController extends Controller
 	
 	public function getEmployeeAdvance()
 	{
-		// $uid = currentOwnerId();
+		$type = 'Employee Advance';
 		if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5) {
 			$uid = currentOwnerId();
 		} else {
 			$uid = session('compId'); //ca-accountant access
 		}
-		// Current Month
-		$start = date('Y-m-01');
-		$end   = date('Y-m-t');
-		$total = DB::table('expenses')
-			->where('added_by', $uid)
-			->where('expense_type', 'employee_benefits')
-			->whereBetween('expense_date', [$start, $end])
-			->sum('expense_amt');
+			
+		$startDate = date('2020-04-01');
+		$endDate = now()->endOfMonth()->toDateString(); //Current Month
+		$amount = $this->balanceSheetService->getCurrentAssetAmount($type,$uid,$startDate,$endDate);
 
 		return response()->json([
-			'amount' => $total ?? 0
+			'amount' => $amount ?? 0
 		]);
 	}
 	
 	public function getPrepaidExpense(Request $request)
 	{
-		// $uid = currentOwnerId();
+		$type = 'Prepaid Expenses';
 		if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5) {
 			$uid = currentOwnerId();
 		} else {
 			$uid = session('compId'); //ca-accountant access
 		}
-		$type = $request->expense_type ?? 'rent_expense';
-		$start = date('Y-m-01');
-		$end   = date('Y-m-t');
 
-		$total = DB::table('expenses')
-			->where('added_by', $uid)
-			->where('expense_type', $type)
-			->whereBetween('expense_date', [$start, $end])
-			->sum('expense_amt');
+		$startDate = date('2020-04-01');
+		$endDate = now()->endOfMonth()->toDateString(); //Current Month
+		$amount = $this->balanceSheetService->getCurrentAssetAmount($type,$uid,$startDate,$endDate);
 
 		return response()->json([
-			'amount' => $total ?? 0
+			'amount' => $amount ?? 0
 		]);
 	}
 	
@@ -272,34 +266,19 @@ class CommonController extends Controller
 	
 	public function getGSTSummary()
 	{
-		// $uid = currentOwnerId();
+		$type = 'Input GST Credit';
 		if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5) {
 			$uid = currentOwnerId();
 		} else {
 			$uid = session('compId'); //ca-accountant access
 		}
-
-		$start = Carbon::now()->startOfMonth();
-		$end   = Carbon::now()->endOfMonth();
-
-		// Input GST (Purchase)
-		$input = DB::table('purchases as p')
-			->leftJoin('purchase_values as pv', 'p.id', '=', 'pv.sid')
-			->where('p.added_by', $uid)
-			->whereBetween('p.inv_date', [$start, $end])
-			->sum('pv.tax_amt');
-
-		// Output GST (Sales)
-		$output = DB::table('sales as s')
-			->leftJoin('sales_values as sv', 's.id', '=', 'sv.sid')
-			->where('s.added_by', $uid)
-			->whereBetween('s.inv_date', [$start, $end])
-			->sum('sv.tax_amt');
+			
+		$startDate = date('2020-04-01');
+		$endDate = now()->endOfMonth()->toDateString(); //Current Month
+		$amount = $this->balanceSheetService->getCurrentAssetAmount($type,$uid,$startDate,$endDate);
 
 		return response()->json([
-			'input_itc' => $input,
-			'output_gst' => $output,
-			'net_payable' => $output - $input
+			'input_itc' => $amount,
 		]);
 	}
 	
@@ -388,55 +367,19 @@ class CommonController extends Controller
 
 	public function calculateGrossProfit(Request $request)
 	{
-		// $userId = currentOwnerId();
-
+		$type = 'Inventories';
 		if (Auth::user()->u_type == 2 || Auth::user()->u_type == 5) {
 			$userId = currentOwnerId();
 		} else {
 			$userId = session('compId'); //ca-accountant access
 		}
 
-		//Handle month (fallback to current)
-		$date = !empty($request->month) ? Carbon::parse($request->month): Carbon::now();
-
-		$month = $date->month;
-		$year  = $date->year;
-
-		$bussType = $request->buss_type ?? null;
-
-		// ================= SALES =================
-		$totalSales = DB::table('sales_values as sv')
-			->join('sales as s', 's.id', '=', 'sv.sid')
-			->join('products as p', 'p.id', '=', 'sv.prod_id')
-			->where('s.added_by', $userId)
-			->whereMonth('s.inv_date', $month)
-			->whereYear('s.inv_date', $year)
-			->when($bussType && $bussType != 'mixed', function ($query) use ($bussType) {
-				$query->where('p.item_type', $bussType);
-			})
-			->selectRaw('COALESCE(SUM(sv.amount - sv.disc_amt), 0) as net_sales')
-			->value('net_sales');
-
-		// ================= COGS =================
-		$totalCOGS = DB::table('sales_values as sv')
-			->join('sales as s', 's.id', '=', 'sv.sid')
-			->join('products as p', 'p.id', '=', 'sv.prod_id')
-			->where('s.added_by', $userId)
-			->where('p.added_by', $userId)
-			->whereMonth('s.inv_date', $month)
-			->whereYear('s.inv_date', $year)
-			->when($bussType && $bussType != 'mixed', function ($query) use ($bussType) {
-				$query->where('p.item_type', $bussType);
-			})
-			->selectRaw('COALESCE(SUM(sv.quantity * p.purchase_price), 0) as cogs')
-			->value('cogs');
-
-		// ================= FINAL =================
-		$grossProfit = $totalSales - $totalCOGS;
+		$startDate = date('2020-04-01');
+		$endDate = now()->endOfMonth()->toDateString(); //Current Month
+		$amount = $this->balanceSheetService->getCurrentAssetAmount($type,$userId,$startDate,$endDate);
 
 		return response()->json([
-			'month' => $date->format('Y-m'),
-			'gross_profit' => round($grossProfit, 2)
+			'gross_profit' => round($amount, 2)
 		]);
 	}
 	

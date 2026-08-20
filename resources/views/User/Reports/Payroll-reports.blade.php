@@ -391,7 +391,7 @@
                             </div>
 
                             {{-- Action Buttons for Attendance Tab --}}
-                            <div class="d-flex justify-content-end gap-3 align-items-center mt-3 pt-3 border-top">
+                            {{-- <div class="d-flex justify-content-end gap-3 align-items-center mt-3 pt-3 border-top">
                                 <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                     <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
                                 </button>
@@ -399,7 +399,7 @@
                                     <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
                                 </button>
                                 
-                            </div>
+                            </div> --}}
                         </div>
 
                         {{-- TAB 3: SUMMARIES & DOWNLOADS --}}
@@ -1168,12 +1168,22 @@
 
             // Dynamic month selector sync
             $('#payrollMonth, #payrollFY').on('change', function() {
-                let m = $('#payrollMonth').val();
-                let fy = $('#payrollFY').val();
-                let fullStr = m + ' ' + (fy === '2026-27' ? '2026' : '2025');
+                const m  = $('#payrollMonth').val();
+                const fy = $('#payrollFY').val();
 
+                // Determine the calendar year for the selected month within the FY
+                const [fyStart, fyEnd] = fy.split('-').map(Number);
+                const monthNum = {
+                    January:1, February:2, March:3, April:4, May:5, June:6,
+                    July:7, August:8, September:9, October:10, November:11, December:12
+                }[m] || 1;
+                const year = monthNum >= 4 ? fyStart : fyEnd;
+
+                const fullStr = m + ' ' + year;
                 $('.active-month-text').text(fullStr);
-                $('#generationDate').text('05-' + (m === 'July' ? '07' : m === 'June' ? '06' : m === 'May' ? '05' : '04') + '-' + (fy === '2026-27' ? '2026' : '2025'));
+
+                const mm = String(monthNum).padStart(2, '0');
+                $('#generationDate').text('01-' + mm + '-' + year);
             });
         });
 
@@ -2087,6 +2097,11 @@
             // Initial load
             loadMonths(fySelect.value);
 
+            // Sync month text heading on initial load
+            setTimeout(function() {
+                $('#payrollMonth, #payrollFY').trigger('change');
+            }, 50);
+
             // Reload months when FY changes
             fySelect.addEventListener("change", function () {
                 loadMonths(this.value);
@@ -2183,7 +2198,7 @@
                     beforeSend: function () {
                         $('#payrollRegisterBody').html(`
                             <tr>
-                                <td colspan="13" class="text-center py-4">
+                                <td colspan="14" class="text-center py-4">
                                     <span class="spinner-border spinner-border-sm me-2"></span>
                                     Loading...
                                 </td>
@@ -2198,62 +2213,94 @@
 
                         let html = '';
 
+                        // Totals accumulators
+                        let totalGross = 0, totalNet = 0, totalPf = 0, totalEsi = 0,
+                            totalPtax  = 0, totalTds = 0, totalLwf = 0,
+                            totalAdv   = 0, totalLoan = 0;
+
                         if (rows.length > 0) {
 
                             $.each(rows, function(index, row){
 
+                                const gross = Number(row.gross_salary || row.total_addition || 0);
+                                const net   = Number(row.net_salary   || row.net_sal        || 0);
+                                const pf    = Number(row.provident_fund || 0);
+                                const esi   = Number(row.esi  || 0);
+                                const ptax  = Number(row.ptax || 0);
+                                const tds   = Number(row.tds  || 0);
+                                const lwf   = Number(row.lwf  || 0);
+                                const adv   = Number(row.advance        || 0);
+                                const loan  = Number(row.loan_deduction || 0);
+
+                                totalGross += gross; totalNet  += net;
+                                totalPf    += pf;    totalEsi  += esi;
+                                totalPtax  += ptax;  totalTds  += tds;
+                                totalLwf   += lwf;   totalAdv  += adv;
+                                totalLoan  += loan;
+
+                                const fmt = (v) => '₹' + v.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+                                const statusBadge = row.payment_status === 'Salary Done'
+                                    ? '<span class="badge bg-light-success text-success rounded-pill">Salary Done</span>'
+                                    : '<span class="badge bg-light-warning text-warning rounded-pill">Payment Pending</span>';
+
+                                // Name with resigned indicator
+                                const isResigned   = row.emp_status === 'Resigned';
+                                const isTerminated = row.emp_status === 'Terminated';
+                                let nameCell = row.name || '';
+                                if (isResigned || isTerminated) {
+                                    const color = isResigned ? 'warning' : 'danger';
+                                    const label = isResigned ? 'Resigned' : 'Terminated';
+                                    const lastDay = row.regine_date
+                                        ? `<small class="text-muted d-block">Left: ${row.regine_date}</small>`
+                                        : '';
+                                    nameCell = `${row.name || ''}
+                                        <span class="badge bg-light-${color} text-${color} ms-1">${label}</span>
+                                        ${lastDay}`;
+                                }
+
                                 html += `
                                     <tr>
-                                        <td class="fw-bold">${row.employee_id || ''}</td>
-
-                                        <td>${row.name || ''}</td>
-
-                                        <td>${row.designation_name || ''}</td>
-
-                                        <td>${row.joining_date || ''}</td>
-
-                                        <td>₹${Number(row.total_addition || 0).toLocaleString('en-IN',{
-                                            minimumFractionDigits:2,
-                                            maximumFractionDigits:2
-                                        })}</td>
-
-                                        <td class="fw-bold text-primary">
-                                            ₹${Number(row.net_sal || 0).toLocaleString('en-IN',{
-                                                minimumFractionDigits:2,
-                                                maximumFractionDigits:2
-                                            })}
-                                        </td>
-
-                                        <td>₹${Number(row.provident_fund || 0).toLocaleString('en-IN')}</td>
-
-                                        <td>₹${Number(row.esi || 0).toLocaleString('en-IN')}</td>
-
-                                        <td>₹${Number(row.ptax || 0).toLocaleString('en-IN')}</td>
-
-                                        <td>₹${Number(row.tds || 0).toLocaleString('en-IN')}</td>
-
-                                        <td>₹${Number(row.lwf || 0).toLocaleString('en-IN')}</td>
-
-                                        <td>₹${Number(row.advance || 0).toLocaleString('en-IN')}</td>
-
-                                        <td>₹${Number(row.loan_deduction || 0).toLocaleString('en-IN')}</td>
-
-                                        <td>
-                                            ${
-                                                row.payment_status === 'Salary Done'
-                                                ? '<span class="badge bg-light-success text-success rounded-pill">Salary Done</span>'
-                                                : '<span class="badge bg-light-warning text-warning rounded-pill">Payment Pending</span>'
-                                            }
-                                        </td>
+                                        <td class="ps-3 fw-bold">${row.employee_id || ''}</td>
+                                        <td class="fw-bold text-dark">${nameCell}</td>
+                                        <td>${row.designation_name || '—'}</td>
+                                        <td>${row.joining_date || '—'}</td>
+                                        <td>${fmt(gross)}</td>
+                                        <td class="fw-bold text-primary">${fmt(net)}</td>
+                                        <td>${fmt(pf)}</td>
+                                        <td>${fmt(esi)}</td>
+                                        <td>${fmt(ptax)}</td>
+                                        <td>${fmt(tds)}</td>
+                                        <td>${fmt(lwf)}</td>
+                                        <td>${fmt(adv)}</td>
+                                        <td>${fmt(loan)}</td>
+                                        <td class="pe-3">${statusBadge}</td>
                                     </tr>`;
                             });
+
+                            // Totals footer row
+                            const fmt = (v) => '₹' + v.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+                            html += `
+                                <tr class="table-light fw-bold border-top" style="background:#f0f9fb;">
+                                    <td class="ps-3" colspan="4">Total (${rows.length} Employee${rows.length !== 1 ? 's' : ''})</td>
+                                    <td class="text-dark">${fmt(totalGross)}</td>
+                                    <td class="text-primary">${fmt(totalNet)}</td>
+                                    <td>${fmt(totalPf)}</td>
+                                    <td>${fmt(totalEsi)}</td>
+                                    <td>${fmt(totalPtax)}</td>
+                                    <td>${fmt(totalTds)}</td>
+                                    <td>${fmt(totalLwf)}</td>
+                                    <td>${fmt(totalAdv)}</td>
+                                    <td>${fmt(totalLoan)}</td>
+                                    <td class="pe-3">—</td>
+                                </tr>`;
 
                         } else {
 
                             html = `
                                 <tr>
-                                    <td colspan="13" class="text-center text-muted">
-                                        No employee found.
+                                    <td colspan="14" class="text-center text-muted py-4">
+                                        No payroll data found for the selected month.
                                     </td>
                                 </tr>`;
                         }
@@ -2267,7 +2314,7 @@
 
                         $('#payrollRegisterBody').html(`
                             <tr>
-                                <td colspan="13" class="text-center text-danger">
+                                <td colspan="14" class="text-center text-danger py-4">
                                     Failed to load payroll register.
                                 </td>
                             </tr>

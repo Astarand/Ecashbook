@@ -926,7 +926,7 @@ class JournalService
 				}
 			}
 
-			$netPayable = $amount - $tdsAmount;
+			$netPayable = ($amount + $gstAmount - $tdsAmount);
 
 			$existing = $this->checkExisting($autoId,$userId,$source);
 			$journalNo = $this->getJournalNo($autoId,$userId,$source);
@@ -965,7 +965,7 @@ class JournalService
 			// ================= 1. EXPENSE DR =================
 			$expenseAmount = $amount;
 			if ($gstApplicable == 'yes') {
-				$expenseAmount = $amount - $gstAmount;
+				$expenseAmount = $amount;
 			}
 			$entries[] = array_merge($common, [
 				'ledger'       => $expenseLedger,
@@ -1043,6 +1043,20 @@ class JournalService
 					'gst_applicable' => 'no',
 					'gst_rate'       => 0,
 					'gst_trans'      => null,
+				]);
+			}elseif ($payStatus == 'Due') {
+
+				// Expense is payable to supplier/party
+				$entries[] = array_merge($common, [
+					'ledger'       => $party,
+					'party_name'   => $party,
+					'debit_credit' => 'Credit',
+					'amount'       => $netPayable,
+					'tot_amt'      => $netPayable,
+					'notes'        => 'Expense Payable',
+					'gst_applicable' => 'no',
+					'gst_rate'     => 0,
+					'gst_trans'    => null,
 				]);
 			}
 			//dd($entries);

@@ -75,9 +75,9 @@
                             <div class="mb-3">
                                 <div class="input-group">
                                     <input type="text" class="form-control"  name="hsn_code" id="hsn_code" value="{{$product->hsn_code}}" placeholder="Enter HSN Number">
-                                    <a href="https://cbic-gst.gov.in/gst-goods-services-rates.html" target="_blank" class="btn btn-primary" id="searchHsnBtn">
+                                    <!--<a href="https://cbic-gst.gov.in/gst-goods-services-rates.html" target="_blank" class="btn btn-primary" id="searchHsnBtn">
                                         <i class="ti ti-search align-middle"></i> Search HSN
-                                    </a>
+                                    </a>-->
                                 </div>
                             </div>
                         </div>
@@ -213,9 +213,9 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control"   name="sac_code" id="sac_code" value="{{$product->sac_code}}" placeholder="Enter SAC Number">
                                     <!--<button class="btn btn-primary" type="button"><i class="ti ti-search align-middle"></i> Serarch SAC</button>-->
-									<a href="https://cbic-gst.gov.in/gst-goods-services-rates.html" target="_blank" class="btn btn-primary" id="searchSacBtn">
+									<!--<a href="https://cbic-gst.gov.in/gst-goods-services-rates.html" target="_blank" class="btn btn-primary" id="searchSacBtn">
                                         <i class="ti ti-search align-middle"></i> Serarch SAC
-                                    </a>
+                                    </a>-->
                                 </div>
                             </div>
                         </div>

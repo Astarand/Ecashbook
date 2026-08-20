@@ -1586,7 +1586,7 @@ class ProformasController extends Controller
 
             // Change required fields
             $proformaData['inv_num']   = $invoiceNo;
-            //$proformaData['inv_date']  = date('Y-m-d');
+            $proformaData['inv_date']  = date('Y-m-d');
             $proformaData['added_by']  = $userId;
             $proformaData['status']  = 1;
 

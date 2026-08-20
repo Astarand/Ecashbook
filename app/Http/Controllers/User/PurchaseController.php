@@ -1820,7 +1820,7 @@ class PurchaseController extends Controller
 				$invoiceNo = $this->create_purchase_invoice_number($userId);
 			}
             $purchaseData['inv_num']  = $invoiceNo;
-            //$proformaData['inv_date']  = date('Y-m-d');
+            $proformaData['inv_date']  = date('Y-m-d');
             $purchaseData['added_by']  = $userId;
             $purchaseData['status']  = 1;
 
