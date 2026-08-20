@@ -3227,10 +3227,72 @@ class PayrollReportController extends Controller
         $totalWorkingDays = max($totalWorkingDays, 0);
         // $totalWorkingDays = max($totalWorkingDays - 1, 0);
 
-        $lateDeduct = intdiv($totalLate, 3);
-        $totalEarlyLogoutDeduct = intdiv($totalEarlyLogout, 3);
-        $totalAbsent = max($totalWorkingDays - ($totalPresent + $totalLeave), 0);
-        $lopDeduction = $perDaySalary * ($totalAbsent + $lateDeduct + $totalEarlyLogoutDeduct);
+        // =========================================================
+        // LOP & Resignation Proration
+        //
+        // Per-day salary is based on a 30-day divisor, so LOP
+        // deduction must also use 30-day basis consistently.
+        //
+        // For resigned employees: company pays only for days 1 to
+        // resignation date (inclusive). LOP = 30 - resignationDay.
+        // Example: resigned 20-Jul → paid 20 days → LOP = 10 days.
+        //
+        // For active employees: standard LOP based on absent days,
+        // late count (3 lates = 1 day), early-logout (3 = 1 day).
+        // =========================================================
+        $resignDate = !empty($employee->regine_date)
+            ? Carbon::parse($employee->regine_date)
+            : null;
+
+        $isResignedThisMonth = $resignDate
+            && (int)$resignDate->year  === (int)$year
+            && (int)$resignDate->month === (int)$monthNum;
+
+        if ($isResignedThisMonth) {
+            // -------------------------------------------------------
+            // Resigned employee LOP calculation:
+            //
+            // The company pays salary only for the period the employee
+            // worked. After the resignation date, ALL remaining days
+            // (including weekoffs/holidays) become LOP — because the
+            // employee is no longer on the payroll.
+            //
+            // Formula:
+            //   absentsInWholeMonth  = normal LOP (working days not attended)
+            //   weekoffsAfterResign  = non-working days after resignation date
+            //   totalLOP             = absentsInWholeMonth + weekoffsAfterResign
+            //
+            // Example: July 2026, resigned 20-Jul, 0 present days
+            //   absentsInWholeMonth = 27 working days − 0 present = 27
+            //   weekoffs 21-31 Jul  = Jul 26 (Sun) = 1
+            //   totalLOP            = 27 + 1 = 28
+            // -------------------------------------------------------
+
+            // Step 1: normal absent count for the whole month
+            $normalAbsent = max($totalWorkingDays - ($totalPresent + $totalLeave), 0);
+
+            // Step 2: count non-working days (weekoffs + holidays) after resignation date
+            $nonWorkingAfterResign = 0;
+            for ($d = $resignDate->copy()->addDay(); $d->lte($lastDay); $d->addDay()) {
+                $dn = strtolower($d->format('l'));
+                $ds = $d->format('Y-m-d');
+                $isWe  = isset($weeklySchedule[$dn]) && strtolower($weeklySchedule[$dn]) === 'closed';
+                $isHol = in_array($ds, $holidays, true);
+                if ($isWe || $isHol) {
+                    $nonWorkingAfterResign++;
+                }
+            }
+
+            $lateDeduct             = 0;
+            $totalEarlyLogoutDeduct = 0;
+            $totalAbsent            = $normalAbsent + $nonWorkingAfterResign;
+            $lopDeduction           = round($perDaySalary * $totalAbsent, 2);
+        } else {
+            $lateDeduct = intdiv($totalLate, 3);
+            $totalEarlyLogoutDeduct = intdiv($totalEarlyLogout, 3);
+            $totalAbsent = max($totalWorkingDays - ($totalPresent + $totalLeave), 0);
+            $lopDeduction = $perDaySalary * ($totalAbsent + $lateDeduct + $totalEarlyLogoutDeduct);
+        }
 
         $baseGross = max($grossSalary - $lopDeduction, 0);
         $basicPercentage = isset($employee->basic_percentage)
@@ -3295,6 +3357,9 @@ class PayrollReportController extends Controller
             'total_earnings' => round($totalEarnings, 2),
             'total_deductions' => round($totalDeductions, 2),
             'net_salary' => round($netSalary, 2),
+            // Resignation info for display
+            'resigned_this_month' => $isResignedThisMonth,
+            'effective_last_day'  => $isResignedThisMonth ? $resignDate->format('d M Y') : null,
         ];
     }
 
@@ -3431,6 +3496,9 @@ class PayrollReportController extends Controller
             $emp->total_early_logout_deduction_days = $calc['total_early_logout_deduction_days'];
             $emp->performance_bonus  = 0;
             $emp->overtime           = 0;
+            // Resignation info
+            $emp->resigned_this_month = $calc['resigned_this_month'] ?? false;
+            $emp->effective_last_day  = $calc['effective_last_day']  ?? null;
         }
 
         // Use per-employee working days (from computeBulkPayslipValuesForEmployee)

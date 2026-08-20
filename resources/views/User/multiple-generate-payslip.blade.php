@@ -301,8 +301,11 @@ function renderTable(data, month, fy, workingDays) {
                 : '';
             const label = isResigned ? 'Resigned' : 'Terminated';
             const color = isResigned ? 'warning' : 'danger';
-            statusBadge = `<span class="badge bg-light-${color} text-${color} d-block mb-1">${label}</span>`
-                        + (dateStr ? `<small class="text-muted">${dateStr}</small>` : '');
+            // Show effective last working day if resigned in this payroll month
+            const lastDayNote = emp.effective_last_day
+                ? `<small class="text-muted d-block">Last day: ${emp.effective_last_day}</small>`
+                : (dateStr ? `<small class="text-muted">${dateStr}</small>` : '');
+            statusBadge = `<span class="badge bg-light-${color} text-${color} d-block mb-1">${label}</span>${lastDayNote}`;
         } else {
             statusBadge = `<span class="badge bg-light-success text-success">${emp.emp_status || 'Active'}</span>`;
         }
@@ -359,24 +362,39 @@ function renderTable(data, month, fy, workingDays) {
 
 // ================================================================
 // Core salary computation (mirrors generate-payslip.blade.php JS exactly)
+// For resigned-this-month employees, lopDays comes directly from the
+// server (30 - resignationDay) — do NOT recalculate from attendance.
 // ================================================================
 function computeNet(emp, bonus, ot, loanVal) {
-    const gross        = parseFloat(emp.total_addition || 0);
-    const perDay       = parseFloat(emp.per_day_salary || 0);
-    const absent       = parseFloat(emp.total_absent || 0);
-    const lateDeduct   = parseFloat(emp.late_deduction_days || 0);
-    const earlyDeduct  = parseFloat(emp.total_early_logout_deduction_days || 0);
-    const basicPct     = parseFloat(emp.basic_percentage != null ? emp.basic_percentage : 50);
+    const gross      = parseFloat(emp.total_addition || 0);
+    const perDay     = parseFloat(emp.per_day_salary || 0);
+    const basicPct   = parseFloat(emp.basic_percentage != null ? emp.basic_percentage : 50);
 
-    const lopDays      = absent + lateDeduct + earlyDeduct;
-    const lopAmount    = perDay * lopDays;
-    const baseGross    = Math.max(gross - lopAmount, 0);
+    // ---------------------------------------------------------------
+    // LOP calculation
+    // For resigned-this-month: server already computed lopDays = 30 - resignDay
+    // For active: derive from attendance (absent + late + early logout)
+    // ---------------------------------------------------------------
+    let lopDays, lopAmount;
+    if (emp.resigned_this_month) {
+        // Use server-computed absent count (= 30 - resignation day)
+        lopDays   = parseFloat(emp.total_absent || 0);
+        lopAmount = perDay * lopDays;
+    } else {
+        const absent      = parseFloat(emp.total_absent || 0);
+        const lateDeduct  = parseFloat(emp.late_deduction_days || 0);
+        const earlyDeduct = parseFloat(emp.total_early_logout_deduction_days || 0);
+        lopDays   = absent + lateDeduct + earlyDeduct;
+        lopAmount = perDay * lopDays;
+    }
 
-    const conveyance        = 1600;
-    const medicalAllowance  = 1250;
-    const basicSalary       = baseGross * (basicPct / 100);
-    const hra               = basicSalary * 0.5;
-    let   specialAllowance  = baseGross - (basicSalary + hra + medicalAllowance + conveyance);
+    const baseGross = Math.max(gross - lopAmount, 0);
+
+    const conveyance       = 1600;
+    const medicalAllowance = 1250;
+    const basicSalary      = baseGross * (basicPct / 100);
+    const hra              = basicSalary * 0.5;
+    let specialAllowance   = baseGross - (basicSalary + hra + medicalAllowance + conveyance);
     if (specialAllowance < 0) specialAllowance = 0;
 
     // PF: server sends computed pf value; if > 0, applicable — recalculate dynamically
@@ -402,10 +420,10 @@ function computeNet(emp, bonus, ot, loanVal) {
         else if (ptBase > 40000)                    pt = 200;
     }
 
-    const tds     = parseFloat(emp.tds_amount  || 0);
-    const advance = 0; // advance not available per-employee in bulk
-    const lwf     = parseFloat(emp.lwf_amount  || 0);
-    const loan    = parseFloat(loanVal         || 0);
+    const tds     = parseFloat(emp.tds_amount || 0);
+    const advance = 0;
+    const lwf     = parseFloat(emp.lwf_amount || 0);
+    const loan    = parseFloat(loanVal        || 0);
 
     const totalEarnings   = basicSalary + hra + conveyance + medicalAllowance + specialAllowance + bonus + ot;
     const totalDeductions = pf + esi + pt + tds + advance + lwf + loan;

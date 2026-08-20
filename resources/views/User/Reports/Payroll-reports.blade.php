@@ -2244,10 +2244,25 @@
                                     ? '<span class="badge bg-light-success text-success rounded-pill">Salary Done</span>'
                                     : '<span class="badge bg-light-warning text-warning rounded-pill">Payment Pending</span>';
 
+                                // Name with resigned indicator
+                                const isResigned   = row.emp_status === 'Resigned';
+                                const isTerminated = row.emp_status === 'Terminated';
+                                let nameCell = row.name || '';
+                                if (isResigned || isTerminated) {
+                                    const color = isResigned ? 'warning' : 'danger';
+                                    const label = isResigned ? 'Resigned' : 'Terminated';
+                                    const lastDay = row.regine_date
+                                        ? `<small class="text-muted d-block">Left: ${row.regine_date}</small>`
+                                        : '';
+                                    nameCell = `${row.name || ''}
+                                        <span class="badge bg-light-${color} text-${color} ms-1">${label}</span>
+                                        ${lastDay}`;
+                                }
+
                                 html += `
                                     <tr>
                                         <td class="ps-3 fw-bold">${row.employee_id || ''}</td>
-                                        <td class="fw-bold text-dark">${row.name || ''}</td>
+                                        <td class="fw-bold text-dark">${nameCell}</td>
                                         <td>${row.designation_name || '—'}</td>
                                         <td>${row.joining_date || '—'}</td>
                                         <td>${fmt(gross)}</td>

@@ -53,9 +53,9 @@
 			<div class="col-md-6">
 				<div class="d-flex justify-content-end mb-3">
 					<button type="button"
-							class="btn btn-primary"
+							class="btn btn-primary btn-lg px-5"
 							onclick="openHsnSacForItem()">
-						<i class="ti ti-search"></i>
+						<i class="ti ti-search me-2"></i>
 						HSN / SAC Search
 					</button>
 				</div>
