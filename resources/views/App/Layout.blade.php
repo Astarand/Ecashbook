@@ -68,6 +68,7 @@
     @include('partials.chat-modal')
     @include('partials.settlement-modal')
     @include('partials.send-mail-modal')
+    @include('partials.hsn-sac-modal')
 
     <div class="pc-container">
         @yield('container')

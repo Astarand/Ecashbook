@@ -1874,7 +1874,8 @@ class SalesController extends Controller
 			}
             $salesData['inv_num']   = $invoiceNo;
             $salesData['added_by']  = $userId;
-            $salesData['status']  = 1;
+			$salesData['inv_date']  = date('Y-m-d');
+            $salesData['status']    = 1;
 
             // Insert into sales
             $salesId = DB::table('sales')->insertGetId($salesData);

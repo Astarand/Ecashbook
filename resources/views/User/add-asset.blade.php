@@ -1295,7 +1295,7 @@
 	//Prepaid Expense
 	function calculatePrepaid() 
 	{
-		$.get('/get-employee-advance', function (data) {
+		$.get('/get-prepaid-expense', function (data) {
 			$('#prepaid_amt').val(data.amount);
 		});
 	}

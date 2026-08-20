@@ -10,6 +10,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DocumentMailController;
+use App\Http\Controllers\HsnSacSearchController;
 
 /* User/Company Controller */
 use App\Http\Controllers\User\DashboardController;
@@ -1324,5 +1325,9 @@ Route::middleware(['ensure.login'])->group(function () {
 	});
 	Route::get('/get-proform-invoice-total/{id}', [ProformasController::class, 'getInvoiceTotal']);
 	Route::post('/send-document-mail', [DocumentMailController::class,'sendDocumentMail'])->name('send.document.mail');
+	
+	Route::get('/user-hsn-sac/search',[HsnSacSearchController::class, 'search'])->name('user-hsn-sac.search');
+	Route::get('/user-hsn-sac/get/{id}',[HsnSacSearchController::class, 'get'])->name('user-hsn-sac.get');
+	Route::post('/user-hsn-sac/store',[HsnSacSearchController::class, 'store'])->name('user-hsn-sac.store');
 	
 });

@@ -68,7 +68,7 @@
                             <div class="mb-3">
                                 <div class="input-group">
                                     <input type="text" class="form-control"  name="hsn_code" id="hsn_code" value="{{$product->hsn_code}}" placeholder="Enter HSN Number">
-                                    <button class="btn btn-primary" type="button"><i class="ti ti-search align-middle"></i> Serarch HSN</button>
+                                    <!--<button class="btn btn-primary" type="button"><i class="ti ti-search align-middle"></i> Serarch HSN</button>-->
                                 </div>
                             </div>
                         </div>
@@ -196,7 +196,7 @@
                             <div class="mb-3">
                                 <div class="input-group">
                                     <input type="text" class="form-control"   name="sac_code" id="sac_code" value="{{$product->sac_code}}" placeholder="Enter HSN Number">
-                                    <button class="btn btn-primary" type="button"><i class="ti ti-search align-middle"></i> Serarch SAC</button>
+                                    <!--<button class="btn btn-primary" type="button"><i class="ti ti-search align-middle"></i> Serarch SAC</button>-->
                                 </div>
                             </div>
                         </div>

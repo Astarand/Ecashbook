@@ -82,11 +82,13 @@ class PayrollReportController extends Controller
 
         // =========================================================
         // Active employees for selected month
-        // (join users + designations so computeBulkPayslipValuesForEmployee
-        //  has all columns it needs for CASE B calculation)
+        // (join users + resign_employee so name is available for
+        //  both active and resigned employees; resigned users are
+        //  removed from `users` table and stored in `resign_employee`)
         // =========================================================
         $activeEmployees = DB::table('employees as e')
             ->leftJoin('users as u', 'u.id', '=', 'e.empId')
+            ->leftJoin('resign_employee as re', 're.id', '=', 'e.empId')
             ->leftJoin('designations as d', 'd.id', '=', 'e.desig_id')
             ->where('e.added_by', $ownerId)
             // Must have joined on or before the last day of the selected month
@@ -102,7 +104,11 @@ class PayrollReportController extends Controller
                         ->whereDate('e.regine_date', '>=', $selectedMonthStart);
                 });
             })
-            ->select('e.*', 'u.name', 'd.designation_name')
+            ->select(
+                'e.*',
+                DB::raw("COALESCE(u.name, re.name) as name"),
+                'd.designation_name'
+            )
             ->get();
 
         // =========================================================
@@ -749,9 +755,13 @@ class PayrollReportController extends Controller
         // 3. Resigned / Terminated     — included only if their
         //    resignation date falls on or after the first day
         //    of the selected month (they worked that month)
+        //
+        // Name: active employees → users.name
+        //        resigned employees → resign_employee.name (user record deleted)
         // =========================================================
         $employees = DB::table('employees as e')
             ->leftJoin('users as u', 'u.id', '=', 'e.empId')
+            ->leftJoin('resign_employee as re', 're.id', '=', 'e.empId')
             ->leftJoin('designations as d', 'd.id', '=', 'e.desig_id')
 
             ->where(function ($query) use ($ownerId, $authUserId) {
@@ -782,7 +792,12 @@ class PayrollReportController extends Controller
                   });
             })
 
-            ->select('e.*', 'u.name', 'd.designation_name')
+            // Name: use resign_employee.name for resigned/terminated, users.name for active
+            ->select(
+                'e.*',
+                DB::raw("COALESCE(u.name, re.name) as name"),
+                'd.designation_name'
+            )
             ->get();
 
         // =========================================================
@@ -3313,6 +3328,7 @@ class PayrollReportController extends Controller
         //             and hide in May-2025 because joining_date 2026-01-20 > May-2025 last day
         $query = DB::table('employees as e')
             ->leftJoin('users as u', 'u.id', '=', 'e.empId')
+            ->leftJoin('resign_employee as re', 're.id', '=', 'e.empId')
             ->leftJoin('designations as d', 'd.id', '=', 'e.desig_id')
             ->where('e.added_by', $ownerId)
             // Must have joined on or before the last day of the selected month
@@ -3339,9 +3355,11 @@ class PayrollReportController extends Controller
             ->select(
                 'e.empId',
                 'e.employee_id',
-                'u.name',
+                // Active employees: users.name — Resigned: resign_employee.name (user row deleted)
+                DB::raw("COALESCE(u.name, re.name) as name"),
                 'e.emp_status',
                 'e.regine_date',
+                'e.joining_date',
                 'e.basic_sal',
                 'e.basic_percentage',
                 'e.hra',
@@ -3363,7 +3381,7 @@ class PayrollReportController extends Controller
                 'e.tds_applicable',
                 'd.designation_name'
             )
-            ->orderBy('u.name')
+            ->orderBy(DB::raw("COALESCE(u.name, re.name)"))
             ->get();
 
         // Working days for the month
