@@ -110,22 +110,14 @@
                                 </option>
                             @endfor
                         </select>
-                        <select id="ptax_filter_type" class="form-select form-select-sm" style="width:140px;" onchange="renderPtaxFilter(); loadPtaxSummary();">
+                        <select id="ptax_filter_type" class="form-select form-select-sm" style="width:140px;">
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
                             <option value="half-yearly">Half-Yearly</option>
                             <option value="yearly">Full Year</option>
                         </select>
-                        <select id="ptax_filter_period" class="form-select form-select-sm" style="width:160px;" onchange="loadPtaxSummary()">
-                            @php
-                                $monthsList = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-                                $defaultPrevMonth = now()->subMonth()->format('F');
-                            @endphp
-                            @foreach ($monthsList as $m)
-                                <option value="{{ $m }}" {{ $m === $defaultPrevMonth ? 'selected' : '' }}>{{ $m }}</option>
-                            @endforeach
-                        </select>
-                        <button class="btn btn-primary btn-sm px-4" onclick="loadPtaxSummary()">
+                        <select id="ptax_filter_period" class="form-select form-select-sm" style="width:160px;"></select>
+                        <button class="btn btn-primary btn-sm px-4" id="ptax_load_btn">
                             <i class="ti ti-refresh me-1"></i> Load
                         </button>
                     </div>
@@ -566,33 +558,45 @@
     }
 
     function renderPtaxFilter() {
-        const sel  = document.getElementById('ptax_filter_type');
-        const type = sel ? sel.value : 'monthly';
-        const period = document.getElementById('ptax_filter_period');
-        if (!period) return;
+        const type = ($('#ptax_filter_type').val() || 'monthly').toLowerCase();
+        const $period = $('#ptax_filter_period');
 
-        let html = '';
-        const prev = prevMonthIdx();
-
-        if (type === 'monthly') {
-            PTAX_MONTHS.forEach((m, i) => {
-                html += `<option value="${m}"${i === prev ? ' selected' : ''}>${m}</option>`;
-            });
-            period.style.display = '';
-        } else if (type === 'quarterly') {
-            [['Q1','Q1 (Apr–Jun)'],['Q2','Q2 (Jul–Sep)'],['Q3','Q3 (Oct–Dec)'],['Q4','Q4 (Jan–Mar)']].forEach(([v,l]) => {
-                html += `<option value="${v}">${l}</option>`;
-            });
-            period.style.display = '';
-        } else if (type === 'half-yearly') {
-            html = `<option value="H1">H1 (Apr–Sep)</option><option value="H2">H2 (Oct–Mar)</option>`;
-            period.style.display = '';
-        } else {
-            html = `<option value="full">Full Year</option>`;
-            period.style.display = 'none';
+        if (type === 'yearly') {
+            $period.empty().append('<option value="full" selected>Full Year</option>').hide();
+            return;
         }
 
-        period.innerHTML = html;
+        $period.show();
+        $period.empty();
+
+        if (type === 'monthly') {
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            const now = new Date();
+            let prevIdx = now.getMonth() - 1;
+            if (prevIdx < 0) prevIdx = 11;
+
+            months.forEach(function(m, i) {
+                const isSelected = (i === prevIdx);
+                $period.append(new Option(m, m, isSelected, isSelected));
+            });
+        } else if (type === 'quarterly') {
+            const quarters = [
+                { val: 'Q1', text: 'Q1 (Apr–Jun)' },
+                { val: 'Q2', text: 'Q2 (Jul–Sep)' },
+                { val: 'Q3', text: 'Q3 (Oct–Dec)' },
+                { val: 'Q4', text: 'Q4 (Jan–Mar)' }
+            ];
+            quarters.forEach(function(q, i) {
+                const isSelected = (i === 0);
+                $period.append(new Option(q.text, q.val, isSelected, isSelected));
+            });
+        } else if (type === 'half-yearly') {
+            $period.append(new Option('H1 (Apr–Sep)', 'H1', true, true));
+            $period.append(new Option('H2 (Oct–Mar)', 'H2', false, false));
+        }
     }
 
     // ============================================================
@@ -796,9 +800,22 @@
             offcanvasEl.addEventListener('shown.bs.offcanvas', initPtaxPeriodToggle);
         }
 
-        // Re-load table when FY changes
-        $('#ptax_fy, #ptax_filter_type').on('change', function() {
+        // Re-render and reload data on filter changes
+        $('#ptax_fy').on('change', function() {
+            loadPtaxSummary();
+        });
+
+        $('#ptax_filter_type').on('change', function() {
             renderPtaxFilter();
+            loadPtaxSummary();
+        });
+
+        $('#ptax_filter_period').on('change', function() {
+            loadPtaxSummary();
+        });
+
+        $('#ptax_load_btn').on('click', function() {
+            loadPtaxSummary();
         });
     });
 

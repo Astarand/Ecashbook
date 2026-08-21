@@ -139,7 +139,7 @@
                 <div class="card-header bg-white border-bottom px-4 py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
                     {{-- Filter controls --}}
                     <div class="d-flex flex-wrap gap-2 align-items-center">
-                        <select id="esi_fy" class="form-select form-select-sm" style="width:150px;" onchange="loadEsiPageData()">
+                        <select id="esi_fy" class="form-select form-select-sm" style="width:150px;">
                             @php
                                 $today = now();
                                 $fyStart = $today->month >= 4 ? $today->year : $today->year - 1;
@@ -150,22 +150,14 @@
                                 </option>
                             @endfor
                         </select>
-                        <select id="esi_filter_type" class="form-select form-select-sm" style="width:140px;" onchange="renderEsiPageFilter(); loadEsiPageData();">
+                        <select id="esi_filter_type" class="form-select form-select-sm" style="width:140px;">
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
                             <option value="half-yearly">Half-Yearly</option>
                             <option value="yearly">Full Year</option>
                         </select>
-                        <select id="esi_filter_period" class="form-select form-select-sm" style="width:160px;" onchange="loadEsiPageData()">
-                            @php
-                                $monthsList = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-                                $defaultPrevMonth = now()->subMonth()->format('F');
-                            @endphp
-                            @foreach ($monthsList as $m)
-                                <option value="{{ $m }}" {{ $m === $defaultPrevMonth ? 'selected' : '' }}>{{ $m }}</option>
-                            @endforeach
-                        </select>
-                        <button class="btn btn-primary btn-sm px-4" onclick="loadEsiPageData()">
+                        <select id="esi_filter_period" class="form-select form-select-sm" style="width:160px;"></select>
+                        <button class="btn btn-primary btn-sm px-4" id="esi_load_btn">
                             <i class="ti ti-refresh me-1"></i> Load
                         </button>
                     </div>
@@ -624,34 +616,45 @@
     }
 
     function renderEsiPageFilter() {
-        const sel  = document.getElementById('esi_filter_type');
-        const type = sel ? sel.value : 'monthly';
-        const period = document.getElementById('esi_filter_period');
-        if (!period) return;
+        const type = ($('#esi_filter_type').val() || 'monthly').toLowerCase();
+        const $period = $('#esi_filter_period');
 
-        let html = '';
-        const prev = prevEsiMonthIdx();
-
-        if (type === 'monthly') {
-            ESI_MONTHS.forEach((m, i) => {
-                html += `<option value="${m}"${i === prev ? ' selected' : ''}>${m}</option>`;
-            });
-            period.style.display = 'inline-block';
-        } else if (type === 'quarterly') {
-            [['Q1','Q1 (Apr–Jun)'],['Q2','Q2 (Jul–Sep)'],['Q3','Q3 (Oct–Dec)'],['Q4','Q4 (Jan–Mar)']].forEach(([v,l]) => {
-                html += `<option value="${v}">${l}</option>`;
-            });
-            period.style.display = 'inline-block';
-        } else if (type === 'half-yearly') {
-            html = `<option value="H1">H1 (Apr–Sep)</option><option value="H2">H2 (Oct–Mar)</option>`;
-            period.style.display = 'inline-block';
-        } else {
-            // Full Year: Hide the period dropdown completely
-            html = `<option value="full">Full Year</option>`;
-            period.style.display = 'none';
+        if (type === 'yearly') {
+            $period.empty().append('<option value="full" selected>Full Year</option>').hide();
+            return;
         }
 
-        period.innerHTML = html;
+        $period.show();
+        $period.empty();
+
+        if (type === 'monthly') {
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            const now = new Date();
+            let prevIdx = now.getMonth() - 1;
+            if (prevIdx < 0) prevIdx = 11;
+
+            months.forEach(function(m, i) {
+                const isSelected = (i === prevIdx);
+                $period.append(new Option(m, m, isSelected, isSelected));
+            });
+        } else if (type === 'quarterly') {
+            const quarters = [
+                { val: 'Q1', text: 'Q1 (Apr–Jun)' },
+                { val: 'Q2', text: 'Q2 (Jul–Sep)' },
+                { val: 'Q3', text: 'Q3 (Oct–Dec)' },
+                { val: 'Q4', text: 'Q4 (Jan–Mar)' }
+            ];
+            quarters.forEach(function(q, i) {
+                const isSelected = (i === 0);
+                $period.append(new Option(q.text, q.val, isSelected, isSelected));
+            });
+        } else if (type === 'half-yearly') {
+            $period.append(new Option('H1 (Apr–Sep)', 'H1', true, true));
+            $period.append(new Option('H2 (Oct–Mar)', 'H2', false, false));
+        }
     }
 
     // ============================================================
@@ -871,6 +874,10 @@
         });
 
         $('#esi_filter_period').on('change', function() {
+            loadEsiPageData();
+        });
+
+        $('#esi_load_btn').on('click', function() {
             loadEsiPageData();
         });
     });
