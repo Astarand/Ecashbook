@@ -2564,24 +2564,22 @@ class PayrollReportController extends Controller
         $records = $query->select(
                 'user_payslip.month',
                 'user_payslip.financial_year',
-                DB::raw("COUNT(DISTINCT user_payslip.user_emp_id) as employee_count"),
-                DB::raw("
-                    SUM(CAST(
-                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
-                            '$.visible_data.salary_details.gross_salary'))
-                        AS DECIMAL(15,2)
-                    )) as total_gross_salary
-                "),
-                DB::raw("
-                    SUM(CAST(
-                        JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
-                            '$.visible_data.final_salary_calculation.ptax'))
-                        AS DECIMAL(12,2)
-                    )) as total_ptax
-                ")
+                DB::raw("JSON_UNQUOTE(JSON_EXTRACT(
+                    user_payslip.emp_salary_slip_response,
+                    '$.visible_data.employee_details.name'
+                )) as employee_name"),
+                DB::raw('1 as employee_count'),
+                DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(
+                    user_payslip.emp_salary_slip_response,
+                    '$.visible_data.salary_details.gross_salary'
+                )) AS DECIMAL(15,2)) as total_gross_salary"),
+                DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(
+                    user_payslip.emp_salary_slip_response,
+                    '$.visible_data.final_salary_calculation.ptax'
+                )) AS DECIMAL(12,2)) as total_ptax")
             )
-            ->groupBy('user_payslip.month', 'user_payslip.financial_year')
             ->orderBy('user_payslip.month')
+            ->orderBy('employee_name')
             ->get();
 
         $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',

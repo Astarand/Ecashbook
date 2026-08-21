@@ -138,7 +138,7 @@
                                 <tr class="bg-light-header">
                                     <th class="text-end py-3 ps-4" style="width:50px;">#</th>
                                     <th class="py-3">Registration No</th>
-                                    <th class="py-3">Employer Name</th>
+                                    <th class="py-3">Employee Name</th>
                                     <th class="py-3">Employee Count</th>
                                     <th class="py-3">Gross Salary</th>
                                     <th class="py-3">PT Deduction</th>
@@ -180,7 +180,7 @@
                             <td id="detailRegNo" class="ps-3 text-muted"></td>
                         </tr>
                         <tr>
-                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Employer Name</th>
+                            <th class="w-30 border-end bg-light fw-bold text-dark ps-3">Employee Name</th>
                             <td id="detailEmployerName" class="ps-3 text-muted"></td>
                         </tr>
                         <tr>
@@ -630,7 +630,7 @@
                 html += `<tr>
                     <td class="text-end ps-4 text-muted">${idx++}</td>
                     <td class="fw-bold text-dark">${r.reg_no || '—'}</td>
-                    <td class="fw-bold text-dark">${r.employer_name || '—'}</td>
+                    <td class="fw-bold text-dark">${r.employee_name || '—'}</td>
                     <td>${empCount} Employee${empCount !== 1 ? 's' : ''}</td>
                     <td class="fw-semibold">₹${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
                     <td class="fw-bold text-danger">₹${ptax.toLocaleString('en-IN', {minimumFractionDigits:2})}</td>
@@ -639,7 +639,7 @@
                     <td class="text-center pe-4">
                         <button class="btn-action-detail view-ptax-details-btn"
                             data-reg-no="${r.reg_no || '—'}"
-                            data-employer-name="${r.employer_name || '—'}"
+                            data-employer-name="${r.employee_name || '—'}"
                             data-period="${period}"
                             data-emp-count="${empCount}"
                             data-gross="${gross.toLocaleString('en-IN', {minimumFractionDigits:2})}"
