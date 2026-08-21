@@ -98,7 +98,7 @@
                                                     <input type="file" id="fileUpload" class="d-none" name="fileUpload"
                                                         accept="image/*">
                                                 </div>
-                                                <img src="/storage/profile/e-cashbook.png" alt="user-image"
+                                                <img src="{{ asset('assets/images/user/avatar-2.jpg') }}" alt="user-image"
                                                     id="uploadedImage" class="wid-150 rounded img-fluid ms-2">
                                             </div>
                                         </div>

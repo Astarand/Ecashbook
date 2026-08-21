@@ -149,10 +149,10 @@
                         @php
                         $profileImg = $employee->profile_img
                         ? asset('storage/user_employee/' . $employee->profile_img)
-                        : asset('storage/profile/e-cashbook.png');
+                        : asset('assets/images/user/avatar-2.jpg');
                         @endphp
                         <img class="rounded-circle img-fluid wid-90 img-thumbnail" src="{{ $profileImg }}"
-                            alt="User image">
+                            alt="User image" onerror="this.onerror=null;this.src='{{ asset('assets/images/user/avatar-2.jpg') }}';">
                     </div>
                     <h5 class="mb-1">{{ $employee->name }}</h5>
                     <span class="badge bg-light-info text-dark mb-2" style="font-size: 13px; padding: 6px 14px;">

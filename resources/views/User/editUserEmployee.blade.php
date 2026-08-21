@@ -97,10 +97,10 @@
                                                 @php
                                                     $profileImg = $employee->profile_img
                                                         ? asset('storage/user_employee/' . $employee->profile_img)
-                                                        : asset('storage/profile/e-cashbook.png');
+                                                        : asset('assets/images/user/avatar-2.jpg');
                                                 @endphp
 
-                                                <img src="{{ $profileImg }}" alt="user-image" id="uploadedImage" class="wid-150 rounded img-fluid ms-2">
+                                                <img src="{{ $profileImg }}" alt="user-image" id="uploadedImage" class="wid-150 rounded img-fluid ms-2" onerror="this.onerror=null;this.src='{{ asset('assets/images/user/avatar-2.jpg') }}';">
                                             </div>
                                         </div>
                                         <div class="col">

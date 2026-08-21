@@ -38,11 +38,11 @@
                                 @php
                                 $profileImg = $employee->profile_img
                                     ? asset('storage/user_employee/' . $employee->profile_img)
-                                    : asset('storage/profile/e-cashbook.png');
+                                    : asset('assets/images/user/avatar-2.jpg');
                                 @endphp
 
                                 <img class="rounded-circle img-fluid shadow-sm border border-3 border-white" style="width: 100px; height: 100px; object-fit: cover;" src="{{ $profileImg }}"
-                                    alt="{{ $employee->name }}">
+                                    alt="{{ $employee->name }}" onerror="this.onerror=null;this.src='{{ asset('assets/images/user/avatar-2.jpg') }}';">
 
                                 {{-- Status Badge --}}
                                 @if(!empty($employee->regine_date))
