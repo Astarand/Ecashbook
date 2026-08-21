@@ -110,13 +110,21 @@
                                 </option>
                             @endfor
                         </select>
-                        <select id="ptax_filter_type" class="form-select form-select-sm" style="width:140px;" onchange="renderPtaxFilter()">
+                        <select id="ptax_filter_type" class="form-select form-select-sm" style="width:140px;" onchange="renderPtaxFilter(); loadPtaxSummary();">
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
                             <option value="half-yearly">Half-Yearly</option>
                             <option value="yearly">Full Year</option>
                         </select>
-                        <select id="ptax_filter_period" class="form-select form-select-sm" style="width:160px;"></select>
+                        <select id="ptax_filter_period" class="form-select form-select-sm" style="width:160px;" onchange="loadPtaxSummary()">
+                            @php
+                                $monthsList = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                                $defaultPrevMonth = now()->subMonth()->format('F');
+                            @endphp
+                            @foreach ($monthsList as $m)
+                                <option value="{{ $m }}" {{ $m === $defaultPrevMonth ? 'selected' : '' }}>{{ $m }}</option>
+                            @endforeach
+                        </select>
                         <button class="btn btn-primary btn-sm px-4" onclick="loadPtaxSummary()">
                             <i class="ti ti-refresh me-1"></i> Load
                         </button>

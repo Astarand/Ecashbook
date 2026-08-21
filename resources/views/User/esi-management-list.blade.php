@@ -156,7 +156,15 @@
                             <option value="half-yearly">Half-Yearly</option>
                             <option value="yearly">Full Year</option>
                         </select>
-                        <select id="esi_filter_period" class="form-select form-select-sm" style="width:160px;" onchange="loadEsiPageData()"></select>
+                        <select id="esi_filter_period" class="form-select form-select-sm" style="width:160px;" onchange="loadEsiPageData()">
+                            @php
+                                $monthsList = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                                $defaultPrevMonth = now()->subMonth()->format('F');
+                            @endphp
+                            @foreach ($monthsList as $m)
+                                <option value="{{ $m }}" {{ $m === $defaultPrevMonth ? 'selected' : '' }}>{{ $m }}</option>
+                            @endforeach
+                        </select>
                         <button class="btn btn-primary btn-sm px-4" onclick="loadEsiPageData()">
                             <i class="ti ti-refresh me-1"></i> Load
                         </button>
