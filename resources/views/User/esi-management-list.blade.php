@@ -156,7 +156,15 @@
                             <option value="half-yearly">Half-Yearly</option>
                             <option value="yearly">Full Year</option>
                         </select>
-                        <select id="esi_filter_period" class="form-select form-select-sm" style="width:160px;"></select>
+                        <select id="esi_filter_period" class="form-select form-select-sm" style="width:160px;">
+                            @php
+                                $esiMonthsList = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                                $defaultEsiPrevMonth = now()->subMonth()->format('F');
+                            @endphp
+                            @foreach ($esiMonthsList as $m)
+                                <option value="{{ $m }}" {{ $m === $defaultEsiPrevMonth ? 'selected' : '' }}>{{ $m }}</option>
+                            @endforeach
+                        </select>
                         <button class="btn btn-primary btn-sm px-4" id="esi_load_btn" onclick="loadEsiPageData()">
                             <i class="ti ti-refresh me-1"></i> Load
                         </button>
@@ -579,10 +587,14 @@
 </style>
 
 <script>
-	var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-	tooltipTriggerList.map(function (tooltipTriggerEl) {
-		return new bootstrap.Tooltip(tooltipTriggerEl);
-	});
+    try {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
+    } catch(e) {}
 
     // ============================================================
     // Period dropdown helpers
