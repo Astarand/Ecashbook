@@ -94,15 +94,15 @@ class PayrollReportController extends Controller
             // Must have joined on or before the last day of the selected month
             ->where(function ($q) use ($selectedMonthEnd) {
                 $q->whereNull('e.joining_date')
-                  ->orWhereDate('e.joining_date', '<=', $selectedMonthEnd);
+                    ->orWhereDate('e.joining_date', '<=', $selectedMonthEnd);
             })
             ->where(function ($q) use ($selectedMonthStart) {
                 $q->whereIn('e.emp_status', ['Confirmed', 'In Probation'])
-                ->orWhere(function ($qq) use ($selectedMonthStart) {
-                    $qq->whereIn('e.emp_status', ['Resigned', 'Terminated'])
-                        ->whereNotNull('e.regine_date')
-                        ->whereDate('e.regine_date', '>=', $selectedMonthStart);
-                });
+                    ->orWhere(function ($qq) use ($selectedMonthStart) {
+                        $qq->whereIn('e.emp_status', ['Resigned', 'Terminated'])
+                            ->whereNotNull('e.regine_date')
+                            ->whereDate('e.regine_date', '>=', $selectedMonthStart);
+                    });
             })
             ->select(
                 'e.*',
@@ -728,10 +728,18 @@ class PayrollReportController extends Controller
         // Month Name => Month Number
         // =========================================================
         $monthMap = [
-            'January'   => 1,  'February'  => 2,  'March'     => 3,
-            'April'     => 4,  'May'       => 5,  'June'      => 6,
-            'July'      => 7,  'August'    => 8,  'September' => 9,
-            'October'   => 10, 'November'  => 11, 'December'  => 12,
+            'January'   => 1,
+            'February'  => 2,
+            'March'     => 3,
+            'April'     => 4,
+            'May'       => 5,
+            'June'      => 6,
+            'July'      => 7,
+            'August'    => 8,
+            'September' => 9,
+            'October'   => 10,
+            'November'  => 11,
+            'December'  => 12,
         ];
 
         // Use the selected month directly — no offset
@@ -779,17 +787,17 @@ class PayrollReportController extends Controller
             // Joining Date: must have joined on or before the last day of the month
             ->where(function ($q) use ($payrollEnd) {
                 $q->whereNull('e.joining_date')
-                  ->orWhereDate('e.joining_date', '<=', $payrollEnd);
+                    ->orWhereDate('e.joining_date', '<=', $payrollEnd);
             })
 
             // Status filter
             ->where(function ($q) use ($payrollStart) {
                 $q->whereIn('e.emp_status', ['Confirmed', 'In Probation'])
-                  ->orWhere(function ($qq) use ($payrollStart) {
-                      $qq->whereIn('e.emp_status', ['Resigned', 'Terminated'])
-                         ->whereNotNull('e.regine_date')
-                         ->whereDate('e.regine_date', '>=', $payrollStart);
-                  });
+                    ->orWhere(function ($qq) use ($payrollStart) {
+                        $qq->whereIn('e.emp_status', ['Resigned', 'Terminated'])
+                            ->whereNotNull('e.regine_date')
+                            ->whereDate('e.regine_date', '>=', $payrollStart);
+                    });
             })
 
             // Name: use resign_employee.name for resigned/terminated, users.name for active
@@ -941,8 +949,8 @@ class PayrollReportController extends Controller
                 // -------------------------------------------------
                 $employee->payment_status =
                     ($payslip->payment_status ?? '') === 'Done'
-                        ? 'Salary Done'
-                        : 'Payment Pending';
+                    ? 'Salary Done'
+                    : 'Payment Pending';
 
                 $employee->payslip_generated = true;
                 $employee->payslip_id = $payslip->id ?? null;
@@ -1092,13 +1100,13 @@ class PayrollReportController extends Controller
 
             $employee->joining_date =
                 $employee->joining_date
-                    ? Carbon::parse($employee->joining_date)->format('Y-m-d')
-                    : null;
+                ? Carbon::parse($employee->joining_date)->format('Y-m-d')
+                : null;
 
             $employee->regine_date =
                 $employee->regine_date
-                    ? Carbon::parse($employee->regine_date)->format('Y-m-d')
-                    : null;
+                ? Carbon::parse($employee->regine_date)->format('Y-m-d')
+                : null;
         }
 
         return response()->json($employees);
@@ -1512,7 +1520,6 @@ class PayrollReportController extends Controller
             }
 
             return response()->json(['message' => "Updated {$affected} record(s)", 'updated' => $affected]);
-
         } catch (\Exception $e) {
             return response()->json(['message' => 'Update failed: ' . $e->getMessage()], 500);
         }
@@ -1747,19 +1754,19 @@ class PayrollReportController extends Controller
                     $tdsAmount,
                     [
                         'propId' =>
-                            $firstPayslip->propId ?? null,
+                        $firstPayslip->propId ?? null,
 
                         'date' =>
-                            $request->tds_deposit_date
+                        $request->tds_deposit_date
                             ?: ($firstPayslip->date
                                 ?? now()->toDateString()),
 
                         'reference_no' =>
-                            $request->tds_challan_no
+                        $request->tds_challan_no
                             ?: ($firstPayslip->payslip_no ?? null),
 
                         'party_name' =>
-                            'TDS Deposit (' . count($ids) . ' records)',
+                        'TDS Deposit (' . count($ids) . ' records)',
 
                         'payroll_month' => '',
 
@@ -1788,7 +1795,6 @@ class PayrollReportController extends Controller
                 'updated'        => $affected,
                 'tds_deposit_id' => $tdsDepositId
             ]);
-
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -1799,7 +1805,7 @@ class PayrollReportController extends Controller
         }
     }
 
-    
+
 
     //------- TDS List -------//
 
@@ -1849,7 +1855,6 @@ class PayrollReportController extends Controller
             if (!empty($months)) {
                 $query->whereIn('user_payslip.month', $months);
             }
-
         } elseif ($filterType == 'half-yearly' && !empty($period)) {
 
             switch ($period) {
@@ -1868,7 +1873,6 @@ class PayrollReportController extends Controller
             if (!empty($months)) {
                 $query->whereIn('user_payslip.month', $months);
             }
-
         } elseif ($filterType == 'yearly') {
 
             // No additional month filter
@@ -1888,24 +1892,24 @@ class PayrollReportController extends Controller
         ");
 
         $tds = $query->select(
-                'user_payslip.id',
-                'user_payslip.user_emp_id',
-                'user_payslip.month',
-                'user_payslip.financial_year',
-                'employees.employee_id',
-                'employees.pan_number',
-                'users.name',
-                'user_payslip.tds_challan_no',
-                'user_payslip.tds_bsr_code',
-                'user_payslip.tds_deposit_date',
-                'user_payslip.tds_tender_date',
-                'user_payslip.tds_deposit_status',
-                'user_payslip.tds_tan',
-                'user_payslip.tds_financial_year',
-                'user_payslip.tds_nature_of_payment',
-                'user_payslip.tds_cin',
-                // TDS amount from the dedicated column (falls back to JSON extraction)
-                DB::raw("
+            'user_payslip.id',
+            'user_payslip.user_emp_id',
+            'user_payslip.month',
+            'user_payslip.financial_year',
+            'employees.employee_id',
+            'employees.pan_number',
+            'users.name',
+            'user_payslip.tds_challan_no',
+            'user_payslip.tds_bsr_code',
+            'user_payslip.tds_deposit_date',
+            'user_payslip.tds_tender_date',
+            'user_payslip.tds_deposit_status',
+            'user_payslip.tds_tan',
+            'user_payslip.tds_financial_year',
+            'user_payslip.tds_nature_of_payment',
+            'user_payslip.tds_cin',
+            // TDS amount from the dedicated column (falls back to JSON extraction)
+            DB::raw("
                     COALESCE(
                         NULLIF(user_payslip.tds_amount, 0),
                         CAST(
@@ -1916,8 +1920,8 @@ class PayrollReportController extends Controller
                         )
                     ) as tds_amount
                 "),
-                // Gross salary (salary amount for FVU)
-                DB::raw("
+            // Gross salary (salary amount for FVU)
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(JSON_EXTRACT(
                             user_payslip.emp_salary_slip_response,
@@ -1925,7 +1929,7 @@ class PayrollReportController extends Controller
                         AS DECIMAL(15,2)
                     ) as gross_salary
                 ")
-            )
+        )
             ->orderBy('users.name')
             ->get();
 
@@ -1934,8 +1938,20 @@ class PayrollReportController extends Controller
             ->where('userId', $ownerId)
             ->value('comp_tan');
 
-        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
-                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+        $monthNames = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
 
         foreach ($tds as $row) {
             $row->comp_tan    = $company ?? '—';
@@ -1962,26 +1978,40 @@ class PayrollReportController extends Controller
 
         // Monthly
         if ($filterType == 'monthly' && !empty($period)) {
-            $month = Carbon::parse('1 '.$period)->month;
+            $month = Carbon::parse('1 ' . $period)->month;
             $query->where('user_payslip.month', $month);
         }
         // Quarterly
         elseif ($filterType == 'quarterly' && !empty($period)) {
             switch ($period) {
-                case 'Q1': $months = [4,5,6]; break;
-                case 'Q2': $months = [7,8,9]; break;
-                case 'Q3': $months = [10,11,12]; break;
-                case 'Q4': $months = [1,2,3]; break;
-                default:   $months = [];
+                case 'Q1':
+                    $months = [4, 5, 6];
+                    break;
+                case 'Q2':
+                    $months = [7, 8, 9];
+                    break;
+                case 'Q3':
+                    $months = [10, 11, 12];
+                    break;
+                case 'Q4':
+                    $months = [1, 2, 3];
+                    break;
+                default:
+                    $months = [];
             }
             if ($months) $query->whereIn('user_payslip.month', $months);
         }
         // Half Yearly
         elseif ($filterType == 'half-yearly' && !empty($period)) {
             switch ($period) {
-                case 'H1': $months = [4,5,6,7,8,9]; break;
-                case 'H2': $months = [10,11,12,1,2,3]; break;
-                default:   $months = [];
+                case 'H1':
+                    $months = [4, 5, 6, 7, 8, 9];
+                    break;
+                case 'H2':
+                    $months = [10, 11, 12, 1, 2, 3];
+                    break;
+                default:
+                    $months = [];
             }
             if ($months) $query->whereIn('user_payslip.month', $months);
         }
@@ -1999,35 +2029,35 @@ class PayrollReportController extends Controller
         ");
 
         $records = $query->select(
-                'user_payslip.id',
-                'user_payslip.user_emp_id',
-                'user_payslip.month',
-                'user_payslip.financial_year',
-                'employees.employee_id',
-                'users.name',
-                'employees.epf_no',
-                'user_payslip.pf_trrn',
-                'user_payslip.pf_crn',
-                'user_payslip.pf_challan_generated_on',
-                'user_payslip.pf_payment_confirmation_date',
-                'user_payslip.pf_payment_status',
+            'user_payslip.id',
+            'user_payslip.user_emp_id',
+            'user_payslip.month',
+            'user_payslip.financial_year',
+            'employees.employee_id',
+            'users.name',
+            'employees.epf_no',
+            'user_payslip.pf_trrn',
+            'user_payslip.pf_crn',
+            'user_payslip.pf_challan_generated_on',
+            'user_payslip.pf_payment_confirmation_date',
+            'user_payslip.pf_payment_status',
 
-                'user_payslip.pf_establishment_id',
-                'user_payslip.pf_wage_month',
-                
-                'user_payslip.pf_total_amount',
-                'user_payslip.pf_payment_type',
-                
-                // Gross wages from JSON
-                DB::raw("
+            'user_payslip.pf_establishment_id',
+            'user_payslip.pf_wage_month',
+
+            'user_payslip.pf_total_amount',
+            'user_payslip.pf_payment_type',
+
+            // Gross wages from JSON
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
                             '$.visible_data.salary_details.gross_salary'))
                         AS DECIMAL(15,2)
                     ) as gross_salary
                 "),
-                // Basic salary = EPF wages (capped at 15000 as per EPFO rules)
-                DB::raw("
+            // Basic salary = EPF wages (capped at 15000 as per EPFO rules)
+            DB::raw("
                     LEAST(
                         CAST(
                             JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
@@ -2037,28 +2067,40 @@ class PayrollReportController extends Controller
                         15000
                     ) as epf_wages
                 "),
-                // Employee PF contribution (12%)
-                DB::raw("
+            // Employee PF contribution (12%)
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
                             '$.visible_data.salary_details.provident_fund'))
                         AS DECIMAL(12,2)
                     ) as provident_fund
                 "),
-                // Absent days for NCP
-                DB::raw("
+            // Absent days for NCP
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
                             '$.visible_data.attendance_details.total_absent'))
                         AS UNSIGNED
                     ) as ncp_days
                 ")
-            )
+        )
             ->orderBy('users.name')
             ->get();
 
-        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
-                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+        $monthNames = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
 
         foreach ($records as $row) {
             $epfWages = (float)($row->epf_wages ?? 0);
@@ -2150,7 +2192,6 @@ class PayrollReportController extends Controller
         $query = DB::table('user_payslip')
             ->leftJoin('employees', 'employees.empId', '=', 'user_payslip.user_emp_id')
             ->leftJoin('users', 'users.id', '=', 'user_payslip.user_emp_id')
-            ->leftJoin('resign_employee as re', 're.id', '=', 'user_payslip.user_emp_id')
             ->where('user_payslip.added_by', $ownerId)
             ->where('user_payslip.financial_year', $financialYear);
 
@@ -2185,7 +2226,6 @@ class PayrollReportController extends Controller
             if ($months) {
                 $query->whereIn('user_payslip.month', $months);
             }
-
         }
 
         // Half Yearly
@@ -2205,7 +2245,6 @@ class PayrollReportController extends Controller
             if ($months) {
                 $query->whereIn('user_payslip.month', $months);
             }
-
         }
 
         // Only employees having ESI > 0
@@ -2221,61 +2260,73 @@ class PayrollReportController extends Controller
         ");
 
         $records = $query->select(
-                'user_payslip.id',
-                'user_payslip.user_emp_id',
-                'user_payslip.month',
-                'user_payslip.financial_year',
-                'employees.employee_id',
-                'employees.esic_no',
-                DB::raw("COALESCE(users.name, re.name) as name"),
-                'user_payslip.esi_employer_code',
-                'user_payslip.esi_employer_name',
-                'user_payslip.esi_contribution_period',
-                'user_payslip.esi_challan_no',
-                'user_payslip.esi_challan_created_date',
-                'user_payslip.esi_challan_submitted_date',
-                'user_payslip.esi_amount_paid',
-                'user_payslip.esi_transaction_no',
-                'user_payslip.esi_payment_status',
+            'user_payslip.id',
+            'user_payslip.user_emp_id',
+            'user_payslip.month',
+            'user_payslip.financial_year',
+            'employees.employee_id',
+            'employees.esic_no',
+            'users.name',
+            'user_payslip.esi_employer_code',
+            'user_payslip.esi_employer_name',
+            'user_payslip.esi_contribution_period',
+            'user_payslip.esi_challan_no',
+            'user_payslip.esi_challan_created_date',
+            'user_payslip.esi_challan_submitted_date',
+            'user_payslip.esi_amount_paid',
+            'user_payslip.esi_transaction_no',
+            'user_payslip.esi_payment_status',
 
-                // Gross wages from JSON
-                DB::raw("
+            // Gross wages from JSON
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
                             '$.visible_data.salary_details.gross_salary'))
                         AS DECIMAL(15,2)
                     ) as gross_wages
                 "),
-                // Employee ESI (0.75%) from final_salary_calculation
-                DB::raw("
+            // Employee ESI (0.75%) from final_salary_calculation
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
                             '$.visible_data.final_salary_calculation.esi'))
                         AS DECIMAL(12,2)
                     ) as employee_esi
                 "),
-                // Attendance present days for ESIC upload sheet
-                DB::raw("
+            // Attendance present days for ESIC upload sheet
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
                             '$.visible_data.attendance_details.total_present'))
                         AS UNSIGNED
                     ) as present_days
                 "),
-                // Total working days
-                DB::raw("
+            // Total working days
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
                             '$.visible_data.month_details.total_working_days'))
                         AS UNSIGNED
                     ) as total_working_days
                 ")
-            )
+        )
             ->orderBy('users.name')
             ->get();
 
-        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
-                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+        $monthNames = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
 
         foreach ($records as $row) {
             $empEsi  = (float)($row->employee_esi ?? 0);
@@ -2372,10 +2423,9 @@ class PayrollReportController extends Controller
         // Monthly
         if ($filterType == 'monthly' && !empty($period)) {
 
-            $month = Carbon::parse('1 '.$period)->month;
+            $month = Carbon::parse('1 ' . $period)->month;
 
             $query->where('user_payslip.month', $month);
-
         }
 
         // Quarterly
@@ -2384,30 +2434,28 @@ class PayrollReportController extends Controller
             switch ($period) {
 
                 case 'Q1':
-                    $months = [4,5,6];
+                    $months = [4, 5, 6];
                     break;
 
                 case 'Q2':
-                    $months = [7,8,9];
+                    $months = [7, 8, 9];
                     break;
 
                 case 'Q3':
-                    $months = [10,11,12];
+                    $months = [10, 11, 12];
                     break;
 
                 case 'Q4':
-                    $months = [1,2,3];
+                    $months = [1, 2, 3];
                     break;
 
                 default:
                     $months = [];
-
             }
 
             if ($months) {
                 $query->whereIn('user_payslip.month', $months);
             }
-
         }
 
         // Half-Yearly
@@ -2416,22 +2464,20 @@ class PayrollReportController extends Controller
             switch ($period) {
 
                 case 'H1':
-                    $months = [4,5,6,7,8,9];
+                    $months = [4, 5, 6, 7, 8, 9];
                     break;
 
                 case 'H2':
-                    $months = [10,11,12,1,2,3];
+                    $months = [10, 11, 12, 1, 2, 3];
                     break;
 
                 default:
                     $months = [];
-
             }
 
             if ($months) {
                 $query->whereIn('user_payslip.month', $months);
             }
-
         }
 
         // Only PTAX > 0
@@ -2447,44 +2493,56 @@ class PayrollReportController extends Controller
         ");
 
         $records = $query->select(
-                'user_payslip.id',
-                'user_payslip.user_emp_id',
-                'user_payslip.financial_year',
-                'user_payslip.month',
-                'employees.employee_id',
-                'users.name',
-                'user_payslip.ptax_grips_payment_id',
-                'user_payslip.ptax_payment_initiated_date',
-                'user_payslip.ptax_brn',
-                'user_payslip.ptax_grn',
-                'user_payslip.ptax_period_from',
-                'user_payslip.ptax_period_to',
-                'user_payslip.ptax_payment_ref_no',
-                'user_payslip.ptax_amount_paid',
-                'user_payslip.ptax_payment_status',
+            'user_payslip.id',
+            'user_payslip.user_emp_id',
+            'user_payslip.financial_year',
+            'user_payslip.month',
+            'employees.employee_id',
+            'users.name',
+            'user_payslip.ptax_grips_payment_id',
+            'user_payslip.ptax_payment_initiated_date',
+            'user_payslip.ptax_brn',
+            'user_payslip.ptax_grn',
+            'user_payslip.ptax_period_from',
+            'user_payslip.ptax_period_to',
+            'user_payslip.ptax_payment_ref_no',
+            'user_payslip.ptax_amount_paid',
+            'user_payslip.ptax_payment_status',
 
-                // PT deduction from final_salary_calculation
-                DB::raw("
+            // PT deduction from final_salary_calculation
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
                             '$.visible_data.final_salary_calculation.ptax'))
                         AS DECIMAL(12,2)
                     ) AS ptax
                 "),
-                // Gross salary for slab display
-                DB::raw("
+            // Gross salary for slab display
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(JSON_EXTRACT(emp_salary_slip_response,
                             '$.visible_data.salary_details.gross_salary'))
                         AS DECIMAL(15,2)
                     ) AS gross_salary
                 ")
-            )
+        )
             ->orderBy('users.name')
             ->get();
 
-        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
-                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+        $monthNames = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
 
         foreach ($records as $row) {
             $gross = (float)($row->gross_salary ?? 0);
@@ -2503,7 +2561,7 @@ class PayrollReportController extends Controller
 
         return response()->json($records);
     }
-    
+
     //------- PTAX Summary (grouped by period) -------//
     public function getPtaxSummary(Request $request)
     {
@@ -2533,18 +2591,32 @@ class PayrollReportController extends Controller
             if ($month) $query->where('user_payslip.month', $month);
         } elseif ($filterType == 'quarterly' && !empty($period)) {
             switch ($period) {
-                case 'Q1': $months = [4, 5, 6]; break;
-                case 'Q2': $months = [7, 8, 9]; break;
-                case 'Q3': $months = [10, 11, 12]; break;
-                case 'Q4': $months = [1, 2, 3]; break;
-                default:   $months = [];
+                case 'Q1':
+                    $months = [4, 5, 6];
+                    break;
+                case 'Q2':
+                    $months = [7, 8, 9];
+                    break;
+                case 'Q3':
+                    $months = [10, 11, 12];
+                    break;
+                case 'Q4':
+                    $months = [1, 2, 3];
+                    break;
+                default:
+                    $months = [];
             }
             if (!empty($months)) $query->whereIn('user_payslip.month', $months);
         } elseif ($filterType == 'half-yearly' && !empty($period)) {
             switch ($period) {
-                case 'H1': $months = [4, 5, 6, 7, 8, 9]; break;
-                case 'H2': $months = [10, 11, 12, 1, 2, 3]; break;
-                default:   $months = [];
+                case 'H1':
+                    $months = [4, 5, 6, 7, 8, 9];
+                    break;
+                case 'H2':
+                    $months = [10, 11, 12, 1, 2, 3];
+                    break;
+                default:
+                    $months = [];
             }
             if (!empty($months)) $query->whereIn('user_payslip.month', $months);
         }
@@ -2562,28 +2634,40 @@ class PayrollReportController extends Controller
         ");
 
         $records = $query->select(
-                'user_payslip.month',
-                'user_payslip.financial_year',
-                DB::raw("JSON_UNQUOTE(JSON_EXTRACT(
+            'user_payslip.month',
+            'user_payslip.financial_year',
+            DB::raw("JSON_UNQUOTE(JSON_EXTRACT(
                     user_payslip.emp_salary_slip_response,
                     '$.visible_data.employee_details.name'
                 )) as employee_name"),
-                DB::raw('1 as employee_count'),
-                DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(
+            DB::raw('1 as employee_count'),
+            DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(
                     user_payslip.emp_salary_slip_response,
                     '$.visible_data.salary_details.gross_salary'
                 )) AS DECIMAL(15,2)) as total_gross_salary"),
-                DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(
+            DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(
                     user_payslip.emp_salary_slip_response,
                     '$.visible_data.final_salary_calculation.ptax'
                 )) AS DECIMAL(12,2)) as total_ptax")
-            )
+        )
             ->orderBy('user_payslip.month')
             ->orderBy('employee_name')
             ->get();
 
-        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
-                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+        $monthNames = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
 
         foreach ($records as $row) {
             $row->reg_no        = $compPtax;
@@ -2692,7 +2776,6 @@ class PayrollReportController extends Controller
             if (!empty($months)) {
                 $query->whereIn('user_payslip.month', $months);
             }
-
         } elseif ($filterType == 'half-yearly' && !empty($period)) {
 
             switch ($period) {
@@ -2724,13 +2807,13 @@ class PayrollReportController extends Controller
         ");
 
         $records = $query->select(
-                'user_payslip.id',
-                'employees.employee_id',
-                DB::raw("COALESCE(users.name) as name"),
-                'user_payslip.financial_year',
+            'user_payslip.id',
+            'employees.employee_id',
+            DB::raw("COALESCE(users.name) as name"),
+            'user_payslip.financial_year',
 
-                // Employee Contribution
-                DB::raw("
+            // Employee Contribution
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(
                             JSON_EXTRACT(
@@ -2741,8 +2824,8 @@ class PayrollReportController extends Controller
                     ) AS employee_contribution
                 "),
 
-                // Employer Contribution
-                DB::raw("
+            // Employer Contribution
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(
                             JSON_EXTRACT(
@@ -2753,17 +2836,17 @@ class PayrollReportController extends Controller
                     ) AS company_contribution
                 "),
 
-                'user_payslip.lwf_receipt_date',
-                'user_payslip.lwf_receipt_no',
-                'user_payslip.lwf_payment_status',
-                
-                'user_payslip.lwf_payment_month',
-                'user_payslip.lwf_total_payment',
-                'user_payslip.lwf_interest_amount',
-                'user_payslip.lwf_employee_count',
-                'user_payslip.lwf_employee_contribution',
-                'user_payslip.lwf_employer_contribution',
-            )
+            'user_payslip.lwf_receipt_date',
+            'user_payslip.lwf_receipt_no',
+            'user_payslip.lwf_payment_status',
+
+            'user_payslip.lwf_payment_month',
+            'user_payslip.lwf_total_payment',
+            'user_payslip.lwf_interest_amount',
+            'user_payslip.lwf_employee_count',
+            'user_payslip.lwf_employee_contribution',
+            'user_payslip.lwf_employer_contribution',
+        )
             ->orderBy('employees.employee_id')
             ->get();
 
@@ -2849,20 +2932,20 @@ class PayrollReportController extends Controller
         }
 
         $records = $query->select(
-                'up.id',
-                'up.user_emp_id',
-                'up.month',
-                'up.financial_year',
-                'up.date',
-                'up.payment_date',
-                'up.payment_trans_id',
-                'up.payment_status',
-                'e.employee_id',
-                'u.name',
-                'e.bank_name',
-                'e.account_number',
-                'e.ifsc',
-                DB::raw("
+            'up.id',
+            'up.user_emp_id',
+            'up.month',
+            'up.financial_year',
+            'up.date',
+            'up.payment_date',
+            'up.payment_trans_id',
+            'up.payment_status',
+            'e.employee_id',
+            'u.name',
+            'e.bank_name',
+            'e.account_number',
+            'e.ifsc',
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(
                             JSON_EXTRACT(up.emp_salary_slip_response,
@@ -2870,14 +2953,26 @@ class PayrollReportController extends Controller
                         ) AS DECIMAL(15,2)
                     ) as net_salary
                 ")
-            )
+        )
             ->orderBy('up.month')
             ->orderBy('u.name')
             ->get();
 
         // Month number → name map
-        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
-                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+        $monthNames = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
 
         foreach ($records as $row) {
             $row->month_name = $monthNames[$row->month] ?? $row->month;
@@ -2959,7 +3054,7 @@ class PayrollReportController extends Controller
         $period        = $request->period;
 
         $months = $this->resolveMonths($filterType, $period);
-        
+
 
         $query = DB::table('user_payslip as up')
             ->leftJoin('users as u', 'u.id', '=', 'up.user_emp_id')
@@ -2985,15 +3080,15 @@ class PayrollReportController extends Controller
         ");
 
         $records = $query->select(
-                'up.id',
-                'up.user_emp_id',
-                'up.month',
-                'up.lwf_payment_status',
-                'e.employee_id',
-                'u.name',
-                's.name as state_name',
+            'up.id',
+            'up.user_emp_id',
+            'up.month',
+            'up.lwf_payment_status',
+            'e.employee_id',
+            'u.name',
+            's.name as state_name',
 
-                DB::raw("
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(
                             JSON_EXTRACT(
@@ -3004,7 +3099,7 @@ class PayrollReportController extends Controller
                     ) AS gross_wages
                 "),
 
-                DB::raw("
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(
                             JSON_EXTRACT(
@@ -3015,7 +3110,7 @@ class PayrollReportController extends Controller
                     ) AS lwf_employee
                 "),
 
-                DB::raw("
+            DB::raw("
                     CAST(
                         JSON_UNQUOTE(
                             JSON_EXTRACT(
@@ -3025,7 +3120,7 @@ class PayrollReportController extends Controller
                         ) AS DECIMAL(15,2)
                     ) AS lwf_employer
                 ")
-            )
+        )
             ->orderBy('u.name')
             ->get();
 
@@ -3131,7 +3226,7 @@ class PayrollReportController extends Controller
         }
 
         if ($filterType === 'quarterly' && !empty($period)) {
-            return match($period) {
+            return match ($period) {
                 'Q1'    => [4, 5, 6],
                 'Q2'    => [7, 8, 9],
                 'Q3'    => [10, 11, 12],
@@ -3141,7 +3236,7 @@ class PayrollReportController extends Controller
         }
 
         if ($filterType === 'half-yearly' && !empty($period)) {
-            return match($period) {
+            return match ($period) {
                 'H1'    => [4, 5, 6, 7, 8, 9],
                 'H2'    => [10, 11, 12, 1, 2, 3],
                 default => [],
@@ -3153,7 +3248,8 @@ class PayrollReportController extends Controller
     }
 
     //-------- Multiple Payslip Generate ---------
-    public function multiplePayslipGenerate(){
+    public function multiplePayslipGenerate()
+    {
         return view('User.multiple-generate-payslip');
     }
 
@@ -3194,7 +3290,9 @@ class PayrollReportController extends Controller
         $allSchedules = DB::table('weekly_schedules')
             ->where('added_by', $ownerId)
             ->get()
-            ->keyBy(function($item) { return strtolower(trim($item->day)); });
+            ->keyBy(function ($item) {
+                return strtolower(trim($item->day));
+            });
 
         foreach ($attendanceRecords as $record) {
             $dayName = strtolower(Carbon::parse($record->present_date)->format('l'));
@@ -3434,16 +3532,16 @@ class PayrollReportController extends Controller
             // Must have joined on or before the last day of the selected month
             ->where(function ($q) use ($lastDayOfMonth) {
                 $q->whereNull('e.joining_date')
-                  ->orWhereDate('e.joining_date', '<=', $lastDayOfMonth);
+                    ->orWhereDate('e.joining_date', '<=', $lastDayOfMonth);
             })
             // Must be active OR resigned/terminated with last day >= first day of month
             ->where(function ($q) use ($firstDayOfMonth) {
                 $q->whereIn('e.emp_status', ['Confirmed', 'In Probation'])
-                  ->orWhere(function ($qq) use ($firstDayOfMonth) {
-                      $qq->whereIn('e.emp_status', ['Resigned', 'Terminated'])
-                         ->whereNotNull('e.regine_date')
-                         ->whereDate('e.regine_date', '>=', $firstDayOfMonth);
-                  });
+                    ->orWhere(function ($qq) use ($firstDayOfMonth) {
+                        $qq->whereIn('e.emp_status', ['Resigned', 'Terminated'])
+                            ->whereNotNull('e.regine_date')
+                            ->whereDate('e.regine_date', '>=', $firstDayOfMonth);
+                    });
             });
 
         // Only exclude existing payslip employees if there are any
@@ -3544,7 +3642,7 @@ class PayrollReportController extends Controller
 
         return response()->json([
             'employees'         => $employees,
-            'total_working_days'=> $displayWorkingDays,
+            'total_working_days' => $displayWorkingDays,
             'month'             => $month,
             'financial_year'    => $financialYear,
         ]);
@@ -3577,8 +3675,20 @@ class PayrollReportController extends Controller
         $fyEnd   = (int)($fyParts[1] ?? ($fyStart + 1));
         $year    = ($monthNum >= 4) ? $fyStart : $fyEnd;
 
-        $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
-                       7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
+        $monthNames = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December'
+        ];
 
         $firstDay = Carbon::create($year, $monthNum, 1)->startOfMonth();
 
@@ -3602,7 +3712,10 @@ class PayrollReportController extends Controller
         for ($d = $firstDay->copy(); $d->lte($firstDay->copy()->endOfMonth()); $d->addDay()) {
             $dayName = strtolower($d->format('l'));
             $isWeekend = isset($weeklySchedule[$dayName]) && strtolower($weeklySchedule[$dayName]) === 'closed';
-            if ($isWeekend) { $totalWeekends++; continue; }
+            if ($isWeekend) {
+                $totalWeekends++;
+                continue;
+            }
             if (!in_array($d->format('Y-m-d'), $holidayDates)) $totalWorkingDays++;
         }
         $totalWorkingDays = max($totalWorkingDays - 1, 0);
@@ -3631,14 +3744,17 @@ class PayrollReportController extends Controller
                 ->where('month', $monthNum)
                 ->exists();
 
-            if ($exists) { $skipped++; continue; }
+            if ($exists) {
+                $skipped++;
+                continue;
+            }
 
             try {
                 $employee = DB::table('employees as e')
                     ->leftJoin('users as u',           'u.id',  '=', 'e.empId')
-                    ->leftJoin('resign_employee as re','re.id', '=', 'e.empId')
+                    ->leftJoin('resign_employee as re', 're.id', '=', 'e.empId')
                     ->leftJoin('depertments as d',     'd.id',  '=', 'e.dept_id')
-                    ->leftJoin('designations as des',  'des.id','=', 'e.desig_id')
+                    ->leftJoin('designations as des',  'des.id', '=', 'e.desig_id')
                     ->where('e.empId', $empId)
                     ->select(
                         'e.empId',
@@ -3857,7 +3973,7 @@ class PayrollReportController extends Controller
                     'employee'         => $employeeDetails,
                     'salaryDetails'    => $salaryDetails,
                     'monthDetails'     => $monthDetails,
-                    'attendanceDetails'=> $attendanceDetails,
+                    'attendanceDetails' => $attendanceDetails,
                     'financialYear'    => $financialYear,
                     'month'            => $monthNum,
                     'month_name'       => $monthName,
@@ -3903,7 +4019,6 @@ class PayrollReportController extends Controller
                 $totalLwf   += $lwf;
 
                 $generated++;
-
             } catch (\Exception $e) {
                 $errors[] = ['emp_id' => $empId, 'error' => $e->getMessage()];
             }
@@ -4057,7 +4172,6 @@ class PayrollReportController extends Controller
                 }
 
                 DB::table('journals')->insert($entries);
-
             } catch (\Exception $e) {
                 \Log::error('Bulk payroll journal entry failed', [
                     'error' => $e->getMessage(),
@@ -4076,5 +4190,4 @@ class PayrollReportController extends Controller
             'message'   => "{$generated} payslip(s) generated successfully." . ($skipped ? " {$skipped} already existed." : ''),
         ]);
     }
-
 }

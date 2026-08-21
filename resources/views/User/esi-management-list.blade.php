@@ -139,7 +139,7 @@
                 <div class="card-header bg-white border-bottom px-4 py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
                     {{-- Filter controls --}}
                     <div class="d-flex flex-wrap gap-2 align-items-center">
-                        <select id="esi_fy" class="form-select form-select-sm" style="width:150px;">
+                        <select id="esi_fy" class="form-select form-select-sm" style="width:150px;" onchange="loadEsiPageData()">
                             @php
                                 $today = now();
                                 $fyStart = $today->month >= 4 ? $today->year : $today->year - 1;
@@ -150,13 +150,13 @@
                                 </option>
                             @endfor
                         </select>
-                        <select id="esi_filter_type" class="form-select form-select-sm" style="width:140px;">
+                        <select id="esi_filter_type" class="form-select form-select-sm" style="width:140px;" onchange="renderEsiPageFilter(); loadEsiPageData();">
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
                             <option value="half-yearly">Half-Yearly</option>
                             <option value="yearly">Full Year</option>
                         </select>
-                        <select id="esi_filter_period" class="form-select form-select-sm" style="width:160px;"></select>
+                        <select id="esi_filter_period" class="form-select form-select-sm" style="width:160px;" onchange="loadEsiPageData()"></select>
                         <button class="btn btn-primary btn-sm px-4" onclick="loadEsiPageData()">
                             <i class="ti ti-refresh me-1"></i> Load
                         </button>
@@ -628,16 +628,17 @@
             ESI_MONTHS.forEach((m, i) => {
                 html += `<option value="${m}"${i === prev ? ' selected' : ''}>${m}</option>`;
             });
-            period.style.display = '';
+            period.style.display = 'inline-block';
         } else if (type === 'quarterly') {
             [['Q1','Q1 (Apr–Jun)'],['Q2','Q2 (Jul–Sep)'],['Q3','Q3 (Oct–Dec)'],['Q4','Q4 (Jan–Mar)']].forEach(([v,l]) => {
                 html += `<option value="${v}">${l}</option>`;
             });
-            period.style.display = '';
+            period.style.display = 'inline-block';
         } else if (type === 'half-yearly') {
             html = `<option value="H1">H1 (Apr–Sep)</option><option value="H2">H2 (Oct–Mar)</option>`;
-            period.style.display = '';
+            period.style.display = 'inline-block';
         } else {
+            // Full Year: Hide the period dropdown completely
             html = `<option value="full">Full Year</option>`;
             period.style.display = 'none';
         }

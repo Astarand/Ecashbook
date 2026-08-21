@@ -788,18 +788,9 @@
             offcanvasEl.addEventListener('shown.bs.offcanvas', initPtaxPeriodToggle);
         }
 
-        // Re-render and reload data on filter changes
-        $('#ptax_fy').on('change', function() {
-            loadPtaxSummary();
-        });
-
-        $('#ptax_filter_type').on('change', function() {
+        // Re-load table when FY changes
+        $('#ptax_fy, #ptax_filter_type').on('change', function() {
             renderPtaxFilter();
-            loadPtaxSummary();
-        });
-
-        $('#ptax_filter_period').on('change', function() {
-            loadPtaxSummary();
         });
     });
 
