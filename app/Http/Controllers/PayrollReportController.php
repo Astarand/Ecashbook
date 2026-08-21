@@ -1825,10 +1825,9 @@ class PayrollReportController extends Controller
 
         // Apply filter based on filter type
         if ($filterType == 'monthly' && !empty($period)) {
-            $month = $this->parseMonthNumber($period);
-            if ($month) {
-                $query->where('user_payslip.month', $month);
-            }
+
+            $month = Carbon::parse('1 ' . $period)->month;
+            $query->where('user_payslip.month', $month);
         } elseif ($filterType == 'quarterly' && !empty($period)) {
 
             switch ($period) {
@@ -2197,9 +2196,13 @@ class PayrollReportController extends Controller
 
         // Monthly
         if ($filterType == 'monthly' && !empty($period)) {
-            $month = $this->parseMonthNumber($period);
-            if ($month) {
+            try {
+                $month = Carbon::parse('1 ' . $period)->month;
                 $query->where('user_payslip.month', $month);
+            } catch (\Exception $e) {
+                if (is_numeric($period) && (int)$period >= 1 && (int)$period <= 12) {
+                    $query->where('user_payslip.month', (int)$period);
+                }
             }
         }
 
@@ -2587,8 +2590,8 @@ class PayrollReportController extends Controller
 
         // Period filters
         if ($filterType == 'monthly' && !empty($period)) {
-            $month = $this->parseMonthNumber($period);
-            if ($month) $query->where('user_payslip.month', $month);
+            $month = Carbon::parse('1 ' . $period)->month;
+            $query->where('user_payslip.month', $month);
         } elseif ($filterType == 'quarterly' && !empty($period)) {
             switch ($period) {
                 case 'Q1':
@@ -2752,8 +2755,9 @@ class PayrollReportController extends Controller
 
         // Period Filter
         if ($filterType == 'monthly' && !empty($period)) {
-            $month = $this->parseMonthNumber($period);
-            if ($month) $query->where('user_payslip.month', $month);
+
+            $month = Carbon::parse('1 ' . $period)->month;
+            $query->where('user_payslip.month', $month);
         } elseif ($filterType == 'quarterly' && !empty($period)) {
 
             switch ($period) {
@@ -3184,45 +3188,11 @@ class PayrollReportController extends Controller
         return response()->json($data);
     }
 
-    // ------- Safe Month Parser Helper -------//
-    private function parseMonthNumber(?string $period): ?int
-    {
-        if (empty($period)) return null;
-        $p = strtolower(trim((string)$period));
-        if (is_numeric($p)) {
-            $num = (int)$p;
-            return ($num >= 1 && $num <= 12) ? $num : null;
-        }
-        $monthMap = [
-            'january' => 1, 'jan' => 1,
-            'february' => 2, 'feb' => 2,
-            'march' => 3, 'mar' => 3,
-            'april' => 4, 'apr' => 4,
-            'may' => 5,
-            'june' => 6, 'jun' => 6,
-            'july' => 7, 'jul' => 7,
-            'august' => 8, 'aug' => 8,
-            'september' => 9, 'sep' => 9, 'sept' => 9,
-            'october' => 10, 'oct' => 10,
-            'november' => 11, 'nov' => 11,
-            'december' => 12, 'dec' => 12,
-        ];
-        if (isset($monthMap[$p])) {
-            return $monthMap[$p];
-        }
-        try {
-            return Carbon::parse('1 ' . $period)->month;
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
     // ------- Helper: resolve month numbers from filter type -------//
     private function resolveMonths(string $filterType, ?string $period): array
     {
         if ($filterType === 'monthly' && !empty($period)) {
-            $m = $this->parseMonthNumber($period);
-            return $m ? [$m] : [];
+            return [Carbon::parse('1 ' . $period)->month];
         }
 
         if ($filterType === 'quarterly' && !empty($period)) {

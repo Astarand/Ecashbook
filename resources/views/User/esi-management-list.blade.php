@@ -157,7 +157,7 @@
                             <option value="yearly">Full Year</option>
                         </select>
                         <select id="esi_filter_period" class="form-select form-select-sm" style="width:160px;"></select>
-                        <button class="btn btn-primary btn-sm px-4" id="esi_load_btn">
+                        <button class="btn btn-primary btn-sm px-4" id="esi_load_btn" onclick="loadEsiPageData()">
                             <i class="ti ti-refresh me-1"></i> Load
                         </button>
                     </div>
@@ -874,10 +874,6 @@
         });
 
         $('#esi_filter_period').on('change', function() {
-            loadEsiPageData();
-        });
-
-        $('#esi_load_btn').on('click', function() {
             loadEsiPageData();
         });
     });
