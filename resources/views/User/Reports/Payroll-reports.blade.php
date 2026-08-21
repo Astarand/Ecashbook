@@ -470,10 +470,10 @@
                                             <div class="d-flex align-items-center gap-3">
                                                 {{-- Mock Company Logo --}}
                                                 <div class="bg-gradient-primary text-white rounded-3 p-2 fw-bold d-flex align-items-center justify-content-center" style="width: 46px; height: 46px; font-size: 1.2rem;">
-                                                    EC
+                                                    MX
                                                 </div>
                                                 <div>
-                                                    <h5 class="fw-bold text-dark mb-0 uppercase-label" id="reportCompanyHeader">E-Cashbook Systems Ltd</h5>
+                                                    <h5 class="fw-bold text-dark mb-0 uppercase-label" id="reportCompanyHeader">Methotx</h5>
                                                     <span class="text-muted small">Generated on: <span id="generationDate">05-07-2026</span> &nbsp;·&nbsp; Month: <span class="active-month-text text-primary fw-bold">July 2026</span></span>
                                                 </div>
                                             </div>
