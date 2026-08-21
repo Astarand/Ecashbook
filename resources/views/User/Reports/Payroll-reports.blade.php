@@ -468,10 +468,8 @@
                                         {{-- Report Official Header --}}
                                         <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-4">
                                             <div class="d-flex align-items-center gap-3">
-                                                {{-- Mock Company Logo --}}
-                                                <div class="bg-gradient-primary text-white rounded-3 p-2 fw-bold d-flex align-items-center justify-content-center" style="width: 46px; height: 46px; font-size: 1.2rem;">
-                                                    MX
-                                                </div>
+                                                {{-- Company Favicon Logo --}}
+                                                <img src="{{ asset('assets/images/favicon.ico') }}" alt="Methotx" class="rounded-3 shadow-sm" style="width: 44px; height: 44px; object-fit: contain; padding: 4px; border: 1px solid #e9ecef; background: #fff;">
                                                 <div>
                                                     <h5 class="fw-bold text-dark mb-0 uppercase-label" id="reportCompanyHeader">Methotx</h5>
                                                     <span class="text-muted small">Generated on: <span id="generationDate">05-07-2026</span> &nbsp;·&nbsp; Month: <span class="active-month-text text-primary fw-bold">July 2026</span></span>
