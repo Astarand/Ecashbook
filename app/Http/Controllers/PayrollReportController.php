@@ -3369,11 +3369,14 @@ class PayrollReportController extends Controller
     public function getBulkPayslipEmployees(Request $request)
     {
         $ownerId       = currentOwnerId();
-        $financialYear = $request->financial_year;
-        $month         = Carbon::parse('1 ' . $request->month)->month;
+        $financialYear = trim((string)$request->financial_year);
+        $monthInput    = trim((string)$request->month);
+        $month         = is_numeric($monthInput) ? (int)$monthInput : (Carbon::parse('1 ' . $monthInput)->month ?? 1);
 
-        [$fyStart, $fyEnd] = explode('-', $financialYear);
-        $year = ($month >= 4) ? $fyStart : $fyEnd;
+        $fyParts = explode('-', $financialYear);
+        $fyStart = (int)($fyParts[0] ?? date('Y'));
+        $fyEnd   = (int)($fyParts[1] ?? ($fyStart + 1));
+        $year    = ($month >= 4) ? $fyStart : $fyEnd;
 
         // IDs that already have a payslip
         $existingEmpIds = DB::table('user_payslip')
@@ -3521,12 +3524,28 @@ class PayrollReportController extends Controller
     public function bulkGeneratePayslip(Request $request)
     {
         $ownerId       = currentOwnerId();
-        $financialYear = $request->financial_year;
+        $financialYear = trim((string)$request->financial_year);
         $monthNum      = (int)$request->month;
         $employeesData = $request->employees; // array from JS
 
-        [$fyStart, $fyEnd] = explode('-', $financialYear);
-        $year = ($monthNum >= 4) ? $fyStart : $fyEnd;
+        if (empty($employeesData) || !is_array($employeesData)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No employee data received to generate payslips.',
+            ], 422);
+        }
+
+        if (empty($financialYear) || empty($monthNum) || $monthNum < 1 || $monthNum > 12) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid financial year or payroll month.',
+            ], 422);
+        }
+
+        $fyParts = explode('-', $financialYear);
+        $fyStart = (int)($fyParts[0] ?? date('Y'));
+        $fyEnd   = (int)($fyParts[1] ?? ($fyStart + 1));
+        $year    = ($monthNum >= 4) ? $fyStart : $fyEnd;
 
         $monthNames = [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',
                        7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December'];
