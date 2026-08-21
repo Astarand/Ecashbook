@@ -108,18 +108,15 @@
                 <div class="modal-body p-4">
                     <!-- Assignee Field -->
                     <div class="mb-4">
-                        <label class="form-label fw-semibold text-dark">
+                        <label class="form-label fw-semibold text-dark mb-1">
                             Assign To <span class="text-danger">*</span>
                         </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0"><i class="ti ti-user text-primary"></i></span>
-                            <select name="employee_id" class="form-select border-start-0" required>
-                                <option value="">Select Employee...</option>
-                                @foreach($employees as $employee)
-                                    <option value="{{ $employee->employee_id }}">{{ $employee->name }} (ID: {{ $employee->employee_id }})</option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <select name="employee_id" class="form-select" required style="height: 42px; border-radius: 8px;">
+                            <option value="">Select Employee...</option>
+                            @foreach($employees as $employee)
+                                <option value="{{ $employee->employee_id }}">{{ $employee->name }} (ID: {{ $employee->employee_id }})</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <!-- Tasks List Section -->
@@ -132,7 +129,7 @@
                         </div>
 
                         <div id="taskTitleWrapper">
-                            <div class="card border mb-3 task-row bg-light-subtle rounded-3 shadow-none">
+                            <div class="card border mb-3 task-row bg-light-subtle rounded-3 shadow-none" style="border-color: #e2e8f0 !important;">
                                 <div class="card-body p-3">
                                     <div class="row g-2 align-items-end">
                                         <div class="col-md-5">
@@ -141,11 +138,12 @@
                                                    name="title[]"
                                                    class="form-control"
                                                    placeholder="e.g. Prepare Monthly GST Reports"
-                                                   required>
+                                                   required
+                                                   style="height: 42px; border-radius: 8px;">
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label small fw-semibold text-muted mb-1">Priority <span class="text-danger">*</span></label>
-                                            <select name="priority[]" class="form-select" required>
+                                            <select name="priority[]" class="form-select" required style="height: 42px; border-radius: 8px;">
                                                 <option value="">Select Priority</option>
                                                 <option value="High">🔴 High</option>
                                                 <option value="Medium">🟡 Medium</option>
@@ -157,11 +155,12 @@
                                             <input type="datetime-local"
                                                    name="due_date[]"
                                                    class="form-control"
-                                                   required>
+                                                   required
+                                                   style="height: 42px; border-radius: 8px;">
                                         </div>
                                         <div class="col-md-1 text-center">
-                                            <button type="button" class="btn btn-outline-primary w-100 add-task-row" title="Add Another Task">
-                                                <i class="ti ti-plus"></i>
+                                            <button type="button" class="btn btn-outline-primary w-100 add-task-row d-flex align-items-center justify-content-center" style="height: 42px; border-radius: 8px;" title="Add Another Task">
+                                                <i class="ti ti-plus fs-5"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -361,7 +360,7 @@
 <script>
     function getTaskRowTemplate(isFirst = false) {
         return `
-            <div class="card border mb-3 task-row bg-light-subtle rounded-3 shadow-none">
+            <div class="card border mb-3 task-row bg-light-subtle rounded-3 shadow-none" style="border-color: #e2e8f0 !important;">
                 <div class="card-body p-3">
                     <div class="row g-2 align-items-end">
                         <div class="col-md-5">
@@ -370,11 +369,12 @@
                                    name="title[]"
                                    class="form-control"
                                    placeholder="e.g. Prepare Monthly GST Reports"
-                                   required>
+                                   required
+                                   style="height: 42px; border-radius: 8px;">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-semibold text-muted mb-1">Priority <span class="text-danger">*</span></label>
-                            <select name="priority[]" class="form-select" required>
+                            <select name="priority[]" class="form-select" required style="height: 42px; border-radius: 8px;">
                                 <option value="">Select Priority</option>
                                 <option value="High">🔴 High</option>
                                 <option value="Medium">🟡 Medium</option>
@@ -386,16 +386,17 @@
                             <input type="datetime-local"
                                    name="due_date[]"
                                    class="form-control"
-                                   required>
+                                   required
+                                   style="height: 42px; border-radius: 8px;">
                         </div>
                         <div class="col-md-1 text-center">
                             ${isFirst ? `
-                                <button type="button" class="btn btn-outline-primary w-100 add-task-row" title="Add Another Task">
-                                    <i class="ti ti-plus"></i>
+                                <button type="button" class="btn btn-outline-primary w-100 add-task-row d-flex align-items-center justify-content-center" style="height: 42px; border-radius: 8px;" title="Add Another Task">
+                                    <i class="ti ti-plus fs-5"></i>
                                 </button>
                             ` : `
-                                <button type="button" class="btn btn-outline-danger w-100 remove-task-row" title="Remove Task">
-                                    <i class="ti ti-trash"></i>
+                                <button type="button" class="btn btn-outline-danger w-100 remove-task-row d-flex align-items-center justify-content-center" style="height: 42px; border-radius: 8px;" title="Remove Task">
+                                    <i class="ti ti-trash fs-5"></i>
                                 </button>
                             `}
                         </div>
@@ -405,124 +406,129 @@
         `;
     }
 
-	// Add More Task Row
+	// Add More Task Row & Remove Row (Event Delegation)
 	document.addEventListener("click", function (e) {
 		// ADD ROW
-		if (e.target.closest(".add-task-row")) {
+		const addBtn = e.target.closest(".add-task-row");
+		if (addBtn) {
+			e.preventDefault();
 			const wrapper = document.getElementById("taskTitleWrapper");
-			wrapper.insertAdjacentHTML("beforeend", getTaskRowTemplate(false));
+			if (wrapper) {
+				wrapper.insertAdjacentHTML("beforeend", getTaskRowTemplate(false));
+			}
 		}
 
 		// REMOVE ROW
-		if (e.target.closest(".remove-task-row")) {
-			e.target.closest(".task-row").remove();
+		const removeBtn = e.target.closest(".remove-task-row");
+		if (removeBtn) {
+			e.preventDefault();
+			const row = removeBtn.closest(".task-row");
+			if (row) {
+				row.remove();
+			}
 		}
 	});
 
-	// Reset Add Task Modal on show
 	document.addEventListener("DOMContentLoaded", function () {
+		// Reset Add Task Modal on show
 		const addTaskModal = document.getElementById('addTaskModal');
         if (addTaskModal) {
             addTaskModal.addEventListener('show.bs.modal', function () {
-                document.getElementById('taskForm').reset();
-                document.getElementById("taskTitleWrapper").innerHTML = getTaskRowTemplate(true);
+                const form = document.getElementById('taskForm');
+				if (form) form.reset();
+                const wrapper = document.getElementById("taskTitleWrapper");
+				if (wrapper) wrapper.innerHTML = getTaskRowTemplate(true);
             });
         }
-	});
 
-	document.addEventListener("DOMContentLoaded", function () {
 		// Submit Task
-		document.getElementById("taskForm")?.addEventListener("submit", function (e) {
-			e.preventDefault();
-			let formData = new FormData(this);
-			fetch(this.action, {
-				method: "POST",
-				body: formData,
-				headers: {"X-Requested-With":"XMLHttpRequest","X-CSRF-TOKEN":document.querySelector('meta[name="csrf-token"]').content}
-			})
-			.then(res => res.json())
-			.then(res => {
-				if(res.status){
-					showToast(res.message,"success");
-					// Reset form
-					this.reset();
-					document.getElementById("taskTitleWrapper").innerHTML = getTaskRowTemplate(true);
-
-					// Close modal
-					bootstrap.Modal.getInstance(this.closest(".modal")).hide();
-
-					// Reload
-					setTimeout(() => location.reload(), 1000);
-				} else {
-					showToast("Error saving task!","error");
-				}
-			});
-		});
-
-					// Close modal
-					bootstrap.Modal.getInstance(this.closest(".modal")).hide();
-
-					// Reload
-					location.reload();
-
-				} else {
-
-					showToast("Error!","error");
-
-				}
-
-			});
-		});
-
-		// Edit Task
-		/*document.querySelectorAll(".edit-task-form").forEach(f=>{
-			f.addEventListener("submit",function(e){
+		const taskForm = document.getElementById("taskForm");
+		if (taskForm) {
+			taskForm.addEventListener("submit", function (e) {
 				e.preventDefault();
-				let fd=new FormData(f);
-				fetch(f.action,{method:"POST",body:fd,headers:{"X-Requested-With":"XMLHttpRequest","X-CSRF-TOKEN":document.querySelector('meta[name="csrf-token"]').content}})
-				.then(res=>res.json())
-				.then(res=>{ if(res.status){ showToast(res.message,"success"); bootstrap.Modal.getInstance(f.closest(".modal")).hide(); location.reload(); } else { showToast("Validation failed","error"); }});
-			})
-		});*/
-		
+				let formData = new FormData(this);
+				const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
+				
+				fetch(this.action, {
+					method: "POST",
+					body: formData,
+					headers: {
+						"X-Requested-With": "XMLHttpRequest",
+						"X-CSRF-TOKEN": csrfToken
+					}
+				})
+				.then(res => res.json())
+				.then(res => {
+					if (res.status) {
+						if (typeof showToast === 'function') {
+							showToast(res.message, "success");
+						} else {
+							alert(res.message);
+						}
+						// Reset form
+						this.reset();
+						const wrapper = document.getElementById("taskTitleWrapper");
+						if (wrapper) wrapper.innerHTML = getTaskRowTemplate(true);
+
+						// Close modal
+						const modalEl = this.closest(".modal");
+						if (modalEl) {
+							const modalInstance = bootstrap.Modal.getInstance(modalEl);
+							if (modalInstance) modalInstance.hide();
+						}
+
+						// Reload
+						setTimeout(() => location.reload(), 1000);
+					} else {
+						let errorMsg = res.message || "Error saving task!";
+						if (typeof showToast === 'function') {
+							showToast(errorMsg, "error");
+						} else {
+							alert(errorMsg);
+						}
+					}
+				})
+				.catch(err => {
+					console.error(err);
+					if (typeof showToast === 'function') {
+						showToast("Something went wrong!", "error");
+					}
+				});
+			});
+		}
+
 		// Open Edit Modal
 		document.querySelectorAll(".edit-task-btn").forEach(btn => {
-
 			btn.addEventListener("click", function () {
-
 				let taskId = this.dataset.id;
-
 				fetch("{{ url('/task-management/get-task') }}/" + taskId)
 				.then(res => res.json())
 				.then(task => {
-
 					// Set form action
-					document.getElementById("editTaskForm")
-						.action = "{{ url('/task-management/update') }}/" + task.id;
+					document.getElementById("editTaskForm").action = "{{ url('/task-management/update') }}/" + task.id;
 
 					// Fill data
 					document.getElementById("edit_title").value = task.title;
 					document.getElementById("edit_employee_id").value = task.employee_id;
 					document.getElementById("edit_priority").value = task.priority;
-					document.getElementById("edit_due_date").value = task.due_date.replace(' ', 'T');
+					document.getElementById("edit_due_date").value = task.due_date ? task.due_date.replace(' ', 'T') : '';
 					document.getElementById("edit_description").value = task.description ?? '';
 					document.getElementById("edit_status").value = task.status;
 
 					// Show modal
 					let modal = new bootstrap.Modal(document.getElementById('editTaskModal'));
 					modal.show();
-
-				});
-
+				})
+				.catch(err => console.error(err));
 			});
-
 		});
 
-
-
+		// Delete Task
 		document.querySelectorAll('.delete-task-btn').forEach(function(btn){
 			btn.addEventListener('click', function(){
 				let taskId = this.getAttribute('data-id');
+				const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
+				
 				Swal.fire({
 					title: 'Are you sure?',
 					text: "You won't be able to revert this!",
@@ -536,19 +542,24 @@
 						fetch("{{ url('/task-management/delete') }}/" + taskId, {
 							method: "DELETE",
 							headers: {
-								"X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+								"X-CSRF-TOKEN": csrfToken,
 								"X-Requested-With": "XMLHttpRequest"
 							}
 						})
 						.then(res => res.json())
 						.then(res => {
 							if (res.status) {
-								showToast(res.message, "success");
-								setTimeout(() => location.reload(), 1500); // reload after showing success
+								if (typeof showToast === 'function') {
+									showToast(res.message, "success");
+								}
+								setTimeout(() => location.reload(), 1200);
 							} else {
-								showToast(res.message, "error");
+								if (typeof showToast === 'function') {
+									showToast(res.message || "Error deleting task", "error");
+								}
 							}
 						})
+						.catch(err => console.error(err));
 					}
 				});
 			});

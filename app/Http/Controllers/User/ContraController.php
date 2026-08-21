@@ -2446,7 +2446,8 @@ class ContraController extends Controller
 
 		$data = $query
 			->orderBy('payment_vouchers.id', 'DESC')
-			->get();
+			->paginate(10)
+			->appends($request->all());
 
 		return view('User.payment-voucher-list', compact('data','proprietorships','banks', 'req_type'));
 	}

@@ -25,8 +25,8 @@
                         <h3 class="mb-0">Payment / Receipt Voucher List</h3>
                     </div>
                 </div>
-                <div class="col-md-8 text-end">    
-					@if($req_type != 1)                
+                <div class="col-md-8 text-end">
+					@if($req_type != 1)
                     	<button class="btn btn-primary btn-add"><i class="ti ti-square-plus"></i> Add New Voucher</button>
 					@endif
                 </div>
@@ -39,7 +39,7 @@
     <!-- [ Main Content ] start -->
     <div class="row">
         <div class="col-sm-12">
-            <!-- Filter Options Card -->			
+            <!-- Filter Options Card -->
 			<div class="card mb-4 shadow-sm border-0">
 				<div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
 					<h5 class="mb-0 fw-bold text-primary">
@@ -93,7 +93,7 @@
 									   class="form-control"
 									   value="{{ request('to_date') }}">
 							</div>
-							
+
 							<div class="col-md-3">
 								<label class="form-label">Search Transaction</label>
 								<select class="form-select" name="search_transaction" id="search_transaction">
@@ -272,20 +272,20 @@
             <div class="card" style="border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
                 <div class="card-body table-card p-3">
                     <div class="table-responsive">
-                        <table class="table tbl-product my-3" id="pc-dt-simple">
+                        <table class="table tbl-product mb-0">
                             <thead>
                                 <tr style="background-color: #cbcbcb;">
                                     <th class="text-end py-3">#</th>
 								@if($hasProprietorship)
 								<th>Proprietorship Company</th>
 								@endif
-                                <th width="120">Date</th>
+                                <th width="140">Date</th>
                                 <th width="">Paid</th>
                                 <th>Voucher No</th>
                                 <th>Transaction</th>
                                 <th>Source</th>
                                 <th>Party Type</th>
-                                <th>Party Name</th>								
+                                <th>Party Name</th>
                                 <th>Amount(₹)</th>
                                 <th>CR/DR</th>
                                 <th>Payment Mode</th>
@@ -296,13 +296,13 @@
                         <tbody>
                             @forelse($data as $key => $v)
                             <tr>
-								<td class="text-end">{{ $loop->iteration }}</td>
+								<td class="text-end">{{ $data->firstItem() ? ($data->firstItem() + $loop->index) : ($loop->iteration) }}</td>
 								@if($hasProprietorship)
                                 <td><span class="text-muted text-hover-primary">{{ !empty($v->prop_comp_name) ? $v->prop_comp_name : $v->comp_name }}</span></td>
 								@endif
 								<td>
 									<input type="date" class="form-control updateDate" data-id="{{ $v->id }}" value="{{ $v->date }}">
-								</td>   
+								</td>
 								<td class="text-center">
 									<div class="form-check d-flex justify-content-center">
 										<input class="form-check-input updatePaid"
@@ -328,24 +328,23 @@
                                     <span><i class="ti ti-dots-vertical f-20"></i></span>
                                     <div class="prod-action-links">
                                         <ul class="list-inline me-auto mb-0">
-											@if($v->record_type == 'Manual')
                                             <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="View">
                                                 <a href="#" class="avtar avtar-xs btn-link-warning btn-pc-default viewBtn" data-id="{{ $v->id }}">
                                                     <i class="ti ti-eye f-18"></i>
                                                 </a>
                                             </li>
-                                            <li class="list-inline-item align-bottom reqTypeBtn" data-bs-toggle="tooltip" title="Edit">
+											@if($v->record_type == 'Manual')
+                                            <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
                                                 <a href="#" class="avtar avtar-xs btn-link-success btn-pc-default editBtn" data-id="{{ $v->id }}">
                                                     <i class="ti ti-edit-circle f-18"></i>
                                                 </a>
                                             </li>
-											<li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
+                                            <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
                                                 <a href="#" class="avtar avtar-xs btn-link-danger btn-pc-default deleteBtn" data-id="{{ $v->id }}">
                                                     <i class="ti ti-trash f-18"></i>
                                                 </a>
                                             </li>
 											@else
-												
 											@php
 												switch($v->source) {
 													case 'Sales':
@@ -389,21 +388,28 @@
 													<i class="ti ti-eye f-18"></i>
 												</a>
 											</li>
-											@endif										
+											@endif
                                         </ul>
                                     </div>
                                 </td>
                             </tr>
                             @empty
 							<tr>
-								<td colspan="14" class="text-center">
+								<td colspan="14" class="text-center text-muted py-4">
 									No data found
 								</td>
 							</tr>
 							@endforelse
-
                         </tbody>
                     </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2 px-2">
+                    <div class="text-muted small">
+                        Showing {{ $data->firstItem() ?? 0 }} to {{ $data->lastItem() ?? 0 }} of {{ $data->total() }} entries
+                    </div>
+                    <div>
+                        {{ $data->links('pagination::bootstrap-5') }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -441,7 +447,7 @@
                     </div>
 
                     <div class="row" id="voucherFieldsSection">
-					
+
 						<div class="col-md-6 mb-2">
 							<label class="form-label">{{ $hasProprietorship ? 'Proprietorship Company' : 'Company Name' }}</label>
 							<select name="propId" id="propId" class="form-select">
@@ -453,7 +459,7 @@
 								@endforeach
 							</select>
 						</div>
-						
+
                         <div class="col-md-6 mb-2">
                             <label class="form-label">Date <span class="text-danger">*</span></label>
                             <input type="date" name="date" id="date" class="form-control" value="{{ date('Y-m-d') }}">
@@ -484,10 +490,10 @@
                         </div>
 
                         <div class="col-md-6 mb-2">
-                            <label class="form-label">Party Name <span class="text-danger">*</span></label>                            
+                            <label class="form-label">Party Name <span class="text-danger">*</span></label>
 							<select name="party_name" id="party_name" class="form-select">
                                 <option value="">Please Select</option>
-                            </select>						
+                            </select>
 						</div>
 
                         <div class="col-md-6 mb-2">
@@ -517,7 +523,7 @@
                         </div>
 
                         <div class="col-md-6 mb-2" id="invoiceNoWrap" style="display: none;">
-                            <label class="form-label">Invoice / Reference No</label>                            
+                            <label class="form-label">Invoice / Reference No</label>
 							<select name="invoice_no" id="invoice_no" class="form-select">
                                 <option value="">Please Select</option>
                             </select>
@@ -537,14 +543,14 @@
                                 <option value="UPI">UPI</option>
                             </select>
                         </div>
-						
+
 						<div class="col-md-6 mb-2" id="bankWrap" style="display:none;">
 							<label class="form-label">Bank Name <span class="text-danger">*</span></label>
 							<select name="bank_id" id="bank_id" class="form-select">
 								<option value="">Please Select</option>
 							</select>
 						</div>
-						
+
 						<div class="col-md-6 mb-2">
 							<label class="form-label">Payment Status <span class="text-danger">*</span></label>
 							<select name="is_paid" id="is_paid" class="form-select">
@@ -558,7 +564,7 @@
                             <input type="text" name="reference_id" id="reference_id" class="form-control" placeholder="Enter reference ID">
                         </div>
 
-                        
+
 
                         <!--<div class="col-md-12 mb-2">
                             <label class="form-label">Purpose <span class="text-danger">*</span></label>
@@ -595,23 +601,23 @@
 
 $(document).ready(function () {
 
-	
+
     var req_type = "{{ $req_type }}";
 
     if(req_type == 1){
         $('.reqTypeBtn').hide();
     }
 
-	
-	//Update DATE
-	$('body').on('change', '.updateDate', function (e) {
 
+	//Update DATE
+	$(document).on('change', '.updateDate', function (e) {
 		e.stopPropagation();
 		let id   = $(this).data('id');
 		let date = $(this).val();
+		if (!date) return;
 		$("#loader").show();
 		$.ajax({
-			url: '/payment-voucher/quick-update',
+			url: '{{ url("/payment-voucher/quick-update") }}',
 			type: 'POST',
 			data: {
 				_token: '{{ csrf_token() }}',
@@ -619,29 +625,32 @@ $(document).ready(function () {
 				field: 'date',
 				value: date
 			},
-
 			success: function(res)
 			{
 				$("#loader").hide();
-				showToast(res.message, "success");
+				if (typeof showToast === 'function') {
+					showToast(res.message || "Date updated successfully", "success");
+				}
 			},
-
-			error: function()
+			error: function(xhr)
 			{
 				$("#loader").hide();
-				showToast("Something went wrong!", "error");
+				let msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : "Something went wrong!";
+				if (typeof showToast === 'function') {
+					showToast(msg, "error");
+				}
 			}
 		});
 	});
-	
-	//Update paid status
-	$(document).on('change', '.updatePaid', function () {
 
+	//Update paid status
+	$(document).on('change', '.updatePaid', function (e) {
+		e.stopPropagation();
 		let id = $(this).data('id');
 		let value = $(this).is(':checked') ? 1 : 0;
 		$("#loader").show();
 		$.ajax({
-			url: '/payment-voucher/quick-update',
+			url: '{{ url("/payment-voucher/quick-update") }}',
 			type: 'POST',
 			data: {
 				_token: '{{ csrf_token() }}',
@@ -649,21 +658,24 @@ $(document).ready(function () {
 				field: 'is_paid',
 				value: value
 			},
-
 			success: function(res)
 			{
 				$("#loader").hide();
-				showToast(res.message, "success");
+				if (typeof showToast === 'function') {
+					showToast(res.message || "Status updated successfully", "success");
+				}
 			},
-
-			error: function()
+			error: function(xhr)
 			{
 				$("#loader").hide();
-				showToast("Something went wrong!", "error");
+				let msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : "Something went wrong!";
+				if (typeof showToast === 'function') {
+					showToast(msg, "error");
+				}
 			}
 		});
 	});
-	
+
 	//Payment mode change
 	function loadBankList(selectedBank = '')
 	{
@@ -688,7 +700,7 @@ $(document).ready(function () {
 			$('#bank_id').html(html);
 		});
 	}
-	
+
 	function toggleBankField(selectedBank = '')
 	{
 		let paymentMode = $('#payment_mode').val();
@@ -704,7 +716,7 @@ $(document).ready(function () {
 			$('#bank_id').val('').prop('required', false).html('<option value="">Please Select</option>');
 		}
 	}
-	
+
 	$('#payment_mode').on('change', function () {
 		toggleBankField();
 	});
@@ -882,7 +894,7 @@ $(document).ready(function () {
 
 			return;
 		}
-		
+
 		// validation
 		if(!party_type || !party_name)
 		{
@@ -924,7 +936,7 @@ $(document).ready(function () {
 			$('#invoice_no').html(html);
 		});
 	}
-	
+
 	$('#party_name').on('change', function(){
 
 		$('#invoice_no').html(`
@@ -1088,10 +1100,10 @@ $(document).ready(function () {
 	// =========================================
 
 	$('.btn-add').click(function() {
-		
+
 		isEditMode = false;
 		isViewMode = false;
-		
+
 		$('#voucherForm')[0].reset();
 		$('#attachmentPreview').html('');
 		resetFullFormKeepVoucher();
@@ -1115,10 +1127,10 @@ $(document).ready(function () {
 	// =========================================
 
 	$('.editBtn').click(function () {
-		
+
 		isEditMode = true;
 		isViewMode = false;
-		
+
 		let id = $(this).data('id');
 		$('#voucherForm')[0].reset();
 		resetFullFormKeepVoucher();
@@ -1130,7 +1142,7 @@ $(document).ready(function () {
 		$('.voucher_type').prop('disabled', false);
 		$('#saveBtn').show();
 		$("#loader").show();
-		
+
 		$.get('/payment-voucher/edit/' + id, function (res) {
 
 			$("#loader").hide();
@@ -1182,7 +1194,7 @@ $(document).ready(function () {
 			{
 				loadInvoices(res.invoice_no);
 			}*/
-			
+
 			if(res.transaction_details === 'Against Invoice')
 			{
 				$('#invoiceNoWrap').show();
@@ -1279,7 +1291,7 @@ $(document).ready(function () {
 
 		isEditMode = false;
 		isViewMode = true;
-	
+
 		let id = $(this).data('id');
 
 		$('.editBtn[data-id="'+id+'"]').trigger('click');
@@ -1345,7 +1357,7 @@ $(document).ready(function () {
 			}
 		});
 	});
-	
+
 	//delete data
 	$(document).on('click', '.deleteBtn', function () {
 
@@ -1374,7 +1386,7 @@ $(document).ready(function () {
 
 	});
 
-	
+
 
 });
 
