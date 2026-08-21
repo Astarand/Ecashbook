@@ -591,6 +591,32 @@
     $('#amount, #advance_amt, #receivable_amt, #adjust_amt').on('input', function () {
         allowOnlyDecimal(this);
     });
+	
+	function togglePaymentFields() {
+		let status = $('#pay_status').val();
+		let mode   = $('#pay_mode').val();
+
+		if (status === 'Due') {
+			$('#pay_mode').val('').prop('required', false);
+			$('#bank_id').val('');
+			$('#bank_div').hide();
+
+		} else if (status === 'Full' || status === 'Advance') {
+			$('#pay_mode').prop('required', true);
+
+			if (mode === 'Bank' || mode === 'UPI') {
+				$('#bank_div').fadeIn(200);
+			} else {
+				$('#bank_div').fadeOut(200);
+				$('#bank_id').val('');
+			}
+
+		} else {
+			$('#pay_mode').val('').prop('required', false);
+			$('#bank_id').val('');
+			$('#bank_div').hide();
+		}
+	}
 
     $(document).ready(function () {
         function resetFields() {
@@ -647,6 +673,7 @@
         $('#pay_status').on('change', function () {
             resetFields();
             calculateAmounts();
+			togglePaymentFields();
         });
 
         $('#amount').on('input', calculateAmounts);

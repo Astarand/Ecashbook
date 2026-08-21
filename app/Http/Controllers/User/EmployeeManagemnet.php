@@ -4262,6 +4262,7 @@ class EmployeeManagemnet extends Controller
 				// Update employee table
 				$employee->regine_date = $request->regdate;
 				$employee->regine_document = $fileName;
+				$employee->emp_status = 'Resigned';
 				$employee->save();
 
 				// 🔥 Call separate function
