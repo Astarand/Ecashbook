@@ -80,7 +80,7 @@
                         <div class="mb-3">
                             <label class="form-label">Discount On Grand Total</label>
                             
-                            <input type="text" name="discount_amount" id="discount_amount" class="form-control" value="{{ $value->special_discount_amount }}">
+                            <input type="text" name="discount_amount" id="discount_amount" class="form-control" value="{{ $special_discount_amount }}">
                         </div>
                     </div>
                     <div class="col-6">
