@@ -3161,6 +3161,11 @@ class PayrollReportController extends Controller
             ->whereMonth('present_date', $monthNum)
             ->get();
 
+        $allSchedules = DB::table('weekly_schedules')
+            ->where('added_by', $ownerId)
+            ->get()
+            ->keyBy(function($item) { return strtolower(trim($item->day)); });
+
         foreach ($attendanceRecords as $record) {
             $dayName = strtolower(Carbon::parse($record->present_date)->format('l'));
             $dateStr = Carbon::parse($record->present_date)->format('Y-m-d');
@@ -3172,10 +3177,7 @@ class PayrollReportController extends Controller
             }
 
             $totalPresent++;
-            $schedule = DB::table('weekly_schedules')
-                ->where('added_by', $ownerId)
-                ->where('day', $dayName)
-                ->first();
+            $schedule = $allSchedules[$dayName] ?? null;
 
             if ($schedule && strtolower($schedule->status) === 'open') {
                 if (!empty($schedule->opening_time) && !empty($record->in_time)) {
@@ -3584,14 +3586,15 @@ class PayrollReportController extends Controller
 
             try {
                 $employee = DB::table('employees as e')
-                    ->leftJoin('users as u',         'u.id',  '=', 'e.empId')
-                    ->leftJoin('depertments as d',   'd.id',  '=', 'e.dept_id')
-                    ->leftJoin('designations as des','des.id','=', 'e.desig_id')
+                    ->leftJoin('users as u',           'u.id',  '=', 'e.empId')
+                    ->leftJoin('resign_employee as re','re.id', '=', 'e.empId')
+                    ->leftJoin('depertments as d',     'd.id',  '=', 'e.dept_id')
+                    ->leftJoin('designations as des',  'des.id','=', 'e.desig_id')
                     ->where('e.empId', $empId)
                     ->select(
                         'e.empId',
                         'e.employee_id',
-                        'u.name as employee_name',
+                        DB::raw("COALESCE(u.name, re.name) as employee_name"),
                         'u.email as employee_email',
                         'u.phone as employee_phone',
                         // Department & Designation

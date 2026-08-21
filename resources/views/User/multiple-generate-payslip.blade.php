@@ -8,15 +8,21 @@
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12 mb-2">
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">HR &amp; Payroll Management</a></li>
-                        <li class="breadcrumb-item active">Multiple Generate Payslip</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="#">HR &amp; Payroll Management</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('user.GeneratePayslip') }}">Payslip Management</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Multiple Payslip Generate</li>
+                        </ul>
+                        <a href="{{ route('user.GeneratePayslip') }}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1 shadow-sm px-3">
+                            <i class="ti ti-arrow-left"></i> Single Payslip Generator
+                        </a>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <h2 class="mb-0 text-dark fw-bold">Bulk Payslip Generation</h2>
-                    <p class="text-muted small mb-0">Select FY and month to preview and generate payslips for all eligible employees at once.</p>
+                <div class="col-md-8">
+                    <h2 class="mb-1 text-dark fw-bold">Bulk Payslip Generation</h2>
+                    <p class="text-muted small mb-0">Review salary breakdown and generate monthly payslips for all eligible employees in one click.</p>
                 </div>
             </div>
         </div>
@@ -25,22 +31,34 @@
 
     <!-- Filter Card -->
     <div class="row mb-4">
-        <div class="col-lg-8 col-xl-6">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4">
-                    <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
-                        <i class="ph-duotone ph-funnel text-primary fs-5"></i> Select Period
-                    </h6>
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avtar avtar-s bg-light-primary text-primary rounded-circle">
+                            <i class="ph-duotone ph-calendar-check fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold text-dark">Select Payroll Period</h5>
+                            <span class="text-muted small">Choose the financial year and payroll month to fetch eligible employees</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4 bg-light-subtle">
                     <div class="row g-3 align-items-end">
-                        <div class="col-sm-4">
-                            <label class="form-label fw-semibold text-dark small">Financial Year <span class="text-danger">*</span></label>
-                            <select class="form-select" id="select_financial_year">
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label fw-semibold text-dark small mb-1">
+                                <i class="ph-duotone ph-calendar text-muted me-1"></i> Financial Year <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select form-select-lg shadow-none bg-white border-secondary-subtle" id="select_financial_year" style="height: 44px; font-size: 14px;">
                                 <option value="">Select FY</option>
                             </select>
                         </div>
-                        <div class="col-sm-4">
-                            <label class="form-label fw-semibold text-dark small">Month <span class="text-danger">*</span></label>
-                            <select class="form-select" id="monthSelect">
+                        <div class="col-md-4 col-sm-6">
+                            <label class="form-label fw-semibold text-dark small mb-1">
+                                <i class="ph-duotone ph-clock text-muted me-1"></i> Payroll Month <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select form-select-lg shadow-none bg-white border-secondary-subtle" id="monthSelect" style="height: 44px; font-size: 14px;">
                                 <option value="">Select Month</option>
                                 <option>January</option><option>February</option><option>March</option>
                                 <option>April</option><option>May</option><option>June</option>
@@ -48,9 +66,9 @@
                                 <option>October</option><option>November</option><option>December</option>
                             </select>
                         </div>
-                        <div class="col-sm-4">
-                            <button type="button" id="checkPayslipBtn" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
-                                <i class="ph-duotone ph-magnifying-glass fs-5"></i> Load Employees
+                        <div class="col-md-4 col-sm-12">
+                            <button type="button" id="checkPayslipBtn" class="btn btn-primary w-100 d-inline-flex align-items-center justify-content-center gap-2 shadow-sm" style="height: 44px; font-size: 14px; font-weight: 600;">
+                                <i class="ph-duotone ph-magnifying-glass fs-5"></i> Load Employees &amp; Preview
                             </button>
                         </div>
                     </div>
@@ -62,55 +80,89 @@
     <!-- Result Section -->
     <div id="resultSection" class="d-none">
 
-        <!-- Summary bar -->
+        <!-- KPI Summary Cards -->
+        <div class="row g-3 mb-4" id="kpiCards">
+            <div class="col-sm-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-light-primary border-start border-primary border-4">
+                    <div class="text-muted small fw-semibold text-uppercase">Eligible Employees</div>
+                    <h3 class="fw-bold text-primary mb-0 mt-1" id="kpiEmployeeCount">0</h3>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-light-success border-start border-success border-4">
+                    <div class="text-muted small fw-semibold text-uppercase">Total Gross Earnings</div>
+                    <h3 class="fw-bold text-success mb-0 mt-1" id="kpiGrossTotal">₹0.00</h3>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-light-danger border-start border-danger border-4">
+                    <div class="text-muted small fw-semibold text-uppercase">Total Deductions</div>
+                    <h3 class="fw-bold text-danger mb-0 mt-1" id="kpiDeductionsTotal">₹0.00</h3>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-light-info border-start border-info border-4">
+                    <div class="text-muted small fw-semibold text-uppercase">Net Payroll Payable</div>
+                    <h3 class="fw-bold text-dark mb-0 mt-1" id="kpiNetTotal">₹0.00</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action bar -->
         <div class="row mb-3">
             <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-3">
-                    <span class="badge bg-light-primary text-primary fw-bold px-3 py-2 rounded-pill" id="resultBadge">0 Employees</span>
-                    <span class="text-muted small" id="periodLabel"></span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary text-white fw-bold px-3 py-2 rounded-pill fs-6" id="resultBadge">0 Employees</span>
+                    <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill" id="periodLabel"></span>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-outline-secondary btn-sm" id="selectAllBtn" onclick="toggleSelectAll()">
-                        <i class="ph ph-check-square me-1"></i> Select All
+                    <button type="button" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1 shadow-sm" id="selectAllBtn" onclick="toggleSelectAll()">
+                        <i class="ph ph-check-square"></i> Select All
                     </button>
-                    <button class="btn btn-success px-4" id="generateBtn" onclick="generateSelected()" disabled>
-                        <i class="ph-duotone ph-file-plus me-1 fs-5"></i> Generate Selected Payslips
+                    <button type="button" class="btn btn-success px-4 d-inline-flex align-items-center gap-2 shadow-sm" id="generateBtn" onclick="generateSelected()" disabled>
+                        <i class="ph-duotone ph-file-plus fs-5"></i> Generate Selected Payslips
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Table -->
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <!-- Table Container -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
             <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table m-0 align-middle table-bordered" id="bulkPayslipTable" style="font-size:12px;">
-                        <thead class="bg-light">
-                            <tr class="text-secondary fw-bold">
-                                <th class="ps-3 py-3" rowspan="2" style="width:36px;vertical-align:middle;">
+                <div class="table-responsive" style="max-height: 580px; overflow-y: auto;">
+                    <table class="table m-0 align-middle table-hover table-bordered" id="bulkPayslipTable" style="font-size:12px;">
+                        <thead class="sticky-top bg-light" style="z-index: 5;">
+                            <tr class="text-dark fw-bold text-center">
+                                <th class="ps-3 py-3 bg-light" rowspan="2" style="width:36px; vertical-align:middle;">
                                     <input type="checkbox" id="masterCheck" class="form-check-input" onchange="masterToggle(this)">
                                 </th>
-                                <th class="py-3" rowspan="2" style="vertical-align:middle;">#</th>
-                                <th class="py-3" rowspan="2" style="min-width:70px;vertical-align:middle;">Emp ID</th>
-                                <th class="py-3" rowspan="2" style="min-width:120px;vertical-align:middle;">Employee Name</th>
-                                <th class="py-3" rowspan="2" style="vertical-align:middle;">Status</th>
-                                {{-- Earnings --}}
-                                <th class="py-2 text-center text-success bg-success bg-opacity-10" colspan="7">Earnings</th>
-                                {{-- Deductions --}}
-                                <th class="py-2 text-center text-danger bg-danger bg-opacity-10" colspan="7">Deductions</th>
-                                {{-- Editable --}}
-                                <th class="py-2 text-center text-primary bg-primary bg-opacity-10" colspan="3">Manual Entry</th>
+                                <th class="py-3 bg-light" rowspan="2" style="width:40px; vertical-align:middle;">#</th>
+                                <th class="py-3 bg-light text-start" rowspan="2" style="min-width:90px; vertical-align:middle;">Emp ID</th>
+                                <th class="py-3 bg-light text-start" rowspan="2" style="min-width:140px; vertical-align:middle;">Employee Name</th>
+                                <th class="py-3 bg-light" rowspan="2" style="min-width:90px; vertical-align:middle;">Status</th>
+                                {{-- Earnings Header Group --}}
+                                <th class="py-2 text-center text-success bg-success bg-opacity-10 fw-bold border-bottom" colspan="7">
+                                    <i class="ph-duotone ph-trend-up me-1"></i> Earnings Breakdown
+                                </th>
+                                {{-- Deductions Header Group --}}
+                                <th class="py-2 text-center text-danger bg-danger bg-opacity-10 fw-bold border-bottom" colspan="7">
+                                    <i class="ph-duotone ph-trend-down me-1"></i> Statutory &amp; Other Deductions
+                                </th>
+                                {{-- Manual Adjustments --}}
+                                <th class="py-2 text-center text-primary bg-primary bg-opacity-10 fw-bold border-bottom" colspan="3">
+                                    <i class="ph-duotone ph-pencil-simple me-1"></i> Manual Additions / Deductions
+                                </th>
                                 {{-- Net --}}
-                                <th class="py-2 text-center text-success" rowspan="2" style="min-width:110px;vertical-align:middle;">Net Payable</th>
+                                <th class="py-2 text-center text-dark bg-light fw-bold" rowspan="2" style="min-width:110px; vertical-align:middle;">Net Payable (₹)</th>
                             </tr>
-                            <tr class="text-secondary fw-bold" style="font-size:11px;">
+                            <tr class="text-secondary fw-semibold text-center" style="font-size:11px;">
                                 {{-- Earnings sub --}}
-                                <th class="py-2 bg-success bg-opacity-10">Gross Salary</th>
+                                <th class="py-2 bg-success bg-opacity-10">Gross</th>
                                 <th class="py-2 bg-success bg-opacity-10">Basic</th>
                                 <th class="py-2 bg-success bg-opacity-10">HRA</th>
-                                <th class="py-2 bg-success bg-opacity-10">Conveyance</th>
-                                <th class="py-2 bg-success bg-opacity-10">Medical</th>
-                                <th class="py-2 bg-success bg-opacity-10">Special Allow.</th>
+                                <th class="py-2 bg-success bg-opacity-10">Conv.</th>
+                                <th class="py-2 bg-success bg-opacity-10">Med.</th>
+                                <th class="py-2 bg-success bg-opacity-10">Spl. Allow</th>
                                 <th class="py-2 bg-success bg-opacity-10">LOP Days</th>
                                 {{-- Deductions sub --}}
                                 <th class="py-2 bg-danger bg-opacity-10">PF</th>
@@ -121,71 +173,77 @@
                                 <th class="py-2 bg-danger bg-opacity-10">LWF</th>
                                 <th class="py-2 bg-danger bg-opacity-10">LOP (₹)</th>
                                 {{-- Manual entry sub --}}
-                                <th class="py-2 bg-primary bg-opacity-10" style="min-width:110px;">Bonus</th>
-                                <th class="py-2 bg-primary bg-opacity-10" style="min-width:110px;">Overtime (₹)</th>
-                                <th class="py-2 bg-primary bg-opacity-10" style="min-width:110px;">Loan Ded.</th>
+                                <th class="py-2 bg-primary bg-opacity-10" style="min-width:100px;">Bonus (₹)</th>
+                                <th class="py-2 bg-primary bg-opacity-10" style="min-width:100px;">Overtime (₹)</th>
+                                <th class="py-2 bg-primary bg-opacity-10" style="min-width:100px;">Loan Ded. (₹)</th>
                             </tr>
                         </thead>
                         <tbody id="bulkPayslipBody"></tbody>
-                        <tfoot class="bg-light fw-bold" id="bulkPayslipFoot"></tfoot>
+                        <tfoot class="sticky-bottom bg-light fw-bold" id="bulkPayslipFoot" style="z-index: 4;"></tfoot>
                     </table>
                 </div>
             </div>
         </div>
 
-        <p class="text-muted small mt-2">
-            <i class="ph ph-info text-primary me-1"></i>
-            Performance Bonus, Overtime and Loan Deduction are editable — Net Salary updates live.
-        </p>
+        <div class="d-flex align-items-center gap-2 text-muted small mt-2">
+            <i class="ph-duotone ph-info text-primary fs-5"></i>
+            <span>Performance Bonus, Overtime and Loan Deductions are editable inline. Net Salary updates automatically in real-time.</span>
+        </div>
     </div>
 
     <!-- Empty state -->
-    <div id="emptyState" class="d-none text-center py-5">
-        <i class="ph-duotone ph-check-circle text-success" style="font-size:3rem;"></i>
-        <h5 class="fw-bold text-dark mt-3">All Payslips Already Generated</h5>
-        <p class="text-muted">Every active employee already has a payslip for the selected period.</p>
-    </div>
-
-</div>
-
-<!-- Generate Progress Modal -->
-<div class="modal fade" id="generateModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-body text-center py-4">
-                <div class="spinner-border text-primary mb-3" role="status"></div>
-                <h6 class="fw-bold text-dark mb-1">Generating Payslips…</h6>
-                <p class="text-muted small mb-0" id="generateProgress">Please wait.</p>
+    <div id="emptyState" class="d-none card border-0 shadow-sm rounded-4 p-5 text-center my-4">
+        <div>
+            <div class="avtar avtar-xl bg-light-success text-success rounded-circle mx-auto mb-3" style="width: 72px; height: 72px; font-size: 2rem;">
+                <i class="ph-duotone ph-check-circle"></i>
             </div>
         </div>
+        <h4 class="fw-bold text-dark mb-1">All Payslips Generated</h4>
+        <p class="text-muted mb-3">Every eligible employee already has a payslip generated for the selected payroll month.</p>
+        <div>
+            <a href="{{ route('payroll.payslip_update') }}" class="btn btn-outline-primary shadow-sm px-4">
+                <i class="ti ti-history me-1"></i> View / Update Generated Payslips
+            </a>
+        </div>
     </div>
+
 </div>
 
 <style>
     .editable-cell {
-        border: 1px solid #dee2e6;
+        border: 1px solid #cbd5e1;
         border-radius: 6px;
         padding: 4px 6px;
-        width: 90px;
+        width: 85px;
         font-size: 12px;
         text-align: right;
-        background: #fff;
-        transition: border-color .15s;
+        background: #ffffff;
+        transition: all .2s ease-in-out;
     }
     .editable-cell:focus {
         outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 2px rgba(102,126,234,.18);
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
-    .net-cell { font-weight: 700; color: #198754; }
+    .net-cell { font-weight: 700; color: #16a34a; }
     #bulkPayslipTable thead th { white-space: nowrap; }
     #bulkPayslipTable td { white-space: nowrap; }
+    .table-hover tbody tr:hover { background-color: #f8fafc; }
 </style>
 
 @endsection
 
 @section('page-script')
 <script>
+// ================================================================
+// Months Mapping Dictionary
+// ================================================================
+const monthsMap = {
+    'January': 1, 'February': 2, 'March': 3, 'April': 4,
+    'May': 5, 'June': 6, 'July': 7, 'August': 8,
+    'September': 9, 'October': 10, 'November': 11, 'December': 12
+};
+
 // ================================================================
 // FY & Month selector init
 // ================================================================
@@ -224,17 +282,11 @@ function loadEmployees() {
     const month = document.getElementById('monthSelect').value;
 
     if (!fy || !month) {
-        showToast('Please select both Financial Year and Month.', 'warning');
+        Swal.fire('Warning', 'Please select both Financial Year and Month.', 'warning');
         return;
     }
 
-    const monthsMap = {
-        'January': 1, 'February': 2, 'March': 3, 'April': 4,
-        'May': 5, 'June': 6, 'July': 7, 'August': 8,
-        'September': 9, 'October': 10, 'November': 11, 'December': 12
-    };
-
-    const selectedMonthNum = isNaN(month) ? monthsMap[month] : parseInt(month, 10);
+    const selectedMonthNum = monthsMap[month] || parseInt(month, 10);
 
     if (selectedMonthNum) {
         const [fyStartStr, fyEndStr] = fy.split('-');
@@ -244,13 +296,13 @@ function loadEmployees() {
 
         const now = new Date();
         const currentYear  = now.getFullYear();
-        const currentMonth = now.getMonth() + 1; // JS months 0-indexed
+        const currentMonth = now.getMonth() + 1;
 
         const isFuture = (selectedYear > currentYear) ||
                         (selectedYear === currentYear && selectedMonthNum > currentMonth);
 
         if (isFuture) {
-            showToast('Future month cannot be selected.', 'warning');
+            Swal.fire('Warning', 'Future month cannot be selected for payslip generation.', 'warning');
             return;
         }
     }
@@ -266,11 +318,11 @@ function loadEmployees() {
             document.getElementById('periodLabel').textContent = month + ' · ' + fy;
         })
         .fail(function() {
-            alert('Failed to load employees. Please try again.');
+            Swal.fire('Error', 'Failed to load employees. Please try again.', 'error');
         })
         .always(function() {
             btn.disabled = false;
-            btn.innerHTML = '<i class="ph-duotone ph-magnifying-glass fs-5"></i> Load Employees';
+            btn.innerHTML = '<i class="ph-duotone ph-magnifying-glass fs-5"></i> Load Employees &amp; Preview';
         });
 }
 
@@ -301,7 +353,6 @@ function renderTable(data, month, fy, workingDays) {
                 : '';
             const label = isResigned ? 'Resigned' : 'Terminated';
             const color = isResigned ? 'warning' : 'danger';
-            // Show effective last working day if resigned in this payroll month
             const lastDayNote = emp.effective_last_day
                 ? `<small class="text-muted d-block">Last day: ${emp.effective_last_day}</small>`
                 : (dateStr ? `<small class="text-muted">${dateStr}</small>` : '');
@@ -310,10 +361,9 @@ function renderTable(data, month, fy, workingDays) {
             statusBadge = `<span class="badge bg-light-success text-success">${emp.emp_status || 'Active'}</span>`;
         }
 
-        // Compute initial salary values from server data
+        // Compute initial salary values
         const calc = computeNet(emp, 0, 0, parseFloat(emp.loan_ded || 0));
 
-        // Store computed values on emp
         emp._calc  = calc;
         emp._bonus = 0;
         emp._ot    = 0;
@@ -321,11 +371,14 @@ function renderTable(data, month, fy, workingDays) {
         emp._net   = calc.netSalary;
 
         html += `<tr data-idx="${idx}">
-            <td class="ps-3"><input type="checkbox" class="form-check-input row-check" data-idx="${idx}" onchange="updateGenerateBtn()" checked></td>
-            <td class="text-muted">${idx + 1}</td>
+            <td class="ps-3 text-center"><input type="checkbox" class="form-check-input row-check" data-idx="${idx}" onchange="updateGenerateBtn()" checked></td>
+            <td class="text-muted text-center">${idx + 1}</td>
             <td class="fw-bold text-dark">${emp.employee_id || '—'}</td>
-            <td class="fw-bold text-dark" style="min-width:120px;">${emp.name || '—'}</td>
-            <td>${statusBadge}</td>
+            <td class="fw-bold text-dark">
+                ${emp.name || '—'}
+                ${emp.designation_name ? `<small class="text-muted d-block fw-normal">${emp.designation_name}</small>` : ''}
+            </td>
+            <td class="text-center">${statusBadge}</td>
 
             {{-- Earnings --}}
             <td class="text-end">₹${fmt(calc.baseGross)}</td>
@@ -351,7 +404,7 @@ function renderTable(data, month, fy, workingDays) {
             <td><input type="number" min="0" step="0.01" class="editable-cell loan-input"  data-idx="${idx}" value="${emp._loan}" oninput="recalcNet(${idx})"></td>
 
             {{-- Net --}}
-            <td class="net-cell text-end" id="net-${idx}">₹${fmt(calc.netSalary)}</td>
+            <td class="net-cell text-end fw-bold" id="net-${idx}">₹${fmt(calc.netSalary)}</td>
         </tr>`;
     });
 
@@ -361,23 +414,15 @@ function renderTable(data, month, fy, workingDays) {
 }
 
 // ================================================================
-// Core salary computation (mirrors generate-payslip.blade.php JS exactly)
-// For resigned-this-month employees, lopDays comes directly from the
-// server (30 - resignationDay) — do NOT recalculate from attendance.
+// Core salary computation
 // ================================================================
 function computeNet(emp, bonus, ot, loanVal) {
     const gross      = parseFloat(emp.total_addition || 0);
     const perDay     = parseFloat(emp.per_day_salary || 0);
     const basicPct   = parseFloat(emp.basic_percentage != null ? emp.basic_percentage : 50);
 
-    // ---------------------------------------------------------------
-    // LOP calculation
-    // For resigned-this-month: server already computed lopDays = 30 - resignDay
-    // For active: derive from attendance (absent + late + early logout)
-    // ---------------------------------------------------------------
     let lopDays, lopAmount;
     if (emp.resigned_this_month) {
-        // Use server-computed absent count (= 30 - resignation day)
         lopDays   = parseFloat(emp.total_absent || 0);
         lopAmount = perDay * lopDays;
     } else {
@@ -397,20 +442,17 @@ function computeNet(emp, bonus, ot, loanVal) {
     let specialAllowance   = baseGross - (basicSalary + hra + medicalAllowance + conveyance);
     if (specialAllowance < 0) specialAllowance = 0;
 
-    // PF: server sends computed pf value; if > 0, applicable — recalculate dynamically
     let pf = 0;
     if (parseFloat(emp.pf || 0) > 0) {
         pf = Math.min(parseFloat((basicSalary * 0.12).toFixed(2)), 1800);
     }
 
-    // ESI: server sends computed esi; recalculate with overtime impact
     let esi = 0;
     if (parseFloat(emp.esi_amount || 0) > 0) {
         const esiBase = baseGross + ot;
         esi = (esiBase <= 21000) ? parseFloat((esiBase * 0.0075).toFixed(2)) : 0;
     }
 
-    // PT: server sends computed ptax; recalculate with bonus+ot impact
     let pt = 0;
     if (parseFloat(emp.ptax_amount || 0) > 0) {
         const ptBase = baseGross + bonus + ot;
@@ -459,9 +501,10 @@ function recalcNet(idx) {
 }
 
 // ================================================================
-// Footer totals
+// Footer totals & KPI cards update
 // ================================================================
 function renderFooter() {
+    const totalGross      = employees.reduce((s, e) => s + (e._calc ? e._calc.baseGross : 0), 0);
     const totalEarnings   = employees.reduce((s, e) => s + (e._calc ? e._calc.totalEarnings : 0), 0);
     const totalNet        = employees.reduce((s, e) => s + (e._net !== undefined ? e._net : 0), 0);
     const totalPf         = employees.reduce((s, e) => s + (e._calc ? e._calc.pf   : 0), 0);
@@ -469,8 +512,14 @@ function renderFooter() {
     const totalPt         = employees.reduce((s, e) => s + (e._calc ? e._calc.pt   : 0), 0);
     const totalDeductions = employees.reduce((s, e) => s + (e._calc ? e._calc.totalDeductions : 0), 0);
 
+    // Update KPIs
+    document.getElementById('kpiEmployeeCount').textContent  = employees.length;
+    document.getElementById('kpiGrossTotal').textContent      = '₹' + fmt(totalEarnings);
+    document.getElementById('kpiDeductionsTotal').textContent = '₹' + fmt(totalDeductions);
+    document.getElementById('kpiNetTotal').textContent        = '₹' + fmt(totalNet);
+
     document.getElementById('bulkPayslipFoot').innerHTML = `
-        <tr>
+        <tr class="bg-light">
             <td colspan="5" class="ps-3 py-2 text-end text-dark fw-bold">Total (${employees.length} employees)</td>
             <td colspan="6" class="text-end fw-bold text-success">₹${fmt(totalEarnings)}</td>
             <td></td>
@@ -523,8 +572,8 @@ function updateGenerateBtn() {
     const btn   = document.getElementById('generateBtn');
     btn.disabled = count === 0;
     btn.innerHTML = count
-        ? `<i class="ph-duotone ph-file-plus me-1 fs-5"></i> Generate ${count} Payslip${count !== 1 ? 's' : ''}`
-        : `<i class="ph-duotone ph-file-plus me-1 fs-5"></i> Generate Selected Payslips`;
+        ? `<i class="ph-duotone ph-file-plus fs-5"></i> Generate ${count} Payslip${count !== 1 ? 's' : ''}`
+        : `<i class="ph-duotone ph-file-plus fs-5"></i> Generate Selected Payslips`;
     updateSelectAllButtonState();
 }
 
@@ -534,7 +583,12 @@ function updateGenerateBtn() {
 function generateSelected() {
     const fy       = document.getElementById('select_financial_year').value;
     const month    = document.getElementById('monthSelect').value;
-    const monthNum = new Date(`1 ${month} 2000`).getMonth() + 1;
+    const monthNum = monthsMap[month] || parseInt(month, 10);
+
+    if (!monthNum) {
+        Swal.fire('Error', 'Please select a valid month.', 'warning');
+        return;
+    }
 
     const selected = [];
     document.querySelectorAll('.row-check:checked').forEach(chk => {
@@ -561,11 +615,24 @@ function generateSelected() {
         });
     });
 
-    if (!selected.length) return;
+    if (!selected.length) {
+        Swal.fire('Warning', 'Please select at least one employee.', 'warning');
+        return;
+    }
 
-    document.getElementById('generateProgress').textContent = `Generating ${selected.length} payslip(s)…`;
-    const modal = new bootstrap.Modal(document.getElementById('generateModal'));
-    modal.show();
+    const generateBtn = document.getElementById('generateBtn');
+    generateBtn.disabled = true;
+
+    Swal.fire({
+        title: 'Generating Payslips...',
+        html: `Processing <b>${selected.length}</b> employee payslip(s). Please wait...`,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
 
     $.ajax({
         url:  '{{ route("payroll.bulk.generate") }}',
@@ -577,22 +644,26 @@ function generateSelected() {
             employees:      selected,
         },
         success: function(res) {
-            modal.hide();
             if (res.success) {
                 Swal.fire({
                     icon:             'success',
-                    title:            'Done!',
+                    title:            'Payslips Generated!',
                     text:             res.message,
                     confirmButtonText:'OK',
-                    confirmButtonColor:'#198754',
+                    confirmButtonColor:'#16a34a',
                 }).then(() => loadEmployees());
             } else {
                 Swal.fire('Error', res.message || 'Generation failed.', 'error');
+                generateBtn.disabled = false;
             }
         },
-        error: function() {
-            modal.hide();
-            Swal.fire('Error', 'Server error. Please try again.', 'error');
+        error: function(xhr) {
+            generateBtn.disabled = false;
+            let errorMsg = 'Server error occurred during payslip generation.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            }
+            Swal.fire('Error', errorMsg, 'error');
         }
     });
 }

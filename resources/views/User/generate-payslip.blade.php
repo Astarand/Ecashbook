@@ -38,16 +38,20 @@
                     </a>
                 </div>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-5 mt-2">
                     <div class="page-header-title">
                         <h2 class="mb-0">Payslip Management</h2>
                     </div>
-                    <a href="{{ route('payroll.payslip_update') }}" class="btn btn-primary float-end">
-                        Update Payslip
-                    </a>
-                    <a href="{{ route('payroll.multiplePayslipGenerate') }}" class="btn btn-primary float-end">
-                        Multiple Payslip Generate
-                    </a>
+                </div>
+                <div class="col-md-7 text-end mt-2">
+                    <div class="d-inline-flex gap-2 align-items-center justify-content-end flex-wrap">
+                        <a href="{{ route('payroll.payslip_update') }}" class="btn btn-outline-primary d-inline-flex align-items-center gap-1 shadow-sm px-3">
+                            <i class="ti ti-edit fs-5"></i> Update Payslip
+                        </a>
+                        <a href="{{ route('payroll.multiplePayslipGenerate') }}" class="btn btn-primary d-inline-flex align-items-center gap-1 shadow-sm px-3">
+                            <i class="ti ti-files fs-5"></i> Multiple Payslip Generate
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
