@@ -136,7 +136,7 @@
                                 </option>
                             @endfor
                         </select>
-                        <select id="pf_filter_type" class="form-select form-select-sm" style="width:140px;" onchange="renderPfPageFilter()">
+                        <select id="pf_filter_type" class="form-select form-select-sm" style="width:140px;">
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
                             <option value="half-yearly">Half-Yearly</option>
@@ -859,9 +859,18 @@
             offcanvasEl.addEventListener('shown.bs.offcanvas', initPfPeriodToggle);
         }
 
-        // Re-render period dropdown on filter type change
-        $('#pf_fy, #pf_filter_type').on('change', function() {
+        // Re-render and reload data on filter changes
+        $('#pf_fy').on('change', function() {
+            loadPfPageData();
+        });
+
+        $('#pf_filter_type').on('change', function() {
             renderPfPageFilter();
+            loadPfPageData();
+        });
+
+        $('#pf_filter_period').on('change', function() {
+            loadPfPageData();
         });
     });
 

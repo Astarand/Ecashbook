@@ -150,7 +150,7 @@
                                 </option>
                             @endfor
                         </select>
-                        <select id="esi_filter_type" class="form-select form-select-sm" style="width:140px;" onchange="renderEsiPageFilter()">
+                        <select id="esi_filter_type" class="form-select form-select-sm" style="width:140px;">
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
                             <option value="half-yearly">Half-Yearly</option>
@@ -851,9 +851,18 @@
             offcanvasEl.addEventListener('shown.bs.offcanvas', initEsiPeriodToggle);
         }
 
-        // Re-render period dropdown on filter type change
-        $('#esi_fy, #esi_filter_type').on('change', function() {
+        // Re-render and reload data on filter changes
+        $('#esi_fy').on('change', function() {
+            loadEsiPageData();
+        });
+
+        $('#esi_filter_type').on('change', function() {
             renderEsiPageFilter();
+            loadEsiPageData();
+        });
+
+        $('#esi_filter_period').on('change', function() {
+            loadEsiPageData();
         });
     });
 
