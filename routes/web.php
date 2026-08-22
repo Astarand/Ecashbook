@@ -476,6 +476,7 @@ Route::middleware(['ensure.login'])->group(function () {
     /* Employee Policies */
     Route::get('/employee-policy/create/{subject}', [EmployeePolicy::class, 'create'])->name('employee.policy.create');
     Route::get('/employee-policy-list', [EmployeePolicy::class, 'EmployeePolicyList'])->name('user.EmployeePolicyList');
+    Route::get('/employee-policy-log', [EmployeePolicy::class, 'PolicyLog'])->name('employee.policy.log');
     Route::get('/add-employee-policy', [EmployeePolicy::class, 'AddEmployeePolicy'])->name('user.AddEmployeePolicy');
     Route::post('/employee-policy/store', [EmployeePolicy::class, 'store'])->name('employee.policy.store');
     Route::post('/employee-policy/delete/{id}', [EmployeePolicy::class, 'delete'])->name('employee.policy.delete');

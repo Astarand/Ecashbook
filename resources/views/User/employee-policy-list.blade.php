@@ -23,11 +23,11 @@
                         <h2 class="mb-0">Employment Policies</h2>
                     </div>
                 </div>
-                {{-- <div class="col-md-8 text-end">
-                    <a href="{{ route('user.AddEmployeePolicy') }}" class="btn btn-primary">
-                        <i class="ti ti-square-plus"></i> Generate New Policy
+                <div class="col-md-8 text-end">
+                    <a href="{{ route('employee.policy.log') }}" class="btn btn-primary">
+                        <i class="ti ti-history me-1"></i> View Policy Log
                     </a>
-                </div> --}}
+                </div>
             </div>
         </div>
     </div>

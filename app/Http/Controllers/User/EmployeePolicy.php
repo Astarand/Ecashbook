@@ -48,6 +48,19 @@ class EmployeePolicy extends Controller
         return view('User.employee-policy-list', compact('policies'));
     }
 
+    public function PolicyLog()
+    {
+        $userId = currentOwnerId();
+
+        $policyLogs = DB::table('policy_update_log')
+            ->where('added_by', $userId)
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get();
+
+        return view('User.employee-policy-log', compact('policyLogs'));
+    }
+
     public function AddEmployeePolicy()
     {
         return view('User.add-employee-policy');
