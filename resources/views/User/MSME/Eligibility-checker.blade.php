@@ -114,9 +114,9 @@
                     <div class="border-top w-100 pt-4 mt-3 text-start">
                         <h6 class="fw-bold mb-2 text-dark">Revised MSME Threshold Rules:</h6>
                         <ul class="text-muted small ps-3">
-                            <li class="mb-1"><strong class="text-secondary">Micro:</strong> Investment ≤ ₹1 Cr & Turnover ≤ ₹5 Cr</li>
-                            <li class="mb-1"><strong class="text-secondary">Small:</strong> Investment ≤ ₹10 Cr & Turnover ≤ ₹50 Cr</li>
-                            <li class="mb-1"><strong class="text-secondary">Medium:</strong> Investment ≤ ₹50 Cr & Turnover ≤ ₹250 Cr</li>
+                            <li class="mb-1"><strong class="text-secondary">Micro:</strong> Investment ≤ ₹2.5 Cr & Turnover ≤ ₹10 Cr</li>
+                            <li class="mb-1"><strong class="text-secondary">Small:</strong> Investment ≤ ₹25 Cr & Turnover ≤ ₹100 Cr</li>
+                            <li class="mb-1"><strong class="text-secondary">Medium:</strong> Investment ≤ ₹125 Cr & Turnover ≤ ₹500 Cr</li>
                         </ul>
                     </div>
                 </div>

@@ -564,22 +564,20 @@
                             <input type="text" name="reference_id" id="reference_id" class="form-control" placeholder="Enter reference ID">
                         </div>
 
-
-
-                        <!--<div class="col-md-12 mb-2">
-                            <label class="form-label">Purpose <span class="text-danger">*</span></label>
-                            <textarea name="narration" id="narration" class="form-control" rows="2" placeholder="Enter purpose"></textarea>
-                        </div>-->
-
                         <div class="col-md-6 mb-2">
                             <label class="form-label">Attachment</label>
                             <input type="file" name="attachment" id="attachment" class="form-control">
 							<div id="attachmentPreview" class="mt-2"></div>
                         </div>
 
-                        <div class="col-md-6 mb-2">
+                        <!--<div class="col-md-6 mb-2">
                             <label class="form-label">Approved By</label>
                             <input type="text" name="approved_by" id="approved_by" class="form-control" placeholder="Enter approver name">
+                        </div>-->
+						
+						<div class="col-md-12 mb-2">
+                            <label class="form-label">Notes <span class="text-danger">*</span></label>
+                            <textarea name="narration" id="narration" class="form-control" rows="2" placeholder="Enter notes"></textarea>
                         </div>
 
                     </div>
@@ -780,8 +778,8 @@ $(document).ready(function () {
 		$('#bank_id').html(`<option value="">Please Select</option>`);
 		$('#bankWrap').hide();
 		$('#reference_id').val('');
-		//$('#narration').val('');
-		$('#approved_by').val('');
+		$('#narration').val('');
+		//$('#approved_by').val('');
 		$('#attachment').val('');
 		$('#attachmentPreview').html('');
 	}
@@ -1157,8 +1155,8 @@ $(document).ready(function () {
 			toggleBankField(res.bank_id);
 			$('#is_paid').val(res.is_paid);
 			$('#reference_id').val(res.reference_id);
-			//$('#narration').val(res.narration);
-			$('#approved_by').val(res.approved_by);
+			$('#narration').val(res.narration);
+			//$('#approved_by').val(res.approved_by);
 
 			// party
 			if(res.party_type === 'Other')

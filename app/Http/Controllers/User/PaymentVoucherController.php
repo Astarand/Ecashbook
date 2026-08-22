@@ -200,9 +200,9 @@ class PaymentVoucherController extends Controller
             'payment_mode' => 'required',
 			'is_paid'      => 'required|in:0,1',
 			'bank_id'      => 'required_if:payment_mode,Bank',
-			//'narration' => 'required',
+			'narration' => 'required',
         ], [
-			//'narration.required' => 'Please enter purpose',
+			'narration.required' => 'Please enter notes',
 		]);
 
 		$added_by = currentOwnerId();
@@ -246,9 +246,9 @@ class PaymentVoucherController extends Controller
 		$voucher->bank_id 					= $request->bank_id;
 		$voucher->is_paid 					= $request->is_paid;
 		$voucher->reference_id              = $request->reference_id;
-		//$voucher->narration                 = $request->narration;
+		$voucher->narration                 = $request->narration;
 		$voucher->attachment                = $attachment;
-		$voucher->approved_by               = $request->approved_by;
+		//$voucher->approved_by               = $request->approved_by;
 		$voucher->added_by                  = $added_by;
 		$voucher->propId                    = $propId;
 		$voucher->save();
@@ -272,9 +272,9 @@ class PaymentVoucherController extends Controller
             'payment_mode' => 'required',
 			'is_paid'      => 'required|in:0,1',
 			'bank_id'      => 'required_if:payment_mode,Bank',
-			//'narration'	   => 'required',
+			'narration'	   => 'required',
         ], [
-			//'narration.required' => 'Please enter purpose',
+			'narration.required' => 'Please enter notes',
 		]);
 
         $voucher = PaymentVoucher::findOrFail($id);
@@ -321,8 +321,8 @@ class PaymentVoucherController extends Controller
 		$voucher->bank_id 					= $request->bank_id;
 		$voucher->is_paid 					= $request->is_paid;
 		$voucher->reference_id              = $request->reference_id;
-		//$voucher->narration                 = $request->narration;
-		$voucher->approved_by               = $request->approved_by;
+		$voucher->narration                 = $request->narration;
+		//$voucher->approved_by               = $request->approved_by;
 
 		$voucher->save();
 

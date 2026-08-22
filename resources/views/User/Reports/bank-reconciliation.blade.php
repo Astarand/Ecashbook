@@ -266,7 +266,8 @@
 									<th>Trans. Date</th>
 									<th>Trans. Type</th>
 									<th>Bank Amount</th>
-									<th>Purpose</th>
+									<th>Bank Purpose</th>
+									<th>Voucher Notes</th>
 									<th>Voucher No</th>
 									<th>Voucher Date</th>
 									<th>Voucher Amount</th>									
@@ -609,6 +610,11 @@
 					<td>${item.bank_date}</td>
 					<td>${item.tran_type}</td>
 					<td>${item.bank_amount}</td>
+					<td data-bs-toggle="tooltip" title="${item.bank_purpose || ''}">
+						${(item.bank_purpose || '-').length > 20
+							? item.bank_purpose.substring(0, 20) + '...'
+							: item.bank_purpose || '-'}
+					</td>
 					<td>${item.purpose}</td>
 					<td>${item.voucher_no}</td>
 					<td>${item.voucher_date}</td>

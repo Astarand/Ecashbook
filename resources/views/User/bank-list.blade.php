@@ -76,7 +76,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-auto">
-                                    <p class="text-white text-sm text-opacity-100 mb-0">Account Name</p>
+                                    <p class="text-white text-sm text-opacity-100 mb-0">Account Number</p>
                                     <h4 class="text-white mb-3">{{ $val->bank_ac_no }}</h4>
                                 </div>
                             </div>

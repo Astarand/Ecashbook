@@ -783,6 +783,19 @@ class ReportsController extends Controller
 					$bestMatch = $voucher;
 				}
 			}
+			
+			// GET BANK PURPOSE & VOUCHER NARRATION
+			$bankPurpose = trim($bankTran->purpose ?? '');
+			$voucherNarration = trim($bestMatch->narration ?? '-');
+			if ($voucherNarration === '') {
+				$voucherNarration = trim($bestMatch->transaction_details ?? '');
+			}
+			if ($voucherNarration === '') {
+				$voucherNarration = trim($bestMatch->other_transaction_details ?? '');
+			}
+			if ($voucherNarration === '') {
+				$voucherNarration = '-';
+			}
 
 			if ($bestScore >= 80) {
 
@@ -796,7 +809,8 @@ class ReportsController extends Controller
 					'voucher_no'     => $bestMatch->voucher_no,
 					'voucher_date'   => $bestMatch->date,
 					'voucher_amount' => $bestMatch->amount,
-					'purpose' 		 => $bestMatch->narration ?? '-',
+					'bank_purpose'   => $bankPurpose ?: '-',
+					'purpose' 		 => $voucherNarration ?? '-',
 					'score'          => 100,
 					'status'         => 'Matched'
 				];
@@ -811,7 +825,8 @@ class ReportsController extends Controller
 					'voucher_no'     => $bestMatch->voucher_no ?? '-',
 					'voucher_date'   => $bestMatch->date ?? '-',
 					'voucher_amount' => $bestMatch->amount ?? '-',
-					'purpose' 		 => $bestMatch->narration ?? '-',
+					'bank_purpose'   => $bankPurpose ?: '-',
+					'purpose' 		 => $voucherNarration ?? '-',
 					'score'          => $bestScore,
 					'status'         => 'Review'
 				];
@@ -834,7 +849,8 @@ class ReportsController extends Controller
 					'voucher_no'     => '-',
 					'voucher_date'   => '-',
 					'voucher_amount' => '-',
-					'purpose' 		 => $bestMatch->narration ?? '-',
+					'bank_purpose'   => $bankPurpose ?: '-',
+					'purpose' 		 => $voucherNarration ?? '-',
 					'score'          => 0,
 					'status'         => 'Unmatched'
 				];
@@ -934,9 +950,20 @@ class ReportsController extends Controller
 	public function downloadPdf(Request $request)
 	{
 		$userId = currentOwnerId();
+		if (Auth::user()->u_type == 1 || Auth::user()->u_type == 4) {
+			$userId = getAccessCompanyId($request);
+		}
 		$data = $this->getBankReconciliationData($request);
+		
+		$company = DB::table('company_profiles')
+					->select('comp_name','comp_logo')
+					->where('userId', $userId)
+					->first();
+		
 		$pdf = PDF::loadView('bank_reconciliation_pdf', [
 
+			'companyLogo' 	   => $company->comp_logo ?? null,
+			'companyName' 	   => $company->comp_name ?? '',
 			// Summary
 			'openingCash'      => $data['opening_cash'] ?? 0,
 			'depositAmt'       => $data['deposit'] ?? 0,
