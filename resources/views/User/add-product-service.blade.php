@@ -88,13 +88,14 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="mb-3 col-md-4">
-                            <label class="form-label" for="inputEmail4">Opening Stock<span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="opening_stock_bal" id="opening_stock_bal" placeholder="Enter Opening Stock">
-                        </div>
+                        
                         <div class="mb-3 col-md-4">
                             <label class="form-label" for="inputEmail4">GST Rate<span class="text-danger">*</span></label>
                             <input type="number" class="form-control" name="gst_rate_prod" id="gst_rate_prod" placeholder="Enter GST Rate">
+                        </div>
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="inputEmail4">Opening Stock<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="opening_stock_bal" id="opening_stock_bal" placeholder="Enter Opening Stock">
                         </div>
                          <div class="mb-3 col-md-4">
                             <label class="form-label" for="inputEmail4">Goods Description</label>
@@ -248,7 +249,7 @@
                         </div>
 
                         <div class="mb-3 col-md-4">
-                            <label class="form-label" for="inputEmail4">Govt. Payment<span class="text-danger">*</span></label>
+                            <label class="form-label" for="inputEmail4">Govt. Payment (if not applicable then will be "0")</label>
                             <input type="text" class="form-control" name="gov_pay" id="gov_pay" value="0" placeholder="Enter govt. payment">
                         </div>
 
@@ -260,7 +261,7 @@
                     <div class="row">
                         <h5 class="text-muted"> Service Details</h5>
                         <div class="mb-3 col-md-6">
-                            <label class="form-label" for="inputEmail4">Selling Price<span class="text-danger">*</span></label>
+                            <label class="form-label" for="inputEmail4">Selling Price</label>
                             <input type="text" class="form-control" name="ser_selling_price" id="ser_selling_price" placeholder="Enter Selling Price">
                         </div>
                         <div class="mb-3 col-md-6">
@@ -573,7 +574,7 @@
                 $('.service-section').show();
 
                 // Make service fields required
-                $('#service_name, #sac_code, #gst_rate_service, #gov_pay, #ser_pay, #ser_selling_price').attr('required', true);
+                $('#service_name, #sac_code, #gst_rate_service, #ser_selling_price').attr('required', true);
                 $('#item_name, #hsn_code, #gst_rate_prod, #opening_stock_bal, #base_unit, #purchase_price, #selling_price, #disc_sell').removeAttr('required');
 
                 // Enable/disable submit button
@@ -599,7 +600,7 @@
         }
 
         function checkServiceForm() {
-            let filled = $('#service_name, #sac_code, #gst_rate_service, #gov_pay, #ser_pay, #ser_selling_price')
+            let filled = $('#service_name, #sac_code, #gst_rate_service, #ser_selling_price')
                 .toArray()
                 .every(input => $(input).val().trim() !== '');
             $('button[type="submit"]').prop('disabled', !filled);
