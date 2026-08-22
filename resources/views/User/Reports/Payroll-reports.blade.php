@@ -2418,16 +2418,31 @@
                             $.each(response, function(index, row){
 
                                 html += `
-                                <tr>
-                                    <td class="ps-3 fw-bold">${row.employee_id}</td>
-                                    <td class="fw-bold text-dark">${row.employee_name}</td>
-                                    <td>${row.attendance_days}</td>
-                                    <td>${row.absent_days}</td>
-                                    <td>${row.leave_days}</td>
-                                    <td>${row.late_hours}</td>
-                                    <td>${row.overtime_hours}</td>
-                                    <td class="pe-3">${row.wfh_days}</td>
-                                </tr>`;
+                                    <tr>
+                                        <td class="ps-3 fw-bold">${row.employee_id}</td>
+
+                                        <td class="fw-bold text-dark">
+                                            ${row.employee_name}
+
+                                            ${
+                                                row.employee_status === 'Resigned'
+                                                ? `
+                                                    <br>
+                                                    <span class="badge bg-danger mt-1">
+                                                        Resigned: ${row.resign_date}
+                                                    </span>
+                                                `
+                                                : ''
+                                            }
+                                        </td>
+
+                                        <td>${row.attendance_days}</td>
+                                        <td>${row.absent_days}</td>
+                                        <td>${row.leave_days}</td>
+                                        <td>${row.late_hours}</td>
+                                        <td>${row.overtime_hours}</td>
+                                        <td class="pe-3">${row.wfh_days}</td>
+                                    </tr>`;
                             });
 
                         }
