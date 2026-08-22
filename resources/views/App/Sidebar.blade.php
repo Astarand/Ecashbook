@@ -193,7 +193,7 @@
 									<li class="pc-item"><a class="pc-link" href="{{ route('user.SalesQuotation') }}">Quotation</a></li>
 									<li class="pc-item"><a class="pc-link" href="{{ route('user.ProformaInvoice') }}">Proforma Invoice</a></li>
 									<li class="pc-item"><a class="pc-link" href="{{ route('user.SalesInvoices') }}">Sales Invoice</a></li>
-									<li class="pc-item"><a class="pc-link" href="{{ route('user.SalesCreditDebit') }}">Credit & Debit Note</a></li>
+									<li class="pc-item"><a class="pc-link" href="{{ route('user.SalesCreditDebit') }}">Credit Note</a></li>
 									<li class="pc-item"><a class="pc-link" href="{{ route('user.CustomInvoiceList') }}">Custom Invoice</a></li>
 								</ul>
 							</li>
@@ -209,7 +209,7 @@
 								<ul class="pc-submenu">
 									<li class="pc-item"><a class="pc-link" href="{{ route('user.PurchaseOrder') }}">Purchase Order (PO)</a></li>
 									<li class="pc-item"><a class="pc-link" href="{{ route('user.PurchaseInvoices') }}">Purchase Invoice</a></li>
-									<li class="pc-item"><a class="pc-link" href="{{ route('user.PurchaseCreditDebit') }}">Credit & Debit Note</a></li>
+									<li class="pc-item"><a class="pc-link" href="{{ route('user.PurchaseCreditDebit') }}">Debit Note</a></li>
 									<li class="pc-item"><a class="pc-link" href="{{ url('/tds/vendor-purchase') }}">Vendor Report</a></li>
 								</ul>
 							</li>

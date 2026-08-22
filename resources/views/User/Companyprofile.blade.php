@@ -1043,7 +1043,7 @@
                                                             </div>
 
                                                             <div class="col-auto">
-                                                                <p class="text-white text-sm text-opacity-50 mb-0">Opening Balance</p>
+                                                                <p class="text-white text-sm text-opacity-50 mb-0">Opening Balance (for appropriate cash flow)</p>
                                                                 <h6 class="text-white mb-0">₹{{ number_format($val->curr_bal, 2) }}</h6>
                                                             </div>
 
@@ -1117,7 +1117,7 @@
 																<input type="text" name="upi_id" id="upi_id{{ $val->id }}" value="{{ $val->upi_id }}" class="form-control" placeholder="Enter UPI ID" >
 															</div>
 															<div class="col-md-4  mb-3">
-																<label for="bankName" class="form-label">Current Bank Balance<span class="text-danger">*</span></label>
+																<label for="bankName" class="form-label">Current Bank Balance (For Appropriate Cashflow)<span class="text-danger">*</span></label>
 																<input type="text" name="curr_bal" id="curr_bal{{ $val->id }}" value="{{ $val->curr_bal }}" class="form-control" placeholder="Enter Current Bank Balance" required>
 															</div>
                                                             <div class="col-md-4 mb-3">
@@ -3729,7 +3729,7 @@
 								<input type="text" name="upi_id" id="upi_id" class="form-control" placeholder="Enter UPI ID" >
 							</div>
 							<div class="col-md-4  mb-3">
-								<label for="bankName" class="form-label">Current Bank Balance<span class="text-danger">*</span></label>
+								<label for="bankName" class="form-label">Current Bank Balance (For Appropriate Cashflow)<span class="text-danger">*</span></label>
 								<input type="text" name="curr_bal" id="curr_bal" class="form-control" placeholder="Enter Current Bank Balance" required>
 							</div>
 

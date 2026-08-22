@@ -101,6 +101,22 @@
                             <label class="form-label" for="inputEmail4">Goods Description</label>
                             <input type="text" class="form-control" name="goods_desc" id="goods_desc" placeholder="Enter Goods Description">
                         </div>
+                        
+                        
+
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="inputEmail4">Purchase Price<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="purchase_price" id="purchase_price" placeholder="Enter Purchase Price">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="inputEmail4">Selling Price<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="selling_price" id="selling_price" placeholder="Enter Selling Price">
+                        </div>
+
                         <div class="mb-3 col-md-4">
                             <label class="form-label" for="inputEmail4">Base Unit<span class="text-danger">*</span></label>
                             <select class="select form-select" name="base_unit" id="base_unit">
@@ -166,17 +182,7 @@
                             <label class="form-label" for="inputEmail4">Other Base Unit<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" placeholder="Enter Other Base Unit" id="otherBaseUnit">
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="mb-3 col-md-4">
-                            <label class="form-label" for="inputEmail4">Purchase Price<span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" name="purchase_price" id="purchase_price" placeholder="Enter Purchase Price">
-                        </div>
-                        <div class="mb-3 col-md-4">
-                            <label class="form-label" for="inputEmail4">Selling Price<span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" name="selling_price" id="selling_price" placeholder="Enter Selling Price">
-                        </div>
                         <div class="mb-3 col-md-4">
                             <label class="form-label" for="inputEmail4">Discount on Selling Price </label>
                             <div class="form-group">
@@ -190,8 +196,8 @@
                             </div>
                         </div>
                         <div class="mb-3 col-md-6">
-                            <label class="form-label" for="exampleFormControlTextarea1">Product Details</label>
-                            <textarea class="form-control" name="prod_desc" id="prod_desc" rows="5" placeholder="Write Product Details"></textarea>
+                            <label class="form-label" for="exampleFormControlTextarea1">Goods Description</label>
+                            <textarea class="form-control" name="prod_desc" id="prod_desc" rows="5" placeholder="Write Goods Description"></textarea>
                         </div>
                         <div class="mb-3 col-md-6">
                             <label class="form-label" for="productImageInput">Product Images</label>

@@ -58,7 +58,7 @@
 						</select>
 					</div>
 					<div class="mb-3 col-md-3">
-                        <label class="form-label" for="inv_num">Quotation / Proforma Invoice No</label>
+                        <label class="form-label" for="inv_num">Quotation / Proforma Invoice No. – Auto-Fetch </label>
                         <select name="quotation_ref_num" id="quotation_ref_num" class="form-control">
                             <option value="">Select Ref Number</option>
                             @foreach($quotations as $quotation)
