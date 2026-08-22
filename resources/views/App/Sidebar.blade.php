@@ -757,15 +757,7 @@
 										<li class="pc-item"><a class="pc-link" href="{{ route('smm') }}" target="_blank">Digital Marketing Strategy</a></li>
 									</ul>
 								</li>
-
-								<!-- Partner Services -->
-								<li class="pc-item">
-									<a class="pc-link" href="#">
-										<i class="ph-duotone ph-handshake"></i>
-										<span>Partner Services</span>
-									</a>
-								</li>
-
+								
 							</ul>
 						</li>
 					@endif
@@ -2290,13 +2282,6 @@
 										<li class="pc-item"><a class="pc-link" href="{{ route('seo') }}" target="_blank">SEO & Search Optimization</a></li>
 										<li class="pc-item"><a class="pc-link" href="{{ route('smm') }}" target="_blank">Digital Marketing Strategy</a></li>
 									</ul>
-								</li>
-
-								<li class="pc-item">
-									<a class="pc-link" href="#">
-										<i class="ph-duotone ph-handshake"></i>
-										<span>Partner Services</span>
-									</a>
 								</li>
 
 							</ul>

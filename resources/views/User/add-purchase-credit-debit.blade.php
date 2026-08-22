@@ -12,8 +12,8 @@
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Purchase & Procurement</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('user.PurchaseCreditDebit') }}">Credit & Debit Note</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Add Credit/Debit Note</li>
+                        <li class="breadcrumb-item"><a href="{{ route('user.PurchaseCreditDebit') }}">Debit Note</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Add Debit Note</li>
                     </ul>
                     <a href="javascript:void(0);" id="start-add-purchase-credit-debit-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
                         <u>How does this Page works?</u>
@@ -25,7 +25,7 @@
     <!-- [ breadcrumb ] end -->
 
     <div class="row align-item-center mb-4">
-        <h2 class="text-muted">Generate New Credit Debit</h2>
+        <h2 class="text-muted">Generate New Debit</h2>
     </div>
     <div class="card">
         <div class="card-body">

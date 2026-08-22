@@ -17,11 +17,19 @@
 							<u>How does this Page works?</u>
 						</a>
 					</div>
-					<div class="col-md-4 mt-2">
-						<div class="page-header-title">
-							<h2 class="mb-0">Generate Custom Invoice</h2>
+					<div class="col-md-12 mt-2">
+						<div class="page-header-title d-flex align-items-center">
+							<h4 class="mb-0 text-nowrap me-3">Generate Custom Invoice</h4>
+
+							<div class="text-info d-flex align-items-center">
+								<i class="ti ti-info-circle me-2"></i>
+								<span>
+									This is a non-accounting document. No accounting, ledger, GST liability,
+									receivable or revenue entry will be generated from this document.
+								</span>
+							</div>
 						</div>
-					</div>					
+					</div>				
 				</div>
 			</div>
 		</div>
@@ -39,7 +47,7 @@
                                     <div class="col-sm-6 col-xl-6 mb-3">
                                         <div class="mb-0">
                                             <label class="form-label">Invoice Number</label>
-                                            <input type="text" class="form-control" id="invoice_number" name="invoice_number" value="{{ $newInvoiceNumber }}" >
+                                            <input type="text" class="form-control" id="invoice_number" name="invoice_number" placeholder="e.g. INV/25-26/0001" >
                                             <div id="matchMessage" style="color: red;"></div>
                                         </div>
                                     </div>
@@ -64,7 +72,7 @@
                                             </p>
                                             <p class="mb-0">{{ $comp_details[0]->comp_phone ?? '' }}</p>
                                             <p class="mb-0">{{ $comp_details[0]->comp_email ?? '' }}</p>
-                                            <p class="mb-0"><strong>GST:</strong> {{ $comp_details[0]->gst_no ?? '' }}</p>
+                                            <!--<p class="mb-0"><strong>GST:</strong> {{ $comp_details[0]->gst_no ?? '' }}</p>-->
                                         </div>
                                     </div>
                                     <div class="col-xl-4" id="issued-to-section">
@@ -84,7 +92,7 @@
                                                 <p><strong>Pincode:</strong> <span id="issuedPincode"></span></p>
                                                 <p><strong>Phone:</strong> <span id="issuedPhone"></span></p>
                                                 <p><strong>Email:</strong> <span id="issuedEmail"></span></p>
-                                                <p><strong>GST Number:</strong> <span id="issuedGST"></span></p>
+                                                <!--<p><strong>GST Number:</strong> <span id="issuedGST"></span></p>-->
                                             </div>
                                             
                                             
@@ -116,12 +124,7 @@
                                                         <th>#</th>
                                                         <th><span class="text-danger">*</span>Product / Service</th>
                                                         <th><span class="text-danger">*</span>Price</th>
-                                                        <th><span class="text-danger">*</span>HSN/SAC Code</th>
                                                         <th><span class="text-danger">*</span>Qty</th>
-                                                        <th><span class="text-danger">*</span>GST Mode</th>
-                                                        <th>CGST</th>
-                                                        <th>SGST</th>
-                                                        <th>IGST/UGST</th>
                                                         <th>Total Amount</th>
                                                         <th class="text-center">Action</th>
                                                     </tr>
@@ -129,22 +132,10 @@
                                                 <tbody id="tableBody">
                                                     <tr>
                                                         <td>1</td>
-                                                        <td><input type="text" class="form-control" autocomplete="off" placeholder="Name"></td>
-                                                        <td><input type="text" class="form-control" placeholder="Price"></td>
-                                                        <td><input type="number" class="form-control" placeholder="HSN/ SAC Code"></td>
-                                                        <td><input type="number" class="form-control" placeholder="Quantity"></td>
-                                                        <td>
-                                                            <select class="form-select">
-                                                                <option value="">Select</option>
-                                                                <option value="Intra State">Intra State</option>
-                                                                <option value="Inter State">Inter State</option>
-                                                                <option value="Union Territory">Union Territory</option>
-                                                            </select>
-                                                        </td>
-                                                        <td>₹ 0.00</td>
-                                                        <td>₹ 0.00</td>
-                                                        <td>₹ 0.00</td>
-                                                        <td>₹ 0.00</td>
+                                                        <td><input type="text" class="form-control product-name" autocomplete="off" placeholder="Name"></td>
+                                                        <td><input type="text" class="form-control price" placeholder="Price"></td>                                                        
+                                                        <td><input type="number" class="form-control quantity" placeholder="Quantity"></td>
+                                                        <td class="total-amount">₹ 0.00</td>
                                                         <td class="text-center">
                                                             <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default delete-row"><i class="ti ti-trash f-20"></i></a>
                                                         </td>
@@ -165,37 +156,22 @@
                                                         <input type="text" class="form-control" value="0" >
                                                     </div>
                                                 </div>
-                                                {{-- <div class="col-6"> <p class="text-muted mb-1 text-start">Sub Total Amount :</p></div>
-                                                <div class="col-6"> <p class="f-w-600 mb-1 text-end">₹ 00.00</p></div>
-                                                <div class="col-6"> <p class="text-muted mb-1 text-start">Discount Amount :</p></div>
-                                                <div class="col-6"> <p class="f-w-600 mb-1 text-end text-success">₹ 00.00</p></div>
-                                                <div class="col-6"> <p class="text-muted mb-1 text-start">CGST :</p></div>
-                                                <div class="col-6"> <p class="f-w-600 mb-1 text-end">₹ 0.00</p></div>
-                                                <div class="col-6"> <p class="text-muted mb-1 text-start">CGST :</p></div>
-                                                <div class="col-6"> <p class="f-w-600 mb-1 text-end">₹ 0.00</p></div>
-                                                <div class="col-6"> <p class="f-w-600 mb-1 text-start">Grand Total :</p></div>
-                                                <div class="col-6"> <p class="f-w-600 mb-1 text-end grandTotal">₹ 00.00</p></div> --}}
+                                                
                                                 <div class="col-6"> <p class="text-muted mb-1 text-start">Sub Total Amount :</p></div>
                                                 <div class="col-6"> <p class="f-w-600 mb-1 text-end subTotal">₹ 00.00</p></div>
                                                 <div class="col-6"> <p class="text-muted mb-1 text-start">Discount Amount :</p></div>
-                                                <div class="col-6"> <p class="f-w-600 mb-1 text-end text-success discountAmount">₹ 00.00</p></div>
-                                                <div class="col-6"> <p class="text-muted mb-1 text-start">CGST :</p></div>
-                                                <div class="col-6"> <p class="f-w-600 mb-1 text-end totalCgst">₹ 0.00</p></div>
-                                                <div class="col-6"> <p class="text-muted mb-1 text-start">SGST :</p></div>
-                                                <div class="col-6"> <p class="f-w-600 mb-1 text-end totalSgst">₹ 0.00</p></div>
-                                                <div class="col-6"> <p class="text-muted mb-1 text-start">IGST :</p></div>
-                                                <div class="col-6"> <p class="f-w-600 mb-1 text-end totalIgst">₹ 0.00</p></div>
+                                                <div class="col-6"> <p class="f-w-600 mb-1 text-end text-success discountAmount">₹ 00.00</p></div>                                                
                                                 <div class="col-6"> <p class="f-w-600 mb-1 text-start">Grand Total :</p></div>
                                                 <div class="col-6"> <p class="f-w-600 mb-1 text-end grandTotal">₹ 00.00</p></div>
 
                                                 <div class="col-12">
                                                     <div class="my-3">
-                                                        <input type="text" name="signature_text" id="signature_text" class="form-control" placeholder="Write Signeture">
+                                                        <input type="text" name="signature_text" id="signature_text" class="form-control" placeholder="Write Signature">
                                                     </div>
                                                 </div>
                                                 <div class="col-12">
                                                     <div class="mb-3">
-                                                        <label for="signatureUpload">Upload DSC</label>
+                                                        <label for="signatureUpload">Upload Signature</label>
                                                         <input type="file" class="form-control" name="signatureUpload" id="signatureUpload" accept="image/*">
                                                     </div>
                                                     <div id="previewBox" class="border mt-3 d-flex justify-content-center align-items-center" 
@@ -283,40 +259,7 @@
             </div>
             <div class="modal-body">
                 <div class="collapse multi-collapse show">
-                    {{-- <div class="address-check-block">
-                        @foreach ($customer_list as $customer)
-                            <div class="address-check border rounded p-3">
-                                <div class="form-check">
-                                    <input type="radio" name="customer_select" class="form-check-input input-primary"
-                                        id="customer-{{ $customer->id }}" value="{{ $customer->id }}"
-                                        data-name="{{ $customer->cust_name }}"
-                                        data-address1="{{ $customer->cust_bill_addone }}"
-                                        data-address2="{{ $customer->cust_bill_addtwo }}"
-                                        data-city="{{ $customer->cust_bill_city }}"
-                                        data-state="{{ $customer->cust_bill_state }}"
-                                        data-pincode="{{ $customer->cust_bill_pin }}"
-                                        data-phone="{{ $customer->cust_phone }}"
-                                        data-email="{{ $customer->cust_email }}"
-                                        data-gst="{{ $customer->cust_gst_no }}">
-                    
-                                    <label class="form-check-label d-block" for="customer-{{ $customer->id }}">
-                                        <span class="h6 mb-0 d-block">{{ $customer->cust_name }}</span>
-                                        <span class="text-muted address-details">
-                                            {{ $customer->cust_bill_addone }}<br>
-                                            {{ $customer->cust_bill_addtwo }}<br>
-                                            {{ $customer->cust_bill_city }}, {{ $customer->cust_bill_state }}, {{ $customer->cust_bill_pin }}
-                                        </span>
-                                        <span class="text-muted address-details">{{ $customer->cust_phone }}</span>
-                                        <span class="text-muted address-details">{{ $customer->cust_email }}</span>
-                                        <span class="text-muted address-details"><strong>GST:</strong> {{ $customer->cust_gst_no }}</span>
-                                    </label>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div> --}}
-                    
-                    
-                    
+
                 </div>
 
 
@@ -365,12 +308,12 @@
                                     <input type="email" class="form-control" id="email">
                                 </div>
                             </div>
-                            <div class="mb-3 row">
+                            <!--<div class="mb-3 row">
                                 <label class="col-lg-4 col-form-label">GST Number :<small class="text-muted d-block">Enter GST Number</small></label>
                                 <div class="col-lg-8">
                                     <input type="text" class="form-control" id="gstNumber">
                                 </div>
-                            </div>
+                            </div>-->
                             <div class="text-end btn-page mb-0 mt-4">
                                 <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target=".multi-collapse">Cancel</button>
                                 <button class="btn btn-primary" id="saveAddress">Save & Deliver to this Address</button>
@@ -679,9 +622,6 @@
     const subTotalElement = document.querySelector(".subTotal"); 
     const discountAmountElement = document.querySelector(".discountAmount");
     const grandTotalElement = document.querySelector(".grandTotal");
-    const totalCgstElement = document.querySelector(".totalCgst");
-    const totalSgstElement = document.querySelector(".totalSgst");
-    const totalIgstElement = document.querySelector(".totalIgst");
 
     const maxRows = 10;
 
@@ -693,23 +633,10 @@
 
         document.querySelectorAll("#tableBody tr").forEach(row => {
             let price = parseFloat(row.querySelector("td:nth-child(3) input").value) || 0;
-            let qty = parseFloat(row.querySelector("td:nth-child(5) input").value) || 0;
-            let gstMode = row.querySelector("td:nth-child(6) select").value;
-
+            let qty = parseFloat(row.querySelector("td:nth-child(4) input").value) || 0;
             let totalAmount = price * qty;
             let cgst = 0, sgst = 0, igst = 0;
-
-            if (gstMode === "Intra State") {
-                cgst = totalAmount * 0.09;
-                sgst = totalAmount * 0.09;
-            } else if (gstMode === "Inter State" || gstMode === "Union Territory") {
-                igst = totalAmount * 0.18;
-            }
-
-            row.querySelector("td:nth-child(7)").textContent = `₹ ${cgst.toFixed(2)}`;
-            row.querySelector("td:nth-child(8)").textContent = `₹ ${sgst.toFixed(2)}`;
-            row.querySelector("td:nth-child(9)").textContent = `₹ ${igst.toFixed(2)}`;
-            row.querySelector("td:nth-child(10)").textContent = `₹ ${(totalAmount + cgst + sgst + igst).toFixed(2)}`;
+            row.querySelector("td:nth-child(5)").textContent = `₹ ${(totalAmount + cgst + sgst + igst).toFixed(2)}`;
 
             subTotal += totalAmount;
             totalCGST += cgst;
@@ -745,9 +672,6 @@
 
         subTotalElement.textContent = `₹ ${subTotal.toFixed(2)}`;
         discountAmountElement.textContent = `₹ ${discountAmount.toFixed(2)}`;
-        totalCgstElement.textContent = `₹ ${totalCGST.toFixed(2)}`;
-        totalSgstElement.textContent = `₹ ${totalSGST.toFixed(2)}`;
-        totalIgstElement.textContent = `₹ ${totalIGST.toFixed(2)}`;
         grandTotalElement.textContent = `₹ ${grandTotal.toFixed(2)}`;
 
     }
@@ -768,22 +692,10 @@
             const newRow = document.createElement("tr");
             newRow.innerHTML = `
                 <td>${rowCount + 1}</td>
-                <td><input type="text" class="form-control" autocomplete="off" placeholder="Name"></td>
-                <td><input type="number" class="form-control" placeholder="Price"></td>
-                <td><input type="number" class="form-control" placeholder="HSN/ SAC Code"></td>
-                <td><input type="number" class="form-control" placeholder="Quantity"></td>
-                <td>
-                    <select class="form-select">
-                        <option value="">Select</option>
-                        <option value="Intra State">Intra State</option>
-                        <option value="Inter State">Inter State</option>
-                        <option value="Union Territory">Union Territory</option>
-                    </select>
-                </td>
-                <td>₹ 0.00</td>
-                <td>₹ 0.00</td>
-                <td>₹ 0.00</td>
-                <td>₹ 0.00</td>
+                <td><input type="text" class="form-control product-name" autocomplete="off" placeholder="Name"></td>
+                <td><input type="number" class="form-control price" placeholder="Price"></td>
+                <td><input type="number" class="form-control quantity" placeholder="Quantity"></td>
+                <td class="total-amount">₹ 0.00</td>
                 <td class="text-center">
                     <a href="#" class="delete-row"><i class="ti ti-trash f-20"></i></a>
                 </td>
@@ -894,7 +806,7 @@
         document.getElementById("issuedPincode").textContent = selectedCustomer.getAttribute("data-pincode");
         document.getElementById("issuedPhone").textContent = selectedCustomer.getAttribute("data-phone");
         document.getElementById("issuedEmail").textContent = selectedCustomer.getAttribute("data-email");
-        document.getElementById("issuedGST").textContent = selectedCustomer.getAttribute("data-gst");
+        //document.getElementById("issuedGST").textContent = selectedCustomer.getAttribute("data-gst");
         
         // Pre-fill the form in modal
         document.getElementById("editName").value = selectedCustomer.getAttribute("data-name");
@@ -933,7 +845,7 @@
         let pincode = document.getElementById("pincode").value;
         let phone = document.getElementById("phone").value;
         let email = document.getElementById("email").value;
-        let gst = document.getElementById("gstNumber").value;
+        //let gst = document.getElementById("gstNumber").value;
         
         // Update the issuedToDetails section
         document.getElementById("issuedName").innerText = name || "-";
@@ -943,7 +855,7 @@
         document.getElementById("issuedPincode").innerText = pincode || "-";
         document.getElementById("issuedPhone").innerText = phone || "-";
         document.getElementById("issuedEmail").innerText = email || "-";
-        document.getElementById("issuedGST").innerText = gst || "-";
+        //document.getElementById("issuedGST").innerText = gst || "-";
         
         // Hide the form after saving
         document.querySelector('.multi-collapse').classList.remove('show');
@@ -970,7 +882,7 @@
         document.getElementById("pincode").value = "";
         document.getElementById("phone").value = "";
         document.getElementById("email").value = "";
-        document.getElementById("gstNumber").value = "";
+        //document.getElementById("gstNumber").value = "";
         }
         
         // Function to reset customer selection
@@ -1090,7 +1002,7 @@
         var pincode = selectedCustomer.length ? selectedCustomer.data('pincode') : $('#pincode').val().trim();
         var customer_phone = selectedCustomer.length ? selectedCustomer.data('phone') : $('#phone').val().trim();
         var customer_email = selectedCustomer.length ? selectedCustomer.data('email') : $('#email').val().trim();
-        var customer_gst = selectedCustomer.length ? selectedCustomer.data('gst') : $('#gstNumber').val().trim();
+        //var customer_gst = selectedCustomer.length ? selectedCustomer.data('gst') : $('#gstNumber').val().trim();
 
         //---------- Bank Add --------
         var selectedBank = $('input[name="radio1"]:checked');
@@ -1112,31 +1024,33 @@
         var company_phone = "{{ $comp_details[0]->comp_phone ?? '' }}";
         var company_email = "{{ $comp_details[0]->comp_email ?? '' }}";
         var company_gst = "{{ $comp_details[0]->gst_no ?? '' }}";
+		
+		// Validate Invoice Number
+		if (invoice_number === '') {
+			showToast('Please enter Invoice Number.', 'error');
+			$('#invoice_number').focus();
+			return false;
+		}
 
-
+		// Validate Payment Status
+		if (payment_status === '' || payment_status === null) {
+			showToast('Please select Payment Status.', 'error');
+			$('#paymentStatus').focus();
+			return false;
+		}
 
         // Collecting invoice items dynamically
         var items = [];
-        $('#tableBody tr').each(function () {
-            var product_name = $(this).find('td:nth-child(2) input').val();
-            var price = $(this).find('td:nth-child(3) input').val().replace(/[^\d.]/g, ''); // Remove ₹
-            var hsn_sac = $(this).find('td:nth-child(4) input').val();
-            var quantity = $(this).find('td:nth-child(5) input').val();
-            var gst_mode = $(this).find('td:nth-child(6) select').val();
-            var cgst = $(this).find('td:nth-child(7)').text().trim().replace(/[^\d.]/g, ''); // Remove ₹
-            var sgst = $(this).find('td:nth-child(8)').text().trim().replace(/[^\d.]/g, ''); // Remove ₹
-            var igst = $(this).find('td:nth-child(9)').text().trim().replace(/[^\d.]/g, ''); // Remove ₹
-            var total = $(this).find('td:nth-child(10)').text().trim().replace(/[^\d.]/g, ''); // Remove ₹
+        $('#tableBody tr').each(function () {			
+			var product_name = $(this).find('.product-name').val().trim();
+			var price = $(this).find('.price').val().replace(/[^\d.]/g, '');
+			var quantity = $(this).find('.quantity').val();
+			var total = $(this).find('.total-amount').text().trim().replace(/[^\d.]/g, '');
 
             items.push({
                 product_name: product_name,
                 price: price,
-                hsn_sac: hsn_sac,
                 quantity: quantity,
-                gst_mode: gst_mode,
-                cgst: cgst,
-                sgst: sgst,
-                igst: igst,
                 total: total
             });
         });
@@ -1166,7 +1080,7 @@
         formData.append('issued_to_contact_no', customer_phone);
         formData.append('issued_to_email_address', customer_email);
         // formData.append('customer_pan', customer_pan);
-        formData.append('issued_to_gst', customer_gst);
+        //formData.append('issued_to_gst', customer_gst);
 
         //------ Add bank details to FormData ----------
         formData.append('bank_name', bankName);

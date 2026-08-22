@@ -318,7 +318,7 @@
                     <p class="party-desc"><strong>Contact:</strong> {{ $invoice->issued_by_contact_no }}</p>
                 @endif
                 @if(!empty($invoice->issued_by_gst))
-                    <p class="party-desc"><strong>GSTIN:</strong> {{ $invoice->issued_by_gst }}</p>
+                    <!--<p class="party-desc"><strong>GSTIN:</strong> {{ $invoice->issued_by_gst }}</p>-->
                 @endif
             </td>
 
@@ -327,12 +327,16 @@
                 <div class="box-title">Issued To (Customer)</div>
                 <div class="party-name">{!! $invoice->issued_to_company_name ?? 'N/A' !!}</div>
                 <p class="party-desc">{{ $invoice->issued_to_address1 }} {{ $invoice->issued_to_address2 ? ', '.$invoice->issued_to_address2 : '' }}</p>
-                <p class="party-desc">{{ $invoice->issued_to_city }} {{ $invoice->issued_to_state ? ', '.$invoice->issued_to_state : '' }} {{ $invoice->issued_to_pincode ? '- '.$invoice->issued_to_pincode : '' }}</p>
+                <p class="party-desc">
+					{{ !empty($invoice->issued_to_city) && strtolower(trim($invoice->issued_to_city)) !== 'null' ? $invoice->issued_to_city : '' }}
+					{{ !empty($invoice->issued_to_state) && strtolower(trim($invoice->issued_to_state)) !== 'null' ? ', '.$invoice->issued_to_state : '' }}
+					{{ !empty($invoice->issued_to_pincode) && strtolower(trim($invoice->issued_to_pincode)) !== 'null' ? ' - '.$invoice->issued_to_pincode : '' }}
+				</p>
                 @if(!empty($invoice->issued_to_contact_no))
                     <p class="party-desc"><strong>Contact:</strong> {{ $invoice->issued_to_contact_no }}</p>
                 @endif
                 @if(!empty($invoice->issued_to_gst))
-                    <p class="party-desc"><strong>GSTIN:</strong> {{ $invoice->issued_to_gst }}</p>
+                    <!--<p class="party-desc"><strong>GSTIN:</strong> {{ $invoice->issued_to_gst }}</p>-->
                 @endif
             </td>
         </tr>
@@ -343,12 +347,9 @@
         <thead>
             <tr>
                 <th style="width: 4%; text-align: center;">#</th>
-                <th style="width: 32%;">Product / Service</th>
-                <th style="width: 12%;">HSN / SAC</th>
+                <th style="width: 32%;">Product / Service</th>            
                 <th style="width: 7%; text-align: center;">Qty</th>
                 <th style="width: 14%; text-align: right;">Price</th>
-                <th style="width: 14%; text-align: right;">CGST</th>
-                <th style="width: 14%; text-align: right;">SGST</th>
                 <th style="width: 17%; text-align: right;">Total Amount</th>
             </tr>
         </thead>
@@ -371,11 +372,8 @@
                     <tr>
                         <td class="text-center">{{ $k + 1 }}</td>
                         <td><strong>{{ $product->product_name }}</strong></td>
-                        <td>{{ $product->hsn_sac_code ?? 'N/A' }}</td>
                         <td class="text-center">{{ $product->quantity }}</td>
-                        <td class="text-right nowrap"><span class="r-sym">&#8377;</span>{{ number_format((float)$product->price, 2) }}</td>
-                        <td class="text-right nowrap"><span class="r-sym">&#8377;</span>{{ number_format((float)$product->cgst, 2) }}</td>
-                        <td class="text-right nowrap"><span class="r-sym">&#8377;</span>{{ number_format((float)$product->sgst, 2) }}</td>
+                        <td class="text-right nowrap"><span class="r-sym">&#8377;</span>{{ number_format((float)$product->price, 2) }}</td>                        
                         <td class="text-right nowrap"><strong><span class="r-sym">&#8377;</span>{{ number_format((float)$product->total_price, 2) }}</strong></td>
                     </tr>
                 @endforeach

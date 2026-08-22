@@ -13,13 +13,13 @@
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Purchase & Procurement</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('user.PurchaseCreditDebit') }}">Credit & Debit Note</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">View Credit/Debit Note</li>
+                        <li class="breadcrumb-item"><a href="{{ route('user.PurchaseCreditDebit') }}">Debit Note</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">View Debit Note</li>
                     </ul>
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
-                        <h2 class="mb-0">View Purchase Credit Debit</h2>
+                        <h2 class="mb-0">View Purchase Debit</h2>
                     </div>
                 </div>
             </div>
@@ -27,7 +27,7 @@
     </div>
     <!-- [ breadcrumb ] end -->
     <div class="row align-item-center mb-4">
-        <h2 class="text-muted">View Purchase Credit Debit</h2>
+        <h2 class="text-muted">View Purchase Debit</h2>
     </div>
     <div class="card">
         <div class="card-body">

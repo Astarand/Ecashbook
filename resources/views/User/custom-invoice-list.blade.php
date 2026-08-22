@@ -17,13 +17,21 @@
                         <u>How does this Page works?</u>
                     </a>
                 </div>
-                <div class="col-md-4">
-                    <div class="page-header-title">
-                        <h2 class="mb-0">Custom Invoice List</h2>
-                    </div>
-                </div>
+				<div class="col-md-9 d-flex align-items-center">
+					<div class="page-header-title me-3 text-nowrap">
+						<h4 class="mb-0">Custom Invoice List</h4>
+					</div>
+
+					<div class="text-info border-start border-info ps-3 d-flex align-items-center">
+						<i class="ti ti-info-circle me-2"></i>
+						<span>
+							This is a non-accounting document. No accounting, ledger, GST liability,
+							receivable or revenue entry will be generated from this document.
+						</span>
+					</div>
+				</div>
 				@if (Auth::user()->u_type != 3 || Auth::user()->u_type != 6)
-                <div class="col-md-8 text-end">
+                <div class="col-md-3 text-end">
                     <a href="{{ route('user.GenerateCustomInvoice') }}" id="generate-custom-invoice-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Generate New Invoice</a>
                 </div>
 				@endif
@@ -47,8 +55,6 @@
                                 <th>Customer Name</th>
                                 <th>Quantity</th>
                                 <th>Total Amount</th>
-                                <th>Total GST</th>
-                                <th>Customer Type</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -61,18 +67,7 @@
 									<td><span class="text-muted text-hover-primary">{{ $invoice->invoice_number }}</span></td>
                                     <td><a class="text-muted text-hover-primary" href="#">{{ $invoice->issued_to_company_name }}</a></td>
 									<td>{{ $invoice->total_quantity }}</td>
-									<td>₹ {{ number_format($invoice->total_amount, 2) }}</td>
-									<td>₹ {{ number_format($invoice->total_gst, 2) }}</td>
-                                    <td>
-                                        @if(empty($invoice->cust_id))
-                                            <span class="badge bg-ash-gray text-gray">
-                                                Not-Attached
-                                            </span>
-                                        @else
-                                            <span class="badge bg-success">
-                                                Attached
-                                            </span>
-                                    @endif</td>
+									<td>₹ {{ number_format($invoice->total_amount, 2) }}</td>                                    
                                     <td>
                                         
                                         <span class="badge {{ $invoice->status == '1' ? 'bg-success' : 'bg-danger' }}">

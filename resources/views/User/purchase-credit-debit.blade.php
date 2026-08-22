@@ -12,7 +12,7 @@
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Purchase & Procurement</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Purchase Credit & Debit List</li>
+                        <li class="breadcrumb-item active" aria-current="page">Purchase Debit List</li>
                     </ul>
                     <a href="javascript:void(0);" id="start-purchase-credit-debit-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
                         <u>How does this Page works?</u>
@@ -20,11 +20,11 @@
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
-                        <h2 class="mb-0">Purchase Credit & Debit List</h2>
+                        <h2 class="mb-0">Purchase Debit List</h2>
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
-                    <a href="{{ route('user.AddPurchaseCreditDebit') }}" id="add-purchase-credit-debit-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Credit / Debit Note</a>
+                    <a href="{{ route('user.AddPurchaseCreditDebit') }}" id="add-purchase-credit-debit-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Debit Note</a>
                 </div>
             </div>
         </div>

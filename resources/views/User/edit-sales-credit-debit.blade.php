@@ -14,8 +14,8 @@
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Sales & Revenue</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('user.SalesCreditDebit') }}">Credit & Debit Note</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit Credit/Debit Note</li>
+                        <li class="breadcrumb-item"><a href="{{ route('user.SalesCreditDebit') }}">Credit Note</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Credit Note</li>
                     </ul>
                     <a href="javascript:void(0);" id="start-edit-sales-credit-debit-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
                         <u>How does this Page works?</u>
@@ -24,7 +24,7 @@
                 </div>
                 <div class="col-md-12">
                     <div class="page-header-title">
-                        <h2 class="mb-0">Edit Credit/Debit Note</h2>
+                        <h2 class="mb-0">Edit Credit Note</h2>
                     </div>
                 </div>
             </div>
@@ -32,7 +32,7 @@
     </div>
     <!-- [ breadcrumb ] end -->
     <div class="row align-item-center mb-4">
-        <h2 class="text-muted">Edit Credit Debit</h2>
+        <h2 class="text-muted">Edit Credit</h2>
     </div>
     <div class="card">
         <div class="card-body">

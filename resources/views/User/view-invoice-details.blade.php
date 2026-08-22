@@ -37,7 +37,7 @@
                   <p class="mb-1 text-muted" style="font-size: 0.88rem;"><strong>Contact:</strong> {{ $invoice->issued_by_contact_no }}</p>
                 @endif
                 @if(!empty($invoice->issued_by_gst))
-                  <p class="mb-0 text-muted" style="font-size: 0.88rem;"><strong>GSTIN:</strong> {{ $invoice->issued_by_gst }}</p>
+                  <!--<p class="mb-0 text-muted" style="font-size: 0.88rem;"><strong>GSTIN:</strong> {{ $invoice->issued_by_gst }}</p>-->
                 @endif
               </div>
             </div>
@@ -46,13 +46,25 @@
               <div class="border rounded-3 p-3 h-100 bg-light-subtle">
                 <h6 class="mb-2 fw-bold text-primary">Issued To (Customer):</h6>
                 <h5 class="fw-bold mb-1 text-dark">{{ $invoice->issued_to_company_name ?? 'N/A' }}</h5>
-                <p class="mb-1 text-muted" style="font-size: 0.88rem;">{{ $invoice->issued_to_address1 }} {{ $invoice->issued_to_address2 ? ', '.$invoice->issued_to_address2 : '' }}</p>
-                <p class="mb-1 text-muted" style="font-size: 0.88rem;">{{ $invoice->issued_to_city }} {{ $invoice->issued_to_state ? ', '.$invoice->issued_to_state : '' }} {{ $invoice->issued_to_pincode ? '- '.$invoice->issued_to_pincode : '' }}</p>
+                <p class="mb-1 text-muted" style="font-size: 0.88rem;">{{ $invoice->issued_to_address1 ?? '' }} {{ $invoice->issued_to_address2 ? ', '.$invoice->issued_to_address2 : '' }}</p>
+                <p class="mb-1 text-muted" style="font-size: 0.88rem;">
+					@if(!empty($invoice->issued_to_city) && strtolower(trim($invoice->issued_to_city)) !== 'null')
+						{{ $invoice->issued_to_city }}
+					@endif
+
+					@if(!empty($invoice->issued_to_state) && strtolower(trim($invoice->issued_to_state)) !== 'null')
+						, {{ $invoice->issued_to_state }}
+					@endif
+
+					@if(!empty($invoice->issued_to_pincode) && strtolower(trim($invoice->issued_to_pincode)) !== 'null')
+						- {{ $invoice->issued_to_pincode }}
+					@endif
+				</p>
                 @if(!empty($invoice->issued_to_contact_no))
                   <p class="mb-1 text-muted" style="font-size: 0.88rem;"><strong>Contact:</strong> {{ $invoice->issued_to_contact_no }}</p>
                 @endif
                 @if(!empty($invoice->issued_to_gst))
-                  <p class="mb-0 text-muted" style="font-size: 0.88rem;"><strong>GSTIN:</strong> {{ $invoice->issued_to_gst }}</p>
+                  <!--<p class="mb-0 text-muted" style="font-size: 0.88rem;"><strong>GSTIN:</strong> {{ $invoice->issued_to_gst }}</p>-->
                 @endif
               </div>
             </div>
@@ -64,12 +76,9 @@
                   <thead class="table-light">
                     <tr>
                       <th style="width: 5%;">#</th>
-                      <th style="width: 35%;">Product / Service</th>
-                      <th style="width: 15%;">HSN / SAC</th>
+                      <th style="width: 35%;">Product / Service</th>                      
                       <th style="width: 10%;">Qty</th>
                       <th style="width: 12%;">Price</th>
-                      <th style="width: 10%;">CGST</th>
-                      <th style="width: 10%;">SGST</th>
                       <th style="width: 13%;" class="text-end">Total Amount</th>
                     </tr>
                   </thead>
@@ -90,12 +99,9 @@
                     @endphp
                     <tr>
                       <td>{{ $key + 1 }}</td>
-                      <td><span class="fw-semibold text-dark">{{ $product->product_name }}</span></td>
-                      <td><span class="badge bg-light text-dark border">{{ $product->hsn_sac_code ?? 'N/A' }}</span></td>
+                      <td><span class="fw-semibold text-dark">{{ $product->product_name }}</span></td>                      
                       <td>{{ $product->quantity }}</td>
                       <td>₹{{ number_format((float)$product->price, 2) }}</td>
-                      <td>₹{{ number_format((float)$product->cgst, 2) }}</td>
-                      <td>₹{{ number_format((float)$product->sgst, 2) }}</td>
                       <td class="text-end fw-bold">₹{{ number_format((float)$product->total_price, 2) }}</td>
                     </tr>
                     @endforeach
@@ -187,17 +193,25 @@
             <div class="col-12">
               <div class="row justify-content-end mt-3">
                 <div class="col-sm-4 text-end">
-                  @php
-                      $sigSrc = '';
-                      if (!empty($invoice->upload_signature)) {
-                          $sigFile = $invoice->upload_signature;
-                          if (file_exists(public_path('storage/custom_invoice_img/' . $sigFile))) {
-                              $sigSrc = asset('storage/custom_invoice_img/' . $sigFile);
-                          } elseif (file_exists(public_path('uploads/custom_invoice_img/' . $sigFile))) {
-                              $sigSrc = asset('uploads/custom_invoice_img/' . $sigFile);
-                          }
-                      }
-                  @endphp
+					@php
+						$sigSrc = '';
+						if (!empty($invoice->upload_signature)) {
+							$sigFile = $invoice->upload_signature;
+							$sigPath = null;
+							if (file_exists(public_path('storage/custom_invoice_img/' . $sigFile))) {
+								$sigPath = public_path('storage/custom_invoice_img/' . $sigFile);
+							} elseif (file_exists(storage_path('app/public/custom_invoice_img/' . $sigFile))) {
+								$sigPath = storage_path('app/public/custom_invoice_img/' . $sigFile);
+							} elseif (file_exists(public_path('uploads/custom_invoice_img/' . $sigFile))) {
+								$sigPath = public_path('uploads/custom_invoice_img/' . $sigFile);
+							}
+							if (!empty($sigPath) && file_exists($sigPath)) {
+								$sigData = base64_encode(file_get_contents($sigPath));
+								$sigMime = mime_content_type($sigPath) ?: 'image/png';
+								$sigSrc = 'data:' . $sigMime . ';base64,' . $sigData;
+							}
+						}
+					@endphp
                   <div style="height: 55px; min-height: 55px; margin-bottom: 5px;" class="d-flex align-items-end justify-content-end">
                     @if(!empty($sigSrc))
                       <img src="{{ $sigSrc }}" class="img-fluid" alt="Signature" style="max-height: 50px; width: auto; object-fit: contain;">

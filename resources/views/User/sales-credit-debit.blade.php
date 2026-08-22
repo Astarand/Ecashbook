@@ -12,7 +12,7 @@
                         <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="">Accounting & Finance</a></li>
                         <li class="breadcrumb-item"><a href="">Sales & Revenue</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Credit & Debit Note</li>
+                        <li class="breadcrumb-item active" aria-current="page">Credit Note</li>
                     </ul>
                     <a href="javascript:void(0);" id="start-sales-credit-debit-tour" class="text-primary d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.95rem;">
                         <u>How does this Page works?</u>
@@ -20,12 +20,12 @@
                 </div>
                 <div class="col-md-4">
                     <div class="page-header-title">
-                        <h2 class="mb-0">Sales Credit & Debit List</h2>
+                        <h2 class="mb-0">Sales Credit List</h2>
                     </div>
                 </div>
                 <div class="col-md-8 text-end">
                     @if(Auth::user()->u_type == 2 || Auth::user()->u_type == 5)
-                    <a href="{{ route('user.AddSalesCreditDebit') }}" id="add-credit-debit-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Credit / Debit Note</a>
+                    <a href="{{ route('user.AddSalesCreditDebit') }}" id="add-credit-debit-btn" class="btn btn-primary"><i class="ti ti-square-plus"></i> Add New Credit Note</a>
                     @endif
                 </div>
             </div>
