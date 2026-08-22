@@ -355,15 +355,14 @@
                             </div>
                             
                             {{-- Action Buttons for Register Tab --}}
-                            {{-- <div class="d-flex justify-content-end gap-3 align-items-center mt-3 pt-3 border-top">
+                            <div class="d-flex justify-content-end gap-3 align-items-center mt-3 pt-3 border-top">
                                 <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                     <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
                                 </button>
                                 <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                     <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
                                 </button>
-                                
-                            </div> --}}
+                            </div>
                         </div>
 
                         {{-- TAB 2: ATTENDANCE & LEAVE --}}
@@ -391,15 +390,14 @@
                             </div>
 
                             {{-- Action Buttons for Attendance Tab --}}
-                            {{-- <div class="d-flex justify-content-end gap-3 align-items-center mt-3 pt-3 border-top">
+                            <div class="d-flex justify-content-end gap-3 align-items-center mt-3 pt-3 border-top">
                                 <button onclick="exportToPDF()" class="btn custom-action-btn-pdf px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                     <i class="ph-duotone ph-file-pdf fs-4"></i> Export PDF
                                 </button>
                                 <button onclick="exportToExcel()" class="btn custom-action-btn-excel px-4 py-2 rounded-3 d-flex align-items-center gap-2 fw-bold border-0 shadow-sm" style="transition: all 0.2s ease;">
                                     <i class="ph-duotone ph-file-xls fs-4"></i> Export Excel
                                 </button>
-                                
-                            </div> --}}
+                            </div>
                         </div>
 
                         {{-- TAB 3: SUMMARIES & DOWNLOADS --}}
@@ -1700,37 +1698,82 @@
             window.print();
         }
 
+        function getActiveExportContext() {
+            const activeTab = document.querySelector('.tab-pane.active');
+            const monthText   = document.querySelector('.active-month-text')?.textContent?.trim() || '';
+            const companyName = document.getElementById('reportCompanyHeader')?.textContent?.trim() || 'Company';
+
+            if (activeTab && activeTab.id === 'register') {
+                const table = document.getElementById('payrollRegisterTable');
+                return {
+                    table: table,
+                    title: 'Payroll Register',
+                    monthText: monthText,
+                    companyName: companyName
+                };
+            }
+
+            if (activeTab && activeTab.id === 'attendance') {
+                const table = document.getElementById('payrollAttendance');
+                return {
+                    table: table,
+                    title: 'Attendance and Leave Register',
+                    monthText: monthText,
+                    companyName: companyName
+                };
+            }
+
+            // Tab 3: Summaries
+            const section = document.querySelector('.summary-table-section:not(.d-none)');
+            if (!section) return null;
+
+            let table = Array.from(section.querySelectorAll('table')).find(t => {
+                return t.offsetParent !== null || !t.closest('.d-none');
+            }) || section.querySelector('table');
+
+            const reportTitle = document.getElementById('summaryBadge')?.textContent?.trim() || 'Payroll Report';
+
+            return {
+                table: table,
+                title: reportTitle,
+                monthText: monthText,
+                companyName: companyName
+            };
+        }
+
         // Export PDF Handler
         function exportToPDF() {
-            // Find the currently visible summary section
-            const section = document.querySelector('.summary-table-section:not(.d-none)');
-            if (!section) { alert('No report visible to export.'); return; }
+            const ctx = getActiveExportContext();
+            if (!ctx || !ctx.table) { alert('No report visible to export.'); return; }
 
-            const table = section.querySelector('table');
-            if (!table) { alert('No table found in this report.'); return; }
-
-            // Report title from the badge
-            const reportTitle = document.getElementById('summaryBadge')?.textContent?.trim() || 'Payroll Report';
-            const monthText   = document.querySelector('.active-month-text')?.textContent?.trim() || '';
-            const companyName = document.getElementById('reportCompanyHeader')?.textContent?.trim() || '';
+            const table = ctx.table;
+            const reportTitle = ctx.title;
+            const monthText = ctx.monthText;
+            const companyName = ctx.companyName;
 
             // Collect headers
             const headers = [];
             table.querySelectorAll('thead tr').forEach(tr => {
                 const row = [];
                 tr.querySelectorAll('th').forEach(th => row.push(th.innerText.trim()));
-                headers.push(row);
+                if (row.length) headers.push(row);
             });
 
             // Collect body rows
             const body = [];
             table.querySelectorAll('tbody tr').forEach(tr => {
+                if (tr.querySelector('td[colspan]')) return; // Skip placeholder/loading rows
                 const row = [];
                 tr.querySelectorAll('td').forEach(td => row.push(td.innerText.trim()));
                 if (row.some(c => c !== '')) body.push(row);
             });
 
             if (!body.length) { alert('No data rows to export.'); return; }
+
+            if (typeof window.jspdf === 'undefined') {
+                alert('PDF library not loaded. Please refresh the page.');
+                return;
+            }
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
@@ -1744,15 +1787,17 @@
             doc.text(reportTitle + (monthText ? '  ·  ' + monthText : ''), 14, 21);
             doc.text('Generated on: ' + new Date().toLocaleDateString('en-IN'), 14, 27);
 
-            doc.autoTable({
-                head: headers,
-                body: body,
-                startY: 32,
-                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-                headStyles: { fillColor: [66, 47, 144], textColor: 255, fontStyle: 'bold' },
-                alternateRowStyles: { fillColor: [245, 245, 250] },
-                margin: { left: 14, right: 14 },
-            });
+            if (typeof doc.autoTable === 'function') {
+                doc.autoTable({
+                    head: headers,
+                    body: body,
+                    startY: 32,
+                    styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                    headStyles: { fillColor: [66, 47, 144], textColor: 255, fontStyle: 'bold' },
+                    alternateRowStyles: { fillColor: [245, 245, 250] },
+                    margin: { left: 14, right: 14 },
+                });
+            }
 
             const fileName = reportTitle.replace(/\s+/g, '_') + (monthText ? '_' + monthText.replace(/\s+/g, '_') : '') + '.pdf';
             doc.save(fileName);
@@ -1760,15 +1805,13 @@
 
         // Export Excel Handler
         function exportToExcel() {
-            const section = document.querySelector('.summary-table-section:not(.d-none)');
-            if (!section) { alert('No report visible to export.'); return; }
+            const ctx = getActiveExportContext();
+            if (!ctx || !ctx.table) { alert('No report visible to export.'); return; }
 
-            const table = section.querySelector('table');
-            if (!table) { alert('No table found in this report.'); return; }
-
-            const reportTitle = document.getElementById('summaryBadge')?.textContent?.trim() || 'Payroll Report';
-            const monthText   = document.querySelector('.active-month-text')?.textContent?.trim() || '';
-            const companyName = document.getElementById('reportCompanyHeader')?.textContent?.trim() || '';
+            const table = ctx.table;
+            const reportTitle = ctx.title;
+            const monthText = ctx.monthText;
+            const companyName = ctx.companyName;
 
             // Build worksheet data: company/title rows then table rows
             const wsData = [];
@@ -1781,17 +1824,27 @@
             table.querySelectorAll('thead tr').forEach(tr => {
                 const row = [];
                 tr.querySelectorAll('th').forEach(th => row.push(th.innerText.trim()));
-                wsData.push(row);
+                if (row.length) wsData.push(row);
             });
 
             // Body
+            let bodyRowCount = 0;
             table.querySelectorAll('tbody tr').forEach(tr => {
+                if (tr.querySelector('td[colspan]')) return; // Skip placeholder/loading rows
                 const row = [];
                 tr.querySelectorAll('td').forEach(td => row.push(td.innerText.trim()));
-                if (row.some(c => c !== '')) wsData.push(row);
+                if (row.some(c => c !== '')) {
+                    wsData.push(row);
+                    bodyRowCount++;
+                }
             });
 
-            if (wsData.length <= 5) { alert('No data rows to export.'); return; }
+            if (bodyRowCount === 0) { alert('No data rows to export.'); return; }
+
+            if (typeof XLSX === 'undefined') {
+                alert('Excel library not loaded.');
+                return;
+            }
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(wsData);
